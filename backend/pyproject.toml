@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "zeno_backend"
+version = "0.1.0"
+description = ""
+authors = ["Zeno"]
+readme = "README.md"
+packages = [{include = "zeno_backend"}]
+homepage = "https://zenoml.com"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = ">=0.95.1,<0.98.0"
+inquirer = "^3.1.2"
+nest-asyncio = "^1.5.6"
+opentsne = ">=0.7.1,<1.1.0"
+pandas = "^2.0.0"
+pathos = "^0.3.0"
+requests = "^2.28.1"
+setuptools = "*"
+tomli = "^2.0.1"
+tqdm = "^4.64.0"
+uvicorn = "^0.22.0"
+websockets = "^11.0"
+zeno-sliceline = "^0.0.1"
+toml = "^0.10.2"
+python-multipart = "^0.0.6"
+aiofiles = "^23.1.0"
+psycopg = "^3.1.9"
+
+[tool.poetry.dev-dependencies]
+black = "^23.3.0"
+httpx = "^0.24.1"
+pyright = "^1.1.314"
+pytest = "^7.3.2"
+ruff = "^0.0.272"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+backend = "zeno_backend.server:serve"
+
+[tool.pyright]
+include = ["zeno_backend"]
+
+[tool.ruff]
+select = ["E", "F", "I", "PD", "N", "D"]
+
+[tool.ruff.pydocstyle]
+convention = "google"

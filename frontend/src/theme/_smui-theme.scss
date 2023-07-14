@@ -1,0 +1,177 @@
+@use 'sass:color';
+
+@use '@material/theme/color-palette';
+
+@use '@material/theme/index' as theme with (
+	$primary: #6a1b9a,
+	$secondary: #989895,
+	$surface: #ffffff,
+	$background: #ffffff,
+	$error: color-palette.$red-900
+);
+
+:root {
+	--G1: #333333;
+	--G2: #73726f;
+	--G3: #989895;
+	--G4: #d3d3d3;
+	--G5: #ebebea;
+	--G6: #ffffff;
+	--logo: #6a1b9a;
+	--P1: #b18bd3;
+	--P2: #d2bae9;
+	--P3: #f7f1fb;
+	--P4: #f9f7fb;
+	--Y1: #f2f2ee;
+	--Y2: #fbfbfa;
+	--N1: #61988e;
+	--N2: #d0ebe6;
+
+	--mdc-theme-primary: var(--G2);
+	--mdc-theme-secondary: var(--G3);
+	--mdc-theme-background: var(--G6);
+	--mdc-theme-surface: var(--G6);
+	--mdc-theme-error: #b71c1c;
+	--mdc-theme-on-primary: var(--G6);
+	--mdc-theme-on-secondary: var(--G6);
+	--mdc-theme-on-surface: var(--G1);
+	--mdc-theme-on-error: var(--G6);
+	--mdc-theme-text-primary-on-background: rgba(0, 0, 0, 0.87);
+	--mdc-theme-text-secondary-on-background: rgba(0, 0, 0, 0.54);
+	--mdc-theme-text-hint-on-background: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-disabled-on-background: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-icon-on-background: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-primary-on-light: rgba(0, 0, 0, 0.87);
+	--mdc-theme-text-secondary-on-light: rgba(0, 0, 0, 0.54);
+	--mdc-theme-text-hint-on-light: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-disabled-on-light: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-icon-on-light: rgba(0, 0, 0, 0.38);
+	--mdc-theme-text-primary-on-dark: white;
+	--mdc-theme-text-secondary-on-dark: rgba(255, 255, 255, 0.7);
+	--mdc-theme-text-hint-on-dark: rgba(255, 255, 255, 0.5);
+	--mdc-theme-text-disabled-on-dark: rgba(255, 255, 255, 0.5);
+	--mdc-theme-text-icon-on-dark: rgba(255, 255, 255, 0.5);
+	--mdc-outlined-button-container-height: 33px;
+}
+
+$mdc-typography-font-family: unquote('Open Sans, Roboto, sans-serif');
+
+.mdc-data-table__table-container {
+	overflow-x: scroll;
+}
+.mdc-data-table__cell {
+	overflow: visible;
+}
+
+.mdc-icon-button__icon {
+	height: 20px;
+	width: 20px;
+}
+
+.mdc-button--outlined {
+	padding-left: 10px;
+	padding-right: 10px;
+	height: 20px;
+}
+
+a {
+	color: #40b3ff;
+}
+a:visited {
+	color: color.scale(#40b3ff, $lightness: -35%);
+}
+
+.overflow-show {
+	overflow: visible;
+}
+
+html,
+body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background-color: theme.$surface;
+	color: theme.$on-surface;
+}
+
+body {
+	color: var(--G1);
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+	font-size: 14px;
+}
+
+.autocomplete-input {
+	min-width: 100px;
+	background: none;
+	border-radius: 5px;
+	border: 1px solid var(--G4);
+	color: var(--G2);
+}
+
+.autocomplete-input:focus {
+	background: white;
+	color: black;
+}
+
+.has-multiSelection {
+	outline: none !important;
+}
+
+.svelecte-control .has-multiSelection .sv-item {
+	--sv-item-selected-bg: var(--P3);
+	--sv-item-btn-bg: var(--P3);
+}
+
+.svelecte-control .has-multiSelection .sv-item-content {
+	max-width: 210px;
+	white-space: break-spaces;
+	overflow-wrap: break-word;
+}
+
+.autocomplete {
+	min-width: 100px !important;
+}
+
+p {
+	font-size: 14px;
+	color: var(--G2);
+}
+
+h4 {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--G2);
+}
+
+h2 {
+	font-weight: 500;
+}
+
+small {
+	font-size: 10px;
+	color: var(--G2);
+}
+.mdc-data-table__pagination {
+	border-top-width: 0px;
+}
+
+table {
+	overflow: visible;
+}
+
+.end-cell {
+	border-right: 1px solid var(--G5);
+}
+
+.remove {
+	cursor: pointer;
+}
+
+.tooltip.zeno-tooltip {
+	--tooltip-background-color: var(--P3);
+	--tooltip-color: var(--G1);
+	--tooltip-font-family: 'Open Sans', 'Roboto', sans-serif;
+}

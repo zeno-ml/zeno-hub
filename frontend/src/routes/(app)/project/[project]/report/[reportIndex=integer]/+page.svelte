@@ -1,0 +1,88 @@
+<script lang="ts">
+	import Encoding from '$lib/components/report/report-page/encoding/Encoding.svelte';
+	import EditHeader from '$lib/components/report/report-page/report-header/EditHeader.svelte';
+	import ViewHeader from '$lib/components/report/report-page/report-header/ViewHeader.svelte';
+	import ViewSelection from '$lib/components/report/report-page/view-selection/ViewSelection.svelte';
+	import { chartMap } from '$lib/components/report/reportUtil.js';
+	import { charts, currentProject } from '$lib/stores.js';
+	import { ZenoService } from '$lib/zenoapi';
+	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
+
+	export let data;
+
+	let isReportEdit = false;
+	let chart = data.chart;
+	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
+
+	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
+
+	function updateChart() {
+		if ($currentProject) {
+			ZenoService.updateChart($currentProject.uuid, chart).then(() => {
+				if ($currentProject)
+					ZenoService.getCharts($currentProject.uuid).then((fetchedCharts) =>
+						charts.set(fetchedCharts)
+					);
+			});
+		}
+	}
+</script>
+
+<div class={isReportEdit ? 'row-flex report-panel' : 'col-flex report-panel'}>
+	{#if isReportEdit}
+		<div class="edit-bar">
+			<EditHeader bind:isReportEdit bind:chart {updateChart} />
+			<ViewSelection bind:chart bind:chartData />
+			<Encoding bind:chart />
+		</div>
+	{:else}
+		<ViewHeader bind:isReportEdit {chart} />
+	{/if}
+	{#if chartData}
+		<div class={isReportEdit ? 'edit-reports reports' : 'reports'}>
+			<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
+		</div>
+	{/if}
+</div>
+
+<style>
+	.report-panel {
+		width: 100%;
+		display: flex;
+		overflow: hidden;
+	}
+
+	.row-flex {
+		flex-direction: row;
+	}
+
+	.col-flex {
+		flex-direction: column;
+	}
+
+	.edit-bar {
+		height: calc(100vh - 15px);
+		width: 370px;
+		min-width: 370px;
+		max-width: 370px;
+		padding-top: 10px;
+		padding-bottom: 0px;
+		padding-left: 15px;
+		padding-right: 15px;
+		overflow-y: scroll;
+		background-color: var(--Y2);
+	}
+
+	.reports {
+		height: calc(100vh - 15px);
+		overflow: auto;
+		display: flex;
+		flex-direction: column;
+		padding-top: 10px;
+		padding-left: 15px;
+	}
+
+	.edit-reports {
+		width: 100%;
+	}
+</style>
