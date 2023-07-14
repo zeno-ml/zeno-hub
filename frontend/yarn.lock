@@ -144,10 +144,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.43.0.tgz#559ca3d9ddbd6bf907ad524320a0d14b85586af0"
   integrity sha512-s2UHCoiXfxMvmfzqoN+vrQ84ahUSYde9qNO1MdxmoEhyHWsfmwOpFlwYV+ePJEVc7gFnATGUi376WowX1N7tFg==
 
-"@flekschas/utils@^0.30.1":
-  version "0.30.1"
-  resolved "https://registry.yarnpkg.com/@flekschas/utils/-/utils-0.30.1.tgz#dbfe251b165718773c62b6593542ce3323d034b5"
-  integrity sha512-JV/bGmX5hsh3uEKgcV9xe1QymrsXGCaWnD387VBB56sQdpsBexs9d2HmcRbN07DYzF+C89sQ1zP1MeLN2YfOZQ==
+"@flekschas/utils@^0.31.0":
+  version "0.31.0"
+  resolved "https://registry.yarnpkg.com/@flekschas/utils/-/utils-0.31.0.tgz#0b8bfbae7e2466288ae4ceb1da6c78ddca1d4e5e"
+  integrity sha512-ejl+9LrhyTbKjokbTHFqlwBZjqMBttD3R4M5t6p6sKcLRBKVn4gDporO76b/yIGQ0esN90G6/+uGNgjpf/AzXA==
 
 "@formkit/auto-animate@^1.0.0-pre-alpha.3":
   version "1.0.0-pre-alpha.3"
@@ -2386,7 +2386,7 @@ prettier@^2.8.0:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
-pub-sub-es@~2.0.1:
+pub-sub-es@~2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/pub-sub-es/-/pub-sub-es-2.0.2.tgz#ad26bbe6ed83ffc53a94a909da67bad0761c2ab3"
   integrity sha512-CQqZaKOGF6tWb+6XUGJNMHFZ308ZrgjNXTR4einx265b/L/yYKNEpcD7PkYLNq3CBV0K3qyIXSbX2Jg63ra9sw==
@@ -2416,17 +2416,17 @@ regl-line@~1.0.0:
     gl-matrix "^3.3.0"
     regl "^2.1.0"
 
-regl-scatterplot@^1.6.10:
-  version "1.6.10"
-  resolved "https://registry.yarnpkg.com/regl-scatterplot/-/regl-scatterplot-1.6.10.tgz#f45397d7ecfbf135919f7665696604ab4fa02fdc"
-  integrity sha512-FEEeeqMN6uvRJh6qvX7tRHdWVsnC1Cnw+m3UsoUc2Cc3gqeNjqLjyPEP/anKrOpgemEobVrbKg/eaHLIl+Vyqw==
+regl-scatterplot@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/regl-scatterplot/-/regl-scatterplot-1.7.1.tgz#b93bb05884679a9f7fc40498584f95d991216382"
+  integrity sha512-fi9Ybz3gh7KQw68lCKhrT1csqVY0ZG5wQhdGFrcdLNOH6BngSGkdYl8mT+q5RB/yVBQBZ3Wif6NHe12YADaWBg==
   dependencies:
-    "@flekschas/utils" "^0.30.1"
+    "@flekschas/utils" "^0.31.0"
     dom-2d-camera "~2.2.5"
     gl-matrix "~3.4.3"
     kdbush "~3.0.0"
     lodash-es "~4.17.21"
-    pub-sub-es "~2.0.1"
+    pub-sub-es "~2.0.2"
     regl "~2.1.0"
     regl-line "~1.0.0"
 
