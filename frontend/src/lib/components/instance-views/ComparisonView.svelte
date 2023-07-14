@@ -2,11 +2,11 @@
 	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import { getEndpoint } from '$lib/config';
 	import {
 		columns,
 		compareSort,
 		comparisonModel,
-		currentProject,
 		metric,
 		model,
 		models,
@@ -251,7 +251,7 @@
 			<tbody>
 				{#each table as tableContent (tableContent['item'])}
 					<tr>
-						{#if $currentProject !== undefined && $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 							<td>
 								<div class="instance">
 									<svelte:component
@@ -259,8 +259,8 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `/${$currentProject?.url}/api/data/${
-												$currentProject.uuid
+											data: `${getEndpoint()}/api/data/${
+												$projectConfig.uuid
 											}?item=${encodeURIComponent(tableContent['item'])}`
 										}}
 										modelColumn={modelAColumn?.id}
@@ -274,8 +274,8 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `/${$currentProject?.url}/api/data/${
-												$currentProject.uuid
+											data: `${getEndpoint()}/api/data/${
+												$projectConfig.uuid
 											}?item=${encodeURIComponent(tableContent['item'])}`
 										}}
 										modelColumn={modelBColumn?.id}

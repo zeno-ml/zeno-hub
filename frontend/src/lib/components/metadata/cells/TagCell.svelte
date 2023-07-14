@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getMetricsForTags } from '$lib/api/tag';
-	import { currentProject, editTag, metric, model, selections, tagIds, tags } from '$lib/stores';
+	import { editTag, metric, model, projectConfig, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -28,8 +28,8 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteTag(tag).then(() => {
-			if ($currentProject !== undefined) {
-				ZenoService.getTags($currentProject.uuid).then((fetchedTags) => tags.set(fetchedTags));
+			if ($projectConfig !== undefined) {
+				ZenoService.getTags($projectConfig.uuid).then((fetchedTags) => tags.set(fetchedTags));
 			}
 		});
 		tagIds.set([]);

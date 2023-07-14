@@ -1,23 +1,23 @@
 <script lang="ts">
-	import Beeswarm from './chart-icons/BeeswarmIcon.svelte';
 	import BarChart from './chart-icons/BarChartIcon.svelte';
-	import LineChart from './chart-icons/LineChartIcon.svelte';
-	import Table from './chart-icons/TableIcon.svelte';
-	import Radar from './chart-icons/RadarChartIcon.svelte';
+	import Beeswarm from './chart-icons/BeeswarmIcon.svelte';
 	import HeatMap from './chart-icons/HeatMapIcon.svelte';
+	import LineChart from './chart-icons/LineChartIcon.svelte';
+	import Radar from './chart-icons/RadarChartIcon.svelte';
+	import Table from './chart-icons/TableIcon.svelte';
 
-	import { ChartType, type Chart, ZenoService } from '$lib/zenoapi';
+	import { projectConfig } from '$lib/stores';
+	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { chartDefaults } from '../../reportUtil';
-	import { currentProject } from '$lib/stores';
 
 	export let chart: Chart;
 	export let chartData: { table: Record<string, unknown> } | undefined;
 
 	async function updateChart(chartType: ChartType) {
-		if (chart.type !== chartType && $currentProject) {
+		if (chart.type !== chartType && $projectConfig) {
 			chart = { ...chartDefaults(chart.name, chart.id, chartType) };
 			chartData = undefined;
-			chartData = JSON.parse(await ZenoService.getChartData($currentProject.uuid, chart));
+			chartData = JSON.parse(await ZenoService.getChartData($projectConfig.uuid, chart));
 		}
 	}
 </script>

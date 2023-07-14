@@ -1,10 +1,10 @@
 <script lang="ts">
-	import AutoComplete from 'simple-svelte-autocomplete';
+	import { projectConfig } from '$lib/stores';
+	import { ZenoService } from '$lib/zenoapi';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import AutoComplete from 'simple-svelte-autocomplete';
 	import MatchWholeWordIcon from '../cells/metadata-cells/static/MatchWholeWordIcon.svelte';
 	import RegexIcon from '../cells/metadata-cells/static/RegexIcon.svelte';
-	import { ZenoService } from '$lib/zenoapi';
-	import { currentProject } from '$lib/stores';
 
 	export let predicate;
 	export let col;
@@ -55,14 +55,16 @@
 		}
 
 		try {
-			searchResults = await ZenoService.filterStringMetadata($currentProject.name, {
-				column: col,
-				filterString: input,
-				isRegex: isRegex,
-				caseMatch: caseMatch,
-				wholeWordMatch: wholeWordMatch
-			});
-			return searchResults;
+			if (projectConfig) {
+				searchResults = await ZenoService.filterStringMetadata($projectConfig.name, {
+					column: col,
+					filterString: input,
+					isRegex: isRegex,
+					caseMatch: caseMatch,
+					wholeWordMatch: wholeWordMatch
+				});
+				return searchResults;
+			}
 		} catch (e) {
 			searchResults = [];
 			return searchResults;

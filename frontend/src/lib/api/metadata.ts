@@ -4,15 +4,15 @@
  * can run then asynchronously and provide interactive updates while waiting
  * for more expensive computations like calculating metrics.
  */
-import { currentProject, metricRange, projectConfig, requestingHistogramCounts } from '$lib/stores';
+import { metricRange, projectConfig, requestingHistogramCounts } from '$lib/stores';
 import { columnHash, getMetricRange } from '$lib/util/util';
 import {
 	CancelablePromise,
+	ZenoColumnType,
 	ZenoService,
 	type FilterPredicateGroup,
-	type ZenoColumn,
 	type Metric,
-	ZenoColumnType
+	type ZenoColumn
 } from '$lib/zenoapi';
 import { InternMap } from 'internmap';
 import { get } from 'svelte/store';
@@ -41,7 +41,7 @@ export async function getHistograms(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.ITEM
 	);
 	requestingHistogramCounts.set(true);
-	const project = get(currentProject);
+	const project = get(projectConfig);
 	if (!project) {
 		return Promise.reject('No project selected.');
 	}
@@ -77,7 +77,7 @@ export async function getHistogramCounts(
 		histogramCountRequest.cancel();
 	}
 	try {
-		const project = get(currentProject);
+		const project = get(projectConfig);
 		if (!project) {
 			return Promise.reject('No project selected.');
 		}
@@ -139,7 +139,7 @@ export async function getHistogramMetrics(
 		histogramMetricRequest.cancel();
 	}
 	try {
-		const project = get(currentProject);
+		const project = get(projectConfig);
 		if (!project) {
 			return Promise.reject('No project selected.');
 		}

@@ -1,4 +1,4 @@
-import { currentProject } from '$lib/stores';
+import { projectConfig } from '$lib/stores';
 import { isPredicateGroup } from '$lib/util/typeCheck';
 import {
 	ZenoColumnType,
@@ -85,7 +85,7 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		}
 	}
 	if (keysToRequest.length > 0) {
-		const project = get(currentProject);
+		const project = get(projectConfig);
 		if (!project) {
 			return Promise.reject('No project selected.');
 		}
@@ -114,7 +114,7 @@ export async function getMetricsForSlicesAndTags(
 		metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	}
 	if (metricKeys.length > 0) {
-		const project = get(currentProject);
+		const project = get(projectConfig);
 		if (!project) {
 			return Promise.reject('No project selected.');
 		}

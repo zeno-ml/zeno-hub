@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { comparisonModel, currentProject, model, slices } from '$lib/stores';
+	import { comparisonModel, model, projectConfig, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { updateModelDependentSlices } from '$lib/util/util';
 	import { ZenoService, type Slice } from '$lib/zenoapi';
@@ -29,9 +29,9 @@
 	/** Save a generated slice to the slice drawer **/
 	function addSlice() {
 		slice.sliceName = newSliceName;
-		if ($currentProject !== undefined) {
-			ZenoService.addSlice($currentProject.uuid, slice).then(() => {
-				ZenoService.getSlices($currentProject ? $currentProject.uuid : '').then((fetchedSlices) => {
+		if ($projectConfig !== undefined) {
+			ZenoService.addSlice($projectConfig.uuid, slice).then(() => {
+				ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then((fetchedSlices) => {
 					slices.set(fetchedSlices);
 					$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
 					$comparisonModel !== undefined &&
@@ -46,8 +46,8 @@
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($currentProject) {
-				ZenoService.getSlices($currentProject.uuid).then((fetchedSlices) => {
+			if ($projectConfig) {
+				ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) => {
 					slices.set(fetchedSlices);
 					created = false;
 				});

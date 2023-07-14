@@ -2,9 +2,9 @@
 	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import { getEndpoint } from '$lib/config';
 	import {
 		columns,
-		currentProject,
 		model,
 		projectConfig,
 		rowsPerPage,
@@ -103,7 +103,7 @@
 </script>
 
 {#if table}
-	{#if $currentProject !== undefined && $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+	{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 		<div class="container sample-container">
 			{#each table as inst (inst['item'])}
 				<div class="instance">
@@ -112,9 +112,9 @@
 						options={viewOptions}
 						entry={{
 							...inst,
-							data: `/${$currentProject?.url}/api/data/${
-								$currentProject.uuid
-							}?item=${encodeURIComponent(inst['item'])}`
+							data: `${getEndpoint()}/api/data/${$projectConfig.uuid}?item=${encodeURIComponent(
+								inst['item']
+							)}`
 						}}
 						modelColumn={modelColumn?.id}
 					/>

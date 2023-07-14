@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {
 		columns,
-		currentProject,
+		projectConfig,
 		selectionPredicates,
 		selections,
 		showNewSlice,
@@ -110,21 +110,21 @@
 			sliceName = 'Slice ' + $slices.length;
 		}
 
-		if ($sliceToEdit && $currentProject) {
-			ZenoService.updateSlice($currentProject.uuid, {
+		if ($sliceToEdit && $projectConfig) {
+			ZenoService.updateSlice($projectConfig.uuid, {
 				id: $sliceToEdit.id,
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
 			});
 		} else {
-			ZenoService.addSlice($currentProject ? $currentProject.uuid : '', {
+			ZenoService.addSlice($projectConfig ? $projectConfig.uuid : '', {
 				id: 0,
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
 			}).then(() => {
-				ZenoService.getSlices($currentProject ? $currentProject.uuid : '').then((fetchedSlices) => {
+				ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then((fetchedSlices) => {
 					slices.set(fetchedSlices);
 					selections.update(() => ({
 						slices: [],

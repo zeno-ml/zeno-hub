@@ -32,6 +32,7 @@ class ProjectConfig(CamelModel):
     """Configuration specification of the Zeno project."""
 
     uuid: str
+    name: str
     view: str
     calculate_histogram_metrics: bool = True
     num_items: int = 10

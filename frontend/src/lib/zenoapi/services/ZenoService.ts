@@ -21,6 +21,7 @@ import type { SliceFinderReturn } from '../models/SliceFinderReturn';
 import type { TableRequest } from '../models/TableRequest';
 import type { Tag } from '../models/Tag';
 import type { TagMetricKey } from '../models/TagMetricKey';
+import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -28,6 +29,18 @@ import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
 
 export class ZenoService {
+	/**
+	 * Get Projects
+	 * @returns ProjectConfig Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjects(): CancelablePromise<Array<ProjectConfig>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/projects'
+		});
+	}
+
 	/**
 	 * Get Project
 	 * @param project
@@ -197,6 +210,42 @@ export class ZenoService {
 			path: {
 				project: project
 			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Register User
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static registerUser(requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/register',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Login
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static login(requestBody: User): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/login',
+			body: requestBody,
+			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}

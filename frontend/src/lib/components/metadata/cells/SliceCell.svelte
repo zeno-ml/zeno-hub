@@ -2,8 +2,8 @@
 	import { doesModelDependOnPredicates } from '$lib/api/slice';
 	import {
 		comparisonModel,
-		currentProject,
 		model,
+		projectConfig,
 		selections,
 		showNewSlice,
 		sliceToEdit,
@@ -48,8 +48,8 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($currentProject) {
-				ZenoService.getSlices($currentProject.uuid).then((fetchedSlices) =>
+			if ($projectConfig) {
+				ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
 					slices.set(fetchedSlices)
 				);
 			}
@@ -73,14 +73,12 @@
 	function dragEnd(e: DragEvent) {
 		if (e.dataTransfer !== null) {
 			// If dragged out of a folder, remove from the folder it was in.
-			if (e.dataTransfer.dropEffect === 'none' && $currentProject) {
-				ZenoService.updateSlice($currentProject.uuid, { ...slice, folderId: undefined }).then(
-					() => {
-						ZenoService.getSlices($currentProject ? $currentProject.uuid : '').then(
-							(fetchedSlices) => slices.set(fetchedSlices)
-						);
-					}
-				);
+			if (e.dataTransfer.dropEffect === 'none' && $projectConfig) {
+				ZenoService.updateSlice($projectConfig.uuid, { ...slice, folderId: undefined }).then(() => {
+					ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then((fetchedSlices) =>
+						slices.set(fetchedSlices)
+					);
+				});
 			}
 		}
 	}

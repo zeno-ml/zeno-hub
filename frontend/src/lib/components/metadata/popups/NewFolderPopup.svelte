@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currentProject, folderToEdit, folders, showNewFolder } from '$lib/stores';
+	import { folderToEdit, folders, projectConfig, showNewFolder } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
@@ -20,13 +20,13 @@
 	}
 
 	function editFolder() {
-		if ($folderToEdit && $currentProject) {
-			ZenoService.updateFolder($currentProject.uuid, {
+		if ($folderToEdit && $projectConfig) {
+			ZenoService.updateFolder($projectConfig.uuid, {
 				...$folderToEdit,
 				name: folderName
 			}).then(() => {
-				if ($currentProject) {
-					ZenoService.getFolders($currentProject.uuid).then((fetchedFolders) =>
+				if ($projectConfig) {
+					ZenoService.getFolders($projectConfig.uuid).then((fetchedFolders) =>
 						folders.set(fetchedFolders)
 					);
 				}
@@ -37,10 +37,10 @@
 
 	/** Create a folder using the folderName variable **/
 	function createFolder() {
-		if ($currentProject) {
-			ZenoService.addFolder($currentProject.uuid, folderName).then(() => {
-				if ($currentProject) {
-					ZenoService.getFolders($currentProject.uuid).then((fetchedFolders) =>
+		if ($projectConfig) {
+			ZenoService.addFolder($projectConfig.uuid, folderName).then(() => {
+				if ($projectConfig) {
+					ZenoService.getFolders($projectConfig.uuid).then((fetchedFolders) =>
 						folders.set(fetchedFolders)
 					);
 				}

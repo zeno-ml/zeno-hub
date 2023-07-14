@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { getEndpoint } from '$lib/config.js';
 	import {
 		columns,
-		currentProject,
 		folders,
 		metrics,
 		models,
@@ -15,7 +15,6 @@
 	export let data;
 
 	$: {
-		currentProject.set(data.project);
 		projectConfig.set(data.projectConfig);
 		rowsPerPage.set(data.projectConfig.numItems ?? 5);
 		slices.set(data.slices);
@@ -24,7 +23,7 @@
 		metrics.set(data.metrics);
 		folders.set(data.folders);
 		tags.set(data.tags);
-		zenoAPI.BASE = `/${data.project.url}/api`;
+		zenoAPI.BASE = `${getEndpoint()}/api`;
 	}
 </script>
 

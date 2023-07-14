@@ -41,6 +41,7 @@ export type { TableParameters } from './models/TableParameters';
 export type { TableRequest } from './models/TableRequest';
 export type { Tag } from './models/Tag';
 export type { TagMetricKey } from './models/TagMetricKey';
+export type { User } from './models/User';
 export type { ValidationError } from './models/ValidationError';
 export type { XCParameters } from './models/XCParameters';
 export type { ZenoColumn } from './models/ZenoColumn';

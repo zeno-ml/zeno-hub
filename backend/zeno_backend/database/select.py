@@ -35,6 +35,36 @@ def models(project: str) -> List[str]:
     return list(map(itemgetter(0), model_results)) if model_results is not None else []
 
 
+def projects() -> List[ProjectConfig]:
+    """Get all projects available to the user.
+
+    Returns:
+        List[ProjectConfig]: the projects that the user can interact with.
+    """
+    db = Database()
+    project_result = db.connect_execute_return(
+        "SELECT uuid, name, view, calculate_histogram_metrics, num_items "
+        "FROM projects;",
+        return_all=True,
+    )
+    return (
+        list(
+            map(
+                lambda project: ProjectConfig(
+                    uuid=project[0],
+                    name=project[1],
+                    view=project[2],
+                    calculate_histogram_metrics=bool(project[3]),
+                    num_items=project[4],
+                ),
+                project_result,
+            )
+        )
+        if project_result is not None
+        else []
+    )
+
+
 def project(project: str) -> Union[ProjectConfig, None]:
     """Get the project data for a specific project ID.
 
@@ -46,7 +76,7 @@ def project(project: str) -> Union[ProjectConfig, None]:
     """
     db = Database()
     project_result = db.connect_execute_return(
-        "SELECT uuid, view, calculate_histogram_metrics, num_items FROM projects "
+        "SELECT uuid, name, view, calculate_histogram_metrics, num_items FROM projects "
         "WHERE uuid = %s",
         [
             project,
@@ -55,9 +85,10 @@ def project(project: str) -> Union[ProjectConfig, None]:
     return (
         ProjectConfig(
             uuid=str(project_result[0]),
-            view=str(project_result[1]),
-            calculate_histogram_metrics=bool(project_result[2]),
-            num_items=project_result[3] if isinstance(project_result[3], int) else 5,
+            name=str(project_result[1]),
+            view=str(project_result[2]),
+            calculate_histogram_metrics=bool(project_result[3]),
+            num_items=project_result[4] if isinstance(project_result[4], int) else 5,
         )
         if project_result is not None
         else None
@@ -483,3 +514,21 @@ def tags(project: str) -> List[Tag]:
         raise Exception(error) from error
     finally:
         db.disconnect()
+
+
+def secret(email: str) -> Optional[str]:
+    """Get the secret of a user with a specific email address.
+
+    Args:
+        email (str): the email address of the user for which to fetch the secret.
+
+    Returns:
+        Optional[str]: the secret of the user.
+    """
+    db = Database()
+    secret = db.connect_execute_return(
+        "SELECT secret FROM users WHERE email = %s", [email]
+    )
+    if secret is None:
+        return None
+    return str(secret[0])

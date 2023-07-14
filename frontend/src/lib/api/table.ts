@@ -1,8 +1,8 @@
-import { get } from 'svelte/store';
+import { projectConfig } from '$lib/stores';
 import type { FilterPredicateGroup, ZenoColumn } from '$lib/zenoapi';
 import { ZenoService } from '$lib/zenoapi';
 import { ZenoColumnType } from '$lib/zenoapi/models/ZenoColumnType';
-import { currentProject } from '$lib/stores';
+import { get } from 'svelte/store';
 
 export async function getFilteredTable(
 	completeColumns: ZenoColumn[],
@@ -34,7 +34,7 @@ export async function getFilteredTable(
 		diffColumn2.model = addModel ? filterModels[1] : '';
 	}
 
-	const project = get(currentProject);
+	const project = get(projectConfig);
 	if (!project) {
 		return Promise.reject('No project selected.');
 	}

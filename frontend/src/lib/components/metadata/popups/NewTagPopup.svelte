@@ -1,10 +1,10 @@
 <script lang="ts">
+	import { projectConfig, selectionIds, showNewTag, tags } from '$lib/stores';
+	import { clickOutside } from '$lib/util/clickOutside';
+	import { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import Paper, { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { tags, showNewTag, selectionIds, currentProject } from '$lib/stores';
-	import { clickOutside } from '$lib/util/clickOutside';
-	import { ZenoService } from '$lib/zenoapi';
 
 	let tagName = '';
 	let input: Textfield;
@@ -23,14 +23,14 @@
 			tagName = 'Tag ' + $tags.length;
 		}
 
-		if ($currentProject !== undefined) {
-			ZenoService.addTag($currentProject.uuid, {
+		if ($projectConfig !== undefined) {
+			ZenoService.addTag($projectConfig.uuid, {
 				id: 0,
 				tagName,
 				items: []
 			}).then(() => {
-				if ($currentProject !== undefined) {
-					ZenoService.getTags($currentProject.uuid).then((fetchedTags) => {
+				if ($projectConfig !== undefined) {
+					ZenoService.getTags($projectConfig.uuid).then((fetchedTags) => {
 						tags.set(fetchedTags);
 						showNewTag.set(false);
 					});

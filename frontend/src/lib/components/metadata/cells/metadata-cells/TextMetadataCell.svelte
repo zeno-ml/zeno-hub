@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currentProject } from '$lib/stores';
+	import { projectConfig } from '$lib/stores';
 	import { Join, ZenoService, type FilterPredicate, type ZenoColumn } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { TrailingIcon } from '@smui/chips';
@@ -48,7 +48,7 @@
 			join: Join._
 		});
 		if (filterPredicates.length > 1) {
-			filterPredicates[filterPredicates.length - 1].join = '|';
+			filterPredicates[filterPredicates.length - 1].join = Join.OR;
 		}
 		updatePredicates(filterPredicates);
 
@@ -68,14 +68,16 @@
 		}
 
 		try {
-			results = await ZenoService.filterStringMetadata($currentProject.name, {
-				column: col,
-				filterString: input,
-				isRegex: isRegex,
-				caseMatch: caseMatch,
-				wholeWordMatch: wholeWordMatch
-			});
-			return results;
+			if (projectConfig) {
+				results = await ZenoService.filterStringMetadata($projectConfig.name, {
+					column: col,
+					filterString: input,
+					isRegex: isRegex,
+					caseMatch: caseMatch,
+					wholeWordMatch: wholeWordMatch
+				});
+				return results;
+			}
 		} catch (e) {
 			results = [];
 			return results;
