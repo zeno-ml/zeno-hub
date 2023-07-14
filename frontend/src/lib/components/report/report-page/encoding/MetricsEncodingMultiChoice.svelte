@@ -1,0 +1,52 @@
+<script lang="ts">
+	import { metrics } from '$lib/stores';
+	import Svelecte from 'svelecte';
+	import { createEventDispatcher } from 'svelte';
+	import { dndzone } from 'svelte-dnd-action';
+
+	export let currentValues: number[];
+
+	const dispatch = createEventDispatcher<{ selected: number[] }>();
+
+	let options: { value: number; label: string }[] = [];
+	let value: number[] = [];
+
+	// initial options & values
+	$metrics.forEach((m) => {
+		options.push({ value: m.id, label: m.name });
+	});
+	value = currentValues;
+
+	function updateDragOrder(val: number[]) {
+		// check if all elements are numbers (dndzone's place holder)
+		if (!val.some((i) => !Number.isInteger(i))) {
+			dispatch('selected', val);
+		}
+	}
+
+	$: updateDragOrder(value);
+</script>
+
+<div class="parameters">
+	<h4 class="select-label">&nbsp;</h4>
+	<Svelecte
+		style="width: 280px; flex:none;"
+		bind:value
+		{options}
+		{dndzone}
+		multiple={true}
+		placeholder="Select Metrics..."
+	/>
+</div>
+
+<style>
+	.parameters {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 10px;
+	}
+	.select-label {
+		margin: 5px;
+	}
+</style>
