@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { currentProject } from '$lib/stores';
+	import ReportHomeBlock from '$lib/components/report/ReportHomeBlock.svelte';
+	import { chartDefaults } from '$lib/components/report/reportUtil';
+	import { projectConfig } from '$lib/stores';
+	import { charts } from '$lib/stores.js';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
 	import { Svg } from '@smui/common';
 	import { Icon } from '@smui/icon-button';
-	import ReportHomeBlock from '$lib/components/report/ReportHomeBlock.svelte';
-	import { charts } from '$lib/stores.js';
-	import { chartDefaults } from '$lib/components/report/reportUtil';
 </script>
 
 <div class="reports-container">
@@ -21,10 +21,10 @@
 			class="add-reports"
 			on:click={() => {
 				ZenoService.addChart(
-					$currentProject ? $currentProject.uuid : '',
+					$projectConfig ? $projectConfig.uuid : '',
 					chartDefaults('New Chart', 0, ChartType.BAR)
 				).then(() => {
-					ZenoService.getCharts($currentProject ? $currentProject.uuid : '').then((fetchedCharts) =>
+					ZenoService.getCharts($projectConfig ? $projectConfig.uuid : '').then((fetchedCharts) =>
 						charts.set(fetchedCharts)
 					);
 				});

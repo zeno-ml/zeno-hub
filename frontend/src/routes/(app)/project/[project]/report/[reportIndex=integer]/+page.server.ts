@@ -1,15 +1,11 @@
-import { connexEndpoint, localzeno } from '$lib/config.js';
-import { ConnexService, OpenAPI as connexAPI } from '$lib/connexapi/index.js';
-import { ZenoService, OpenAPI as zenoAPI } from '$lib/zenoapi/index.js';
+import { ZenoService } from '$lib/zenoapi/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
-	connexAPI.BASE = connexEndpoint;
-	const project = await ConnexService.getProject(params.project);
-	if (!project || !project.url) {
+	const project = await ZenoService.getProject(params.project);
+	if (!project) {
 		throw error(404, 'Could not load project');
 	}
-	zenoAPI.BASE = project.url === 'localzeno' ? `${localzeno}/api` : `${project.url}/api`;
 	const charts = await ZenoService.getCharts(project.uuid);
 	const chart = charts.find((chart) => chart.id === parseInt(params.reportIndex));
 	if (!charts || chart === undefined) {

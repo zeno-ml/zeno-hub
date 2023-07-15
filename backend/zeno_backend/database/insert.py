@@ -17,6 +17,7 @@ from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
+from zeno_backend.classes.user import User
 from zeno_backend.database.database import Database
 
 
@@ -39,8 +40,8 @@ def setup_project(description: ProjectConfig):
     try:
         db.connect()
         db.execute(
-            'INSERT INTO projects ("uuid", "view") VALUES (%s,%s);',
-            [description.uuid, description.view],
+            'INSERT INTO projects ("uuid", "name", "view") VALUES (%s,%s,%s);',
+            [description.uuid, description.name, description.view],
         )
         db.execute(
             sql.SQL("CREATE TABLE {}(item TEXT NOT NULL PRIMARY KEY);").format(
@@ -398,3 +399,16 @@ def tag(project: str, tag: Tag):
         raise Exception(error) from error
     finally:
         db.disconnect()
+
+
+def user(user: User):
+    """Add a new user to the database.
+
+    Args:
+        user (User): the user to be added.
+    """
+    db = Database()
+    db.connect_execute(
+        'INSERT INTO users ("user_name","email","secret") values(%s,%s,%s)',
+        [user.name, user.email, user.secret],
+    )

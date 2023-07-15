@@ -1,6 +1,6 @@
 import { dev } from '$app/environment';
-import { connexEndpoint } from '$lib/config';
-import { ConnexService, OpenAPI } from '$lib/connexapi';
+import { backendEndpoint } from '$lib/config';
+import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import { Md5 } from 'ts-md5';
 import type { Actions } from './$types';
@@ -32,8 +32,8 @@ export const actions: Actions = {
 
 		const secret = Md5.hashStr(password as string);
 		try {
-			OpenAPI.BASE = connexEndpoint;
-			await ConnexService.login({
+			OpenAPI.BASE = backendEndpoint + '/api';
+			await ZenoService.login({
 				secret: secret,
 				email: email as string
 			});

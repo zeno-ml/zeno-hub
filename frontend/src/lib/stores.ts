@@ -1,20 +1,17 @@
 import {
 	Join,
-	type ProjectConfig,
+	type Chart,
 	type FilterPredicate,
 	type FilterPredicateGroup,
-	type Slice,
-	type Tag,
-	type ZenoColumn,
 	type Folder,
 	type Metric,
-	type Chart
+	type ProjectConfig,
+	type Slice,
+	type Tag,
+	type ZenoColumn
 } from '$lib/zenoapi';
 import { interpolate } from 'd3-interpolate';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
-import type { Project } from './connexapi';
-
-export const currentProject: Writable<Project | undefined> = writable(undefined);
 
 export const projectConfig: Writable<ProjectConfig | undefined> = writable(undefined);
 export const slices: Writable<Slice[]> = writable([]);

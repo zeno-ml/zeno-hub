@@ -6,7 +6,7 @@
 	import NewTagPopup from '$lib/components/metadata/popups/NewTagPopup.svelte';
 	import SliceFinderPopup from '$lib/components/metadata/popups/SliceFinderPopup.svelte';
 	import {
-		currentProject,
+		projectConfig,
 		showNewFolder,
 		showNewSlice,
 		showNewTag,
@@ -15,7 +15,7 @@
 </script>
 
 <!-- These popups are at the top level b/c of issues with overflow-y scroll. -->
-{#if $showNewSlice && !$page.url.href.includes('compare') && $currentProject}
+{#if $showNewSlice && !$page.url.href.includes('compare') && $projectConfig}
 	<NewSlicePopup />
 {/if}
 {#if $showNewFolder && !$page.url.href.includes('compare')}

@@ -8,6 +8,7 @@
  */
 export type ProjectConfig = {
 	uuid: string;
+	name: string;
 	view: string;
 	calculateHistogramMetrics?: boolean;
 	numItems?: number;

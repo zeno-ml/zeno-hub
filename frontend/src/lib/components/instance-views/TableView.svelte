@@ -2,9 +2,9 @@
 	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import { getEndpoint } from '$lib/config';
 	import {
 		columns,
-		currentProject,
 		editTag,
 		editedIds,
 		model,
@@ -137,7 +137,7 @@
 					{#if $editTag !== undefined}
 						<th>Included</th>
 					{/if}
-					{#if $currentProject !== undefined && $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+					{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 						<th>instance</th>
 					{/if}
 					{#each columnHeader as header}
@@ -167,7 +167,7 @@
 						{#if $editTag !== undefined}
 							<td><Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} /></td>
 						{/if}
-						{#if $currentProject !== undefined && $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 							<td>
 								<div class="instance">
 									<svelte:component
@@ -175,8 +175,8 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `/${$currentProject?.url}/api/data/${
-												$currentProject.uuid
+											data: `${getEndpoint()}/api/data/${
+												$projectConfig.uuid
 											}?item=${encodeURIComponent(tableContent['item'])}`
 										}}
 										modelColumn={modelColumn?.id}

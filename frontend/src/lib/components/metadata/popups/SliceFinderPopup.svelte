@@ -3,8 +3,8 @@
 	import {
 		columns,
 		comparisonModel,
-		currentProject,
 		model,
+		projectConfig,
 		selectionIds,
 		selectionPredicates,
 		selections,
@@ -95,11 +95,11 @@
 			return;
 		}
 		sliceFinderMessage = 'Generating Slices...';
-		if ($currentProject !== undefined && metricColumn !== undefined) {
+		if ($projectConfig !== undefined && metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			sliceFinderReturn = await ZenoService.runSliceFinder($currentProject.uuid, {
+			sliceFinderReturn = await ZenoService.runSliceFinder($projectConfig.uuid, {
 				metricColumn,
 				searchColumns,
 				orderBy: orderByOptions[orderByIdx],

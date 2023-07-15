@@ -4,11 +4,10 @@
 /* eslint-disable */
 
 /**
- * Representation for a project in Connex.
+ * Representation of a user in Zeno.
  */
-export type Project = {
-	uuid: string;
-	name: string;
-	endpointId: number;
-	url?: string;
+export type User = {
+	name?: string;
+	email: string;
+	secret?: string;
 };

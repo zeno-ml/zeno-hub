@@ -1,4 +1,4 @@
-import { currentProject } from '$lib/stores';
+import { projectConfig } from '$lib/stores';
 import { ZenoService, type GroupMetric, type TagMetricKey } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
@@ -6,7 +6,7 @@ export async function getMetricsForTags(tagMetricKey: TagMetricKey): Promise<Gro
 	if (tagMetricKey.metric === undefined || tagMetricKey.model === undefined) {
 		return null;
 	}
-	const project = get(currentProject);
+	const project = get(projectConfig);
 	if (!project) {
 		return Promise.reject('No project selected.');
 	}

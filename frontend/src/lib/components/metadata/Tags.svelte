@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import {
-		currentProject,
 		editTag,
 		editedIds,
+		projectConfig,
 		selectionIds,
 		selections,
 		showNewTag,
@@ -19,12 +19,12 @@
 	import TagCell from './cells/TagCell.svelte';
 
 	function saveChanges() {
-		if ($editTag === undefined || $currentProject === undefined) return;
-		ZenoService.updateTag($currentProject.uuid, { ...$editTag, items: $editedIds }).then(() => {
+		if ($editTag === undefined || $projectConfig === undefined) return;
+		ZenoService.updateTag($projectConfig.uuid, { ...$editTag, items: $editedIds }).then(() => {
 			editTag.set(undefined);
 			editedIds.set([]);
-			if ($currentProject !== undefined) {
-				ZenoService.getTags($currentProject.uuid).then((fetchedTags) => {
+			if ($projectConfig !== undefined) {
+				ZenoService.getTags($projectConfig.uuid).then((fetchedTags) => {
 					tags.set(fetchedTags);
 					let s = new Set<string>();
 					$selections.tags.forEach((tagId) => {

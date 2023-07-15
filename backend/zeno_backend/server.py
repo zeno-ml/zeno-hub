@@ -28,6 +28,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
+from zeno_backend.classes.user import User
 from zeno_backend.processing.chart import chart_data
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import (
@@ -59,6 +60,10 @@ def get_server() -> FastAPI:
     app.mount("/api", api_app)
 
     ###################################################################### Fetch
+    @api_app.get("/projects", response_model=List[ProjectConfig], tags=["zeno"])
+    def get_projects():
+        return select.projects()
+
     @api_app.get("/view/{project}", response_model=ProjectConfig, tags=["zeno"])
     def get_project(project: str):
         return select.project(project)
@@ -100,6 +105,35 @@ def get_server() -> FastAPI:
         return select.tags(project)
 
     ####################################################################### Post
+    @api_app.post("/register", tags=["zeno"])
+    def register_user(user: User):
+        try:
+            insert.user(user)
+            return user.email
+        except Exception as exc:
+            print(exc)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(exc),
+            ) from exc
+
+    @api_app.post("/login", response_model=str, tags=["zeno"])
+    def login(user: User):
+        try:
+            secret = select.secret(user.email)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(exc),
+            ) from exc
+        if secret != user.secret or secret is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect login credentials.",
+            )
+        else:
+            return user.email
+
     @api_app.post("/project", tags=["zeno"])
     def add_project(description: ProjectConfig):
         try:

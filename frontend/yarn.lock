@@ -804,6 +804,14 @@
     "@smui/common" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
+"@smui/common@^7.0.0-beta.14":
+  version "7.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@smui/common/-/common-7.0.0-beta.14.tgz#e55ac24d96fd33c37c450ff93051d8a4a982e90e"
+  integrity sha512-Vw0fth7DiFKoVSJb5UMiXxACMyF65Wof/W23nEywx9rAh/v7kF7gi565d9BZp4sYvFj3hPy2M2Ev3p2tnxzLOw==
+  dependencies:
+    "@material/dom" "^14.0.0"
+    svelte2tsx "^0.6.15"
+
 "@smui/common@^7.0.0-beta.8":
   version "7.0.0-beta.8"
   resolved "https://registry.yarnpkg.com/@smui/common/-/common-7.0.0-beta.8.tgz#ad671c28b9ccde81526eaa46272daa89bdc6f1c7"
@@ -826,16 +834,16 @@
     "@smui/select" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
-"@smui/dialog@7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@smui/dialog/-/dialog-7.0.0-beta.8.tgz#0b82d5ed2109c85a3372fdbe84b87989d2e070d1"
-  integrity sha512-BTUgj8ZKe9xQU1/kfgyZDtxf3kHtog3/2dTiYCm9M1fJAqc5tUXS+SaWI+XoD/F9g2dm9JKBCp3e5nnNoAv0vQ==
+"@smui/dialog@^7.0.0-beta.14":
+  version "7.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@smui/dialog/-/dialog-7.0.0-beta.14.tgz#47854ceb70ce0bf3d0e9ea9d7c8e8589fd239588"
+  integrity sha512-PPYZiI3f+v/WQSWBK9BE7/0gDYx46BpL3P4pdEFznkppP/pg8oC3TzoYTr2fykN/IS7x2Ez15qTvWEy/QvFnEw==
   dependencies:
     "@material/button" "^14.0.0"
     "@material/dialog" "^14.0.0"
     "@material/dom" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
+    "@smui/common" "^7.0.0-beta.14"
+    svelte2tsx "^0.6.15"
 
 "@smui/floating-label@^7.0.0-beta.8":
   version "7.0.0-beta.8"
@@ -2905,6 +2913,14 @@ svelte2tsx@^0.6.10:
   version "0.6.15"
   resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.15.tgz#c85c3360ed8fcea62f6156dd1024303ba6bc79ec"
   integrity sha512-+j6RmA3g5pPs1DHa/rdzJjjhZuCfWx0IbNPaR99A2bvOSPPY6BlVkBGU0urI+DGcWHhYEG28Flo942KqlAkpEQ==
+  dependencies:
+    dedent-js "^1.0.1"
+    pascal-case "^3.1.1"
+
+svelte2tsx@^0.6.15:
+  version "0.6.19"
+  resolved "https://registry.yarnpkg.com/svelte2tsx/-/svelte2tsx-0.6.19.tgz#0c1fe8432643dd2962d373243e3b8b39b559e9b2"
+  integrity sha512-h3b5OtcO8zyVL/RiB2zsDwCopeo/UH+887uyhgb2mjnewOFwiTxu+4IGuVwrrlyuh2onM2ktfUemNrNmQwXONQ==
   dependencies:
     dedent-js "^1.0.1"
     pascal-case "^3.1.1"

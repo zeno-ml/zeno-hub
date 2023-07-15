@@ -1,9 +1,9 @@
-import { connexEndpoint } from '$lib/config.js';
-import { ConnexService, OpenAPI as connexAPI } from '$lib/connexapi/index.js';
+import { backendEndpoint } from '$lib/config';
+import { OpenAPI, ZenoService } from '$lib/zenoapi';
 
 export async function load() {
-	connexAPI.BASE = connexEndpoint;
-	const projects = await ConnexService.getAllProjects();
+	OpenAPI.BASE = backendEndpoint + '/api';
+	const projects = await ZenoService.getProjects();
 
 	return {
 		projects: projects

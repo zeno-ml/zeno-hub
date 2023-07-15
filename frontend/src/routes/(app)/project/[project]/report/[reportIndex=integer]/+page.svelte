@@ -4,7 +4,7 @@
 	import ViewHeader from '$lib/components/report/report-page/report-header/ViewHeader.svelte';
 	import ViewSelection from '$lib/components/report/report-page/view-selection/ViewSelection.svelte';
 	import { chartMap } from '$lib/components/report/reportUtil.js';
-	import { charts, currentProject } from '$lib/stores.js';
+	import { charts, projectConfig } from '$lib/stores.js';
 	import { ZenoService } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
@@ -17,10 +17,10 @@
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
 	function updateChart() {
-		if ($currentProject) {
-			ZenoService.updateChart($currentProject.uuid, chart).then(() => {
-				if ($currentProject)
-					ZenoService.getCharts($currentProject.uuid).then((fetchedCharts) =>
+		if ($projectConfig) {
+			ZenoService.updateChart($projectConfig.uuid, chart).then(() => {
+				if ($projectConfig)
+					ZenoService.getCharts($projectConfig.uuid).then((fetchedCharts) =>
 						charts.set(fetchedCharts)
 					);
 			});

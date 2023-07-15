@@ -1,18 +1,12 @@
-import { connexEndpoint, localzeno } from './src/lib/config';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
+import { backendEndpoint } from './src/lib/config';
 
 export default defineConfig({
 	server: {
 		proxy: {
-			'/connex': {
-				target: connexEndpoint,
-				changeOrigin: true,
-				secure: false,
-				rewrite: (path) => path.replace(/^\/connex/, '')
-			},
 			'/localzeno': {
-				target: localzeno,
+				target: backendEndpoint,
 				changeOrigin: true,
 				secure: false,
 				rewrite: (path) => path.replace(/^\/localzeno/, '')
