@@ -50,7 +50,7 @@ export class ZenoService {
 	public static getProject(project: string): CancelablePromise<ProjectConfig> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/view/{project}',
+			url: '/config/{project}',
 			path: {
 				project: project
 			},

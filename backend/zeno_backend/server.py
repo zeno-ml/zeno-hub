@@ -64,7 +64,7 @@ def get_server() -> FastAPI:
     def get_projects():
         return select.projects()
 
-    @api_app.get("/view/{project}", response_model=ProjectConfig, tags=["zeno"])
+    @api_app.get("/config/{project}", response_model=ProjectConfig, tags=["zeno"])
     def get_project(project: str):
         return select.project(project)
 

@@ -133,15 +133,15 @@ def beeswarm_data(chart: Chart, project: str) -> str:
                 metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
-                        "color_value": current_slice.id
+                        "color_value": current_slice.slice_name
                         if params.color_channel == SlicesOrModels.SLICES
                         else model,
                         "x_value": metric.metric,
-                        "y_value": current_slice.id
+                        "y_value": current_slice.slice_name
                         if params.y_channel == SlicesOrModels.SLICES
                         else model,
                         "size": metric.size,
-                        "metric": current_metric.id,
+                        "metric": current_metric.name,
                     }
                 )
     return json.dumps({"table": elements})
@@ -176,13 +176,13 @@ def radar_data(chart: Chart, project: str) -> str:
                 metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
-                        "axis_value": current_slice.id
+                        "axis_value": current_slice.slice_name
                         if params.axis_channel == SlicesMetricsOrModels.SLICES
                         else model
                         if params.axis_channel == SlicesMetricsOrModels.MODELS
-                        else current_metric.id,
+                        else current_metric.name,
                         "fixed_value": metric.metric,
-                        "layer_value": current_slice.id
+                        "layer_value": current_slice.slice_name
                         if params.layer_channel == SlicesOrModels.SLICES
                         else model,
                         "size": metric.size,
@@ -211,6 +211,10 @@ def heatmap_data(chart: Chart, project: str) -> str:
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
+    print(x_slice)
+    print(params.x_values)
+    print(y_slice)
+    print(params.y_values)
     selected_x: Union[List[Slice], List[str]] = (
         slices(project, params.x_values) if x_slice else params.x_values  # type: ignore
     )
@@ -222,6 +226,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
         for current_y in selected_y:
             metric = {"metric": None, "size": 0}
             if x_slice and y_slice:
+                current_y.filter_predicates.join = Join.AND  # type: ignore
                 filter_sql = table_filter(
                     project,
                     params.model,
@@ -230,7 +235,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
                             current_x.filter_predicates,  # type: ignore
                             current_y.filter_predicates,  # type: ignore
                         ],
-                        join=Join.AND,
+                        join=Join.OMITTED,
                     ),
                 )
                 metric = metric_map(selected_metric, project, params.model, filter_sql)
@@ -247,9 +252,13 @@ def heatmap_data(chart: Chart, project: str) -> str:
                 metric = metric_map(selected_metric, project, params.model, filter_sql)
             elements.append(
                 {
-                    "x_value": current_x.id if x_slice else current_x,  # type: ignore
+                    "x_value": current_x.slice_name  # type: ignore
+                    if x_slice
+                    else current_x,
                     "fixed_value": metric.metric,
-                    "y_value": current_y.id if y_slice else current_y,  # type: ignore
+                    "y_value": current_y.slice_name  # type: ignore
+                    if y_slice
+                    else current_y,
                     "size": metric.size,
                 }
             )
