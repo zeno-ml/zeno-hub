@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {
+		SlicesMetricsOrModels,
 		SlicesOrModels,
 		type Chart,
-		type TableParameters,
-		SlicesMetricsOrModels
+		type TableParameters
 	} from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
@@ -144,7 +144,7 @@
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.yChannel].multi}
-		on:selected={(e) => selected(e, Dimensions.x)}
+		on:selected={(e) => selected(e, Dimensions.y)}
 		currentValues={parameters.yChannel === SlicesOrModels.SLICES
 			? parameters.slices
 			: parameters.models}
@@ -172,7 +172,7 @@
 	<svelte:component
 		this={EncodingMap[parameters.fixedChannel].fixed}
 		on:selected={(e) => fixedSelected(e)}
-		currentValues={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
+		currentValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices[0]
 			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
 			? parameters.metrics[0]

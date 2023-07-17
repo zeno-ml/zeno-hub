@@ -14,6 +14,7 @@
 	export let chart: Chart;
 
 	$: parameters = chart.parameters as BeeswarmParameters;
+	$: fixedDimension = parameters.fixedDimension;
 
 	enum Dimensions {
 		y,
@@ -25,13 +26,13 @@
 		let label = e.detail.label;
 		let paramExcluMap = { slices: SlicesOrModels.MODELS, models: SlicesOrModels.SLICES };
 
-		if (currentParam === Dimensions.x) {
-			parameters.xChannel = e.detail.value;
+		if (currentParam === Dimensions.y) {
+			parameters.yChannel = e.detail.value;
 			parameters.colorChannel = paramExcluMap[label];
 		}
 		if (currentParam === Dimensions.color) {
 			parameters.colorChannel = e.detail.value;
-			parameters.xChannel = paramExcluMap[label];
+			parameters.yChannel = paramExcluMap[label];
 		}
 
 		chart = { ...chart, parameters: { ...parameters } };
@@ -39,9 +40,9 @@
 
 	function selected(e: CustomEvent<number[] | string[]>, channel: Dimensions) {
 		const channelType =
-			channel === Dimensions.x
-				? parameters.xChannel
-				: Dimensions.metric
+			channel === Dimensions.y
+				? parameters.yChannel
+				: channel === Dimensions.metric
 				? SlicesMetricsOrModels.METRICS
 				: parameters.colorChannel;
 		if (channelType === SlicesOrModels.SLICES) {
@@ -57,7 +58,7 @@
 	}
 
 	function fixedSelected(e: CustomEvent<number | string>) {
-		if (parameters.fixedDimension === 'metric') {
+		if (fixedDimension === 'metric') {
 			chart = { ...chart, parameters: { ...parameters, metrics: [e.detail] } };
 		} else {
 			if (parameters.yChannel === SlicesOrModels.MODELS) {
@@ -73,20 +74,18 @@
 	<div class="parameters">
 		<h4>metric</h4>
 		<Checkbox
-			checked={parameters.fixedDimension === 'metric'}
-			onclick={() =>
-				(chart = { ...chart, parameters: { ...parameters, checkedDimension: 'metric' } })}
+			checked={fixedDimension === 'metric'}
+			on:click={() =>
+				(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
 		/>
 	</div>
-	{#if parameters.fixedDimension === 'metric'}
-		<svelte:component
-			this={MetricsEncodingDropdown}
+	{#if fixedDimension === 'metric'}
+		<MetricsEncodingDropdown
 			on:selected={(e) => fixedSelected(e)}
-			currentValues={parameters.metrics[0]}
+			currentValue={parameters.metrics[0]}
 		/>
 	{:else}
-		<svelte:component
-			this={MetricsEncodingMultiChoice}
+		<MetricsEncodingMultiChoice
 			on:selected={(e) => selected(e, Dimensions.metric)}
 			currentValues={parameters.metrics}
 		/>
@@ -110,22 +109,22 @@
 			}}
 		/>
 		<Checkbox
-			checked={parameters.fixedDimension === 'y'}
-			onclick={() => (chart = { ...chart, parameters: { ...parameters, checkedDimension: 'y' } })}
+			checked={fixedDimension === 'y'}
+			on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
 		/>
 	</div>
-	{#if parameters.fixedDimension === 'y'}
+	{#if fixedDimension === 'y'}
 		<svelte:component
 			this={EncodingMap[parameters.yChannel].fixed}
 			on:selected={(e) => fixedSelected(e)}
-			currentValues={parameters.yChannel === SlicesOrModels.MODELS
+			currentValue={parameters.yChannel === SlicesOrModels.MODELS
 				? parameters.models[0]
 				: parameters.slices[0]}
 		/>
 	{:else}
 		<svelte:component
 			this={EncodingMap[parameters.yChannel].multi}
-			on:selected={(e) => fixedSelected(e, Dimensions.y)}
+			on:selected={(e) => selected(e, Dimensions.y)}
 			currentValues={parameters.yChannel === SlicesOrModels.MODELS
 				? parameters.models
 				: parameters.slices}
@@ -152,7 +151,7 @@
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.colorChannel].multi}
-		on:selected={(e) => fixedSelected(e, Dimensions.color)}
+		on:selected={(e) => selected(e, Dimensions.color)}
 		currentValues={parameters.colorChannel === SlicesOrModels.MODELS
 			? parameters.models
 			: parameters.slices}

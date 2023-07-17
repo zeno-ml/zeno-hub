@@ -39,26 +39,29 @@
 			? parameters.metrics
 			: parameters.models;
 	$: rows = parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : parameters.models;
-	$: data.table.map((cell) => {
-		tableRecord[cell.x_value] === undefined
-			? (tableRecord[cell.x_value] = {
-					[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-			  })
-			: (tableRecord[cell.x_value] = {
-					...tableRecord[cell.x_value],
-					[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-			  });
-	});
+	$: {
+		data, (tableRecord = {});
+		data.table.map((cell) => {
+			tableRecord[cell.x_value] === undefined
+				? (tableRecord[cell.x_value] = {
+						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
+				  })
+				: (tableRecord[cell.x_value] = {
+						...tableRecord[cell.x_value],
+						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
+				  });
+		});
+	}
 	$: {
 		if (sortCol.column !== undefined) {
 			if (sortCol.ascending) {
-				rows.sort(
+				rows = rows.sort(
 					(rowA, rowB) =>
 						tableRecord[sortCol.column ?? columns[0]][rowA].fixedValue -
 						tableRecord[sortCol.column ?? columns[0]][rowB].fixedValue
 				);
 			} else {
-				rows.sort(
+				rows = rows.sort(
 					(rowA, rowB) =>
 						tableRecord[sortCol.column ?? columns[0]][rowB].fixedValue -
 						tableRecord[sortCol.column ?? columns[0]][rowA].fixedValue
@@ -118,7 +121,7 @@
 									{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
 										<SliceDetailsContainer sli={$slices.find((sli) => sli.id === column)} />
 									{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
-										{$metrics.find((met) => met.id === column)}
+										{$metrics.find((met) => met.id === column)?.name}
 									{:else}
 										{column}
 									{/if}

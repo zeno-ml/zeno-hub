@@ -8,7 +8,6 @@
 
 	$: parameters = chart.parameters as XCParameters;
 	$: spec = generateSpec(parameters);
-	$: console.log(data);
 </script>
 
 <div class="main">

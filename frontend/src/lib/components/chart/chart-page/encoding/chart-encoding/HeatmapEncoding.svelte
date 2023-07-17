@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { models, slices } from '$lib/stores';
 	import { SlicesOrModels, type Chart, type HeatmapParameters } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
@@ -14,16 +15,25 @@
 	}
 
 	function refreshParams(e, currentParam: Dimensions) {
+		const settingModels = e.detail.value === SlicesOrModels.MODELS;
 		if (currentParam === Dimensions.x) {
 			parameters.xChannel = e.detail.value;
-			if (e.detail.value === SlicesOrModels.MODELS) {
+			parameters.xValues = settingModels
+				? $models.slice(0, 2)
+				: $slices.slice(0, 2).map((slice) => slice.id);
+			if (settingModels) {
 				parameters.yChannel = SlicesOrModels.SLICES;
+				parameters.yValues = $slices.slice(0, 2).map((slice) => slice.id);
 			}
 		}
 		if (currentParam === Dimensions.y) {
 			parameters.yChannel = e.detail.value;
-			if (e.detail.value === SlicesOrModels.MODELS) {
+			parameters.yValues = settingModels
+				? $models.slice(0, 2)
+				: $slices.slice(0, 2).map((slice) => slice.id);
+			if (settingModels) {
 				parameters.xChannel = SlicesOrModels.SLICES;
+				parameters.xValues = $slices.slice(0, 2).map((slice) => slice.id);
 			}
 		}
 
@@ -94,11 +104,7 @@
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>color</h4>
-		<svelte:component
-			this={MetricsEncodingDropdown}
-			on:selected={fixedSelected}
-			metric={parameters.metric}
-		/>
+		<MetricsEncodingDropdown on:selected={fixedSelected} currentValue={parameters.metric} />
 	</div>
 </div>
 

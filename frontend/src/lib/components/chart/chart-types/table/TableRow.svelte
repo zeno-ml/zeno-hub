@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Cell, Row } from '@smui/data-table';
-	import SliceDetailsContainer from './SliceDetailsContainer.svelte';
 	import { slices } from '$lib/stores';
 	import { SlicesOrModels, type TableParameters } from '$lib/zenoapi';
+	import { Cell, Row } from '@smui/data-table';
+	import SliceDetailsContainer from './SliceDetailsContainer.svelte';
 
 	export let columns: string[] | number[];
 	export let tableRecord: Record<
@@ -23,11 +23,13 @@
 		{/if}
 	</Cell>
 	{#each columns as column}
-		<Cell style="text-align: center;">
-			<p>
-				{tableRecord[column][row].fixedValue.toFixed(2)}
-			</p>
-		</Cell>
+		{#if tableRecord[column] !== undefined && tableRecord[column][row] !== undefined}
+			<Cell style="text-align: center;">
+				<p>
+					{tableRecord[column][row].fixedValue.toFixed(2)}
+				</p>
+			</Cell>
+		{/if}
 	{/each}
 </Row>
 

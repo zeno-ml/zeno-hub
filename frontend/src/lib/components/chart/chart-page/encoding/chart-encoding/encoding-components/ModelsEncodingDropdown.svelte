@@ -3,14 +3,14 @@
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 
-	export let model: string;
+	export let currentValue: string;
 
 	const dispatch = createEventDispatcher<{
 		selected: string;
 	}>();
 
 	let options: { value: string; label: string }[] = [];
-	let value = model;
+	let value = currentValue;
 
 	// initial options & values
 	$models.forEach((m) => {
@@ -25,7 +25,7 @@
 		bind:value
 		{options}
 		on:change={(e) => {
-			if (e.detail.value !== model) {
+			if (e.detail.value !== currentValue) {
 				dispatch('selected', e.detail.value);
 			}
 		}}

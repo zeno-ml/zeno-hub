@@ -173,7 +173,7 @@
 	<svelte:component
 		this={EncodingMap[parameters.fixedChannel].fixed}
 		on:selected={(e) => fixedSelected(e)}
-		currentValues={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
+		currentValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices[0]
 			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
 			? parameters.metrics[0]

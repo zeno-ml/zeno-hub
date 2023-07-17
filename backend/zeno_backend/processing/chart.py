@@ -141,7 +141,7 @@ def beeswarm_data(chart: Chart, project: str) -> str:
                         if params.y_channel == SlicesOrModels.SLICES
                         else model,
                         "size": metric.size,
-                        "metric": current_metric.id,
+                        "metric": current_metric.name,
                     }
                 )
     return json.dumps({"table": elements})
@@ -211,6 +211,10 @@ def heatmap_data(chart: Chart, project: str) -> str:
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
+    print(x_slice)
+    print(params.x_values)
+    print(y_slice)
+    print(params.y_values)
     selected_x: Union[List[Slice], List[str]] = (
         slices(project, params.x_values) if x_slice else params.x_values  # type: ignore
     )
@@ -222,6 +226,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
         for current_y in selected_y:
             metric = {"metric": None, "size": 0}
             if x_slice and y_slice:
+                current_y.filter_predicates.join = Join.AND  # type: ignore
                 filter_sql = table_filter(
                     project,
                     params.model,
@@ -230,7 +235,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
                             current_x.filter_predicates,  # type: ignore
                             current_y.filter_predicates,  # type: ignore
                         ],
-                        join=Join.AND,
+                        join=Join.OMITTED,
                     ),
                 )
                 metric = metric_map(selected_metric, project, params.model, filter_sql)

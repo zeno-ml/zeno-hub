@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { metrics, slices } from '$lib/stores';
+	import { SlicesOrModels, type BeeswarmParameters, type Chart } from '$lib/zenoapi';
 	import { Vega } from 'svelte-vega';
 	import generateSpec from './vegaSpec-beeswarm';
-	import { type Chart, type BeeswarmParameters, SlicesOrModels } from '$lib/zenoapi';
-	import { slices, metrics } from '$lib/stores';
 
 	export let chart: Chart;
 	export let data: {
@@ -18,12 +18,21 @@
 	$: parameters = chart.parameters as BeeswarmParameters;
 	$: rows =
 		parameters.fixedDimension === 'y'
-			? parameters.metrics
+			? parameters.metrics.map((id) => $metrics.find((metric) => metric.id === id)?.name ?? '')
 			: parameters.yChannel === SlicesOrModels.MODELS
 			? parameters.models
-			: parameters.slices.map((id) => $slices.find((sli) => sli.id === id)?.sliceName);
+			: parameters.slices.map((id) => $slices.find((sli) => sli.id === id)?.sliceName ?? '');
 
 	function dataFilter(
+		data: {
+			table: Array<{
+				color_value: string | number;
+				x_value: number;
+				y_value: string | number;
+				size: number;
+				metric: number;
+			}>;
+		},
 		metric: number | string | undefined,
 		slice: string | number | undefined,
 		model: string | number | undefined
@@ -37,8 +46,8 @@
 		}>;
 	} {
 		const yCompare = parameters.yChannel === SlicesOrModels.MODELS ? model : slice;
+
 		return {
-			...data,
 			table: data.table.filter(
 				(element) => element.metric === metric && element.y_value === yCompare
 			)
@@ -60,14 +69,17 @@
 				spec={generateSpec(
 					parameters,
 					parameters.fixedDimension === 'y'
-						? $metrics.find((met) => met.id === row)?.name ?? ''
+						? row
 						: $metrics.find((met) => met.id === parameters.metrics[0])?.name ?? ''
 				)}
 				data={dataFilter(
-					parameters.fixedDimension === 'y' ? row : parameters.metrics[0],
+					data,
+					parameters.fixedDimension === 'y'
+						? row
+						: $metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
 					parameters.colorChannel === SlicesOrModels.MODELS
 						? parameters.fixedDimension === 'y'
-							? parameters.slices[0]
+							? $slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
 							: row
 						: undefined,
 					parameters.colorChannel === SlicesOrModels.SLICES

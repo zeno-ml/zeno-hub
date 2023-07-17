@@ -74,11 +74,7 @@
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>y</h4>
-		<svelte:component
-			this={MetricsEncodingDropdown}
-			on:selected={ySelected}
-			metric={parameters.metric}
-		/>
+		<MetricsEncodingDropdown on:selected={ySelected} currentValue={parameters.metric} />
 	</div>
 </div>
 <div class="encoding-section">
