@@ -64,7 +64,7 @@ def setup_project(description: ProjectConfig):
         )
         db.execute(
             sql.SQL(
-                "CREATE TABLE {}(id INTEGER NOT NULL PRIMARY KEY, "
+                "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
                 "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
                 "ON UPDATE CASCADE, item_id text NOT NULL REFERENCES {}(item) "
                 "ON DELETE CASCADE ON UPDATE CASCADE);"

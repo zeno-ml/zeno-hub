@@ -87,7 +87,7 @@ def table_filter(
 
     if items is not None and len(items) > 0:
         items_filter = sql.SQL("item IN ({})").format(
-            sql.SQL(",").join(map(sql.Placeholder, items))
+            sql.SQL(",").join(map(sql.Literal, items))
         )
         if filter_result is not None:
             filter_result += sql.SQL(" AND ") + items_filter
