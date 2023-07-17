@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ReportHomeBlock from '$lib/components/report/ReportHomeBlock.svelte';
-	import { chartDefaults } from '$lib/components/report/reportUtil';
+	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
+	import { chartDefaults } from '$lib/components/chart/chartUtil';
 	import { projectConfig } from '$lib/stores';
 	import { charts } from '$lib/stores.js';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
@@ -9,16 +9,16 @@
 	import { Icon } from '@smui/icon-button';
 </script>
 
-<div class="reports-container">
+<div class="charts-container">
 	<div class="header">
-		<h3>Reports</h3>
+		<h3>Charts</h3>
 	</div>
-	<div class="reports">
+	<div class="charts">
 		{#each $charts as chart}
-			<ReportHomeBlock {chart} />
+			<ChartHomeBlock {chart} />
 		{/each}
 		<div
-			class="add-reports"
+			class="add-charts"
 			on:click={() => {
 				ZenoService.addChart(
 					$projectConfig ? $projectConfig.uuid : '',
@@ -41,13 +41,13 @@
 </div>
 
 <style>
-	.reports-container {
+	.charts-container {
 		display: flex;
 		flex-direction: column;
 		margin: 20px;
 		width: 100%;
 	}
-	.reports {
+	.charts {
 		display: flex;
 		flex-wrap: wrap;
 		overflow-y: auto;
@@ -57,7 +57,7 @@
 		justify-content: space-between;
 		align-items: center;
 	}
-	.add-reports {
+	.add-charts {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;
@@ -72,7 +72,7 @@
 		width: 225px;
 		height: 100px;
 	}
-	.add-reports:hover {
+	.add-charts:hover {
 		background: #f0ebf4;
 	}
 	.add-button {

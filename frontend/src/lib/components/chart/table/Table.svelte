@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { Icon } from '@smui/button';
-	import { slices, metrics } from '$lib/stores';
-	import DataTable, { Body, Cell, Head, Row } from '@smui/data-table';
-	import SliceDetailsContainer from './SliceDetailsContainer.svelte';
-	import TableReportRow from './TableReportRow.svelte';
+	import { metrics, slices } from '$lib/stores';
 	import {
 		SlicesMetricsOrModels,
+		SlicesOrModels,
 		type Chart,
-		type TableParameters,
-		SlicesOrModels
+		type TableParameters
 	} from '$lib/zenoapi';
+	import { Icon } from '@smui/button';
+	import DataTable, { Body, Cell, Head, Row } from '@smui/data-table';
+	import SliceDetailsContainer from './SliceDetailsContainer.svelte';
+	import TableRow from './TableRow.svelte';
 
 	export let chart: Chart;
 	export let data: {
@@ -137,7 +137,7 @@
 			</Head>
 			<Body style="overflow: visible">
 				{#each rows as row}
-					<TableReportRow {columns} {tableRecord} {parameters} {row} />
+					<TableRow {columns} {tableRecord} {parameters} {row} />
 				{/each}
 			</Body>
 		</DataTable>

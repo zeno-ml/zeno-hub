@@ -67,13 +67,13 @@
 							</div>
 						</div>
 						<div
-							class="item {$page.url.href.includes('report') ? 'selected' : ''}"
+							class="item {$page.url.href.includes('chart') ? 'selected' : ''}"
 							on:keydown={() => ({})}
 							on:click={() => {
-								goto(`${getProjectRouteFromURL($page.url)}/report`);
+								goto(`${getProjectRouteFromURL($page.url)}/chart`);
 							}}
 							use:tooltip={{
-								content: 'Create reports from your slices and metrics.',
+								content: 'Create charts from your slices and metrics.',
 								position: 'right',
 								theme: 'zeno-tooltip'
 							}}
@@ -81,7 +81,7 @@
 							<div class="icon">
 								<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
 									<path
-										fill={$page.url.href.includes('report') ? '#6a1b9a' : 'black'}
+										fill={$page.url.href.includes('chart') ? '#6a1b9a' : 'black'}
 										d={mdiChartBoxOutline}
 									/>
 								</Icon>

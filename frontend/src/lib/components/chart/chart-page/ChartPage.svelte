@@ -2,39 +2,39 @@
 	import type { Chart } from '$lib/zenoapi';
 	import { onMount } from 'svelte';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
-	import { chartMap } from '../reportUtil';
+	import { chartMap } from '../chartUtil';
+	import EditHeader from './chart-header/EditHeader.svelte';
+	import ViewHeader from './chart-header/ViewHeader.svelte';
 	import Encoding from './encoding/Encoding.svelte';
-	import EditHeader from './report-header/EditHeader.svelte';
-	import ViewHeader from './report-header/ViewHeader.svelte';
 	import ViewSelection from './view-selection/ViewSelection.svelte';
 
 	export let params: {
 		chart: Chart;
 		chartData: { table: Record<string, unknown> };
-		reportIndex: number;
+		chartIndex: number;
 	};
-	let isReportEdit = false;
+	let isChartEdit = false;
 
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
 	onMount(() => {
 		if (window.location.href.split('/').slice(-2, -1)[0] === 'new') {
-			isReportEdit = true;
+			isChartEdit = true;
 		}
 	});
 </script>
 
-<div id="report-panel" class={isReportEdit ? 'row-flex' : 'col-flex'}>
-	{#if isReportEdit}
+<div id="chart-panel" class={isChartEdit ? 'row-flex' : 'col-flex'}>
+	{#if isChartEdit}
 		<div id="edit-bar">
-			<EditHeader bind:isReportEdit chart={params.chart} />
+			<EditHeader bind:isChartEdit chart={params.chart} />
 			<ViewSelection chart={params.chart} chartData={params.chartData} />
 			<Encoding chart={params.chart} />
 		</div>
 	{:else}
-		<ViewHeader bind:isReportEdit chart={params.chart} />
+		<ViewHeader bind:isChartEdit chart={params.chart} />
 	{/if}
-	<div id="reports" class={isReportEdit ? 'edit-reports' : ''}>
+	<div id="charts" class={isChartEdit ? 'edit-charts' : ''}>
 		<svelte:component
 			this={chartMap[params.chart.type]}
 			chart={params.chart}
@@ -44,7 +44,7 @@
 </div>
 
 <style>
-	#report-panel {
+	#chart-panel {
 		width: 100%;
 		display: flex;
 		overflow: hidden;
@@ -67,7 +67,7 @@
 		overflow-y: scroll;
 		background-color: var(--Y2);
 	}
-	#reports {
+	#charts {
 		height: calc(100vh - 15px);
 		overflow: scroll;
 		display: flex;
@@ -75,7 +75,7 @@
 		padding-top: 10px;
 		padding-left: 15px;
 	}
-	.edit-reports {
+	.edit-charts {
 		width: 100%;
 	}
 </style>

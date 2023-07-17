@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HeatmapParameters, Chart } from '$lib/zenoapi';
+	import type { Chart, HeatmapParameters } from '$lib/zenoapi';
 	import { VegaLite } from 'svelte-vega';
 	import generateSpec from './vegaSpec-heatmap';
 

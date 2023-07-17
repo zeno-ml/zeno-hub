@@ -32,14 +32,14 @@
 	};
 </script>
 
-<div class="report" on:click={() => goto(`${$page.url}/${chart.id}`)} on:keydown={() => ({})}>
+<div class="chart" on:click={() => goto(`${$page.url}/${chart.id}`)} on:keydown={() => ({})}>
 	<div class="inline">
-		<div class="report-type">
+		<div class="chart-type">
 			<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
 		</div>
-		<p class="report-name">{chart.name}</p>
+		<p class="chart-name">{chart.name}</p>
 		<div>
 			<IconButton
 				on:click={(e) => {
@@ -105,7 +105,7 @@
 </div>
 
 <style>
-	.report {
+	.chart {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -119,7 +119,7 @@
 		width: 225px;
 		height: 100px;
 	}
-	.report:hover {
+	.chart:hover {
 		background: var(--P3);
 	}
 	.inline {
@@ -129,12 +129,12 @@
 		align-items: center;
 		width: 100%;
 	}
-	.report-type {
+	.chart-type {
 		width: 24px;
 		height: 24px;
 		margin: 14px;
 	}
-	.report-name {
+	.chart-name {
 		font-size: 16px;
 		color: black;
 		text-overflow: ellipsis;

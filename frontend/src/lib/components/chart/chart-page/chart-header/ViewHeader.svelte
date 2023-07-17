@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { mdiArrowCollapseLeft } from '@mdi/js';
-	import { Svg } from '@smui/common';
-	import Button, { Label } from '@smui/button';
-	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import type { Chart } from '$lib/zenoapi';
-	export let isReportEdit: boolean;
+	import { mdiArrowCollapseLeft } from '@mdi/js';
+	import Button, { Label } from '@smui/button';
+	import { Svg } from '@smui/common';
+	export let isChartEdit: boolean;
 
 	export let chart: Chart;
 
@@ -34,7 +34,7 @@
 		<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
 			<path fill={ishover ? 'black' : 'var(--G2)'} d={mdiArrowCollapseLeft} />
 		</Svg>
-		<h4 style={ishover ? 'color:black' : 'color:var(--G2)'}>Back to Report Home</h4>
+		<h4 style={ishover ? 'color:black' : 'color:var(--G2)'}>Back to Chart Home</h4>
 	</div>
 	<div class="title-flex">
 		<h2 style="margin:0px 20px 0px 0px; color: var(--G2)">
@@ -44,9 +44,9 @@
 			style="width: 24px; height: 24px;background-color:var(--G5)"
 			on:mouseleave={blur}
 			on:focusout={blur}
-			on:click={() => (isReportEdit = !isReportEdit)}
+			on:click={() => (isChartEdit = !isChartEdit)}
 		>
-			<Label>{isReportEdit ? 'View' : 'Edit'}</Label>
+			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
 		</Button>
 	</div>
 </div>

@@ -5,7 +5,7 @@ import { error } from '@sveltejs/kit';
 export async function load({ params }) {
 	OpenAPI.BASE = backendEndpoint + '/api';
 	const charts = await ZenoService.getCharts(params.project);
-	const chart = charts.find((chart) => chart.id === parseInt(params.reportIndex));
+	const chart = charts.find((chart) => chart.id === parseInt(params.chartIndex));
 	if (!charts || chart === undefined) {
 		throw error(404, 'Could not load charts');
 	}
@@ -17,6 +17,6 @@ export async function load({ params }) {
 	return {
 		chart: chart,
 		chartData: JSON.parse(chartData),
-		reportIndex: parseInt(params.reportIndex)
+		chartIndex: parseInt(params.chartIndex)
 	};
 }

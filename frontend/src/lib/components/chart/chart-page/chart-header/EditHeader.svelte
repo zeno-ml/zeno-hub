@@ -7,7 +7,7 @@
 	import Textfield from '@smui/textfield';
 	import { noop } from 'svelte/internal';
 
-	export let isReportEdit: boolean;
+	export let isChartEdit: boolean;
 	export let chart: Chart;
 	export let updateChart: () => void = noop;
 
@@ -35,26 +35,26 @@
 			<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
 				<path fill={ishover ? 'black' : 'var(--G2)'} d={mdiArrowCollapseLeft} />
 			</Svg>
-			<h4 style={ishover ? 'color:black' : 'color:var(--G2)'}>Back to Report Home</h4>
+			<h4 style={ishover ? 'color:black' : 'color:var(--G2)'}>Back to Chart Home</h4>
 		</a>
 		<Button
 			style="width: 24px; height: 24px;margin-bottom:3px;background-color:var(--G5)"
 			on:mouseleave={blur}
 			on:focusout={blur}
 			on:click={() => {
-				isReportEdit = !isReportEdit;
+				isChartEdit = !isChartEdit;
 				updateChart();
 			}}
 		>
-			<Label>{isReportEdit ? 'View' : 'Edit'}</Label>
+			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
 		</Button>
 	</div>
-	<div class="report-name">
+	<div>
 		<Textfield
 			style="width: -webkit-fill-available"
 			variant="outlined"
 			bind:value={chart.name}
-			label="Report Name"
+			label="Chart Name"
 		/>
 	</div>
 </div>

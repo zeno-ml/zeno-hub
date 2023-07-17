@@ -26,7 +26,6 @@
 	export let compare: boolean;
 
 	let confirmDelete = false;
-	let relatedReports = 0;
 
 	let showTooltip = false;
 	let hovering = false;
@@ -40,7 +39,6 @@
 
 	function removeSlice() {
 		confirmDelete = false;
-		relatedReports = 0;
 		selections.update((m) => {
 			for (let key in m.metadata) {
 				m.metadata[key] = { predicates: [], join: Join.AND };
@@ -205,10 +203,7 @@
 	aria-describedby="delete-slice"
 >
 	<Title id="simple-title">Delete Slice</Title>
-	<Content id="simple-content"
-		>This slice will be removed from {relatedReports} report{relatedReports > 1 ? 's' : ''}.
-		Continue?</Content
-	>
+	<Content id="simple-content">Do you really want to delete this slice?</Content>
 	<Actions>
 		<Button on:click={() => (confirmDelete = false)}>
 			<Label>No</Label>

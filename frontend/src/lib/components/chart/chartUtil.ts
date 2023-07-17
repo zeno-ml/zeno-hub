@@ -12,12 +12,12 @@ import {
 } from '$lib/zenoapi';
 import type { ComponentType } from 'svelte';
 import { get } from 'svelte/store';
-import BarChartReport from './bar-chart/BarChartReport.svelte';
-import BeeswarmChartReport from './beeswarm-chart/BeeswarmChartReport.svelte';
-import HeatMapReport from './heatmap-chart/HeatMapReport.svelte';
-import LineChartReport from './line-chart/LineChartReport.svelte';
-import RadarChartReport from './radar-chart/RadarChartReport.svelte';
-import TableReportTable from './table-report/TableReportTable.svelte';
+import BarChart from './bar-chart/BarChart.svelte';
+import BeeswarmChart from './beeswarm-chart/BeeswarmChart.svelte';
+import HeatMap from './heatmap-chart/HeatMap.svelte';
+import LineChart from './line-chart/LineChart.svelte';
+import RadarChart from './radar-chart/RadarChart.svelte';
+import Table from './table/Table.svelte';
 
 export function chartDefaults(name: string, id: number, type: ChartType): Chart {
 	switch (type) {
@@ -105,10 +105,10 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 }
 
 export const chartMap: Record<string, ComponentType> = {
-	[ChartType.BAR]: BarChartReport,
-	[ChartType.LINE]: LineChartReport,
-	[ChartType.TABLE]: TableReportTable,
-	[ChartType.BEESWARM]: BeeswarmChartReport,
-	[ChartType.RADAR]: RadarChartReport,
-	[ChartType.HEATMAP]: HeatMapReport
+	[ChartType.BAR]: BarChart,
+	[ChartType.LINE]: LineChart,
+	[ChartType.TABLE]: Table,
+	[ChartType.BEESWARM]: BeeswarmChart,
+	[ChartType.RADAR]: RadarChart,
+	[ChartType.HEATMAP]: HeatMap
 };

@@ -1,16 +1,16 @@
 <script lang="ts">
-	import Encoding from '$lib/components/report/report-page/encoding/Encoding.svelte';
-	import EditHeader from '$lib/components/report/report-page/report-header/EditHeader.svelte';
-	import ViewHeader from '$lib/components/report/report-page/report-header/ViewHeader.svelte';
-	import ViewSelection from '$lib/components/report/report-page/view-selection/ViewSelection.svelte';
-	import { chartMap } from '$lib/components/report/reportUtil.js';
+	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
+	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
+	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
+	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
+	import { chartMap } from '$lib/components/chart/chartUtil.js';
 	import { charts, projectConfig } from '$lib/stores.js';
 	import { ZenoService } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
 	export let data;
 
-	let isReportEdit = false;
+	let isChartEdit = false;
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
 
@@ -28,25 +28,25 @@
 	}
 </script>
 
-<div class={isReportEdit ? 'row-flex report-panel' : 'col-flex report-panel'}>
-	{#if isReportEdit}
+<div class={isChartEdit ? 'row-flex chart-panel' : 'col-flex chart-panel'}>
+	{#if isChartEdit}
 		<div class="edit-bar">
-			<EditHeader bind:isReportEdit bind:chart {updateChart} />
+			<EditHeader bind:isChartEdit bind:chart {updateChart} />
 			<ViewSelection bind:chart bind:chartData />
 			<Encoding bind:chart />
 		</div>
 	{:else}
-		<ViewHeader bind:isReportEdit {chart} />
+		<ViewHeader bind:isChartEdit {chart} />
 	{/if}
 	{#if chartData}
-		<div class={isReportEdit ? 'edit-reports reports' : 'reports'}>
+		<div class={isChartEdit ? 'edit-charts charts' : 'charts'}>
 			<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
 		</div>
 	{/if}
 </div>
 
 <style>
-	.report-panel {
+	.chart-panel {
 		width: 100%;
 		display: flex;
 		overflow: hidden;
@@ -73,7 +73,7 @@
 		background-color: var(--Y2);
 	}
 
-	.reports {
+	.charts {
 		height: calc(100vh - 15px);
 		overflow: auto;
 		display: flex;
@@ -82,7 +82,7 @@
 		padding-left: 15px;
 	}
 
-	.edit-reports {
+	.edit-charts {
 		width: 100%;
 	}
 </style>

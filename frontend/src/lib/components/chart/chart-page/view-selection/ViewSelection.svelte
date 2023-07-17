@@ -8,7 +8,7 @@
 
 	import { projectConfig } from '$lib/stores';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
-	import { chartDefaults } from '../../reportUtil';
+	import { chartDefaults } from '../../chartUtil';
 
 	export let chart: Chart;
 	export let chartData: { table: Record<string, unknown> } | undefined;
