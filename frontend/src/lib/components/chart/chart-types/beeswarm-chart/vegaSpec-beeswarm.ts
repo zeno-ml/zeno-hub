@@ -76,7 +76,7 @@ export default function generateSpec(
 		legends: [
 			{
 				type: 'symbol',
-				title: parameters.colorChannel === SlicesOrModels.SLICES ? 'Slice Color' : 'Model Color',
+				title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
 				fill: 'color'
 			}
 		],

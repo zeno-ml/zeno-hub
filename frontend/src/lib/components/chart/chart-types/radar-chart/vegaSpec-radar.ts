@@ -1,6 +1,7 @@
+import { SlicesOrModels, type RadarParameters } from '$lib/zenoapi';
 import type { VisualizationSpec } from 'vega-embed';
 
-export default function generateSpec(): VisualizationSpec {
+export default function generateSpec(parameters: RadarParameters): VisualizationSpec {
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
@@ -74,7 +75,7 @@ export default function generateSpec(): VisualizationSpec {
 			{
 				fill: 'color',
 				orient: 'none',
-				title: 'Layer',
+				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
 				encode: {
 					legend: { update: { x: { value: 300 }, y: { value: -250 } } }
 				}

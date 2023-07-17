@@ -32,7 +32,7 @@
 	<div class="model-result">
 		<h4>{getFixedName()}</h4>
 		<Vega
-			spec={generateSpec()}
+			spec={generateSpec(parameters)}
 			{data}
 			options={{
 				actions: { source: false, editor: false, compiled: false },

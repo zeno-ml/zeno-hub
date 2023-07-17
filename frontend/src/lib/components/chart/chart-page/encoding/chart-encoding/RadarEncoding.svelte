@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {
+		SlicesMetricsOrModels,
 		SlicesOrModels,
 		type Chart,
-		type RadarParameters,
-		SlicesMetricsOrModels
+		type RadarParameters
 	} from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
@@ -98,7 +98,7 @@
 
 <div class="encoding-section">
 	<div class="parameters">
-		<h4>x</h4>
+		<h4>axis</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
 			value={parameters.axisChannel}
@@ -127,7 +127,7 @@
 </div>
 <div class="encoding-section">
 	<div class="parameters">
-		<h4>y</h4>
+		<h4>color</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
 			value={parameters.layerChannel}
@@ -153,7 +153,7 @@
 </div>
 <div class="encoding-section">
 	<div class="parameters">
-		<h4>color</h4>
+		<h4>value</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
 			value={parameters.fixedChannel}

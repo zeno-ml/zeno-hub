@@ -27,7 +27,8 @@ export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 					labelAngle: 45,
 					labelFontSize: 14,
 					titleFontSize: 14,
-					titlePadding: 10
+					titlePadding: 10,
+					labelExpr: 'datum.label'
 				},
 				sort: null
 			},
@@ -70,7 +71,8 @@ export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 					color: {
 						field: 'color_value',
 						sort: null,
-						scale: { scheme: 'category20' }
+						scale: { scheme: 'category20' },
+						title: color_name
 					},
 					tooltip: [
 						{ field: 'x_value', type: 'ordinal', title: x_name },

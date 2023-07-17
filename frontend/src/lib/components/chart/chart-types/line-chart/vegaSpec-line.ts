@@ -47,7 +47,8 @@ export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 					param: 'hover',
 					field: 'color_value',
 					scale: { scheme: 'category20' },
-					sort: null
+					sort: null,
+					title: color_name
 				},
 				value: 'grey'
 			},

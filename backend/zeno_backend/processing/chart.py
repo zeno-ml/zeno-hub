@@ -133,11 +133,11 @@ def beeswarm_data(chart: Chart, project: str) -> str:
                 metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
-                        "color_value": current_slice.id
+                        "color_value": current_slice.slice_name
                         if params.color_channel == SlicesOrModels.SLICES
                         else model,
                         "x_value": metric.metric,
-                        "y_value": current_slice.id
+                        "y_value": current_slice.slice_name
                         if params.y_channel == SlicesOrModels.SLICES
                         else model,
                         "size": metric.size,
@@ -176,13 +176,13 @@ def radar_data(chart: Chart, project: str) -> str:
                 metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
-                        "axis_value": current_slice.id
+                        "axis_value": current_slice.slice_name
                         if params.axis_channel == SlicesMetricsOrModels.SLICES
                         else model
                         if params.axis_channel == SlicesMetricsOrModels.MODELS
-                        else current_metric.id,
+                        else current_metric.name,
                         "fixed_value": metric.metric,
-                        "layer_value": current_slice.id
+                        "layer_value": current_slice.slice_name
                         if params.layer_channel == SlicesOrModels.SLICES
                         else model,
                         "size": metric.size,
@@ -247,9 +247,13 @@ def heatmap_data(chart: Chart, project: str) -> str:
                 metric = metric_map(selected_metric, project, params.model, filter_sql)
             elements.append(
                 {
-                    "x_value": current_x.id if x_slice else current_x,  # type: ignore
+                    "x_value": current_x.slice_name  # type: ignore
+                    if x_slice
+                    else current_x,
                     "fixed_value": metric.metric,
-                    "y_value": current_y.id if y_slice else current_y,  # type: ignore
+                    "y_value": current_y.slice_name  # type: ignore
+                    if y_slice
+                    else current_y,
                     "size": metric.size,
                 }
             )
