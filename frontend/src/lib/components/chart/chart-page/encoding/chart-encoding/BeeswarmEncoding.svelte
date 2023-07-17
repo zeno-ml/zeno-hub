@@ -1,15 +1,15 @@
 <script lang="ts">
 	import {
+		SlicesMetricsOrModels,
 		SlicesOrModels,
-		type Chart,
 		type BeeswarmParameters,
-		SlicesMetricsOrModels
+		type Chart
 	} from '$lib/zenoapi';
+	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
-	import MetricsEncodingDropdown from '../MetricsEncodingDropdown.svelte';
-	import MetricsEncodingMultiChoice from '../MetricsEncodingMultiChoice.svelte';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
+	import MetricsEncodingMultiChoice from './encoding-components/MetricsEncodingMultiChoice.svelte';
 
 	export let chart: Chart;
 

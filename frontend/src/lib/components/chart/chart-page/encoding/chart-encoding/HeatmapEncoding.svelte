@@ -2,7 +2,7 @@
 	import { SlicesOrModels, type Chart, type HeatmapParameters } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
-	import MetricsEncodingDropdown from '../MetricsEncodingDropdown.svelte';
+	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
 
 	export let chart: Chart;
 

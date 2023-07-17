@@ -1,10 +1,10 @@
 import { SlicesMetricsOrModels } from '$lib/zenoapi';
-import MetricsEncodingDropdown from './MetricsEncodingDropdown.svelte';
-import MetricsEncodingMultiChoice from './MetricsEncodingMultiChoice.svelte';
-import ModelsEncodingDropdown from './ModelsEncodingDropdown.svelte';
-import ModelsEncodingMultiChoice from './ModelsEncodingMultiChoice.svelte';
-import SlicesEncodingDropdown from './SlicesEncodingDropdown.svelte';
-import SlicesEncodingMultiChoice from './SlicesEncodingMultiChoice.svelte';
+import MetricsEncodingDropdown from './chart-encoding/encoding-components/MetricsEncodingDropdown.svelte';
+import MetricsEncodingMultiChoice from './chart-encoding/encoding-components/MetricsEncodingMultiChoice.svelte';
+import ModelsEncodingDropdown from './chart-encoding/encoding-components/ModelsEncodingDropdown.svelte';
+import ModelsEncodingMultiChoice from './chart-encoding/encoding-components/ModelsEncodingMultiChoice.svelte';
+import SlicesEncodingDropdown from './chart-encoding/encoding-components/SlicesEncodingDropdown.svelte';
+import SlicesEncodingMultiChoice from './chart-encoding/encoding-components/SlicesEncodingMultiChoice.svelte';
 
 export const EncodingMap = {
 	[SlicesMetricsOrModels.SLICES]: {
