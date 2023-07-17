@@ -1,12 +1,10 @@
-import { ZenoService } from '$lib/zenoapi/index.js';
+import { backendEndpoint } from '$lib/config.js';
+import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params }) {
-	const project = await ZenoService.getProject(params.project);
-	if (!project) {
-		throw error(404, 'Could not load project');
-	}
-	const charts = await ZenoService.getCharts(project.uuid);
+	OpenAPI.BASE = backendEndpoint + '/api';
+	const charts = await ZenoService.getCharts(params.project);
 	if (!charts) {
 		throw error(404, 'Could not load charts');
 	}
