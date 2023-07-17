@@ -75,9 +75,10 @@ def tag(tag: Tag, project: str):
         project (str): the project the user is currently working with.
     """
     db = Database()
+    print(tag)
     try:
         db.connect()
-        db.execute_return(
+        db.execute(
             "UPDATE tags SET project_uuid = %s, name = %s, folder_id = %s "
             "WHERE id = %s;",
             [
@@ -89,13 +90,14 @@ def tag(tag: Tag, project: str):
         )
         item_ids_result = db.execute_return(
             sql.SQL("SELECT item_id FROM {} WHERE tag_id = %s;").format(
-                sql.Identifier(f"{project}_tags_items"),
-                [
-                    tag.id,
-                ],
-                return_all=True,
-            )
+                sql.Identifier(f"{project}_tags_items")
+            ),
+            [
+                tag.id,
+            ],
+            return_all=True,
         )
+        print(item_ids_result)
         if item_ids_result is None:
             return
         existing_items = set(map(lambda item_id: item_id[0], item_ids_result))
