@@ -7,6 +7,12 @@
 	import { mdiPlus } from '@mdi/js';
 	import { Svg } from '@smui/common';
 	import { Icon } from '@smui/icon-button';
+
+	export let data;
+
+	$: {
+		charts.set(data.charts);
+	}
 </script>
 
 <div class="charts-container">
