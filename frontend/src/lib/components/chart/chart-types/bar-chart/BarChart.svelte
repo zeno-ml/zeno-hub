@@ -7,12 +7,13 @@
 	export let data: { table: Record<string, unknown> };
 
 	$: parameters = chart.parameters as XCParameters;
+	$: spec = generateSpec(parameters);
 </script>
 
 <div class="main">
 	<div class="model-result">
 		<VegaLite
-			spec={generateSpec(parameters)}
+			{spec}
 			{data}
 			options={{
 				actions: { source: false, editor: false, compiled: false },

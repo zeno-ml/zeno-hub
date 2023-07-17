@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { ChartType, type Chart } from '$lib/zenoapi';
 	import type { ComponentType } from 'svelte';
-	import XcChartEncoding from './chart-encoding/XCChartEncoding.svelte';
-	import TableEncoding from './chart-encoding/TableEncoding.svelte';
 	import BeeswarmEncoding from './chart-encoding/BeeswarmEncoding.svelte';
-	import RadarEncoding from './chart-encoding/RadarEncoding.svelte';
 	import HeatmapEncoding from './chart-encoding/HeatmapEncoding.svelte';
+	import RadarEncoding from './chart-encoding/RadarEncoding.svelte';
+	import TableEncoding from './chart-encoding/TableEncoding.svelte';
+	import XcChartEncoding from './chart-encoding/XCChartEncoding.svelte';
 
 	export let chart: Chart;
 

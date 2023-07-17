@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
 	import { chartMap } from '$lib/components/chart/chartUtil.js';
 	import { charts, projectConfig } from '$lib/stores.js';
-	import { ZenoService } from '$lib/zenoapi';
+	import { ZenoService, type Chart } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
 	export let data;
@@ -13,6 +14,8 @@
 	let isChartEdit = false;
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
+
+	$: reloadData(chart);
 
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
@@ -24,6 +27,12 @@
 						charts.set(fetchedCharts)
 					);
 			});
+		}
+	}
+
+	async function reloadData(chart: Chart) {
+		if ($projectConfig && browser) {
+			chartData = JSON.parse(await ZenoService.getChartData($projectConfig.uuid, chart));
 		}
 	}
 </script>
