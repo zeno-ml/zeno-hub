@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { folderToEdit, folders, projectConfig, showNewFolder, slices } from '$lib/stores';
+	import { folders, projectConfig, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
@@ -8,9 +8,13 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { slide } from 'svelte/transition';
+	import NewFolderPopup from '../popups/FolderPopup.svelte';
+	import Popup from '../popups/Popup.svelte';
 	import SliceCell from './SliceCell.svelte';
 
 	export let folder: Folder;
+
+	let editing = false;
 
 	let expandFolder = false;
 	let dragOver = false;
@@ -21,6 +25,11 @@
 	$: sls = $slices.filter((s) => s.folderId === folder.id);
 </script>
 
+{#if editing}
+	<Popup on:close={() => (editing = false)}>
+		<NewFolderPopup on:close={() => (editing = false)} folderToEdit={folder} />
+	</Popup>
+{/if}
 <div
 	class="cell {dragOver ? 'hover' : ''} {expandFolder ? 'expanded' : ''}"
 	on:mouseover={() => (hovering = true)}
@@ -73,8 +82,7 @@
 							on:click={(e) => {
 								e.stopPropagation();
 								showOptions = false;
-								folderToEdit.set(folder);
-								showNewFolder.set(true);
+								editing = true;
 							}}
 						>
 							<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;

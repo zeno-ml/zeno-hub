@@ -1,14 +1,6 @@
 <script lang="ts">
 	import { doesModelDependOnPredicates } from '$lib/api/slice';
-	import {
-		comparisonModel,
-		model,
-		projectConfig,
-		selections,
-		showNewSlice,
-		sliceToEdit,
-		slices
-	} from '$lib/stores';
+	import { comparisonModel, model, projectConfig, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -18,6 +10,8 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
 	import SliceDetails from '../../general/SliceDetails.svelte';
+	import Popup from '../popups/Popup.svelte';
+	import SlicePopup from '../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
 	import { selectSliceCell } from './sliceCellUtil';
 
@@ -26,10 +20,10 @@
 	export let compare: boolean;
 
 	let confirmDelete = false;
-
 	let showTooltip = false;
 	let hovering = false;
 	let showOptions = false;
+	let editing = false;
 
 	let compareButton = slice
 		? doesModelDependOnPredicates(slice.filterPredicates.predicates)
@@ -79,7 +73,7 @@
 				const data = transferData.split(',');
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
-					if (slice) {
+					if (slice && $projectConfig) {
 						ZenoService.updateSlice($projectConfig.uuid, { ...slice, folderId: undefined }).then(
 							() => {
 								ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then(
@@ -94,6 +88,11 @@
 	}
 </script>
 
+{#if editing}
+	<Popup on:close={() => (editing = false)}>
+		<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
+	</Popup>
+{/if}
 <div
 	class=" cell parent
 	{inFolder ? 'in-folder' : ''}
@@ -149,8 +148,7 @@
 									on:click={(e) => {
 										e.stopPropagation();
 										showOptions = false;
-										sliceToEdit.set(slice);
-										showNewSlice.set(true);
+										editing = true;
 									}}
 								>
 									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
@@ -172,9 +170,9 @@
 						</Paper>
 					</div>
 				{/if}
-				<SliceCellResult {compare} {slice} sliceModel={$model} />
+				<SliceCellResult {compare} {slice} sliceModel={$model ?? ''} />
 				{#if compare}
-					<SliceCellResult {compare} {slice} sliceModel={$comparisonModel} />
+					<SliceCellResult {compare} {slice} sliceModel={$comparisonModel ?? ''} />
 				{/if}
 				<div class="inline" style:cursor="pointer">
 					<div

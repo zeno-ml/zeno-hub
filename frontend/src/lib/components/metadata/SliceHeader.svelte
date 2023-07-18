@@ -1,15 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import {
-		folderToEdit,
-		selectionIds,
-		selectionPredicates,
-		selections,
-		showNewFolder,
-		showNewSlice,
-		showSliceFinder,
-		sliceToEdit
-	} from '$lib/stores';
+	import { selectionIds, selectionPredicates, selections } from '$lib/stores';
 	import {
 		mdiCreation,
 		mdiCreationOutline,
@@ -21,8 +12,31 @@
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import FolderPopup from './popups/FolderPopup.svelte';
+	import Popup from './popups/Popup.svelte';
+	import SliceFinderPopup from './popups/SliceFinderPopup.svelte';
+	import SlicePopup from './popups/SlicePopup.svelte';
+
+	let showSliceFinder = false;
+	let showNewFolder = false;
+	let showNewSlice = false;
 </script>
 
+{#if showSliceFinder}
+	<Popup on:close={() => (showSliceFinder = false)}>
+		<SliceFinderPopup on:close={() => (showSliceFinder = false)} />
+	</Popup>
+{/if}
+{#if showNewSlice}
+	<Popup on:close={() => (showNewSlice = false)}>
+		<SlicePopup on:close={() => (showNewSlice = false)} />
+	</Popup>
+{/if}
+{#if showNewFolder}
+	<Popup on:close={() => (showNewFolder = false)}>
+		<FolderPopup on:close={() => (showNewFolder = false)} />
+	</Popup>
+{/if}
 <div class="slice-header inline">
 	<div class="inline">
 		<h4>Slices</h4>
@@ -52,8 +66,7 @@
 		>
 			<IconButton
 				on:click={() => {
-					showNewFolder.set(false);
-					showSliceFinder.update((c) => !c);
+					showSliceFinder = true;
 				}}
 			>
 				<Icon component={Svg} viewBox="0 0 24 24">
@@ -74,10 +87,7 @@
 		>
 			<IconButton
 				on:click={() => {
-					folderToEdit.set(undefined);
-					showNewSlice.set(false);
-					showNewFolder.update((b) => !b);
-					showSliceFinder.set(false);
+					showNewFolder = true;
 				}}
 			>
 				<Icon component={Svg} viewBox="0 0 24 24">
@@ -94,10 +104,7 @@
 		>
 			<IconButton
 				on:click={() => {
-					sliceToEdit.set(undefined);
-					showNewSlice.update((d) => !d);
-					showNewFolder.set(false);
-					showSliceFinder.set(false);
+					showNewSlice = true;
 				}}
 			>
 				<Icon component={Svg} viewBox="0 0 24 24">

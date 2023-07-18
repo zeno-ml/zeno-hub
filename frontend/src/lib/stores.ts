@@ -88,13 +88,6 @@ export const selectionPredicates: Readable<FilterPredicateGroup | undefined> = d
 	}
 );
 
-export const showNewFolder: Writable<boolean> = writable(false);
-export const showNewSlice: Writable<boolean> = writable(false);
-export const showNewTag: Writable<boolean> = writable(false);
-export const sliceToEdit: Writable<Slice | undefined> = writable(undefined);
-export const folderToEdit: Writable<Folder | undefined> = writable(undefined);
-export const showSliceFinder: Writable<boolean> = writable(false);
-
 export const metricRange: Writable<[number, number]> = writable([Infinity, -Infinity]);
 export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 	[metricRange],
