@@ -12,6 +12,7 @@
 		tagIds
 	} from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
+	import { columnSort } from '$lib/util/util';
 	import {
 		MetadataType,
 		ZenoColumnType,
@@ -48,16 +49,22 @@
 			d.dataType !== MetadataType.DATETIME &&
 			completeColumns.includes(d)
 	);
-	let searchColumns = [searchColumnOptions[0]];
+	let postdistillColumnOptions = searchColumnOptions.filter(
+		(col) => col.columnType === ZenoColumnType.POSTDISTILL
+	);
+	let searchColumns =
+		postdistillColumnOptions.length > 0 ? postdistillColumnOptions : [searchColumnOptions[0]];
 
 	// Column to use as the metric to compare slices.
-	let metricColumns = $columns.filter((d) => {
-		return $page.url.href.includes('compare')
-			? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.POSTDISTILL) &&
-					d.model === $model
-			: (d.dataType = MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
-					completeColumns.includes(d);
-	});
+	let metricColumns = $columns
+		.filter((d) => {
+			return $page.url.href.includes('compare')
+				? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.POSTDISTILL) &&
+						d.model === $model
+				: (d.dataType = MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
+						completeColumns.includes(d);
+		})
+		.sort(columnSort);
 	let metricColumn: ZenoColumn | undefined =
 		metricColumns.length > 0 ? metricColumns[0] : undefined;
 	let compareColumn: ZenoColumn | undefined = undefined;
@@ -144,7 +151,7 @@
 					class="information-tooltip"
 					use:tooltip={{
 						content: $page.url.href.includes('compare')
-							? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a metric column between two models.'
+							? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two models.'
 							: 'Run the SliceLine algorithm to find slices of data with high or low metrics.',
 						position: 'right',
 						theme: 'zeno-tooltip',
@@ -165,12 +172,16 @@
 		<div class="inline">
 			<div style:margin-left={'20px'}>
 				<div style="display:flex">
-					<div class="options-header">Metric Column</div>
+					<div class="options-header">
+						{$page.url.href.includes('compare') ? 'Difference Column' : 'Metric Column'}
+					</div>
 					<div
 						class="information-tooltip"
 						style="margin-top: 3px;"
 						use:tooltip={{
-							content: 'The continuous column to compare slices across',
+							content: $page.url.href.includes('compare')
+								? 'The column on which to measure model disagreement'
+								: 'The continuous column to compare slices across',
 							position: 'right',
 							theme: 'zeno-tooltip',
 							maxWidth: '450'
@@ -227,9 +238,11 @@
 						class="information-tooltip"
 						style="margin-top: 3px;"
 						use:tooltip={{
-							content: 'Increase alpha to find more slices',
+							content:
+								'Weight parameter for the average slice metric. Increase it to find more slices.',
 							theme: 'zeno-tooltip',
-							maxWidth: '250'
+							maxWidth: '195',
+							position: 'left'
 						}}
 					>
 						<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
@@ -276,7 +289,9 @@
 						class="information-tooltip"
 						style="margin-top: 3px;"
 						use:tooltip={{
-							content: 'Order by slice score, a combination of size and metric',
+							content: $page.url.href.includes('compare')
+								? 'Order by slice score, a combination of model difference and size'
+								: 'Order by slice score, a combination of size and metric',
 							theme: 'zeno-tooltip',
 							position: 'left',
 							maxWidth: '250'
@@ -290,7 +305,9 @@
 				<Svelecte
 					style="width: 120px; margin-right: 20px"
 					bind:value={orderByIdx}
-					options={orderByOptions}
+					options={$page.url.href.includes('compare')
+						? ['(model) A > B', '(model) B > A']
+						: orderByOptions}
 					placeholder="Order By"
 				/>
 			</div>

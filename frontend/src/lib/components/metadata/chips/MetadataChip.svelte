@@ -18,6 +18,8 @@
 		{:else if chip[0].column.dataType === MetadataType.BOOLEAN}
 			{chip[0].value}
 			{chip[0].column.name}
+		{:else if chip[0].column.dataType === MetadataType.NOMINAL}
+			{chip[0].column.name} {'=='} {" '" + chip[0].value + "'"}
 		{:else}
 			{chip[0].column.name}
 			{'=='}

@@ -1,7 +1,7 @@
-import { slicesForComparison } from '../stores';
 import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
+import { slicesForComparison } from '../stores';
 
-import { ZenoColumnType, type ZenoColumn, type Slice } from '$lib/zenoapi';
+import { ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
 
 export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
@@ -19,6 +19,41 @@ export function columnHash(col: ZenoColumn) {
 		col.name +
 		(col.model ? col.model : '')
 	);
+}
+
+function columnTypeOrder(colType: ZenoColumnType) {
+	switch (colType) {
+		case ZenoColumnType.POSTDISTILL:
+			return 0;
+		case ZenoColumnType.PREDISTILL:
+			return 1;
+		case ZenoColumnType.OUTPUT:
+			return 2;
+		case ZenoColumnType.METADATA:
+			return 3;
+		case ZenoColumnType.ITEM:
+			return 4;
+		case ZenoColumnType.LABEL:
+			return 4;
+		case ZenoColumnType.EMBEDDING:
+			return 4;
+	}
+}
+
+export function columnSort(col1: ZenoColumn, col2: ZenoColumn) {
+	if (columnTypeOrder(col1.columnType) > columnTypeOrder(col2.columnType)) {
+		return 1;
+	} else if (columnTypeOrder(col1.columnType) < columnTypeOrder(col2.columnType)) {
+		return -1;
+	}
+
+	if (col1.name < col2.name) {
+		return -1;
+	} else if (col1.name > col2.name) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 /** Calculate the metric range for coloring histograms */

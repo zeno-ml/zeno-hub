@@ -73,11 +73,14 @@
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>metric</h4>
-		<Checkbox
-			checked={fixedDimension === 'metric'}
-			on:click={() =>
-				(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
-		/>
+		<div class="fixed-container">
+			<span>fixed</span>
+			<Checkbox
+				checked={fixedDimension === 'metric'}
+				on:click={() =>
+					(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
+			/>
+		</div>
 	</div>
 	{#if fixedDimension === 'metric'}
 		<MetricsEncodingDropdown
@@ -94,8 +97,18 @@
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>y</h4>
+		<div class="fixed-container">
+			<span>fixed</span>
+			<Checkbox
+				checked={fixedDimension === 'y'}
+				on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+			/>
+		</div>
+	</div>
+	<div class="parameters">
+		<h4 class="select-label">&nbsp;</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
+			style="width: 280px; height: 30px; flex:none;"
 			value={parameters.yChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
@@ -107,10 +120,6 @@
 					refreshParams(e, Dimensions.y);
 				}
 			}}
-		/>
-		<Checkbox
-			checked={fixedDimension === 'y'}
-			on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
 		/>
 	</div>
 	{#if fixedDimension === 'y'}
@@ -170,5 +179,15 @@
 	}
 	.parameters h4 {
 		margin: 5px;
+	}
+	.fixed-container {
+		display: flex;
+		align-items: center;
+	}
+	.parameters {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 10px;
 	}
 </style>

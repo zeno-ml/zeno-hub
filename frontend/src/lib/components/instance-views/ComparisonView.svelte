@@ -17,6 +17,7 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
+	import { columnSort } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -42,10 +43,14 @@
 	// decide which model column to show sort icon
 	let sortModel = '';
 
-	let options = $columns.filter(
-		(c) =>
-			c.model === undefined || c.model === $model || (sortModel === undefined && c.model === $model)
-	);
+	let options = $columns
+		.filter(
+			(c) =>
+				c.model === undefined ||
+				c.model === $model ||
+				(sortModel === undefined && c.model === $model)
+		)
+		.sort(columnSort);
 	let selectColumn = options[0];
 
 	let currentPage = 0;

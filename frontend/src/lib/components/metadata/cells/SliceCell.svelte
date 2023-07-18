@@ -36,6 +36,10 @@
 		: false;
 
 	$: selected = $selections.slices.includes(slice.id);
+	$: transferData =
+		$selections.slices.length > 0 && $selections.slices.includes(slice.id)
+			? $selections.slices.join(',')
+			: [slice.id].join(',');
 
 	function removeSlice() {
 		confirmDelete = false;
@@ -63,7 +67,7 @@
 
 	function dragStart(e: DragEvent) {
 		if (e.dataTransfer !== null) {
-			e.dataTransfer.setData('text/plain', slice.id.toString());
+			e.dataTransfer.setData('text/plain', transferData);
 			e.dataTransfer.dropEffect = 'copy';
 		}
 	}
@@ -72,10 +76,18 @@
 		if (e.dataTransfer !== null) {
 			// If dragged out of a folder, remove from the folder it was in.
 			if (e.dataTransfer.dropEffect === 'none' && $projectConfig) {
-				ZenoService.updateSlice($projectConfig.uuid, { ...slice, folderId: undefined }).then(() => {
-					ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then((fetchedSlices) =>
-						slices.set(fetchedSlices)
-					);
+				const data = transferData.split(',');
+				data.forEach((element) => {
+					const slice = $slices.find((slice) => slice.id === parseInt(element));
+					if (slice) {
+						ZenoService.updateSlice($projectConfig.uuid, { ...slice, folderId: undefined }).then(
+							() => {
+								ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then(
+									(fetchedSlices) => slices.set(fetchedSlices)
+								);
+							}
+						);
+					}
 				});
 			}
 		}
@@ -164,32 +176,30 @@
 				{#if compare}
 					<SliceCellResult {compare} {slice} sliceModel={$comparisonModel} />
 				{/if}
-				{#if !compare}
-					<div class="inline" style:cursor="pointer">
-						<div
-							style:width="36px"
-							use:clickOutside
-							on:clickOutside={() => {
-								hovering = false;
-							}}
-						>
-							{#if hovering}
-								<IconButton
-									size="button"
-									style="padding: 0px"
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = !showOptions;
-									}}
-								>
-									<Icon component={Svg} viewBox="0 0 24 24">
-										<path fill="black" d={mdiDotsHorizontal} />
-									</Icon>
-								</IconButton>
-							{/if}
-						</div>
+				<div class="inline" style:cursor="pointer">
+					<div
+						style:width="36px"
+						use:clickOutside
+						on:clickOutside={() => {
+							hovering = false;
+						}}
+					>
+						{#if hovering}
+							<IconButton
+								size="button"
+								style="padding: 0px"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = !showOptions;
+								}}
+							>
+								<Icon component={Svg} viewBox="0 0 24 24">
+									<path fill="black" d={mdiDotsHorizontal} />
+								</Icon>
+							</IconButton>
+						{/if}
 					</div>
-				{/if}
+				</div>
 			</div>
 		</div>
 	</div>

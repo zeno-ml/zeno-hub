@@ -152,7 +152,7 @@
 </div>
 <div class="encoding-section">
 	<div class="parameters">
-		<h4>color</h4>
+		<h4>fixed</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
 			value={parameters.fixedChannel}

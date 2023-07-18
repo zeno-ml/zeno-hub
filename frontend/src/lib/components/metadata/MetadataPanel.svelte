@@ -1,6 +1,6 @@
 <script lang="ts">
-	import MetadataHeader from './MetadataHeader.svelte';
 	import Histograms from './Histograms.svelte';
+	import MetadataHeader from './MetadataHeader.svelte';
 	import Slices from './Slices.svelte';
 	import Tags from './Tags.svelte';
 </script>

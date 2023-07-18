@@ -96,7 +96,8 @@ export default function generateSpec(parameters: HeatmapParameters): VegaLiteSpe
 				encoding: {
 					text: {
 						field: 'fixed_value',
-						type: 'quantitative'
+						type: 'quantitative',
+						format: '.2f'
 					},
 					color: {
 						condition: {

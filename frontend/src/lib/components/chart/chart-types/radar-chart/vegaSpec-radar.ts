@@ -132,7 +132,7 @@ export default function generateSpec(parameters: RadarParameters): Visualization
 							update: {
 								align: { value: 'center' },
 								baseline: { value: 'middle' },
-								text: { signal: 'datum.datum.fixed_value' },
+								text: { signal: 'round(100*datum.datum.fixed_value)/100' },
 								fill: { value: 'black' },
 								fontSize: [{ test: 'datum.datum.layer_value === hover', value: 14 }, { value: 12 }],
 								fontWeight: { value: 'bold' },
