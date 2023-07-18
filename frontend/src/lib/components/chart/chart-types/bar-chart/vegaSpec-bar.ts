@@ -90,7 +90,8 @@ export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 				encoding: {
 					text: {
 						field: 'y_value',
-						type: 'quantitative'
+						type: 'quantitative',
+						format: '.2f'
 					}
 				}
 			}

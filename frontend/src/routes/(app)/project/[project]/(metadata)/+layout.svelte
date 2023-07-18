@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import MetadataPanel from '$lib/components/metadata/MetadataPanel.svelte';
 	import NewFolderPopup from '$lib/components/metadata/popups/NewFolderPopup.svelte';
 	import NewSlicePopup from '$lib/components/metadata/popups/NewSlicePopup.svelte';
@@ -15,16 +14,16 @@
 </script>
 
 <!-- These popups are at the top level b/c of issues with overflow-y scroll. -->
-{#if $showNewSlice && !$page.url.href.includes('compare') && $projectConfig}
+{#if $showNewSlice && $projectConfig}
 	<NewSlicePopup />
 {/if}
-{#if $showNewFolder && !$page.url.href.includes('compare')}
+{#if $showNewFolder}
 	<NewFolderPopup />
 {/if}
 {#if $showSliceFinder}
 	<SliceFinderPopup />
 {/if}
-{#if $showNewTag && !$page.url.href.includes('compare')}
+{#if $showNewTag}
 	<NewTagPopup />
 {/if}
 <div class="container">

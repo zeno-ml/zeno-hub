@@ -1,15 +1,4 @@
 <script lang="ts">
-	import { tooltip } from '@svelte-plugins/tooltips';
-	import { Svg } from '@smui/common';
-	import {
-		mdiCreation,
-		mdiCreationOutline,
-		mdiFolderPlusOutline,
-		mdiInformationOutline,
-		mdiPlus,
-		mdiPlusCircle
-	} from '@mdi/js';
-	import IconButton, { Icon } from '@smui/icon-button';
 	import { page } from '$app/stores';
 	import {
 		folderToEdit,
@@ -21,6 +10,17 @@
 		showSliceFinder,
 		sliceToEdit
 	} from '$lib/stores';
+	import {
+		mdiCreation,
+		mdiCreationOutline,
+		mdiFolderPlusOutline,
+		mdiInformationOutline,
+		mdiPlus,
+		mdiPlusCircle
+	} from '@mdi/js';
+	import { Svg } from '@smui/common';
+	import IconButton, { Icon } from '@smui/icon-button';
+	import { tooltip } from '@svelte-plugins/tooltips';
 </script>
 
 <div class="slice-header inline">
@@ -65,52 +65,50 @@
 				</Icon>
 			</IconButton>
 		</div>
-		{#if !$page.url.href.includes('compare')}
-			<div
-				use:tooltip={{
-					content: 'Create a new folder.',
-					position: 'left',
-					theme: 'zeno-tooltip'
+		<div
+			use:tooltip={{
+				content: 'Create a new folder.',
+				position: 'left',
+				theme: 'zeno-tooltip'
+			}}
+		>
+			<IconButton
+				on:click={() => {
+					folderToEdit.set(undefined);
+					showNewSlice.set(false);
+					showNewFolder.update((b) => !b);
+					showSliceFinder.set(false);
 				}}
 			>
-				<IconButton
-					on:click={() => {
-						folderToEdit.set(undefined);
-						showNewSlice.set(false);
-						showNewFolder.update((b) => !b);
-						showSliceFinder.set(false);
-					}}
-				>
-					<Icon component={Svg} viewBox="0 0 24 24">
-						<path fill="var(--G1)" d={mdiFolderPlusOutline} />
-					</Icon>
-				</IconButton>
-			</div>
-			<div
-				use:tooltip={{
-					content: 'Create a new slice.',
-					position: 'left',
-					theme: 'zeno-tooltip'
+				<Icon component={Svg} viewBox="0 0 24 24">
+					<path fill="var(--G1)" d={mdiFolderPlusOutline} />
+				</Icon>
+			</IconButton>
+		</div>
+		<div
+			use:tooltip={{
+				content: 'Create a new slice.',
+				position: 'left',
+				theme: 'zeno-tooltip'
+			}}
+		>
+			<IconButton
+				on:click={() => {
+					sliceToEdit.set(undefined);
+					showNewSlice.update((d) => !d);
+					showNewFolder.set(false);
+					showSliceFinder.set(false);
 				}}
 			>
-				<IconButton
-					on:click={() => {
-						sliceToEdit.set(undefined);
-						showNewSlice.update((d) => !d);
-						showNewFolder.set(false);
-						showSliceFinder.set(false);
-					}}
-				>
-					<Icon component={Svg} viewBox="0 0 24 24">
-						{#if $selectionPredicates !== undefined}
-							<path fill="#6a1a9a" d={mdiPlusCircle} />
-						{:else}
-							<path fill="var(--G1)" d={mdiPlus} />
-						{/if}
-					</Icon>
-				</IconButton>
-			</div>
-		{/if}
+				<Icon component={Svg} viewBox="0 0 24 24">
+					{#if $selectionPredicates !== undefined}
+						<path fill="#6a1a9a" d={mdiPlusCircle} />
+					{:else}
+						<path fill="var(--G1)" d={mdiPlus} />
+					{/if}
+				</Icon>
+			</IconButton>
+		</div>
 	</div>
 </div>
 
