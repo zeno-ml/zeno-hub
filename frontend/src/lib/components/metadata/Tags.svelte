@@ -6,7 +6,6 @@
 		projectConfig,
 		selectionIds,
 		selections,
-		showNewTag,
 		tagIds,
 		tags
 	} from '$lib/stores';
@@ -17,6 +16,10 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import TagCell from './cells/TagCell.svelte';
+	import Popup from './popups/Popup.svelte';
+	import TagPopup from './popups/TagPopup.svelte';
+
+	let showNewTag = false;
 
 	function saveChanges() {
 		if ($editTag === undefined || $projectConfig === undefined) return;
@@ -38,6 +41,11 @@
 	}
 </script>
 
+{#if showNewTag}
+	<Popup on:close={() => (showNewTag = false)}>
+		<TagPopup on:close={() => (showNewTag = false)} />
+	</Popup>
+{/if}
 <div id="tag-header" class="inline" style:margin-top="10px">
 	<div class="inline">
 		<h4>Tags</h4>
@@ -64,7 +72,7 @@
 						theme: 'zeno-tooltip'
 					}}
 				>
-					<IconButton on:click={() => showNewTag.update((b) => !b)}>
+					<IconButton on:click={() => (showNewTag = true)}>
 						<Icon component={Svg} viewBox="0 0 24 24">
 							{#if $selectionIds !== undefined}
 								<path fill="var(--N1)" d={mdiPlusCircle} />
