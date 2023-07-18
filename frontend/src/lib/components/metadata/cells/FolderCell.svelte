@@ -3,7 +3,7 @@
 	import { folderToEdit, folders, projectConfig, showNewFolder, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
-	import { mdiChevronDown, mdiChevronUp, mdiDotsHorizontal } from '@mdi/js';
+	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
@@ -32,20 +32,22 @@
 	on:dragleave={() => (dragOver = false)}
 	on:drop={(ev) => {
 		dragOver = false;
-		const data = ev.dataTransfer.getData('text/plain');
-		const slice = $slices.find((slice) => slice.id === parseInt(data));
-		if (slice && $projectConfig) {
-			ZenoService.updateSlice($projectConfig.uuid, {
-				...slice,
-				folderId: folder.id
-			}).then(() => {
-				if ($projectConfig) {
-					ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
-						slices.set(fetchedSlices)
-					);
-				}
-			});
-		}
+		const data = ev.dataTransfer.getData('text/plain').split(',');
+		data.forEach((element) => {
+			const slice = $slices.find((slice) => slice.id === parseInt(element));
+			if (slice && $projectConfig) {
+				ZenoService.updateSlice($projectConfig.uuid, {
+					...slice,
+					folderId: folder.id
+				}).then(() => {
+					if ($projectConfig) {
+						ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
+							slices.set(fetchedSlices)
+						);
+					}
+				});
+			}
+		});
 	}}
 >
 	<div class="inline">
@@ -55,7 +57,7 @@
 			on:click={() => (expandFolder = !expandFolder)}
 		>
 			<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
-				<path fill="black" d={expandFolder ? mdiChevronDown : mdiChevronUp} />
+				<path fill="black" d={expandFolder ? mdiChevronDown : mdiChevronRight} />
 			</Icon>
 		</div>
 		{folder.name}
