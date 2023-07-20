@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Body_add_item } from '../models/Body_add_item';
+import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Chart } from '../models/Chart';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
@@ -11,6 +12,7 @@ import type { HistogramRequest } from '../models/HistogramRequest';
 import type { LabelSpec } from '../models/LabelSpec';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
+import type { Organization } from '../models/Organization';
 import type { OutputSpec } from '../models/OutputSpec';
 import type { PostdistillSpec } from '../models/PostdistillSpec';
 import type { PredistillSpec } from '../models/PredistillSpec';
@@ -30,33 +32,26 @@ import { request as __request } from '../core/request';
 
 export class ZenoService {
 	/**
-	 * Get Projects
-	 * @returns ProjectConfig Successful Response
+	 * Get Users
+	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjects(): CancelablePromise<Array<ProjectConfig>> {
+	public static getUsers(): CancelablePromise<Array<User>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/projects'
+			url: '/users'
 		});
 	}
 
 	/**
-	 * Get Project
-	 * @param project
-	 * @returns ProjectConfig Successful Response
+	 * Get Organization Names
+	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getProject(project: string): CancelablePromise<ProjectConfig> {
+	public static getOrganizationNames(): CancelablePromise<Array<Organization>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/config/{project}',
-			path: {
-				project: project
-			},
-			errors: {
-				422: `Validation Error`
-			}
+			url: '/organization_names'
 		});
 	}
 
@@ -217,12 +212,305 @@ export class ZenoService {
 	}
 
 	/**
-	 * Register User
+	 * Get Metric For Tag
+	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns GroupMetric Successful Response
 	 * @throws ApiError
 	 */
-	public static registerUser(requestBody: User): CancelablePromise<any> {
+	public static getMetricForTag(
+		project: string,
+		requestBody: TagMetricKey
+	): CancelablePromise<GroupMetric> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/tag-metric/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Run Slice Finder
+	 * @param project
+	 * @param requestBody
+	 * @returns SliceFinderReturn Successful Response
+	 * @throws ApiError
+	 */
+	public static runSliceFinder(
+		project: string,
+		requestBody: SliceFinderRequest
+	): CancelablePromise<SliceFinderReturn> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slice-finder/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Filtered Table
+	 * @param project
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static getFilteredTable(
+		project: string,
+		requestBody: TableRequest
+	): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/filtered-table/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Data
+	 * @param project
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static getChartData(project: string, requestBody: Chart): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/chart-data/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Organizations
+	 * @param requestBody
+	 * @returns Organization Successful Response
+	 * @throws ApiError
+	 */
+	public static getOrganizations(requestBody: User): CancelablePromise<Array<Organization>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/organizations',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project
+	 * @param project
+	 * @param requestBody
+	 * @returns ProjectConfig Successful Response
+	 * @throws ApiError
+	 */
+	public static getProject(project: string, requestBody: User): CancelablePromise<ProjectConfig> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/config/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Projects
+	 * @param requestBody
+	 * @returns ProjectConfig Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjects(requestBody: User): CancelablePromise<Array<ProjectConfig>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/projects',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Metrics For Slices
+	 * @param project
+	 * @param requestBody
+	 * @returns GroupMetric Successful Response
+	 * @throws ApiError
+	 */
+	public static getMetricsForSlices(
+		project: string,
+		requestBody: MetricRequest
+	): CancelablePromise<Array<GroupMetric>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slice-metrics/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Histogram Buckets
+	 * @param project
+	 * @param requestBody
+	 * @returns HistogramBucket Successful Response
+	 * @throws ApiError
+	 */
+	public static getHistogramBuckets(
+		project: string,
+		requestBody: Array<ZenoColumn>
+	): CancelablePromise<Array<Array<HistogramBucket>>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/histograms/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Calculate Histogram Counts
+	 * @param project
+	 * @param requestBody
+	 * @returns number Successful Response
+	 * @throws ApiError
+	 */
+	public static calculateHistogramCounts(
+		project: string,
+		requestBody: HistogramRequest
+	): CancelablePromise<Array<Array<number>>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/histogram-counts/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Calculate Histogram Metrics
+	 * @param project
+	 * @param requestBody
+	 * @returns number Successful Response
+	 * @throws ApiError
+	 */
+	public static calculateHistogramMetrics(
+		project: string,
+		requestBody: HistogramRequest
+	): CancelablePromise<Array<Array<number>>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/histogram-metrics/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project Users
+	 * @param project
+	 * @returns User Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjectUsers(project: string): CancelablePromise<Array<User>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project_users/{project}',
+			path: {
+				project: project
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project Orgs
+	 * @param project
+	 * @returns Organization Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjectOrgs(project: string): CancelablePromise<Array<Organization>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project_organizations/{project}',
+			path: {
+				project: project
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Register User
+	 * @param requestBody
+	 * @returns User Successful Response
+	 * @throws ApiError
+	 */
+	public static registerUser(requestBody: User): CancelablePromise<User> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/register',
@@ -237,10 +525,10 @@ export class ZenoService {
 	/**
 	 * Login
 	 * @param requestBody
-	 * @returns string Successful Response
+	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static login(requestBody: User): CancelablePromise<string> {
+	public static login(requestBody: User): CancelablePromise<User> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/login',
@@ -462,106 +750,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Metrics For Slices
-	 * @param project
-	 * @param requestBody
-	 * @returns GroupMetric Successful Response
-	 * @throws ApiError
-	 */
-	public static getMetricsForSlices(
-		project: string,
-		requestBody: MetricRequest
-	): CancelablePromise<Array<GroupMetric>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/slice-metrics/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Histogram Buckets
-	 * @param project
-	 * @param requestBody
-	 * @returns HistogramBucket Successful Response
-	 * @throws ApiError
-	 */
-	public static getHistogramBuckets(
-		project: string,
-		requestBody: Array<ZenoColumn>
-	): CancelablePromise<Array<Array<HistogramBucket>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histograms/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Calculate Histogram Counts
-	 * @param project
-	 * @param requestBody
-	 * @returns number Successful Response
-	 * @throws ApiError
-	 */
-	public static calculateHistogramCounts(
-		project: string,
-		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histogram-counts/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Calculate Histogram Metrics
-	 * @param project
-	 * @param requestBody
-	 * @returns number Successful Response
-	 * @throws ApiError
-	 */
-	public static calculateHistogramMetrics(
-		project: string,
-		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histogram-metrics/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Add Tag
 	 * @param project
 	 * @param requestBody
@@ -584,19 +772,34 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Metric For Tag
-	 * @param project
+	 * Add Organization
 	 * @param requestBody
-	 * @returns GroupMetric Successful Response
+	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static getMetricForTag(
-		project: string,
-		requestBody: TagMetricKey
-	): CancelablePromise<GroupMetric> {
+	public static addOrganization(requestBody: Body_add_organization): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/tag-metric/{project}',
+			url: '/add_organization',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Add Project User
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static addProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/add_project_user/{project}',
 			path: {
 				project: project
 			},
@@ -609,66 +812,16 @@ export class ZenoService {
 	}
 
 	/**
-	 * Run Slice Finder
+	 * Add Project Org
 	 * @param project
 	 * @param requestBody
-	 * @returns SliceFinderReturn Successful Response
+	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static runSliceFinder(
-		project: string,
-		requestBody: SliceFinderRequest
-	): CancelablePromise<SliceFinderReturn> {
+	public static addProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/slice-finder/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Filtered Table
-	 * @param project
-	 * @param requestBody
-	 * @returns string Successful Response
-	 * @throws ApiError
-	 */
-	public static getFilteredTable(
-		project: string,
-		requestBody: TableRequest
-	): CancelablePromise<string> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/filtered-table/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Chart Data
-	 * @param project
-	 * @param requestBody
-	 * @returns string Successful Response
-	 * @throws ApiError
-	 */
-	public static getChartData(project: string, requestBody: Chart): CancelablePromise<string> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/chart-data/{project}',
+			url: '/add_project_org/{project}',
 			path: {
 				project: project
 			},
@@ -769,6 +922,107 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update User
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateUser(requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/user/update',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Organization
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateOrganization(requestBody: Organization): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/organization/update',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateProject(requestBody: ProjectConfig): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/project/update',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Project User
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/project_user/update/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Project Org
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateProjectOrg(
+		project: string,
+		requestBody: Organization
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/project_org/update/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Delete Slice
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -832,6 +1086,71 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'DELETE',
 			url: '/tag',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Organization
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteOrganization(requestBody: Organization): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/organization',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Project User
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/project_user/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Project Org
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteProjectOrg(
+		project: string,
+		requestBody: Organization
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/project_org/{project}',
+			path: {
+				project: project
+			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

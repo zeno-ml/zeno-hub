@@ -5,6 +5,7 @@
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
+	import Popup from './Popup.svelte';
 
 	export let folderToEdit: Folder | undefined = undefined;
 
@@ -61,20 +62,22 @@
 
 <svelte:window on:keydown={submit} />
 
-<Content style="display: flex; align-items: center;">
-	<Textfield bind:value={folderName} label="Folder Name" bind:this={input} />
-	<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}>
-		Cancel
-	</Button>
-	<Button
-		style="margin-left: 5px;"
-		variant="outlined"
-		disabled={invalidName}
-		on:click={() => (folderToEdit ? editFolder() : createFolder())}
-	>
-		{folderToEdit ? 'Update' : 'Create'}
-	</Button>
-</Content>
-{#if invalidName && folderName.length > 0}
-	<p style:margin-right="10px" style:color="red">folder already exists</p>
-{/if}
+<Popup on:close>
+	<Content style="display: flex; align-items: center;">
+		<Textfield bind:value={folderName} label="Folder Name" bind:this={input} />
+		<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}>
+			Cancel
+		</Button>
+		<Button
+			style="margin-left: 5px;"
+			variant="outlined"
+			disabled={invalidName}
+			on:click={() => (folderToEdit ? editFolder() : createFolder())}
+		>
+			{folderToEdit ? 'Update' : 'Create'}
+		</Button>
+	</Content>
+	{#if invalidName && folderName.length > 0}
+		<p style:margin-right="10px" style:color="red">folder already exists</p>
+	{/if}
+</Popup>

@@ -1,20 +1,29 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { navigating, page } from '$app/stores';
+	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
+	import { projectConfig } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import {
-		mdiApi,
+		mdiAccount,
 		mdiChartBoxOutline,
+		mdiCog,
 		mdiCompare,
 		mdiCompassOutline,
-		mdiHomeOutline,
 		mdiLogout
 	} from '@mdi/js';
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
+
+	export let data;
+
+	let projectEdit = false;
 </script>
 
+{#if projectEdit && $projectConfig}
+	<ProjectPopup project={$projectConfig} on:close={() => (projectEdit = false)} user={data.user} />
+{/if}
 <main>
 	<nav>
 		<header>
@@ -87,37 +96,39 @@
 								</Icon>
 							</div>
 						</div>
+						{#if $projectConfig && $projectConfig.editor}
+							<div
+								class="item"
+								on:keydown={() => ({})}
+								on:click={() => {
+									projectEdit = true;
+								}}
+								use:tooltip={{
+									content: "Edit your project's configuration.",
+									position: 'right',
+									theme: 'zeno-tooltip'
+								}}
+							>
+								<div class="icon">
+									<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+										<path
+											fill={$page.url.href.includes('chart') ? '#6a1b9a' : 'black'}
+											d={mdiCog}
+										/>
+									</Icon>
+								</div>
+							</div>
+						{/if}
 					</div>
 				{/if}
 			</div>
 
 			<div class="icons">
-				<div
-					use:tooltip={{
-						content: 'Learn more about Zeno.',
-						position: 'right',
-						theme: 'zeno-tooltip'
-					}}
-				>
-					<IconButton href="http://zenoml.com/">
-						<Icon component={Svg} viewBox="0 0 24 24">
-							<path fill="black" d={mdiHomeOutline} />
-						</Icon>
-					</IconButton>
-				</div>
-				<div
-					use:tooltip={{
-						content: 'Explore the documentation.',
-						position: 'right',
-						theme: 'zeno-tooltip'
-					}}
-				>
-					<IconButton href="http://zenoml.com/docs/intro/">
-						<Icon component={Svg} viewBox="0 0 24 24">
-							<path fill="black" d={mdiApi} />
-						</Icon>
-					</IconButton>
-				</div>
+				<IconButton on:click={() => goto('/account')}>
+					<Icon component={Svg} viewBox="0 0 24 24">
+						<path fill="black" d={mdiAccount} />
+					</Icon>
+				</IconButton>
 				<form method="POST" action="/logout">
 					<IconButton>
 						<Icon component={Svg} viewBox="0 0 24 24">

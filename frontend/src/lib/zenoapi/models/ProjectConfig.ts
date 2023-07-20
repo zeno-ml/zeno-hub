@@ -12,4 +12,6 @@ export type ProjectConfig = {
 	view: string;
 	calculateHistogramMetrics?: boolean;
 	numItems?: number;
+	editor: boolean;
+	public: boolean;
 };

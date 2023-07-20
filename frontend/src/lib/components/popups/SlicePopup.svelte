@@ -14,6 +14,7 @@
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
 	import FilterGroupEntry from './FilterGroupEntry.svelte';
+	import Popup from './Popup.svelte';
 
 	export let sliceToEdit: Slice | undefined = undefined;
 
@@ -142,29 +143,31 @@
 
 <svelte:window on:keydown={submit} />
 
-<Content>
-	<Textfield bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
-	<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
-	<div id="submit">
-		<Button
-			variant="outlined"
-			on:click={saveSlice}
-			disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
-				(sliceToEdit &&
-					originalName !== sliceName &&
-					$slices.some((slice) => slice.sliceName === sliceName)) ||
-				!isValidPredicates}
-		>
-			{sliceToEdit ? 'Update Slice' : 'Create Slice'}
-		</Button>
-		<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
-			cancel
-		</Button>
-		{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
-			<p style:margin-right="10px" style:color="red">slice already exists</p>
-		{/if}
-	</div>
-</Content>
+<Popup on:close>
+	<Content>
+		<Textfield bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
+		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
+		<div id="submit">
+			<Button
+				variant="outlined"
+				on:click={saveSlice}
+				disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
+					(sliceToEdit &&
+						originalName !== sliceName &&
+						$slices.some((slice) => slice.sliceName === sliceName)) ||
+					!isValidPredicates}
+			>
+				{sliceToEdit ? 'Update Slice' : 'Create Slice'}
+			</Button>
+			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
+				cancel
+			</Button>
+			{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
+				<p style:margin-right="10px" style:color="red">slice already exists</p>
+			{/if}
+		</div>
+	</Content>
+</Popup>
 
 <style>
 	#submit {

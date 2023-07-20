@@ -33,11 +33,12 @@ export const actions: Actions = {
 		const secret = Md5.hashStr(password as string);
 		try {
 			OpenAPI.BASE = backendEndpoint + '/api';
-			await ZenoService.login({
+			const user = await ZenoService.login({
+				id: -1,
 				secret: secret,
 				email: email as string
 			});
-			cookies.set('loggedIn', 'loggedIn', {
+			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',
@@ -50,7 +51,6 @@ export const actions: Actions = {
 				error: error
 			});
 		}
-
 		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
 	}
 };

@@ -3,11 +3,13 @@ import json
 
 from psycopg import DatabaseError, sql
 
+from zeno_backend.classes.base import ProjectConfig
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
+from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
@@ -75,7 +77,6 @@ def tag(tag: Tag, project: str):
         project (str): the project the user is currently working with.
     """
     db = Database()
-    print(tag)
     try:
         db.connect()
         db.execute(
@@ -97,7 +98,6 @@ def tag(tag: Tag, project: str):
             ],
             return_all=True,
         )
-        print(item_ids_result)
         if item_ids_result is None:
             return
         existing_items = set(map(lambda item_id: item_id[0], item_ids_result))
@@ -126,3 +126,131 @@ def tag(tag: Tag, project: str):
         raise Exception(error) from error
     finally:
         db.disconnect()
+
+
+def user(user: User):
+    """Update a user in the database.
+
+    Args:
+        user (User): the updated representation of the user.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE users SET user_name = %s, email = %s, secret = %s WHERE id = %s",
+        [user.name, user.email, user.secret, user.id],
+    )
+
+
+def organization(organization: Organization):
+    """Update an organization in the database.
+
+    Includes updating the organization's members.
+
+    Args:
+        organization (Organization): the updated representation of the organization.
+    """
+    db = Database()
+    try:
+        db.connect()
+        db.execute(
+            "UPDATE organizations SET name = %s WHERE id = %s",
+            [organization.name, organization.id],
+        )
+        organization_users = db.execute_return(
+            "SELECT user_id, admin FROM user_organization WHERE organization_id = %s",
+            [organization.id],
+            return_all=True,
+        )
+        if organization_users is None:
+            return
+        org_users = set(map(lambda user: user.id, organization.members))
+        existing_users = set(map(lambda user: user[0], organization_users))
+        to_remove = list(existing_users.difference(org_users))
+        for item in to_remove:
+            db.execute(
+                "DELETE FROM user_organization "
+                "WHERE user_id = %s AND organization_id = %s;",
+                [
+                    item,
+                    organization.id,
+                ],
+            )
+        to_add = list(
+            filter(lambda user: user.id not in existing_users, organization.members)
+        )
+        for item in to_add:
+            db.execute(
+                "INSERT INTO user_organization (user_id, organization_id, admin) "
+                "VALUES (%s,%s,%s)",
+                [item.id, organization.id, item.admin],
+            )
+        to_edit = list(
+            filter(
+                lambda user: any(
+                    user.id == org_user[0] and user.admin != org_user[1]
+                    for org_user in organization_users
+                ),
+                organization.members,
+            )
+        )
+        for item in to_edit:
+            db.execute(
+                "UPDATE user_organization SET admin = %s "
+                "WHERE user_id = %s AND organization_id = %s;",
+                [item.admin, item.id, organization.id],
+            )
+        db.commit()
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
+def project(project: ProjectConfig):
+    """Update a project's configuration.
+
+    Args:
+        project (ProjectConfig): the configuration of the project.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, view = %s, "
+        "num_items = %s, public = %s WHERE uuid = %s;",
+        [
+            project.name,
+            project.calculate_histogram_metrics,
+            project.view,
+            project.num_items,
+            project.public,
+            project.uuid,
+        ],
+    )
+
+
+def project_user(project: str, user: User):
+    """Update a user's project access in the database.
+
+    Args:
+        project (str): the project for which to update the access.
+        user (User): the user for which to update the access.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE user_project SET editor = %s WHERE project_uuid = %s AND user_id = %s;",
+        [user.admin, project, user.id],
+    )
+
+
+def project_org(project: str, organization: Organization):
+    """Update a organization's project access in the database.
+
+    Args:
+        project (str): the project for which to update the access.
+        organization (Organization): the organization for which to update the access.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE organization_project SET editor = %s WHERE project_uuid = %s "
+        "AND organization_id = %s;",
+        [organization.admin, project, organization.id],
+    )

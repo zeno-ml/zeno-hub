@@ -28,7 +28,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
-from zeno_backend.classes.user import User
+from zeno_backend.classes.user import Organization, User
 from zeno_backend.processing.chart import chart_data
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import (
@@ -60,13 +60,15 @@ def get_server() -> FastAPI:
     app.mount("/api", api_app)
 
     ###################################################################### Fetch
-    @api_app.get("/projects", response_model=List[ProjectConfig], tags=["zeno"])
-    def get_projects():
-        return select.projects()
+    @api_app.get("/users", response_model=List[User], tags=["zeno"])
+    def get_users():
+        return select.users()
 
-    @api_app.get("/config/{project}", response_model=ProjectConfig, tags=["zeno"])
-    def get_project(project: str):
-        return select.project(project)
+    @api_app.get(
+        "/organization_names", response_model=List[Organization], tags=["zeno"]
+    )
+    def get_organization_names():
+        return select.organization_names()
 
     @api_app.get("/data/{project}", response_model=bytes, tags=["zeno"])
     def get_data(project: str, item: str):
@@ -104,35 +106,122 @@ def get_server() -> FastAPI:
     def get_tags(project: str):
         return select.tags(project)
 
+    @api_app.post("/tag-metric/{project}", response_model=GroupMetric, tags=["zeno"])
+    def get_metric_for_tag(metric_key: TagMetricKey, project: str):
+        filter_sql = table_filter(project, metric_key.model, None, metric_key.tag.items)
+        return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+
+    @api_app.post(
+        "/slice-finder/{project}", tags=["zeno"], response_model=SliceFinderReturn
+    )
+    def run_slice_finder(req: SliceFinderRequest, project: str):
+        return slice_finder(project, req)
+
+    @api_app.post("/filtered-table/{project}", response_model=str, tags=["zeno"])
+    def get_filtered_table(req: TableRequest, project: str):
+        filter_sql = table_filter(project, None, req.filter_predicates, req.items)
+        sql_table = select.table_data_paginated(
+            project, filter_sql, req.offset, req.limit
+        )
+        filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
+        if req.diff_column_1 and req.diff_column_2:
+            filt_df = generate_diff_cols(
+                filt_df, req.diff_column_1, req.diff_column_2, project
+            )
+        return filt_df.to_json(orient="records")
+
+    @api_app.post("/chart-data/{project}", tags=["zeno"], response_model=str)
+    def get_chart_data(chart: Chart, project: str):
+        return chart_data(chart, project)
+
+    @api_app.post("/organizations", tags=["zeno"], response_model=List[Organization])
+    def get_organizations(user: User):
+        return select.organizations(user)
+
+    @api_app.post("/config/{project}", response_model=ProjectConfig, tags=["zeno"])
+    def get_project(project: str, user: User):
+        return select.project(project, user)
+
+    @api_app.post("/projects", response_model=List[ProjectConfig], tags=["zeno"])
+    def get_projects(user: User):
+        return select.projects(user)
+
+    @api_app.post(
+        "/slice-metrics/{project}", response_model=List[GroupMetric], tags=["zeno"]
+    )
+    def get_metrics_for_slices(req: MetricRequest, project: str):
+        return_metrics: List[GroupMetric] = []
+        for metric_key in req.metric_keys:
+            filter_sql = table_filter(
+                project, metric_key.model, metric_key.slice.filter_predicates, req.items
+            )
+            return_metrics.append(
+                metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+            )
+        return return_metrics
+
+    @api_app.post(
+        "/histograms/{project}",
+        response_model=List[List[HistogramBucket]],
+        tags=["zeno"],
+    )
+    def get_histogram_buckets(req: List[ZenoColumn], project: str):
+        return histogram_buckets(project, req)
+
+    @api_app.post(
+        "/histogram-counts/{project}", response_model=List[List[int]], tags=["zeno"]
+    )
+    def calculate_histogram_counts(req: HistogramRequest, project: str):
+        return histogram_counts(project, req)
+
+    @api_app.post(
+        "/histogram-metrics/{project}",
+        response_model=List[List[Union[float, None]]],
+        tags=["zeno"],
+    )
+    def calculate_histogram_metrics(req: HistogramRequest, project: str):
+        return histogram_metrics(project, req)
+
+    @api_app.get("/project_users/{project}", response_model=List[User], tags=["zeno"])
+    def get_project_users(project: str):
+        return select.project_users(project)
+
+    @api_app.get(
+        "/project_organizations/{project}",
+        response_model=List[Organization],
+        tags=["zeno"],
+    )
+    def get_project_orgs(project: str):
+        return select.project_orgs(project)
+
     ####################################################################### Post
-    @api_app.post("/register", tags=["zeno"])
+    @api_app.post("/register", response_model=User, tags=["zeno"])
     def register_user(user: User):
         try:
             insert.user(user)
-            return user.email
+            return select.user(user.email)
         except Exception as exc:
-            print(exc)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
             ) from exc
 
-    @api_app.post("/login", response_model=str, tags=["zeno"])
+    @api_app.post("/login", response_model=User, tags=["zeno"])
     def login(user: User):
         try:
-            secret = select.secret(user.email)
+            fetched_user = select.user(user.email)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
             ) from exc
-        if secret != user.secret or secret is None:
+        if fetched_user is None or fetched_user.secret != user.secret:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect login credentials.",
             )
         else:
-            return user.email
+            return fetched_user
 
     @api_app.post("/project", tags=["zeno"])
     def add_project(description: ProjectConfig):
@@ -190,74 +279,25 @@ def get_server() -> FastAPI:
         insert.chart(project, chart)
         return chart.name
 
-    @api_app.post(
-        "/slice-metrics/{project}", response_model=List[GroupMetric], tags=["zeno"]
-    )
-    def get_metrics_for_slices(req: MetricRequest, project: str):
-        return_metrics: List[GroupMetric] = []
-        for metric_key in req.metric_keys:
-            filter_sql = table_filter(
-                project, metric_key.model, metric_key.slice.filter_predicates, req.items
-            )
-            return_metrics.append(
-                metric_map(metric_key.metric, project, metric_key.model, filter_sql)
-            )
-        return return_metrics
-
-    @api_app.post(
-        "/histograms/{project}",
-        response_model=List[List[HistogramBucket]],
-        tags=["zeno"],
-    )
-    def get_histogram_buckets(req: List[ZenoColumn], project: str):
-        return histogram_buckets(project, req)
-
-    @api_app.post(
-        "/histogram-counts/{project}", response_model=List[List[int]], tags=["zeno"]
-    )
-    def calculate_histogram_counts(req: HistogramRequest, project: str):
-        return histogram_counts(project, req)
-
-    @api_app.post(
-        "/histogram-metrics/{project}",
-        response_model=List[List[Union[float, None]]],
-        tags=["zeno"],
-    )
-    def calculate_histogram_metrics(req: HistogramRequest, project: str):
-        return histogram_metrics(project, req)
-
     @api_app.post("/tag/{project}", tags=["zeno"])
     def add_tag(tag: Tag, project: str):
         insert.tag(project, tag)
         return tag.tag_name
 
-    @api_app.post("/tag-metric/{project}", response_model=GroupMetric, tags=["zeno"])
-    def get_metric_for_tag(metric_key: TagMetricKey, project: str):
-        filter_sql = table_filter(project, metric_key.model, None, metric_key.tag.items)
-        return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+    @api_app.post("/add_organization", tags=["zeno"])
+    def add_organization(user: User, organization: Organization):
+        insert.organization(user, organization)
+        return organization.name
 
-    @api_app.post(
-        "/slice-finder/{project}", tags=["zeno"], response_model=SliceFinderReturn
-    )
-    def run_slice_finder(req: SliceFinderRequest, project: str):
-        return slice_finder(project, req)
+    @api_app.post("/add_project_user/{project}", tags=["zeno"])
+    def add_project_user(project: str, user: User):
+        insert.project_user(project, user)
+        return user.name
 
-    @api_app.post("/filtered-table/{project}", response_model=str, tags=["zeno"])
-    def get_filtered_table(req: TableRequest, project: str):
-        filter_sql = table_filter(project, None, req.filter_predicates, req.items)
-        sql_table = select.table_data_paginated(
-            project, filter_sql, req.offset, req.limit
-        )
-        filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
-        if req.diff_column_1 and req.diff_column_2:
-            filt_df = generate_diff_cols(
-                filt_df, req.diff_column_1, req.diff_column_2, project
-            )
-        return filt_df.to_json(orient="records")
-
-    @api_app.post("/chart-data/{project}", tags=["zeno"], response_model=str)
-    def get_chart_data(chart: Chart, project: str):
-        return chart_data(chart, project)
+    @api_app.post("/add_project_org/{project}", tags=["zeno"])
+    def add_project_org(project: str, organization: Organization):
+        insert.project_org(project, organization)
+        return organization.name
 
     ####################################################################### Update
     @api_app.post("/slice/update/{project}", tags=["zeno"])
@@ -280,6 +320,31 @@ def get_server() -> FastAPI:
         update.tag(tag, project)
         return tag.tag_name
 
+    @api_app.post("/user/update", tags=["zeno"])
+    def update_user(user: User):
+        update.user(user)
+        return user.name
+
+    @api_app.post("/organization/update", tags=["zeno"])
+    def update_organization(organization: Organization):
+        update.organization(organization)
+        return organization.name
+
+    @api_app.post("/project/update", tags=["zeno"])
+    def update_project(project: ProjectConfig):
+        update.project(project)
+        return project.name
+
+    @api_app.post("/project_user/update/{project}", tags=["zeno"])
+    def update_project_user(project: str, user: User):
+        update.project_user(project, user)
+        return user.name
+
+    @api_app.post("/project_org/update/{project}", tags=["zeno"])
+    def update_project_org(project: str, organization: Organization):
+        update.project_org(project, organization)
+        return organization.name
+
     ####################################################################### Delete
     @api_app.delete("/slice", tags=["zeno"])
     def delete_slice(req: Slice):
@@ -300,6 +365,21 @@ def get_server() -> FastAPI:
     def delete_tag(tag: Tag):
         delete.tag(tag)
         return tag.tag_name
+
+    @api_app.delete("/organization", tags=["zeno"])
+    def delete_organization(organization: Organization):
+        delete.organization(organization)
+        return organization.name
+
+    @api_app.delete("/project_user/{project}", tags=["zeno"])
+    def delete_project_user(project: str, user: User):
+        delete.project_user(project, user)
+        return user.name
+
+    @api_app.delete("/project_org/{project}", tags=["zeno"])
+    def delete_project_org(project: str, organization: Organization):
+        delete.project_org(project, organization)
+        return organization.name
 
     return app
 

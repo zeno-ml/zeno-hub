@@ -38,12 +38,13 @@ export const actions: Actions = {
 		const secret = Md5.hashStr(password as string);
 		try {
 			OpenAPI.BASE = backendEndpoint + '/api';
-			await ZenoService.registerUser({
+			const user = await ZenoService.registerUser({
+				id: -1,
 				name: username as string,
 				secret: secret,
 				email: email as string
 			});
-			cookies.set('loggedIn', 'loggedIn', {
+			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',

@@ -1,5 +1,5 @@
 """Types for Zeno's users."""
-from typing import Optional
+from typing import List, Optional
 
 from zeno_backend.classes.base import CamelModel
 
@@ -7,6 +7,17 @@ from zeno_backend.classes.base import CamelModel
 class User(CamelModel):
     """Representation of a user in Zeno."""
 
+    id: int
     name: Optional[str]
     email: str
     secret: Optional[str]
+    admin: Optional[bool]
+
+
+class Organization(CamelModel):
+    """Representation of a organization in Zeno."""
+
+    id: int
+    name: str
+    members: List[User]
+    admin: bool

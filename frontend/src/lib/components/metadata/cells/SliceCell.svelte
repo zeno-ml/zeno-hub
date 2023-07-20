@@ -10,8 +10,7 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
 	import SliceDetails from '../../general/SliceDetails.svelte';
-	import Popup from '../popups/Popup.svelte';
-	import SlicePopup from '../popups/SlicePopup.svelte';
+	import SlicePopup from '../../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
 	import { selectSliceCell } from './sliceCellUtil';
 
@@ -89,9 +88,7 @@
 </script>
 
 {#if editing}
-	<Popup on:close={() => (editing = false)}>
-		<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
-	</Popup>
+	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <div
 	class=" cell parent

@@ -9,6 +9,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { BeeswarmParameters } from './models/BeeswarmParameters';
 export type { Body_add_item } from './models/Body_add_item';
+export type { Body_add_organization } from './models/Body_add_organization';
 export type { Chart } from './models/Chart';
 export { ChartType } from './models/ChartType';
 export type { FilterPredicate } from './models/FilterPredicate';
@@ -27,6 +28,7 @@ export type { Metric } from './models/Metric';
 export type { MetricKey } from './models/MetricKey';
 export type { MetricRequest } from './models/MetricRequest';
 export { Operation } from './models/Operation';
+export type { Organization } from './models/Organization';
 export type { OutputSpec } from './models/OutputSpec';
 export type { PostdistillSpec } from './models/PostdistillSpec';
 export type { PredistillSpec } from './models/PredistillSpec';
