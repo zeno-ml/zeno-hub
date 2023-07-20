@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
 
-test('index page has expected h1', async ({ page }) => {
+test('can go to home', async ({ page }) => {
 	await page.goto('/');
 });

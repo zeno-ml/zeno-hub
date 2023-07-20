@@ -8,8 +8,7 @@
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { slide } from 'svelte/transition';
-	import NewFolderPopup from '../popups/FolderPopup.svelte';
-	import Popup from '../popups/Popup.svelte';
+	import NewFolderPopup from '../../popups/FolderPopup.svelte';
 	import SliceCell from './SliceCell.svelte';
 
 	export let folder: Folder;
@@ -26,9 +25,7 @@
 </script>
 
 {#if editing}
-	<Popup on:close={() => (editing = false)}>
-		<NewFolderPopup on:close={() => (editing = false)} folderToEdit={folder} />
-	</Popup>
+	<NewFolderPopup on:close={() => (editing = false)} folderToEdit={folder} />
 {/if}
 <div
 	class="cell {dragOver ? 'hover' : ''} {expandFolder ? 'expanded' : ''}"

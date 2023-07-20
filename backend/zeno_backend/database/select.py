@@ -13,6 +13,7 @@ from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.tag import Tag
+from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
@@ -35,19 +36,24 @@ def models(project: str) -> List[str]:
     return list(map(itemgetter(0), model_results)) if model_results is not None else []
 
 
-def projects() -> List[ProjectConfig]:
+def projects(user: User) -> List[ProjectConfig]:
     """Get all projects available to the user.
+
+    Args:
+        user (User): the user for which to fetch the available projects.
 
     Returns:
         List[ProjectConfig]: the projects that the user can interact with.
     """
     db = Database()
-    project_result = db.connect_execute_return(
-        "SELECT uuid, name, view, calculate_histogram_metrics, num_items "
-        "FROM projects;",
+    project_user_result = db.connect_execute_return(
+        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, p.num_items, "
+        "up.editor, p.public FROM projects AS p JOIN user_project AS up "
+        "ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
+        [user.id],
         return_all=True,
     )
-    return (
+    result = (
         list(
             map(
                 lambda project: ProjectConfig(
@@ -56,43 +62,106 @@ def projects() -> List[ProjectConfig]:
                     view=project[2],
                     calculate_histogram_metrics=bool(project[3]),
                     num_items=project[4],
+                    editor=project[5],
+                    public=project[6],
                 ),
-                project_result,
+                project_user_result,
             )
         )
-        if project_result is not None
+        if project_user_result is not None
         else []
     )
+    project_org_result = db.connect_execute_return(
+        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, p.num_items, "
+        "op.editor, p.public FROM projects AS p JOIN "
+        "(SELECT organization_project.project_uuid, user_organization.organization_id, "
+        "editor FROM user_organization JOIN organization_project "
+        "on user_organization.organization_id = organization_project.organization_id "
+        "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
+        [user.id],
+        return_all=True,
+    )
+    org_projects = (
+        list(
+            map(
+                lambda project: ProjectConfig(
+                    uuid=project[0],
+                    name=project[1],
+                    view=project[2],
+                    calculate_histogram_metrics=bool(project[3]),
+                    num_items=project[4],
+                    editor=project[5],
+                    public=project[6],
+                ),
+                project_org_result,
+            )
+        )
+        if project_org_result is not None
+        else []
+    )
+    org_projects = list(
+        filter(
+            lambda project: not any(p.uuid == project.uuid for p in result),
+            org_projects,
+        )
+    )
+    result = result + org_projects
+    return result
 
 
-def project(project: str) -> Union[ProjectConfig, None]:
+def project(project: str, user: User) -> Union[ProjectConfig, None]:
     """Get the project data for a specific project ID.
 
     Args:
         project (str): the project the user is currently working with.
+        user (User): the user for which to fetch the project.
 
     Returns:
         Union[ProjectConfig, None]: the data for the requested project.
     """
     db = Database()
-    project_result = db.connect_execute_return(
-        "SELECT uuid, name, view, calculate_histogram_metrics, num_items FROM projects "
-        "WHERE uuid = %s",
-        [
-            project,
-        ],
-    )
-    return (
-        ProjectConfig(
-            uuid=str(project_result[0]),
-            name=str(project_result[1]),
-            view=str(project_result[2]),
-            calculate_histogram_metrics=bool(project_result[3]),
-            num_items=project_result[4] if isinstance(project_result[4], int) else 5,
+    try:
+        db.connect()
+        project_result = db.execute_return(
+            "SELECT uuid, name, view, calculate_histogram_metrics, num_items, "
+            "public FROM projects WHERE uuid = %s;",
+            [
+                project,
+            ],
         )
-        if project_result is not None
-        else None
-    )
+        user_editor = db.execute_return(
+            "SELECT editor from user_project WHERE user_id = %s AND project_uuid = %s",
+            [user.id, project],
+        )
+        org_editor = db.execute_return(
+            "SELECT editor from organization_project AS p JOIN user_organization as o "
+            "ON p.organization_id = o.organization_id "
+            "WHERE p.project_uuid = %s AND o.user_id = %s",
+            [project, user.id],
+        )
+        editor = (bool(org_editor[0]) if org_editor is not None else False) or (
+            bool(user_editor) if user_editor is not None else False
+        )
+        print(editor)
+        return (
+            ProjectConfig(
+                uuid=str(project_result[0]),
+                name=str(project_result[1]),
+                view=str(project_result[2]),
+                calculate_histogram_metrics=bool(project_result[3]),
+                num_items=project_result[4]
+                if isinstance(project_result[4], int)
+                else 5,
+                editor=editor,
+                public=bool(project_result[5]),
+            )
+            if project_result is not None
+            else None
+        )
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
 
 
 def metrics(project: str) -> List[Metric]:
@@ -516,7 +585,7 @@ def tags(project: str) -> List[Tag]:
         db.disconnect()
 
 
-def secret(email: str) -> Optional[str]:
+def user(email: str) -> Optional[User]:
     """Get the secret of a user with a specific email address.
 
     Args:
@@ -526,9 +595,182 @@ def secret(email: str) -> Optional[str]:
         Optional[str]: the secret of the user.
     """
     db = Database()
-    secret = db.connect_execute_return(
-        "SELECT secret FROM users WHERE email = %s", [email]
+    user = db.connect_execute_return(
+        "SELECT id, user_name, email, secret FROM users WHERE email = %s", [email]
     )
-    if secret is None:
+    if user is None:
         return None
-    return str(secret[0])
+    return User(
+        id=user[0] if isinstance(user[0], int) else -1,
+        name=str(user[1]),
+        email=str(user[2]),
+        secret=str(user[3]),
+        admin=None,
+    )
+
+
+def users() -> List[User]:
+    """Get a list of all registered users.
+
+    Returns:
+        List[User]: all registered users.
+    """
+    db = Database()
+    users = db.connect_execute_return(
+        "SELECT id, user_name, email FROM users;", return_all=True
+    )
+    return (
+        list(
+            map(
+                lambda user: User(
+                    id=user[0], name=user[1], email=user[2], secret=None, admin=None
+                ),
+                users,
+            )
+        )
+        if users is not None
+        else []
+    )
+
+
+def organization_names() -> List[Organization]:
+    """Get a list of all organizations.
+
+    Returns:
+        List[Organization]: all organizations in the database.
+    """
+    db = Database()
+    organizations = db.connect_execute_return(
+        "SELECT id, name FROM organizations;", return_all=True
+    )
+    return (
+        list(
+            map(
+                lambda organization: Organization(
+                    id=organization[0], name=organization[1], admin=False, members=[]
+                ),
+                organizations,
+            )
+        )
+        if organizations is not None
+        else []
+    )
+
+
+def organizations(user: User) -> List[Organization]:
+    """Get the organizations that a user is a member of.
+
+    Args:
+        user (User): the user for which to fetch available organizations.
+
+    Returns:
+        List[Organization]: all organizations the user is a member of.
+    """
+    organizations: List[Organization] = []
+    db = Database()
+    try:
+        db.connect()
+        organizations_result = db.execute_return(
+            "SELECT o.id, o.name, uo.admin FROM organizations AS o "
+            "JOIN user_organization AS uo ON o.id = uo.organization_id "
+            "WHERE uo.user_id = %s;",
+            [user.id],
+            return_all=True,
+        )
+        if organizations_result is None:
+            return organizations
+        for org in organizations_result:
+            members = db.execute_return(
+                "SELECT u.id, u.user_name, u.email, uo.admin FROM users as u "
+                "JOIN user_organization as uo ON u.id = uo.user_id "
+                "WHERE uo.organization_id = %s;",
+                [org[0]],
+                return_all=True,
+            )
+            organizations.append(
+                Organization(
+                    id=org[0],
+                    name=org[1],
+                    admin=org[2],
+                    members=[]
+                    if members is None
+                    else list(
+                        map(
+                            lambda member: User(
+                                id=member[0],
+                                name=member[1],
+                                email=member[2],
+                                secret=None,
+                                admin=member[3],
+                            ),
+                            members,
+                        )
+                    ),
+                )
+            )
+        return organizations
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
+def project_users(project: str) -> List[User]:
+    """Get all the users that have access to a project.
+
+    Args:
+        project (str): the project for which to get user access.
+
+    Returns:
+        List[User]: the list of users who can access the project.
+    """
+    db = Database()
+    project_users = db.connect_execute_return(
+        "SELECT u.id, u.user_name, u.email, up.editor FROM users as u "
+        "JOIN user_project AS up ON u.id = up.user_id WHERE up.project_uuid = %s",
+        [project],
+        return_all=True,
+    )
+    return (
+        list(
+            map(
+                lambda user: User(
+                    id=user[0], name=user[1], email=user[2], secret=None, admin=user[3]
+                ),
+                project_users,
+            )
+        )
+        if project_users is not None
+        else []
+    )
+
+
+def project_orgs(project: str) -> List[Organization]:
+    """Get all the organizations that have access to a project.
+
+    Args:
+        project (str): the project for which to get organization access.
+
+    Returns:
+        List[User]: the list of organizations who can access the project.
+    """
+    db = Database()
+    project_organizations = db.connect_execute_return(
+        "SELECT o.id, o.name, op.editor FROM organizations as o "
+        "JOIN organization_project AS op ON o.id = op.organization_id "
+        "WHERE op.project_uuid = %s",
+        [project],
+        return_all=True,
+    )
+    return (
+        list(
+            map(
+                lambda org: Organization(
+                    id=org[0], name=org[1], members=[], admin=org[2]
+                ),
+                project_organizations,
+            )
+        )
+        if project_organizations is not None
+        else []
+    )

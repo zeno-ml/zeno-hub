@@ -36,6 +36,8 @@ class ProjectConfig(CamelModel):
     view: str
     calculate_histogram_metrics: bool = True
     num_items: int = 10
+    editor: bool
+    public: bool
 
 
 class ZenoColumnType(str, Enum):

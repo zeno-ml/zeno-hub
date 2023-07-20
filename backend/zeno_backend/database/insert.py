@@ -17,7 +17,7 @@ from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
-from zeno_backend.classes.user import User
+from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
@@ -40,8 +40,16 @@ def setup_project(description: ProjectConfig):
     try:
         db.connect()
         db.execute(
-            'INSERT INTO projects ("uuid", "name", "view") VALUES (%s,%s,%s);',
-            [description.uuid, description.name, description.view],
+            "INSERT INTO projects (uuid, name, view, calculate_histogram_metrics, "
+            "num_items, public) VALUES (%s,%s,%s,%s,%s,%s);",
+            [
+                description.uuid,
+                description.name,
+                description.view,
+                description.calculate_histogram_metrics,
+                description.num_items,
+                description.public,
+            ],
         )
         db.execute(
             sql.SQL("CREATE TABLE {}(item TEXT NOT NULL PRIMARY KEY);").format(
@@ -411,4 +419,61 @@ def user(user: User):
     db.connect_execute(
         'INSERT INTO users ("user_name","email","secret") values(%s,%s,%s)',
         [user.name, user.email, user.secret],
+    )
+
+
+def organization(user: User, organization: Organization):
+    """Add a new organization to the database.
+
+    Args:
+        user (User): the user who created the organization.
+        organization (Organization): the organization to be created.
+    """
+    db = Database()
+    try:
+        db.connect()
+        id = db.execute_return(
+            "INSERT INTO organizations (name) VALUES (%s) RETURNING id;",
+            [organization.name],
+        )
+        if id is None:
+            return
+        db.execute(
+            "INSERT INTO user_organization (user_id, organization_id, admin) "
+            "VALUES (%s,%s,%s);",
+            [user.id, id[0], True],
+        )
+        db.commit()
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
+def project_user(project: str, user: User):
+    """Add a user to a project.
+
+    Args:
+        project (str): the project id to add the user to.
+        user (User): the user to add to the project.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO user_project (user_id, project_uuid, editor) VALUES (%s,%s,%s)",
+        [user.id, project, user.admin],
+    )
+
+
+def project_org(project: str, organization: Organization):
+    """Add a organization to a project.
+
+    Args:
+        project (str): the project id to add the organization to.
+        organization (Organization): the organization to add to the project.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO organization_project (organization_id, project_uuid, editor) "
+        "VALUES (%s,%s,%s)",
+        [organization.id, project, organization.admin],
     )

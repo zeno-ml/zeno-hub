@@ -12,10 +12,9 @@
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
-	import FolderPopup from './popups/FolderPopup.svelte';
-	import Popup from './popups/Popup.svelte';
-	import SliceFinderPopup from './popups/SliceFinderPopup.svelte';
-	import SlicePopup from './popups/SlicePopup.svelte';
+	import FolderPopup from '../popups/FolderPopup.svelte';
+	import SliceFinderPopup from '../popups/SliceFinderPopup.svelte';
+	import SlicePopup from '../popups/SlicePopup.svelte';
 
 	let showSliceFinder = false;
 	let showNewFolder = false;
@@ -23,19 +22,13 @@
 </script>
 
 {#if showSliceFinder}
-	<Popup on:close={() => (showSliceFinder = false)}>
-		<SliceFinderPopup on:close={() => (showSliceFinder = false)} />
-	</Popup>
+	<SliceFinderPopup on:close={() => (showSliceFinder = false)} />
 {/if}
 {#if showNewSlice}
-	<Popup on:close={() => (showNewSlice = false)}>
-		<SlicePopup on:close={() => (showNewSlice = false)} />
-	</Popup>
+	<SlicePopup on:close={() => (showNewSlice = false)} />
 {/if}
 {#if showNewFolder}
-	<Popup on:close={() => (showNewFolder = false)}>
-		<FolderPopup on:close={() => (showNewFolder = false)} />
-	</Popup>
+	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
 <div class="slice-header inline">
 	<div class="inline">

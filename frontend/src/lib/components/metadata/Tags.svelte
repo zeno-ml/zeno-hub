@@ -15,9 +15,8 @@
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import TagPopup from '../popups/TagPopup.svelte';
 	import TagCell from './cells/TagCell.svelte';
-	import Popup from './popups/Popup.svelte';
-	import TagPopup from './popups/TagPopup.svelte';
 
 	let showNewTag = false;
 
@@ -42,9 +41,7 @@
 </script>
 
 {#if showNewTag}
-	<Popup on:close={() => (showNewTag = false)}>
-		<TagPopup on:close={() => (showNewTag = false)} />
-	</Popup>
+	<TagPopup on:close={() => (showNewTag = false)} />
 {/if}
 <div id="tag-header" class="inline" style:margin-top="10px">
 	<div class="inline">

@@ -211,10 +211,6 @@ def heatmap_data(chart: Chart, project: str) -> str:
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
-    print(x_slice)
-    print(params.x_values)
-    print(y_slice)
-    print(params.y_values)
     selected_x: Union[List[Slice], List[str]] = (
         slices(project, params.x_values) if x_slice else params.x_values  # type: ignore
     )

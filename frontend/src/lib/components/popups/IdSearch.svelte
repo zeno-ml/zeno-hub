@@ -3,8 +3,8 @@
 	import { ZenoService } from '$lib/zenoapi';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import AutoComplete from 'simple-svelte-autocomplete';
-	import MatchWholeWordIcon from '../cells/metadata-cells/static/MatchWholeWordIcon.svelte';
-	import RegexIcon from '../cells/metadata-cells/static/RegexIcon.svelte';
+	import MatchWholeWordIcon from '../metadata/cells/metadata-cells/static/MatchWholeWordIcon.svelte';
+	import RegexIcon from '../metadata/cells/metadata-cells/static/RegexIcon.svelte';
 
 	export let predicate;
 	export let col;

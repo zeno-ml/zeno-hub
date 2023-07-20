@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import SliceDetails from '$lib/components/general/SliceDetails.svelte';
 	import { selections } from '$lib/stores';
+	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { Slice } from '$lib/zenoapi';
 
 	export let sli: Slice | undefined;
@@ -12,12 +15,12 @@
 	<div
 		class="slice-link"
 		on:click={() => {
-			// TODO: navigate to explore Tab
 			selections.update((sel) => ({
 				slices: sli !== undefined && sli.sliceName !== 'All Instances' ? [sli.id] : [],
 				metadata: sel.metadata,
 				tags: sel.tags
 			}));
+			goto(`${getProjectRouteFromURL($page.url)}/explore`);
 		}}
 		on:mouseover={() => (showTooltip = true)}
 		on:mouseout={() => (showTooltip = false)}
