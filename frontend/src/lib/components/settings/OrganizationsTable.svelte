@@ -2,7 +2,6 @@
 	import { ZenoService, type Organization, type User } from '$lib/zenoapi';
 	import { mdiClose, mdiCog, mdiLogout, mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import OrganizationPopup from '../popups/OrganizationPopup.svelte';
@@ -40,7 +39,7 @@
 				);
 			}}
 		>
-			<Icon component={Svg} viewBox="0 0 24 24">
+			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={mdiPlus} />
 			</Icon>
 		</IconButton>
@@ -83,7 +82,7 @@
 										}}
 										disabled={!organization.admin}
 									>
-										<Icon component={Svg} viewBox="0 0 24 24">
+										<Icon tag="svg" viewBox="0 0 24 24">
 											<path fill={organization.admin ? 'black' : 'grey'} d={mdiCog} />
 										</Icon>
 									</IconButton>
@@ -114,7 +113,7 @@
 										disabled={organization.admin &&
 											organization.members.filter((member) => member.admin).length < 2}
 									>
-										<Icon component={Svg} viewBox="0 0 24 24">
+										<Icon tag="svg" viewBox="0 0 24 24">
 											<path
 												fill={organization.admin &&
 												organization.members.filter((member) => member.admin).length < 2
@@ -140,7 +139,7 @@
 										}}
 										disabled={!organization.admin}
 									>
-										<Icon component={Svg} viewBox="0 0 24 24">
+										<Icon tag="svg" viewBox="0 0 24 24">
 											<path fill={organization.admin ? 'black' : 'grey'} d={mdiClose} />
 										</Icon>
 									</IconButton>

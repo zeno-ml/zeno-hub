@@ -20,24 +20,16 @@
 		tagIds
 	} from '$lib/stores';
 	import { columnHash, updateModelDependentSlices } from '$lib/util/util';
-	import {
-		Join,
-		ZenoColumnType,
-		type FilterPredicateGroup,
-		type Metric,
-		type ZenoColumn
-	} from '$lib/zenoapi';
+	import { Join, ZenoColumnType, type FilterPredicateGroup, type Metric } from '$lib/zenoapi';
 	import { mdiInformationOutline } from '@mdi/js';
 	import CircularProgress from '@smui/circular-progress';
-	import { Svg } from '@smui/common';
 	import { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
-	import { InternMap } from 'internmap';
 	import { onMount } from 'svelte';
-	import MetricRange from './MetricRange.svelte';
 	import MetadataCell from './cells/MetadataCell.svelte';
+	import MetricRange from './MetricRange.svelte';
 
-	let metadataHistograms: InternMap<ZenoColumn, HistogramEntry[]> = new InternMap([], columnHash);
+	let metadataHistograms: Map<string, HistogramEntry[]> = new Map();
 
 	// Get histogram buckets, counts, and metrics when columns update.
 	onMount(() => {
@@ -197,7 +189,7 @@
 					theme: 'zeno-tooltip'
 				}}
 			>
-				<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+				<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 					<path d={mdiInformationOutline} />
 				</Icon>
 			</div>
@@ -208,20 +200,32 @@
 		<MetricRange />
 	</div>
 	{#each $columns.filter((m) => m.columnType === ZenoColumnType.LABEL) as col (columnHash(col))}
-		<MetadataCell {col} histogram={metadataHistograms.get(col)} />
+		{@const hist = metadataHistograms.get(col.id)}
+		{#if hist}
+			<MetadataCell {col} histogram={hist} />
+		{/if}
 	{/each}
 	{#each $columns.filter((m) => m.columnType === ZenoColumnType.PREDISTILL) as col (columnHash(col))}
-		<MetadataCell {col} histogram={metadataHistograms.get(col)} />
+		{@const hist = metadataHistograms.get(col.id)}
+		{#if hist}
+			<MetadataCell {col} histogram={hist} />
+		{/if}
 	{/each}
 	{#if $model}
 		{#each $columns.filter((m) => m.columnType === ZenoColumnType.POSTDISTILL && m.model === $model) as col (columnHash(col))}
-			<MetadataCell {col} histogram={metadataHistograms.get(col)} />
+			{@const hist = metadataHistograms.get(col.id)}
+			{#if hist}
+				<MetadataCell {col} histogram={hist} />
+			{/if}
 		{/each}
 		{@const outputCol = $columns.filter(
 			(m) => m.columnType === ZenoColumnType.OUTPUT && m.model === $model
 		)}
 		{#if outputCol.length > 0}
-			<MetadataCell col={outputCol[0]} histogram={metadataHistograms.get(outputCol[0])} />
+			{@const hist = metadataHistograms.get(outputCol[0].id)}
+			{#if hist}
+				<MetadataCell col={outputCol[0]} histogram={hist} />
+			{/if}
 		{/if}
 	{/if}
 {/if}

@@ -2,6 +2,7 @@ import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$l
 import { slicesForComparison } from '../stores';
 
 import { ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
+import { get } from 'svelte/store';
 
 export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
@@ -80,15 +81,20 @@ export function updateModelDependentSlices(name: string, mod: string, slis: Slic
 	slis.forEach((sli) => {
 		const preds = sli.filterPredicates.predicates;
 		if (doesModelDependOnPredicates(preds)) {
-			slicesForComparison.update((ms) => {
-				ms.set(sli.sliceName + ' (' + name + ')', <Slice>{
-					id: sli.id,
-					sliceName: sli.sliceName + ' (' + name + ')',
-					folderId: sli.folderId,
-					filterPredicates: setModelForFilterPredicateGroup(sli.filterPredicates, mod)
-				});
-				return ms;
-			});
+			const slices = [...get(slicesForComparison)];
+			const index = slices.findIndex((current) => current.id === sli.id);
+			if (index !== -1) {
+				slicesForComparison.set([
+					...slices.slice(0, index),
+					<Slice>{
+						id: sli.id,
+						sliceName: sli.sliceName + ' (' + name + ')',
+						folderId: sli.folderId,
+						filterPredicates: setModelForFilterPredicateGroup(sli.filterPredicates, mod)
+					},
+					...slices.slice(index + 1)
+				]);
+			}
 		}
 	});
 }

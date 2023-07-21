@@ -4,7 +4,6 @@
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
-	import { Svg } from '@smui/common';
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
@@ -44,6 +43,11 @@
 		if (e.key === 'Enter') {
 			updateOrganization();
 		}
+	}
+
+	function addUser(e: CustomEvent) {
+		organizationToEdit.members = [...organizationToEdit.members, { ...e.detail, admin: false }];
+		selectedUser = undefined;
 	}
 </script>
 
@@ -89,7 +93,7 @@
 												];
 											}}
 										>
-											<Icon component={Svg} viewBox="0 0 24 24">
+											<Icon tag="svg" viewBox="0 0 24 24">
 												<path fill="black" d={mdiClose} />
 											</Icon>
 										</IconButton>
@@ -112,13 +116,7 @@
 					<Svelecte
 						style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
 						bind:value={selectedUser}
-						on:change={(e) => {
-							organizationToEdit.members = [
-								...organizationToEdit.members,
-								{ ...e.detail, admin: false }
-							];
-							selectedUser = undefined;
-						}}
+						on:change={addUser}
 						options={availableUsers}
 						placeholder="add members"
 						searchable={true}

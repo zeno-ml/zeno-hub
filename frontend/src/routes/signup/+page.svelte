@@ -24,23 +24,23 @@
 	<div class="login-right">
 		<form method="POST" class="login-form" action="?/signup" use:enhance>
 			<div class="form-container">
-				<Textfield input$name="username" value={form?.name ?? ''} label="User name" />
+				<Textfield input$name="username" value={form ? `${form.name}` : ''} label="User name" />
 				<Textfield
 					input$name="email"
 					type="email"
-					value={form?.email ?? ''}
+					value={form ? `${form.email}` : ''}
 					label="Email address"
 				/>
 				<Textfield
 					input$name="password"
 					type="password"
-					value={form?.password ?? ''}
+					value={form ? `${form.password}` : ''}
 					label="Password"
 				/>
 				<Textfield
 					input$name="repeatPassword"
 					type="password"
-					value={form?.repeat ?? ''}
+					value={form ? `${form.repeat}` : ''}
 					label="Repeat password"
 				/>
 				<Button type="submit">Sign Up</Button>

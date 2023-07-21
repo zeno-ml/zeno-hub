@@ -4,7 +4,6 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { slide } from 'svelte/transition';
@@ -22,6 +21,28 @@
 	let showOptions = false;
 
 	$: sls = $slices.filter((s) => s.folderId === folder.id);
+
+	function dragDropped(ev: DragEvent) {
+		dragOver = false;
+		if (ev.dataTransfer) {
+			const data = ev.dataTransfer.getData('text/plain').split(',');
+			data.forEach((element) => {
+				const slice = $slices.find((slice) => slice.id === parseInt(element));
+				if (slice && $projectConfig) {
+					ZenoService.updateSlice($projectConfig.uuid, {
+						...slice,
+						folderId: folder.id
+					}).then(() => {
+						if ($projectConfig) {
+							ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
+								slices.set(fetchedSlices)
+							);
+						}
+					});
+				}
+			});
+		}
+	}
 </script>
 
 {#if editing}
@@ -36,25 +57,7 @@
 	on:dragenter={() => (dragOver = true)}
 	on:dragover={(ev) => ev.preventDefault()}
 	on:dragleave={() => (dragOver = false)}
-	on:drop={(ev) => {
-		dragOver = false;
-		const data = ev.dataTransfer.getData('text/plain').split(',');
-		data.forEach((element) => {
-			const slice = $slices.find((slice) => slice.id === parseInt(element));
-			if (slice && $projectConfig) {
-				ZenoService.updateSlice($projectConfig.uuid, {
-					...slice,
-					folderId: folder.id
-				}).then(() => {
-					if ($projectConfig) {
-						ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
-							slices.set(fetchedSlices)
-						);
-					}
-				});
-			}
-		});
-	}}
+	on:drop={dragDropped}
 >
 	<div class="inline">
 		<div
@@ -62,13 +65,13 @@
 			on:keydown={() => ({})}
 			on:click={() => (expandFolder = !expandFolder)}
 		>
-			<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={expandFolder ? mdiChevronDown : mdiChevronRight} />
 			</Icon>
 		</div>
 		{folder.name}
 	</div>
-	<div class="inline" use:clickOutside on:clickOutside={() => (showOptions = false)}>
+	<div class="inline" use:clickOutside={() => (showOptions = false)}>
 		{#if showOptions}
 			<div id="options-container">
 				<Paper style="padding: 3px 0px;" elevation={7}>
@@ -124,7 +127,7 @@
 							showOptions = !showOptions;
 						}}
 					>
-						<Icon component={Svg} viewBox="0 0 24 24">
+						<Icon tag="svg" viewBox="0 0 24 24">
 							<path fill="black" d={mdiDotsHorizontal} />
 						</Icon>
 					</IconButton>

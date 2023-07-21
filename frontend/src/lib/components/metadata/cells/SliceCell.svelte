@@ -5,7 +5,6 @@
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
 	import Button, { Label } from '@smui/button';
-	import { Svg } from '@smui/common';
 	import Dialog, { Actions, Content, InitialFocus, Title } from '@smui/dialog';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
@@ -130,8 +129,7 @@
 			</div>
 			<div
 				class="group"
-				use:clickOutside
-				on:clickOutside={() => {
+				use:clickOutside={() => {
 					showOptions = false;
 				}}
 			>
@@ -174,8 +172,7 @@
 				<div class="inline" style:cursor="pointer">
 					<div
 						style:width="36px"
-						use:clickOutside
-						on:clickOutside={() => {
+						use:clickOutside={() => {
 							hovering = false;
 						}}
 					>
@@ -188,7 +185,7 @@
 									showOptions = !showOptions;
 								}}
 							>
-								<Icon component={Svg} viewBox="0 0 24 24">
+								<Icon tag="svg" viewBox="0 0 24 24">
 									<path fill="black" d={mdiDotsHorizontal} />
 								</Icon>
 							</IconButton>

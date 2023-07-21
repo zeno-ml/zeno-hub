@@ -9,7 +9,6 @@
 		mdiPlus,
 		mdiPlusCircle
 	} from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import FolderPopup from '../popups/FolderPopup.svelte';
@@ -41,7 +40,7 @@
 				theme: 'zeno-tooltip'
 			}}
 		>
-			<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+			<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 				<path d={mdiInformationOutline} />
 			</Icon>
 		</div>
@@ -62,7 +61,7 @@
 					showSliceFinder = true;
 				}}
 			>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || ($selectionIds !== undefined && $selectionIds.length > 0)}
 						<path fill="#6a1a9a" d={mdiCreation} />
 					{:else}
@@ -83,7 +82,7 @@
 					showNewFolder = true;
 				}}
 			>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="var(--G1)" d={mdiFolderPlusOutline} />
 				</Icon>
 			</IconButton>
@@ -100,7 +99,7 @@
 					showNewSlice = true;
 				}}
 			>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					{#if $selectionPredicates !== undefined}
 						<path fill="#6a1a9a" d={mdiPlusCircle} />
 					{:else}

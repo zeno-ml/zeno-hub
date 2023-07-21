@@ -12,7 +12,6 @@
 	import { ZenoService } from '$lib/zenoapi';
 	import { mdiInformationOutline, mdiPlus, mdiPlusCircle } from '@mdi/js';
 	import Button from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import TagPopup from '../popups/TagPopup.svelte';
@@ -54,7 +53,7 @@
 				theme: 'zeno-tooltip'
 			}}
 		>
-			<Icon component={Svg} viewBox="-6 -6 36 36">
+			<Icon tag="svg" viewBox="-6 -6 36 36">
 				<path d={mdiInformationOutline} />
 			</Icon>
 		</div>
@@ -70,7 +69,7 @@
 					}}
 				>
 					<IconButton on:click={() => (showNewTag = true)}>
-						<Icon component={Svg} viewBox="0 0 24 24">
+						<Icon tag="svg" viewBox="0 0 24 24">
 							{#if $selectionIds !== undefined}
 								<path fill="var(--N1)" d={mdiPlusCircle} />
 							{:else}

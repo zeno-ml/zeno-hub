@@ -1,9 +1,9 @@
 <script lang="ts">
+	import type { HistogramEntry } from '$lib/api/metadata';
+	import { metricRangeColorScale } from '$lib/stores';
+	import { Join, Operation, type FilterPredicate, type ZenoColumn } from '$lib/zenoapi';
 	import { Label } from '@smui/common';
 	import { scaleLinear } from 'd3-scale';
-	import { metricRangeColorScale } from '$lib/stores';
-	import { Join, type FilterPredicate, type ZenoColumn, Operation } from '$lib/zenoapi';
-	import type { HistogramEntry } from '$lib/api/metadata';
 
 	export let col: ZenoColumn;
 	export let histogram: HistogramEntry[];
@@ -31,7 +31,7 @@
 	}
 
 	$: widthScale = scaleLinear()
-		.domain([0, (histogram[0].filteredCount || 0) + (histogram[1].filteredCount || 0)])
+		.domain([0, (histogram[0].filteredCount ?? 0) + (histogram[1].filteredCount ?? 0)])
 		.range([20, 80]);
 
 	$: selectedValue = filterPredicates.length > 0 ? filterPredicates[0].value : null;
@@ -39,12 +39,12 @@
 
 {#if histogram}
 	<div class="binary-button-wrapper">
-		<div class="binary-button-single" style:width="{widthScale(histogram[0].filteredCount)}%">
+		<div class="binary-button-single" style:width="{widthScale(histogram[0].filteredCount ?? 0)}%">
 			<div
 				class="binary-button left {selectedValue !== null && selectedValue === true
 					? 'selected'
 					: ''}"
-				style="color: white; background-color: {$metricRangeColorScale(histogram[0].metric || 0)}"
+				style="color: white; background-color: {$metricRangeColorScale(histogram[0].metric ?? 0)}"
 				on:click={() => setSelection(true)}
 				on:keydown={() => setSelection(true)}
 			>
@@ -52,12 +52,12 @@
 			</div>
 			<small>{histogram[0].filteredCount} / {histogram[0].count}</small>
 		</div>
-		<div class="binary-button-single" style:width="{widthScale(histogram[1].filteredCount)}%">
+		<div class="binary-button-single" style:width="{widthScale(histogram[1].filteredCount ?? 0)}%">
 			<div
 				class="binary-button right {selectedValue !== null && selectedValue === false
 					? 'selected'
 					: ''}"
-				style="color: white; background-color: {$metricRangeColorScale(histogram[1].metric || 0)}"
+				style="color: white; background-color: {$metricRangeColorScale(histogram[1].metric ?? 0)}"
 				on:click={() => setSelection(false)}
 				on:keydown={() => setSelection(false)}
 			>

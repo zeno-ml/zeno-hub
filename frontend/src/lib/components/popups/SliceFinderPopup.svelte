@@ -20,7 +20,6 @@
 	} from '$lib/zenoapi';
 	import { mdiClose, mdiInformationOutline } from '@mdi/js';
 	import Button from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import Svelecte from 'svelecte';
@@ -32,7 +31,7 @@
 	const dispatch = createEventDispatcher();
 
 	let blur = function (ev: CustomEvent<unknown>) {
-		ev.target !== null && ev.target.blur();
+		ev.target !== null && (ev.target as HTMLElement).blur();
 	};
 
 	let completeColumns = $columns.filter(
@@ -150,13 +149,13 @@
 					maxWidth: '350'
 				}}
 			>
-				<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+				<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 					<path d={mdiInformationOutline} />
 				</Icon>
 			</div>
 		</div>
 		<IconButton on:click={() => dispatch('close')}>
-			<Icon component={Svg} viewBox="0 0 24 24">
+			<Icon tag="svg" viewBox="0 0 24 24">
 				<path d={mdiClose} />
 			</Icon>
 		</IconButton>
@@ -179,7 +178,7 @@
 						maxWidth: '450'
 					}}
 				>
-					<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -207,7 +206,7 @@
 						maxWidth: '450'
 					}}
 				>
-					<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -237,7 +236,7 @@
 						position: 'left'
 					}}
 				>
-					<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -262,7 +261,7 @@
 						maxWidth: '270'
 					}}
 				>
-					<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -289,7 +288,7 @@
 						maxWidth: '250'
 					}}
 				>
-					<Icon style="outline:none" component={Svg} viewBox="-6 -6 36 36">
+					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>

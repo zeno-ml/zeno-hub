@@ -4,8 +4,8 @@
  * can run then asynchronously and provide interactive updates while waiting
  * for more expensive computations like calculating metrics.
  */
-import { metricRange, projectConfig, requestingHistogramCounts } from '$lib/stores';
-import { columnHash, getMetricRange } from '$lib/util/util';
+import { columns, metricRange, projectConfig, requestingHistogramCounts } from '$lib/stores';
+import { getMetricRange } from '$lib/util/util';
 import {
 	CancelablePromise,
 	ZenoColumnType,
@@ -14,7 +14,6 @@ import {
 	type Metric,
 	type ZenoColumn
 } from '$lib/zenoapi';
-import { InternMap } from 'internmap';
 import { get } from 'svelte/store';
 
 export interface HistogramEntry {
@@ -36,7 +35,7 @@ export interface HistogramEntry {
 export async function getHistograms(
 	completeColumns: ZenoColumn[],
 	model: string
-): Promise<InternMap<ZenoColumn, HistogramEntry[]>> {
+): Promise<Map<string, HistogramEntry[]>> {
 	const requestedHistograms = completeColumns.filter(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.ITEM
 	);
@@ -47,9 +46,8 @@ export async function getHistograms(
 	}
 	const res = await ZenoService.getHistogramBuckets(project.uuid, requestedHistograms);
 	requestingHistogramCounts.set(false);
-	const histograms = new InternMap<string, HistogramEntry[]>(
-		requestedHistograms.map((col, i) => [col, res[i]]),
-		columnHash
+	const histograms = new Map<string, HistogramEntry[]>(
+		requestedHistograms.map((col, i) => [col.id, res[i]])
 	);
 	return histograms;
 }
@@ -65,12 +63,12 @@ let histogramCountRequest: CancelablePromise<Array<Array<number>>>;
  * @returns Histogram counts for each column.
  */
 export async function getHistogramCounts(
-	histograms: InternMap<ZenoColumn, HistogramEntry[]>,
+	histograms: Map<string, HistogramEntry[]>,
 	filterPredicates?: FilterPredicateGroup,
 	items?: string[]
-): Promise<number[][] | undefined> {
+): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
-		column: k,
+		column: get(columns).find((col) => col.id === k) ?? get(columns)[0],
 		buckets: v
 	}));
 	if (histogramCountRequest) {
@@ -91,16 +89,19 @@ export async function getHistogramCounts(
 		requestingHistogramCounts.set(false);
 
 		[...histograms.keys()].forEach((k, i) => {
-			histograms.set(
-				k,
-				histograms.get(k).map((h, j) => {
-					if (filterPredicates === undefined) {
-						h.count = out[i][j];
-					}
-					h.filteredCount = out[i][j];
-					return h;
-				})
-			);
+			const hist = histograms.get(k);
+			if (hist) {
+				histograms.set(
+					k,
+					hist.map((h, j) => {
+						if (filterPredicates === undefined) {
+							h.count = out[i][j];
+						}
+						h.filteredCount = out[i][j];
+						return h;
+					})
+				);
+			}
 		});
 		return histograms;
 	} catch (e) {
@@ -121,18 +122,18 @@ let histogramMetricRequest: CancelablePromise<Array<Array<number>>>;
  * @returns Histogram metrics for each column.
  */
 export async function getHistogramMetrics(
-	histograms: InternMap<ZenoColumn, HistogramEntry[]>,
+	histograms: Map<string, HistogramEntry[]>,
 	model: string,
 	metric: Metric,
 	items: string[] | undefined,
 	filterPredicates?: FilterPredicateGroup
-): Promise<InternMap<ZenoColumn, HistogramEntry[]> | undefined> {
+): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const config = get(projectConfig);
 	if (metric.name === '' || !config || !config.calculateHistogramMetrics) {
 		return undefined;
 	}
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
-		column: k,
+		column: get(columns).find((col) => col.id === k) ?? get(columns)[0],
 		buckets: v
 	}));
 	if (histogramMetricRequest) {
@@ -164,13 +165,16 @@ export async function getHistogramMetrics(
 		}
 
 		[...histograms.keys()].forEach((k, i) => {
-			histograms.set(
-				k,
-				histograms.get(k).map((h, j) => {
-					h.metric = res[i][j];
-					return h;
-				})
-			);
+			const hist = histograms.get(k);
+			if (hist !== undefined) {
+				histograms.set(
+					k,
+					hist.map((h, j) => {
+						h.metric = res[i][j];
+						return h;
+					})
+				);
+			}
 		});
 		return histograms;
 	} catch (e) {

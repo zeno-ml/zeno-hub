@@ -20,6 +20,7 @@ import type { ProjectConfig } from '../models/ProjectConfig';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
+import type { StringFilterRequest } from '../models/StringFilterRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { Tag } from '../models/Tag';
 import type { TagMetricKey } from '../models/TagMetricKey';
@@ -498,6 +499,31 @@ export class ZenoService {
 			path: {
 				project: project
 			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Filter String Metadata
+	 * @param project
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static filterStringMetadata(
+		project: string,
+		requestBody: StringFilterRequest
+	): CancelablePromise<Array<string>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/string-filter/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}

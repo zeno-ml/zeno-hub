@@ -22,7 +22,7 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.metadata import HistogramBucket
+from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
@@ -194,7 +194,11 @@ def get_server() -> FastAPI:
     def get_project_orgs(project: str):
         return select.project_orgs(project)
 
-    ####################################################################### Post
+    @api_app.post("/string-filter/{project}", response_model=List[str], tags=["zeno"])
+    def filter_string_metadata(project: str, req: StringFilterRequest):
+        return select.filered_short_string_column_values(project, req)
+
+    ####################################################################### Insert
     @api_app.post("/register", response_model=User, tags=["zeno"])
     def register_user(user: User):
         try:

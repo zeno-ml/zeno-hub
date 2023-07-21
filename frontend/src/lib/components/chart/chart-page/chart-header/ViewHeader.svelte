@@ -10,8 +10,8 @@
 	export let chart: Chart;
 
 	let ishover = false;
-	let blur = function (ev) {
-		ev.target.blur();
+	let blur = function (ev: CustomEvent) {
+		ev.target && (ev.target as HTMLElement).blur();
 	};
 </script>
 

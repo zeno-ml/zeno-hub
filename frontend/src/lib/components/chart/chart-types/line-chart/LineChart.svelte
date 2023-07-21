@@ -1,16 +1,18 @@
 <script lang="ts">
+	import type { Chart, XCParameters } from '$lib/zenoapi';
 	import { VegaLite } from 'svelte-vega';
-	import type { Chart } from '$lib/zenoapi';
 	import generateSpec from './vegaSpec-line';
 
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
+
+	$: parameters = chart.parameters as XCParameters;
 </script>
 
 <div class="main">
 	<div class="model-result">
 		<VegaLite
-			spec={generateSpec(chart.parameters)}
+			spec={generateSpec(parameters)}
 			{data}
 			options={{
 				actions: { source: false, editor: false, compiled: false },

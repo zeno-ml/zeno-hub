@@ -39,6 +39,7 @@ export type { SliceFinderRequest } from './models/SliceFinderRequest';
 export type { SliceFinderReturn } from './models/SliceFinderReturn';
 export { SlicesMetricsOrModels } from './models/SlicesMetricsOrModels';
 export { SlicesOrModels } from './models/SlicesOrModels';
+export type { StringFilterRequest } from './models/StringFilterRequest';
 export type { TableParameters } from './models/TableParameters';
 export type { TableRequest } from './models/TableRequest';
 export type { Tag } from './models/Tag';

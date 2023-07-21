@@ -6,7 +6,7 @@
 
 <div class="id-chip">
 	<span>Scatter Selection</span>
-	<TrailingIcon class="remove material-icons" on:click={() => selectionIds.set({ ids: [] })}>
+	<TrailingIcon class="remove material-icons" on:click={() => selectionIds.set([])}>
 		cancel
 	</TrailingIcon>
 </div>

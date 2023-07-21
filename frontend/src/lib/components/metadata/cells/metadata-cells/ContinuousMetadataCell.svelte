@@ -12,8 +12,8 @@
 	export let updatePredicates: (predicates: FilterPredicate[]) => void;
 
 	let view: View;
-	let localSelection = [];
-	let localSelectionX = [];
+	let localSelection: number[] = [];
+	let localSelectionX: number[] = [];
 
 	function updateSel() {
 		if (filterPredicates.length !== 0) {

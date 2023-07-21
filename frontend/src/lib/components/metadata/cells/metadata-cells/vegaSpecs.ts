@@ -1,6 +1,6 @@
 import type { VegaLiteSpec } from 'svelte-vega';
 
-export function nominalVegaSpec(metricRange) {
+export function nominalVegaSpec(metricRange: [number, number]) {
 	const countSpec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		data: {
@@ -91,28 +91,32 @@ export function nominalVegaSpec(metricRange) {
 		]
 	} as VegaLiteSpec;
 
-	const topLayerBars = countSpec['layer'][1];
-	if (metricRange[0] !== Infinity) {
-		topLayerBars.encoding.color = {
-			field: 'metric',
-			type: 'quantitative',
-			scale: {
-				domainMin: metricRange[0],
-				domainMax: metricRange[1],
-				range: ['#decbe9', '#6a1b9a']
-			},
-			legend: null
-		};
-	} else {
-		topLayerBars.encoding.color = {
-			value: '#6a1b9a'
-		};
+	if ('layer' in countSpec) {
+		const topLayerBars = countSpec['layer'][1];
+		if (topLayerBars['encoding'] !== undefined) {
+			if (metricRange[0] !== Infinity) {
+				topLayerBars.encoding.color = {
+					field: 'metric',
+					type: 'quantitative',
+					scale: {
+						domainMin: metricRange[0],
+						domainMax: metricRange[1],
+						range: ['#decbe9', '#6a1b9a']
+					},
+					legend: null
+				};
+			} else {
+				topLayerBars.encoding.color = {
+					value: '#6a1b9a'
+				};
+			}
+		}
 	}
 
 	return countSpec;
 }
 
-export function continuousVegaSpec(metricRange) {
+export function continuousVegaSpec(metricRange: [number, number]) {
 	const histogramSpec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		data: {
@@ -205,22 +209,26 @@ export function continuousVegaSpec(metricRange) {
 		]
 	} as VegaLiteSpec;
 
-	const topLayerBars = histogramSpec['layer'][1];
-	if (metricRange[0] !== Infinity) {
-		topLayerBars.encoding.color = {
-			field: 'metric',
-			type: 'quantitative',
-			scale: {
-				domainMin: metricRange[0],
-				domainMax: metricRange[1],
-				range: ['#decbe9', '#6a1b9a']
-			},
-			legend: null
-		};
-	} else {
-		topLayerBars.encoding.color = {
-			value: '#6a1b9a'
-		};
+	if ('layer' in histogramSpec) {
+		const topLayerBars = histogramSpec['layer'][1];
+		if (topLayerBars.encoding !== undefined) {
+			if (metricRange[0] !== Infinity) {
+				topLayerBars.encoding.color = {
+					field: 'metric',
+					type: 'quantitative',
+					scale: {
+						domainMin: metricRange[0],
+						domainMax: metricRange[1],
+						range: ['#decbe9', '#6a1b9a']
+					},
+					legend: null
+				};
+			} else {
+				topLayerBars.encoding.color = {
+					value: '#6a1b9a'
+				};
+			}
+		}
 	}
 
 	return histogramSpec;
