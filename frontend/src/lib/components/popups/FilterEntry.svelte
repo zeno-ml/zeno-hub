@@ -1,24 +1,40 @@
 <script lang="ts">
+	import { columns, model } from '$lib/stores';
+	import {
+		Join,
+		MetadataType,
+		Operation,
+		ZenoColumnType,
+		type FilterPredicate
+	} from '$lib/zenoapi';
 	import { mdiTrashCanOutline } from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Svelecte from 'svelecte';
-	import { model, columns } from '$lib/stores';
-	import { MetadataType, ZenoColumnType, type FilterPredicate, Operation } from '$lib/zenoapi';
-	import IdSearch from './IdSearch.svelte';
 
 	export let predicate: FilterPredicate;
 	export let deletePredicate: () => void;
 	export let index: number;
 
-	let operationMap = {
-		'==': Operation.EQUAL,
-		'!=': Operation.DIFFERENT,
-		'>': Operation.GT,
-		'<': Operation.LT,
-		'>=': Operation.GTE,
-		'<=': Operation.LTE
-	};
+	function getOperation(representation: string) {
+		switch (representation) {
+			case '==':
+				return Operation.EQUAL;
+			case '!=':
+				return Operation.DIFFERENT;
+			case '>':
+				return Operation.GT;
+			case '<':
+				return Operation.LT;
+			case '>=':
+				return Operation.GTE;
+			case '<=':
+				return Operation.LTE;
+			case 'LIKE':
+				return Operation.LIKE;
+			default:
+				return Operation.EQUAL;
+		}
+	}
 
 	let inverseOperationMap = {
 		[Operation.EQUAL]: '==',
@@ -29,6 +45,19 @@
 		[Operation.LTE]: '<=',
 		[Operation.LIKE]: 'LIKE'
 	};
+
+	function joinChange(e: CustomEvent) {
+		// avoid backspace or delete
+		predicate.join = e.detail !== null ? e.detail.label : Join.AND;
+	}
+
+	function operationChange(e: CustomEvent) {
+		predicate.operation = e.detail !== null ? getOperation(e.detail.label) : Operation.EQUAL;
+	}
+
+	function predicateChange(e: CustomEvent) {
+		predicate.value = e.detail.label;
+	}
 </script>
 
 <div id="group">
@@ -37,10 +66,7 @@
 			<Svelecte
 				style={'width: 80px'}
 				value={predicate.join}
-				on:change={(e) => {
-					// avoid backspace or delete
-					predicate.join = e.detail !== null ? e.detail.label : 'AND';
-				}}
+				on:change={joinChange}
 				searchable={false}
 				valueField="label"
 				options={['AND', 'OR']}
@@ -78,28 +104,20 @@
 			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
 					value={predicate.operation}
-					on:change={(e) => {
-						predicate.operation =
-							e.detail !== null ? operationMap[e.detail.label] : Operation.EQUAL;
-					}}
+					on:change={operationChange}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
 					options={['==', '!=']}
 				/>
-			{:else if predicate.column.dataType === MetadataType.OTHER}
-				<IdSearch col={$columns.filter((d) => d.name === 'id')[0]} bind:predicate />
 			{:else}
 				<Svelecte
 					value={inverseOperationMap[predicate.operation]}
-					on:change={(e) => {
-						predicate.operation =
-							e.detail !== null ? operationMap[e.detail.label] : Operation.EQUAL;
-					}}
+					on:change={operationChange}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={Object.keys(operationMap)}
+					options={['==', '!=', '>', '<', '>=', '<=', 'LIKE']}
 				/>
 			{/if}
 		{/if}
@@ -110,9 +128,7 @@
 			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
 					value={predicate.value + ''}
-					on:change={(e) => {
-						predicate.value = e.detail.label;
-					}}
+					on:change={predicateChange}
 					valueField="label"
 					placeholder={'Value'}
 					searchable={false}
@@ -127,7 +143,7 @@
 	</div>
 	<div class="selector">
 		<IconButton on:click={deletePredicate} style="height:10px; margin-top: 5px; color: var(--G2)">
-			<Icon component={Svg} viewBox="0 0 24 24">
+			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="currentColor" d={mdiTrashCanOutline} />
 			</Icon>
 		</IconButton>

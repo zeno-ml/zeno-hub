@@ -186,7 +186,7 @@
 						{/if}
 						{#each columnHeader as header}
 							{#if header.dataType === MetadataType.CONTINUOUS}
-								<td>{tableContent[header.id].toFixed(2)}</td>
+								<td>{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
 							{:else}
 								<td>{tableContent[header.id]}</td>
 							{/if}

@@ -18,7 +18,7 @@
 		fixed
 	}
 
-	function refreshParams(e, currentParam: Dimensions) {
+	function refreshParams(e: CustomEvent, currentParam: Dimensions) {
 		if (currentParam === Dimensions.axis) {
 			parameters.axisChannel = e.detail.value;
 			if (e.detail.value === SlicesMetricsOrModels.METRICS) {
@@ -65,6 +65,18 @@
 		chart = { ...chart, parameters: { ...parameters } };
 	}
 
+	function refreshAxisParams(e: CustomEvent) {
+		refreshParams(e, Dimensions.axis);
+	}
+
+	function refreshLayerParams(e: CustomEvent) {
+		refreshParams(e, Dimensions.layer);
+	}
+
+	function refreshFixedParams(e: CustomEvent) {
+		refreshParams(e, Dimensions.fixed);
+	}
+
 	function selected(e: CustomEvent<number[] | string[]>, channel: Dimensions) {
 		const channelType =
 			channel === Dimensions.axis ? parameters.axisChannel : parameters.layerChannel;
@@ -81,7 +93,7 @@
 		}
 	}
 
-	function fixedSelected(e: CustomEvent<number | string>) {
+	function fixedSelected(e: CustomEvent) {
 		switch (parameters.fixedChannel) {
 			case SlicesMetricsOrModels.METRICS:
 				chart = { ...chart, parameters: { ...parameters, metrics: [e.detail as number] } };
@@ -108,21 +120,18 @@
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.axisChannel) {
-					refreshParams(e, Dimensions.axis);
-				}
-			}}
+			on:change={refreshAxisParams}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.axisChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.axis)}
-		currentValues={parameters.axisChannel === SlicesMetricsOrModels.SLICES
+		numberValues={parameters.axisChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices
-			: parameters.axisChannel === SlicesMetricsOrModels.METRICS
+			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
 			? parameters.metrics
-			: parameters.models}
+			: []}
+		stringValues={parameters.axisChannel === SlicesMetricsOrModels.MODELS ? parameters.models : []}
 	/>
 </div>
 <div class="encoding-section">
@@ -136,19 +145,14 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.layerChannel) {
-					refreshParams(e, Dimensions.layer);
-				}
-			}}
+			on:change={refreshLayerParams}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.layerChannel].multi}
-		on:selected={(e) => selected(e, Dimensions.x)}
-		currentValues={parameters.layerChannel === SlicesOrModels.SLICES
-			? parameters.slices
-			: parameters.models}
+		on:selected={(e) => selected(e, Dimensions.layer)}
+		numberValues={parameters.layerChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+		stringValues={parameters.layerChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
 </div>
 <div class="encoding-section">
@@ -163,21 +167,20 @@
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.fixedChannel) {
-					refreshParams(e, Dimensions.fixed);
-				}
-			}}
+			on:change={refreshFixedParams}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.fixedChannel].fixed}
-		on:selected={(e) => fixedSelected(e)}
-		currentValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
+		on:selected={fixedSelected}
+		numberValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices[0]
 			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
 			? parameters.metrics[0]
-			: parameters.models[0]}
+			: 0}
+		stringValue={parameters.fixedChannel === SlicesMetricsOrModels.MODELS
+			? parameters.models[0]
+			: ''}
 	/>
 </div>
 

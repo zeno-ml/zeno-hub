@@ -12,6 +12,12 @@
 	$: chatData = entry['data'] as { role: string; content: string }[];
 	$: showall = chatData.length <= 5;
 	$: entries = showall ? chatData : chatData.slice(-4);
+
+	function entryString(
+		value: number | string | boolean | { role: string; content: string }[]
+	): string {
+		return `${value}`;
+	}
 </script>
 
 <div id="container">
@@ -44,7 +50,7 @@
 		{/each}
 	{/if}
 	{#if entry[modelColumn]}
-		<AssistantBlock input={entry[modelColumn]} output={true} />
+		<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
 	{/if}
 	{#if entry['label']}
 		<div class="expected">

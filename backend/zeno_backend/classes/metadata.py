@@ -28,3 +28,13 @@ class HistogramRequest(CamelModel):
     model: Optional[str] = None
     metric: Optional[Metric] = None
     items: Optional[List[str]] = None
+
+
+class StringFilterRequest(CamelModel):
+    """Specification of a string filter request in Zeno."""
+
+    column: ZenoColumn
+    filter_string: str
+    is_regex: bool
+    case_match: bool
+    whole_word_match: bool

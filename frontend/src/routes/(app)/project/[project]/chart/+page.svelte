@@ -5,7 +5,6 @@
 	import { charts } from '$lib/stores.js';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import { Icon } from '@smui/icon-button';
 
 	export let data;
@@ -38,7 +37,7 @@
 			on:keydown={() => ({})}
 		>
 			<div class="add-button">
-				<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+				<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiPlus} />
 				</Icon>
 			</div>

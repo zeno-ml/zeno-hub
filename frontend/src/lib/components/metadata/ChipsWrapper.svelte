@@ -5,6 +5,7 @@
 	import MetadataChip from './chips/MetadataChip.svelte';
 	import SliceChip from './chips/SliceChip.svelte';
 	import TagChip from './chips/TagChip.svelte';
+
 	$: filters = Object.entries($selections.metadata)
 		.filter(([, value]) => value.predicates.length > 0)
 		.map(([key, value]) => [key, value.predicates as unknown] as [string, FilterPredicate[]]);
@@ -20,8 +21,8 @@
 		{#each filters as [hash, chip]}
 			<MetadataChip {hash} {chip} />
 		{/each}
-		{#each $selections.tags as tag}
-			<TagChip {tag} />
+		{#each $selections.tags as tagId}
+			<TagChip {tagId} />
 		{/each}
 		{#if $selectionIds !== undefined}
 			<IdsChip />

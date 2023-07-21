@@ -22,8 +22,8 @@
 		metric
 	}
 
-	function refreshParams(e, currentParam: Dimensions) {
-		let label = e.detail.label;
+	function refreshParams(e: CustomEvent, currentParam: Dimensions) {
+		let label = e.detail.label as 'models' | 'slices';
 		let paramExcluMap = { slices: SlicesOrModels.MODELS, models: SlicesOrModels.SLICES };
 
 		if (currentParam === Dimensions.y) {
@@ -36,6 +36,14 @@
 		}
 
 		chart = { ...chart, parameters: { ...parameters } };
+	}
+
+	function refreshY(e: CustomEvent) {
+		refreshParams(e, Dimensions.y);
+	}
+
+	function refreshColor(e: CustomEvent) {
+		refreshParams(e, Dimensions.color);
 	}
 
 	function selected(e: CustomEvent<number[] | string[]>, channel: Dimensions) {
@@ -57,7 +65,7 @@
 		}
 	}
 
-	function fixedSelected(e: CustomEvent<number | string>) {
+	function fixedSelected(e: CustomEvent) {
 		if (fixedDimension === 'metric') {
 			chart = { ...chart, parameters: { ...parameters, metrics: [e.detail] } };
 		} else {
@@ -83,14 +91,11 @@
 		</div>
 	</div>
 	{#if fixedDimension === 'metric'}
-		<MetricsEncodingDropdown
-			on:selected={(e) => fixedSelected(e)}
-			currentValue={parameters.metrics[0]}
-		/>
+		<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metrics[0]} />
 	{:else}
 		<MetricsEncodingMultiChoice
 			on:selected={(e) => selected(e, Dimensions.metric)}
-			currentValues={parameters.metrics}
+			numberValues={parameters.metrics}
 		/>
 	{/if}
 </div>
@@ -115,28 +120,22 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.yChannel) {
-					refreshParams(e, Dimensions.y);
-				}
-			}}
+			on:change={refreshY}
 		/>
 	</div>
 	{#if fixedDimension === 'y'}
 		<svelte:component
 			this={EncodingMap[parameters.yChannel].fixed}
-			on:selected={(e) => fixedSelected(e)}
-			currentValue={parameters.yChannel === SlicesOrModels.MODELS
-				? parameters.models[0]
-				: parameters.slices[0]}
+			on:selected={fixedSelected}
+			numberValue={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices[0] : 0}
+			stringValue={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models[0] : ''}
 		/>
 	{:else}
 		<svelte:component
 			this={EncodingMap[parameters.yChannel].multi}
 			on:selected={(e) => selected(e, Dimensions.y)}
-			currentValues={parameters.yChannel === SlicesOrModels.MODELS
-				? parameters.models
-				: parameters.slices}
+			numberValues={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+			stringValues={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models : []}
 		/>
 	{/if}
 </div>
@@ -151,19 +150,14 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.colorChannel) {
-					refreshParams(e, Dimensions.color);
-				}
-			}}
+			on:change={refreshColor}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.colorChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.color)}
-		currentValues={parameters.colorChannel === SlicesOrModels.MODELS
-			? parameters.models
-			: parameters.slices}
+		numberValues={parameters.colorChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+		stringValues={parameters.colorChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
 </div>
 

@@ -1,11 +1,11 @@
 <script lang="ts">
+	import { columns } from '$lib/stores';
+	import { Join, Operation, type FilterPredicateGroup } from '$lib/zenoapi';
 	import autoAnimate from '@formkit/auto-animate';
 	import { mdiTrashCanOutline } from '@mdi/js';
 	import Button from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Svelecte from 'svelecte';
-	import { Join, type FilterPredicateGroup, Operation } from '$lib/zenoapi';
 	import FilterEntry from './FilterEntry.svelte';
 
 	export let predicateGroup: FilterPredicateGroup;
@@ -22,6 +22,11 @@
 		}
 		predicateGroup = predicateGroup;
 	}
+
+	function joinChange(e: CustomEvent) {
+		predicateGroup.join = e.detail.label;
+		predicateGroup = predicateGroup;
+	}
 </script>
 
 <div class="group">
@@ -31,10 +36,7 @@
 				placeholder={''}
 				style={'width: 80px'}
 				value={predicateGroup.join}
-				on:change={(e) => {
-					predicateGroup.join = e.detail.label;
-					predicateGroup = predicateGroup;
-				}}
+				on:change={joinChange}
 				valueField="label"
 				labelField="label"
 				options={['AND', 'OR']}
@@ -42,7 +44,7 @@
 		{/if}
 		{#if index > -1}
 			<IconButton on:click={deletePredicate} style="min-width: 60px; color: var(--G2)">
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="currentColor" d={mdiTrashCanOutline} />
 				</Icon>
 			</IconButton>
@@ -73,7 +75,7 @@
 				color="secondary"
 				on:click={() => {
 					predicateGroup.predicates.push({
-						column: undefined,
+						column: $columns[0],
 						operation: Operation.EQUAL,
 						value: '',
 						join: predicateGroup.predicates.length === 0 ? Join._ : Join.AND
@@ -89,7 +91,7 @@
 					predicateGroup.predicates.push({
 						predicates: [
 							{
-								column: undefined,
+								column: $columns[0],
 								operation: Operation.EQUAL,
 								value: '',
 								join: Join._

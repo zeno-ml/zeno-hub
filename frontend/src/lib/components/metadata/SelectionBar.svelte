@@ -6,7 +6,6 @@
 	import { mdiRefresh } from '@mdi/js';
 	import Button, { Group, Icon } from '@smui/button';
 	import CircularProgress from '@smui/circular-progress';
-	import { Svg } from '@smui/common';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
@@ -54,7 +53,7 @@
 					}}
 				>
 					<div class="icon">
-						<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 							<path d={mdiRefresh} />
 						</Icon>
 					</div>

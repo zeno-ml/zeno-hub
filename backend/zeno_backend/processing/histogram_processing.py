@@ -6,7 +6,10 @@ import pandas as pd
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
-from zeno_backend.classes.metadata import HistogramBucket, HistogramRequest
+from zeno_backend.classes.metadata import (
+    HistogramBucket,
+    HistogramRequest,
+)
 from zeno_backend.database.select import column
 from zeno_backend.processing.filtering import bucket_filter, filter_to_sql, table_filter
 from zeno_backend.processing.metrics import metric_map

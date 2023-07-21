@@ -4,9 +4,9 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+
 	export let tag: Tag;
 	export let inFolder = false;
 
@@ -157,8 +157,7 @@
 			</div>
 			<div
 				class="group"
-				use:clickOutside
-				on:clickOutside={() => {
+				use:clickOutside={() => {
 					showOptions = false;
 				}}
 			>
@@ -210,8 +209,7 @@
 					<div class="inline" style:cursor="pointer">
 						<div
 							style:width="36px"
-							use:clickOutside
-							on:clickOutside={() => {
+							use:clickOutside={() => {
 								hovering = false;
 							}}
 						>
@@ -224,7 +222,7 @@
 										showOptions = !showOptions;
 									}}
 								>
-									<Icon component={Svg} viewBox="0 0 24 24">
+									<Icon tag="svg" viewBox="0 0 24 24">
 										<path fill="black" d={mdiDotsHorizontal} />
 									</Icon>
 								</IconButton>

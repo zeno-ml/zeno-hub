@@ -4,7 +4,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
 
-	export let currentValues: number[];
+	export let numberValues: number[];
 
 	const dispatch = createEventDispatcher<{ selected: number[] }>();
 
@@ -15,7 +15,7 @@
 	$metrics.forEach((m) => {
 		options.push({ value: m.id, label: m.name });
 	});
-	value = currentValues;
+	value = numberValues;
 
 	function updateDragOrder(val: number[]) {
 		// check if all elements are numbers (dndzone's place holder)

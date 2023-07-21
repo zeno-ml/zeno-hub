@@ -15,7 +15,6 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 
@@ -35,7 +34,7 @@
 <div class="chart" on:click={() => goto(`${$page.url}/${chart.id}`)} on:keydown={() => ({})}>
 	<div class="inline">
 		<div class="chart-type">
-			<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
 		</div>
@@ -47,16 +46,12 @@
 					showOptions = !showOptions;
 				}}
 			>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiDotsVertical} />
 				</Icon>
 			</IconButton>
 			{#if showOptions}
-				<div
-					id="options-container"
-					use:clickOutside
-					on:clickOutside={() => (showOptions = !showOptions)}
-				>
+				<div id="options-container" use:clickOutside={() => (showOptions = !showOptions)}>
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
 							<div

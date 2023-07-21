@@ -13,8 +13,8 @@
 		color
 	}
 
-	function refreshParams(e, currentParam: Dimensions) {
-		let label = e.detail.label;
+	function refreshParams(e: CustomEvent, currentParam: Dimensions) {
+		let label = e.detail.label as 'models' | 'slices';
 		let paramExcluMap = { slices: SlicesOrModels.MODELS, models: SlicesOrModels.SLICES };
 
 		if (currentParam === Dimensions.x) {
@@ -43,6 +43,18 @@
 	function ySelected(e: CustomEvent<number>) {
 		chart = { ...chart, parameters: { ...parameters, metric: e.detail } };
 	}
+
+	function xChanged(e: CustomEvent) {
+		if (e.detail.value !== parameters.xChannel) {
+			refreshParams(e, Dimensions.x);
+		}
+	}
+
+	function colorChaned(e: CustomEvent) {
+		if (e.detail.value !== parameters.colorChannel) {
+			refreshParams(e, Dimensions.color);
+		}
+	}
 </script>
 
 <div class="encoding-section">
@@ -56,25 +68,20 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.xChannel) {
-					refreshParams(e, Dimensions.x);
-				}
-			}}
+			on:change={xChanged}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.xChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.x)}
-		currentValues={parameters.xChannel === SlicesOrModels.SLICES
-			? parameters.slices
-			: parameters.models}
+		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
 </div>
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>y</h4>
-		<MetricsEncodingDropdown on:selected={ySelected} currentValue={parameters.metric} />
+		<MetricsEncodingDropdown on:selected={ySelected} numberValue={parameters.metric} />
 	</div>
 </div>
 <div class="encoding-section">
@@ -88,19 +95,14 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.colorChannel) {
-					refreshParams(e, Dimensions.color);
-				}
-			}}
+			on:change={colorChaned}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.colorChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.color)}
-		currentValues={parameters.colorChannel === SlicesOrModels.SLICES
-			? parameters.slices
-			: parameters.models}
+		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
 </div>
 

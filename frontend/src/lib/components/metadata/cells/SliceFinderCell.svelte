@@ -5,7 +5,6 @@
 	import { ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiCheckCircle, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
@@ -82,7 +81,7 @@
 		</span>
 		{#if created}
 			<IconButton on:click={() => removeSlice()}>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="#6a1b9a" d={mdiCheckCircle} />
 				</Icon>
 			</IconButton>
@@ -92,19 +91,14 @@
 					showSliceName = true;
 				}}
 			>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="#6a1b9a" d={mdiPlus} />
 				</Icon>
 			</IconButton>
 		{/if}
 	</div>
 	{#if showSliceName}
-		<div
-			id="slice-name"
-			use:clickOutside
-			on:clickOutside={() => (showSliceName = false)}
-			on:keydown={submit}
-		>
+		<div id="slice-name" use:clickOutside={() => (showSliceName = false)} on:keydown={submit}>
 			<Paper elevation={7}>
 				<Content style="display:flex; flex-direction:column">
 					<Textfield bind:value={newSliceName} label="Slice Name" bind:this={input} />

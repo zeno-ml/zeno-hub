@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { projectConfig } from '$lib/stores';
-	import { Join, ZenoService, type FilterPredicate, type ZenoColumn } from '$lib/zenoapi';
+	import {
+		Join,
+		Operation,
+		ZenoService,
+		type FilterPredicate,
+		type ZenoColumn
+	} from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { TrailingIcon } from '@smui/chips';
 	import { Label } from '@smui/common';
@@ -20,11 +26,11 @@
 	let wholeWordMatch = false;
 	let refresh = 0;
 	let noResultsText = 'No results';
-	let results = [];
-
-	let blur = function (ev) {
-		ev.target.blur();
+	let results: string[] = [];
+	let blur = function (ev: CustomEvent) {
+		ev.target && (ev.target as HTMLElement).blur();
 	};
+
 	$: {
 		regexValid = true;
 		if (isRegex) {
@@ -43,7 +49,7 @@
 
 		filterPredicates.push({
 			column: col,
-			operation: isRegex ? 'match (regex)' : 'match',
+			operation: Operation.LIKE,
 			value: searchString,
 			join: Join._
 		});
@@ -55,7 +61,7 @@
 		searchString = '';
 	}
 
-	async function searchItems(input: string) {
+	async function searchItems(input: string): Promise<string[]> {
 		if (isRegex) {
 			try {
 				new RegExp(input);
@@ -63,13 +69,12 @@
 			} catch (e) {
 				noResultsText = 'Invalid Regex!';
 				results = [];
-				return results;
 			}
 		}
 
 		try {
-			if (projectConfig) {
-				results = await ZenoService.filterStringMetadata($projectConfig.name, {
+			if ($projectConfig) {
+				results = await ZenoService.filterStringMetadata($projectConfig.uuid, {
 					column: col,
 					filterString: input,
 					isRegex: isRegex,
@@ -82,9 +87,10 @@
 			results = [];
 			return results;
 		}
+		return results;
 	}
 
-	function optionClick(e) {
+	function optionClick(e: MouseEvent) {
 		if (e.currentTarget instanceof HTMLElement) {
 			let id = e.currentTarget.id;
 			if (id === 'caseMatch') {
@@ -183,9 +189,9 @@
 	{#each filterPredicates as pred}
 		<div class="meta-chip">
 			<span>
-				{pred.operation === 'match (regex)' ? '/' : ''}
+				{pred.operation === Operation.LIKE ? '/' : ''}
 				{pred.value}
-				{pred.operation === 'match (regex)' ? '/' : ''}
+				{pred.operation === Operation.LIKE ? '/' : ''}
 			</span>
 			<TrailingIcon
 				class="remove material-icons"

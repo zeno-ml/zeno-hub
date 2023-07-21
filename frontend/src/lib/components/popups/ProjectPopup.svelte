@@ -5,7 +5,6 @@
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
-	import { Svg } from '@smui/common';
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
@@ -47,6 +46,32 @@
 		if (e.key === 'Enter') {
 			updateProject();
 		}
+	}
+
+	function addUser(e: CustomEvent) {
+		$projectConfig &&
+			ZenoService.addProjectUser($projectConfig.uuid, {
+				...e.detail,
+				admin: false
+			}).then(() => {
+				if ($projectConfig) {
+					userRequest = ZenoService.getProjectUsers($projectConfig.uuid);
+				}
+			});
+		selectedUser = undefined;
+	}
+
+	function addOrganization(e: CustomEvent) {
+		$projectConfig &&
+			ZenoService.addProjectOrg($projectConfig.uuid, {
+				...e.detail,
+				admin: false
+			}).then(() => {
+				if ($projectConfig) {
+					organizationRequest = ZenoService.getProjectOrgs($projectConfig.uuid);
+				}
+			});
+		selectedOrg = undefined;
 	}
 </script>
 
@@ -132,7 +157,7 @@
 															}
 														})}
 												>
-													<Icon component={Svg} viewBox="0 0 24 24">
+													<Icon tag="svg" viewBox="0 0 24 24">
 														<path fill="black" d={mdiClose} />
 													</Icon>
 												</IconButton>
@@ -155,18 +180,7 @@
 							<Svelecte
 								style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
 								bind:value={selectedUser}
-								on:change={(e) => {
-									$projectConfig &&
-										ZenoService.addProjectUser($projectConfig.uuid, {
-											...e.detail,
-											admin: false
-										}).then(() => {
-											if ($projectConfig) {
-												userRequest = ZenoService.getProjectUsers($projectConfig.uuid);
-											}
-										});
-									selectedUser = undefined;
-								}}
+								on:change={addUser}
 								options={availableUsers}
 								placeholder="add collaborators"
 								searchable={true}
@@ -222,7 +236,7 @@
 														}
 													})}
 											>
-												<Icon component={Svg} viewBox="0 0 24 24">
+												<Icon tag="svg" viewBox="0 0 24 24">
 													<path fill="black" d={mdiClose} />
 												</Icon>
 											</IconButton>
@@ -240,18 +254,7 @@
 							<Svelecte
 								style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
 								bind:value={selectedOrg}
-								on:change={(e) => {
-									$projectConfig &&
-										ZenoService.addProjectOrg($projectConfig.uuid, {
-											...e.detail,
-											admin: false
-										}).then(() => {
-											if ($projectConfig) {
-												organizationRequest = ZenoService.getProjectOrgs($projectConfig.uuid);
-											}
-										});
-									selectedUser = undefined;
-								}}
+								on:change={addOrganization}
 								options={availableOrgs}
 								placeholder="add organization access"
 								searchable={true}

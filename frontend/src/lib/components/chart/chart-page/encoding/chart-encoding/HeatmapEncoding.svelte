@@ -8,13 +8,21 @@
 	export let chart: Chart;
 
 	$: parameters = chart.parameters as HeatmapParameters;
+	$: numberValues =
+		parameters.xChannel === SlicesOrModels.SLICES
+			? (parameters.xValues as number[])
+			: (parameters.yValues as number[]);
+	$: stringValues =
+		parameters.xChannel === SlicesOrModels.MODELS
+			? (parameters.xValues as string[])
+			: (parameters.yValues as string[]);
 
 	enum Dimensions {
 		x,
 		y
 	}
 
-	function refreshParams(e, currentParam: Dimensions) {
+	function refreshParams(e: CustomEvent, currentParam: Dimensions) {
 		const settingModels = e.detail.value === SlicesOrModels.MODELS;
 		if (currentParam === Dimensions.x) {
 			parameters.xChannel = e.detail.value;
@@ -38,6 +46,14 @@
 		}
 
 		chart = { ...chart, parameters: { ...parameters } };
+	}
+
+	function refreshX(e: CustomEvent) {
+		refreshParams(e, Dimensions.x);
+	}
+
+	function refreshY(e: CustomEvent) {
+		refreshParams(e, Dimensions.y);
 	}
 
 	function selected(e: CustomEvent<number[] | string[]>, channel: Dimensions) {
@@ -64,17 +80,14 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.xChannel) {
-					refreshParams(e, Dimensions.x);
-				}
-			}}
+			on:change={refreshX}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.xChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.x)}
-		currentValues={parameters.xValues}
+		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? numberValues : []}
+		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
 </div>
 <div class="encoding-section">
@@ -88,23 +101,20 @@
 				{ label: 'models', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
-			on:change={(e) => {
-				if (e.detail.value !== parameters.yChannel) {
-					refreshParams(e, Dimensions.y);
-				}
-			}}
+			on:change={refreshY}
 		/>
 	</div>
 	<svelte:component
 		this={EncodingMap[parameters.yChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.y)}
-		currentValues={parameters.yValues}
+		numberValues={parameters.yChannel === SlicesOrModels.SLICES ? numberValues : []}
+		stringValues={parameters.yChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
 </div>
 <div class="encoding-section">
 	<div class="parameters">
 		<h4>color</h4>
-		<MetricsEncodingDropdown on:selected={fixedSelected} currentValue={parameters.metric} />
+		<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metric} />
 	</div>
 </div>
 

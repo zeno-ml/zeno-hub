@@ -1,35 +1,32 @@
 <script lang="ts">
 	// List of objects with keys corresponding to the following props.
-	export let entry;
-	export let viewOptions;
-	// Key for model outputs.
-	export let modelColumn;
-	// Key for groundtruth labels.
-	export let labelColumn;
-	// Key for the input data.
-	export let dataColumn;
-	// Key for unique identifier of each item.
-	export let idColumn;
+	export let entry: Record<string, number | string | boolean | { role: string; content: string }[]>;
+	export let modelColumn: string;
+	export let viewOptions: Record<string, unknown>;
+
+	$: imageURL = entry['data'] as string;
+	$: maskOption =
+		viewOptions['mask'] && (viewOptions['mask'] as string).includes('Label') ? 'label' : 'model';
 </script>
 
 <div class="box">
 	<div id="overlays">
 		<img
-			src={entry[dataColumn]}
+			src={imageURL}
 			style:width="150px"
 			style:height="150px"
-			alt="Image thumbnail for instance {entry[idColumn]}"
+			alt="Image thumbnail for instance {entry['item']}"
 		/>
-		{#if viewOptions['mask'].includes('Label')}
+		{#if maskOption === 'label'}
 			<img
 				class="overlay"
-				src="/labels/{entry[labelColumn]}"
+				src="/labels/{entry['label']}"
 				style:width="150px"
 				style:height="150px"
-				alt="Image thumbnail for instance {entry[labelColumn]}"
+				alt="Image thumbnail for instance {entry['label']}"
 			/>
 		{/if}
-		{#if entry[modelColumn] && viewOptions['mask'].includes('Model')}
+		{#if entry[modelColumn] && maskOption === 'model'}
 			<img
 				class="overlay"
 				src="/cache/{modelColumn}/{entry[modelColumn]}"

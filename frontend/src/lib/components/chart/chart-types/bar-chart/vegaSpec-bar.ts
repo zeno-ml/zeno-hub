@@ -6,7 +6,7 @@ import { get } from 'svelte/store';
 export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
 	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
-	const metric = get(metrics).find((metric) => metric.id === parameters.metric.projectMetricId);
+	const metric = get(metrics).find((metric) => metric.id === parameters.metric);
 
 	const spec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',

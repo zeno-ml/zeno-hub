@@ -12,7 +12,6 @@
 		mdiCompassOutline,
 		mdiLogout
 	} from '@mdi/js';
-	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 
@@ -46,7 +45,7 @@
 							}}
 						>
 							<div class="icon">
-								<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+								<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 									<path
 										fill={$page.url.href.includes('explore') ? '#6a1b9a' : 'black'}
 										d={mdiCompassOutline}
@@ -67,7 +66,7 @@
 							}}
 						>
 							<div class="icon">
-								<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+								<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 									<path
 										fill={$page.url.href.includes('compare') ? '#6a1b9a' : 'black'}
 										d={mdiCompare}
@@ -88,7 +87,7 @@
 							}}
 						>
 							<div class="icon">
-								<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+								<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 									<path
 										fill={$page.url.href.includes('chart') ? '#6a1b9a' : 'black'}
 										d={mdiChartBoxOutline}
@@ -110,7 +109,7 @@
 								}}
 							>
 								<div class="icon">
-									<Icon style="outline:none" component={Svg} viewBox="0 0 24 24">
+									<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 										<path
 											fill={$page.url.href.includes('chart') ? '#6a1b9a' : 'black'}
 											d={mdiCog}
@@ -125,13 +124,13 @@
 
 			<div class="icons">
 				<IconButton on:click={() => goto('/account')}>
-					<Icon component={Svg} viewBox="0 0 24 24">
+					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill="black" d={mdiAccount} />
 					</Icon>
 				</IconButton>
 				<form method="POST" action="/logout">
 					<IconButton>
-						<Icon component={Svg} viewBox="0 0 24 24">
+						<Icon tag="svg" viewBox="0 0 24 24">
 							<path fill="black" d={mdiLogout} />
 						</Icon>
 					</IconButton>

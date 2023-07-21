@@ -3,7 +3,7 @@
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 
-	export let currentValue: number;
+	export let numberValue: number;
 
 	const dispatch = createEventDispatcher<{
 		selected: number;
@@ -15,21 +15,18 @@
 	$metrics.forEach((m) => {
 		options.push({ value: m.id, label: m.name });
 	});
-	value = currentValue;
+	value = numberValue;
+
+	function valueSelected(e: CustomEvent) {
+		if (e.detail.value !== numberValue) {
+			dispatch('selected', e.detail);
+		}
+	}
 </script>
 
 <div class="parameters">
 	<h4 class="select-label">&nbsp;</h4>
-	<Svelecte
-		style="width: 280px; flex:none;"
-		bind:value
-		{options}
-		on:change={(e) => {
-			if (e.detail.value !== currentValue) {
-				dispatch('selected', e.detail.value);
-			}
-		}}
-	/>
+	<Svelecte style="width: 280px; flex:none;" bind:value {options} on:change={valueSelected} />
 </div>
 
 <style>

@@ -193,8 +193,17 @@
 		let newHeader = setColumnModel(selectColumn, model);
 		let key = diff ? 'diff' : newHeader.id;
 		return tableContent[key] && newHeader.dataType === MetadataType.CONTINUOUS
-			? tableContent[key].toFixed(2)
+			? parseFloat(`${tableContent[key]}`).toFixed(2)
 			: tableContent[key];
+	}
+
+	function columnSelected(e: CustomEvent) {
+		if (e.detail !== selectColumn) {
+			selectColumn = e.detail;
+			// reset tables data to prevent rerender the existing(non-updated) data
+			table = undefined;
+			compareSort.set([undefined, true]);
+		}
 	}
 </script>
 
@@ -207,14 +216,7 @@
 		valueAsObject
 		valueField={'name'}
 		{options}
-		on:change={(e) => {
-			if (e.detail !== selectColumn) {
-				selectColumn = e.detail;
-				// reset tables data to prevent rerender the existing(non-updated) data
-				table = undefined;
-				compareSort.set([undefined, true]);
-			}
-		}}
+		on:change={columnSelected}
 	/>
 </div>
 <div class="table-container" bind:this={instanceContainer}>
