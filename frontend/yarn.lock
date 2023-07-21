@@ -898,14 +898,14 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/layout-grid@7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@smui/layout-grid/-/layout-grid-7.0.0-beta.8.tgz#79236a369ef2efe9e406cc2994846475767fd838"
-  integrity sha512-VPNa7BPBIdYq90Zut33+MsR5CEh1jUT6jpeCtFWaA7S/jRsxZocHeL4dH3CfCDYuO2rMUs2+zWTOvLe3tDzIqA==
+"@smui/layout-grid@7.0.0-beta.14":
+  version "7.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@smui/layout-grid/-/layout-grid-7.0.0-beta.14.tgz#733f73ea828326043e3760b5360a2fc856a80a5c"
+  integrity sha512-SoaHrFai1yHaWJkupyNBtQsCbwSSsdRrYIJ7jEbRVPbaV+W1GPTVo2tuIhyl1e5r0/RpxFvyBfmNzZ2g2lBPRQ==
   dependencies:
     "@material/layout-grid" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
+    "@smui/common" "^7.0.0-beta.14"
+    svelte2tsx "^0.6.15"
 
 "@smui/line-ripple@^7.0.0-beta.14", "@smui/line-ripple@^7.0.0-beta.8":
   version "7.0.0-beta.14"
