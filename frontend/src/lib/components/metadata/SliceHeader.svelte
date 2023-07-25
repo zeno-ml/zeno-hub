@@ -53,7 +53,7 @@
 					: 'Find slices with the largest output differences between models',
 				position: 'left',
 				theme: 'zeno-tooltip',
-				maxWidth: !$page.url.href.includes('compare') ? '150' : '200'
+				maxWidth: '150'
 			}}
 		>
 			<IconButton
