@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getEndpoint } from '$lib/config.js';
 	import {
 		columns,
 		folders,
@@ -10,6 +9,7 @@
 		slices,
 		tags
 	} from '$lib/stores';
+	import { getEndpoint } from '$lib/util/util';
 	import { OpenAPI as zenoAPI } from '$lib/zenoapi';
 
 	export let data;

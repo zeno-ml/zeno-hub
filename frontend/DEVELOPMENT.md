@@ -6,6 +6,10 @@ Zeno's frontend is a SvelteKit application.
 
 Please read the [overall development setup](../DEVELOPMENT.md) before reading this.
 
+Before starting local development, you need a `.env` file.
+You can take inspiration for this from the `.env.example` file in this folder.
+Once you have this set up, you can run `yarn` or `npm install` to install required npm packages and then `yarn dev` or `npm run dev` to run the frontend in dev mode.
+
 ### Static Analysis Tools
 
 eslint (linting), prettier (formatting)
@@ -25,4 +29,6 @@ Everything else should be handled by linting and typechecking. If your code does
 
 ## Deployment
 
-To inform the frontend about where your backend has been deployed, change the backendEndpoint in [src/lib/config.ts](./src/lib/config.ts). Then build the project by issuing `yarn build` or `npm run build` depending on which package manager you use. This will create a build folder that can be started as a node server (e.g., `node build`).
+To inform the frontend about where your backend has been deployed, set an environment variable witht the name `PUBLIC_BACKEND_ENDPOINT`.
+Then build the project by issuing `yarn build` or `npm run build` depending on which package manager you use.
+This will create a build folder that can be started as a node server (e.g., `node build`).

@@ -1,4 +1,4 @@
-import { backendEndpoint } from '$lib/config.js';
+import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error } from '@sveltejs/kit';
 
@@ -8,7 +8,7 @@ export async function load({ cookies, params }) {
 		throw error(404, 'User not found in cookies');
 	}
 
-	OpenAPI.BASE = backendEndpoint + '/api';
+	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 	const projectConfig = await ZenoService.getProject(params.project, JSON.parse(userCookie));
 	if (!projectConfig) {
 		throw error(404, 'Could not load project config');

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Account from '$lib/components/settings/Account.svelte';
 	import OrganizationsTable from '$lib/components/settings/OrganizationsTable.svelte';
-	import { getEndpoint } from '$lib/config';
+	import { getEndpoint } from '$lib/util/util';
 	import { OpenAPI, type Organization, type User } from '$lib/zenoapi';
 
 	export let data;

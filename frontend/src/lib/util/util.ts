@@ -1,3 +1,4 @@
+import { env } from '$env/dynamic/public';
 import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
 import { slicesForComparison } from '../stores';
 
@@ -97,4 +98,9 @@ export function updateModelDependentSlices(name: string, mod: string, slis: Slic
 			}
 		}
 	});
+}
+
+export function getEndpoint() {
+	if (env.PUBLIC_BACKEND_ENDPOINT === 'http://127.0.0.1:8000') return '/localzeno';
+	return env.PUBLIC_BACKEND_ENDPOINT;
 }

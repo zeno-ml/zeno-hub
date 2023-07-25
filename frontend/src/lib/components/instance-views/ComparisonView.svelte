@@ -2,7 +2,6 @@
 	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
-	import { getEndpoint } from '$lib/config';
 	import {
 		columns,
 		compareSort,
@@ -17,7 +16,7 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
-	import { columnSort } from '$lib/util/util';
+	import { columnSort, getEndpoint } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
