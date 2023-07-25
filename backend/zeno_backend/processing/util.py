@@ -29,11 +29,9 @@ def generate_diff_cols(
         diff_col_1.column_type != diff_col_2.column_type
         or diff_col_1.data_type != diff_col_2.data_type
     ):
-        print("error: different column types!")
         return df
 
     if diff_col_1.model is None or diff_col_2.model is None:
-        print("error: no model specified!")
         return df
 
     col1_id = column_id_from_name_and_model(
