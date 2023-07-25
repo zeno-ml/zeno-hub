@@ -1,5 +1,5 @@
-<script>
-	export let input;
+<script lang="ts">
+	export let input: string;
 	export let output = false;
 </script>
 

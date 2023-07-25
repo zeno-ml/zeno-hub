@@ -6,12 +6,13 @@
 	export let modelColumn: string;
 
 	$: chatData = entry['data'] as string;
+	$: modelContent = entry[modelColumn] as string;
 </script>
 
 <div id="container">
 	<UserBlock input={chatData} />
 	{#if entry[modelColumn]}
-		<AssistantBlock input={entry[modelColumn]} output={true} />
+		<AssistantBlock input={modelContent} output={true} />
 	{/if}
 	{#if entry['label']}
 		<p><span class="label">expected:</span> {entry['label']}</p>
