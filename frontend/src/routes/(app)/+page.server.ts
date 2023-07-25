@@ -1,14 +1,21 @@
 import { env } from '$env/dynamic/public';
-import { OpenAPI, ZenoService, type ProjectConfig } from '$lib/zenoapi';
+import { OpenAPI, ZenoService } from '$lib/zenoapi';
+import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies }) {
+export async function load({ cookies, url }) {
 	const userCookie = cookies.get('loggedIn');
-	let projects: ProjectConfig[] = [];
-	if (userCookie) {
-		const user = JSON.parse(userCookie);
-		OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-		projects = await ZenoService.getProjects(user);
+	if (!userCookie) {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
+	const cognitoUser = JSON.parse(userCookie);
+	// If the user is not authenticated, redirect to the login page
+	if (!cognitoUser.id || !cognitoUser.accessToken) {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+	}
+
+	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
+	const user = await ZenoService.login(cognitoUser.email);
+	const projects = await ZenoService.getProjects(user);
 
 	return {
 		projects: projects

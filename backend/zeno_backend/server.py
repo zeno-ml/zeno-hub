@@ -202,7 +202,10 @@ def get_server() -> FastAPI:
     @api_app.post("/register", response_model=User, tags=["zeno"])
     def register_user(user: User):
         try:
+            print("insert")
+            print(user)
             insert.user(user)
+            print("inserted")
             return select.user(user.email)
         except Exception as exc:
             raise HTTPException(
@@ -211,19 +214,23 @@ def get_server() -> FastAPI:
             ) from exc
 
     @api_app.post("/login", response_model=User, tags=["zeno"])
-    def login(user: User):
+    def login(email: str):
         try:
-            fetched_user = select.user(user.email)
+            fetched_user = select.user(email)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(exc),
             ) from exc
-        if fetched_user is None or fetched_user.secret != user.secret:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect login credentials.",
-            )
+        if fetched_user is None:
+            try:
+                insert.user(User(id=-1, email=email, admin=None))
+                return select.user(email)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=str(exc),
+                ) from exc
         else:
             return fetched_user
 

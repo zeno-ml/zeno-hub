@@ -417,8 +417,8 @@ def user(user: User):
     """
     db = Database()
     db.connect_execute(
-        'INSERT INTO users ("user_name","email","secret") values(%s,%s,%s)',
-        [user.name, user.email, user.secret],
+        'INSERT INTO users ("email") values(%s)',
+        [user.email],
     )
 
 

@@ -4,11 +4,8 @@
 	import Textfield from '@smui/textfield';
 
 	export let form;
+	export let data;
 </script>
-
-<svelte:head>
-	<title>Register</title>
-</svelte:head>
 
 <div class="login-container">
 	<div class="login-left">
@@ -22,32 +19,17 @@
 		</div>
 	</div>
 	<div class="login-right">
-		<form method="POST" class="login-form" action="?/signup" use:enhance>
+		<form class="login-form" method="POST" action="?/verify" use:enhance>
 			<div class="form-container">
-				<Textfield input$name="username" value={form ? `${form.name}` : ''} label="User name" />
-				<Textfield
-					input$name="email"
-					type="email"
-					value={form ? `${form.email}` : ''}
-					label="Email address"
-				/>
-				<Textfield
-					input$name="password"
-					type="password"
-					value={form ? `${form.password}` : ''}
-					label="Password"
-				/>
-				<Textfield
-					input$name="repeatPassword"
-					type="password"
-					value={form ? `${form.repeat}` : ''}
-					label="Repeat password"
-				/>
-				<Button type="submit">Sign Up</Button>
-				{#if form?.error}
-					<p>{form.error}</p>
-				{/if}
+				<span>
+					Hi {data.username}, please enter the verification code that we sent to you.
+				</span>
+				<Textfield input$name="code" label="Verification Code" value={form ? `${form.code}` : ''} />
+				<Button type="submit">Verify</Button>
 			</div>
+			{#if form?.error}
+				<p>{form.error}</p>
+			{/if}
 		</form>
 	</div>
 </div>

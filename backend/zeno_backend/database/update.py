@@ -136,8 +136,8 @@ def user(user: User):
     """
     db = Database()
     db.connect_execute(
-        "UPDATE users SET user_name = %s, email = %s, secret = %s WHERE id = %s",
-        [user.name, user.email, user.secret, user.id],
+        "UPDATE users SET email = %s WHERE id = %s",
+        [user.email, user.id],
     )
 
 

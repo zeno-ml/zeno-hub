@@ -8,8 +8,6 @@
  */
 export type User = {
 	id: number;
-	name?: string;
 	email: string;
-	secret?: string;
 	admin?: boolean;
 };
