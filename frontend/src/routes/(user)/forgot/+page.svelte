@@ -3,8 +3,12 @@
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
-	export let form;
+	let username = '';
 </script>
+
+<svelte:head>
+	<title>Reset Password</title>
+</svelte:head>
 
 <div class="login-container">
 	<div class="login-left">
@@ -18,28 +22,11 @@
 		</div>
 	</div>
 	<div class="login-right">
-		<form class="login-form" method="POST" action="?/login" use:enhance>
+		<form method="POST" class="login-form" action="?/code" use:enhance>
 			<div class="form-container">
-				<Textfield input$name="username" label="Username" value={form ? form.username : ''} />
-				<Textfield
-					type="password"
-					input$name="password"
-					value={form ? form.password : ''}
-					label="Password"
-				/>
-				<Button type="submit">Login</Button>
+				<Textfield input$name="username" bind:value={username} label="Username" />
+				<Button type="submit" disabled={username.length === 0}>Confirm</Button>
 			</div>
-			<div>
-				Don't have an account? <a href="/signup">Sign up now!</a>
-			</div>
-			{#if form?.error}
-				<p>
-					{form.error}
-					{#if form.showReset}
-						<a href="/forgot">Forgot your password?</a>
-					{/if}
-				</p>
-			{/if}
 		</form>
 	</div>
 </div>

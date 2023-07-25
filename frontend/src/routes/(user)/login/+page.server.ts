@@ -7,12 +7,13 @@ import type { Actions } from './$types';
 export const actions: Actions = {
 	login: async ({ request, cookies, url }) => {
 		const data = await request.formData();
-		const username = data.get('username');
-		const password = data.get('password');
+		const username = data.get('username') as string;
+		const password = data.get('password') as string;
 		const failProps = {
 			username: username,
 			password: password,
-			error: 'Failed to log in.'
+			error: 'Failed to log in.',
+			showReset: false
 		};
 
 		if (!username) {
@@ -30,7 +31,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			const res = await getSession(username as string, password as string);
+			const res = await getSession(username, password);
 			const user = extractUserFromSession(res);
 			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
@@ -40,9 +41,11 @@ export const actions: Actions = {
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (error) {
+			const err = error as Error;
 			return fail(400, {
 				...failProps,
-				error: (error as Error).message
+				error: err.message,
+				showReset: err.name === 'NotAuthorizedException'
 			});
 		}
 		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');

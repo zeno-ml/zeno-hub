@@ -6,6 +6,10 @@
 	export let form;
 </script>
 
+<svelte:head>
+	<title>Reset Password</title>
+</svelte:head>
+
 <div class="login-container">
 	<div class="login-left">
 		<h1>Zeno</h1>
@@ -18,28 +22,31 @@
 		</div>
 	</div>
 	<div class="login-right">
-		<form class="login-form" method="POST" action="?/login" use:enhance>
+		<form method="POST" class="login-form" action="?/reset" use:enhance>
+			<div>We have sent you a validation code to reset your password.</div>
 			<div class="form-container">
-				<Textfield input$name="username" label="Username" value={form ? form.username : ''} />
 				<Textfield
-					type="password"
+					input$name="validation"
+					value={form ? `${form.validation}` : ''}
+					label="Validation code"
+				/>
+				<Textfield
 					input$name="password"
-					value={form ? form.password : ''}
+					type="password"
+					value={form ? `${form.password}` : ''}
 					label="Password"
 				/>
-				<Button type="submit">Login</Button>
+				<Textfield
+					input$name="repeatPassword"
+					type="password"
+					value={form ? `${form.repeat}` : ''}
+					label="Repeat password"
+				/>
+				<Button type="submit">Reset</Button>
+				{#if form?.error}
+					<p>{form.error}</p>
+				{/if}
 			</div>
-			<div>
-				Don't have an account? <a href="/signup">Sign up now!</a>
-			</div>
-			{#if form?.error}
-				<p>
-					{form.error}
-					{#if form.showReset}
-						<a href="/forgot">Forgot your password?</a>
-					{/if}
-				</p>
-			{/if}
 		</form>
 	</div>
 </div>

@@ -417,7 +417,7 @@ def user(user: User):
     """
     db = Database()
     db.connect_execute(
-        'INSERT INTO users ("email") values(%s,%s)',
+        'INSERT INTO users ("email") values(%s)',
         [user.email],
     )
 

@@ -1,8 +1,4 @@
-import {
-	zeno_user_pool_client_id,
-	zeno_user_pool_id,
-	zeno_user_pool_secret
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import {
 	AuthenticationDetails,
 	CognitoRefreshToken,
@@ -17,9 +13,8 @@ import { noop } from 'svelte/internal';
 export type CognitoUserSessionType = CognitoUserSession;
 
 const CONFIGS = {
-	UserPoolId: zeno_user_pool_id,
-	ClientId: zeno_user_pool_client_id,
-	ClientSecret: zeno_user_pool_secret
+	UserPoolId: env.ZENO_USER_POOL_ID,
+	ClientId: env.ZENO_USER_POOL_CLIENT_ID
 };
 const Pool = new CognitoUserPool(CONFIGS);
 
@@ -102,4 +97,23 @@ export async function signUpUserWithEmail(
 			}
 		});
 	});
+}
+
+export async function resetPassword(
+	username: string,
+	validation: string,
+	password: string
+): Promise<unknown> {
+	return new Promise(function (resolve, reject) {
+		const user = new CognitoUser({ Username: username, Pool });
+		user.confirmPassword(validation, password, {
+			onSuccess: resolve,
+			onFailure: reject
+		});
+	});
+}
+
+export async function sendPasswordResetCode(username: string) {
+	const user = new CognitoUser({ Username: username, Pool });
+	user.forgotPassword({ onSuccess: noop, onFailure: noop });
 }
