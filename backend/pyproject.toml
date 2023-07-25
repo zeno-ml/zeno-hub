@@ -45,7 +45,7 @@ backend = "zeno_backend.server:serve"
 include = ["zeno_backend"]
 
 [tool.ruff]
-select = ["E", "F", "I", "PD", "N", "D"]
+select = ["E", "F", "I", "PD", "N", "D", "T20"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

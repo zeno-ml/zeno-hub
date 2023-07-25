@@ -300,7 +300,7 @@ def get_server() -> FastAPI:
     @api_app.post("/add_project_user/{project}", tags=["zeno"])
     def add_project_user(project: str, user: User):
         insert.project_user(project, user)
-        return user.name
+        return user.email
 
     @api_app.post("/add_project_org/{project}", tags=["zeno"])
     def add_project_org(project: str, organization: Organization):
@@ -346,7 +346,7 @@ def get_server() -> FastAPI:
     @api_app.post("/project_user/update/{project}", tags=["zeno"])
     def update_project_user(project: str, user: User):
         update.project_user(project, user)
-        return user.name
+        return user.email
 
     @api_app.post("/project_org/update/{project}", tags=["zeno"])
     def update_project_org(project: str, organization: Organization):
@@ -382,7 +382,7 @@ def get_server() -> FastAPI:
     @api_app.delete("/project_user/{project}", tags=["zeno"])
     def delete_project_user(project: str, user: User):
         delete.project_user(project, user)
-        return user.name
+        return user.email
 
     @api_app.delete("/project_org/{project}", tags=["zeno"])
     def delete_project_org(project: str, organization: Organization):
@@ -395,9 +395,4 @@ def get_server() -> FastAPI:
 def serve():
     """Serve the FastAPI application for the backend."""
     app = get_server()
-    print(
-        "\n\033[1mZeno server\033[0m running on http://{}:{}\n".format(
-            "localhost", 8000
-        )
-    )
     uvicorn.run(app, host="localhost", port=8000, log_level="error")
