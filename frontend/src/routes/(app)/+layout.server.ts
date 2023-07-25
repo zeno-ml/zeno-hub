@@ -1,4 +1,4 @@
-import { backendEndpoint } from '$lib/config';
+import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
@@ -13,7 +13,7 @@ export const load = async ({ cookies, url }) => {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	OpenAPI.BASE = backendEndpoint + '/api';
+	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 	const user = await ZenoService.login(cognitoUser.email);
 
 	return {
