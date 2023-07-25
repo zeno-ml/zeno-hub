@@ -2,7 +2,6 @@
 	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
-	import { getEndpoint } from '$lib/config';
 	import {
 		columns,
 		editTag,
@@ -16,6 +15,7 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
+	import { getEndpoint } from '$lib/util/util';
 	import type { GroupMetric, ZenoColumn } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';

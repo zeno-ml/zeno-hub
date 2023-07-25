@@ -1,5 +1,5 @@
 import { dev } from '$app/environment';
-import { backendEndpoint } from '$lib/config';
+import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import { Md5 } from 'ts-md5';
@@ -37,7 +37,7 @@ export const actions: Actions = {
 		}
 		const secret = Md5.hashStr(password as string);
 		try {
-			OpenAPI.BASE = backendEndpoint + '/api';
+			OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 			const user = await ZenoService.registerUser({
 				id: -1,
 				name: username as string,

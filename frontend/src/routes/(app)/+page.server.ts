@@ -1,4 +1,4 @@
-import { backendEndpoint } from '$lib/config';
+import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService, type ProjectConfig } from '$lib/zenoapi';
 
 export async function load({ cookies }) {
@@ -6,7 +6,7 @@ export async function load({ cookies }) {
 	let projects: ProjectConfig[] = [];
 	if (userCookie) {
 		const user = JSON.parse(userCookie);
-		OpenAPI.BASE = backendEndpoint + '/api';
+		OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 		projects = await ZenoService.getProjects(user);
 	}
 

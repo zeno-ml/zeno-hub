@@ -1,5 +1,7 @@
 """Functionality to interact with the database."""
+import os
 from configparser import ConfigParser
+from pathlib import Path
 from typing import Any, Dict, List, LiteralString, Optional, Tuple, Union
 
 import psycopg
@@ -164,13 +166,21 @@ class Database:
         Returns:
             Dict[str, Any]: the database configuration.
         """
-        parser = ConfigParser()
-        parser.read(filename)
-        db: Dict[str, Any] = {}
-        if parser.has_section(section):
-            params = parser.items(section)
-            for param in params:
-                db[param[0]] = param[1]
+        if Path(filename).exists():
+            parser = ConfigParser()
+            parser.read(filename)
+            db: Dict[str, Any] = {}
+            if parser.has_section(section):
+                params = parser.items(section)
+                for param in params:
+                    db[param[0]] = param[1]
+            else:
+                raise Exception(f"Section {section} not found in the {filename} file")
+            return db
         else:
-            raise Exception(f"Section {section} not found in the {filename} file")
-        return db
+            db: Dict[str, Any] = {}
+            db["host"] = os.environ["DB_HOST"]
+            db["dbname"] = os.environ["DB_NAME"]
+            db["user"] = os.environ["DB_USER"]
+            db["password"] = os.environ["DB_PASSWORD"]
+            return db

@@ -1,5 +1,5 @@
 import { dev } from '$app/environment';
-import { backendEndpoint } from '$lib/config.js';
+import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService, type User } from '$lib/zenoapi';
 import { fail } from '@sveltejs/kit';
 
@@ -12,7 +12,7 @@ export async function load({ cookies }) {
 	}
 	const user = JSON.parse(userCookie) as User;
 
-	OpenAPI.BASE = backendEndpoint + '/api';
+	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 	const organizations = await ZenoService.getOrganizations(user);
 
 	return {
@@ -34,7 +34,7 @@ export const actions = {
 		}
 		const user = { ...(JSON.parse(userCookie) as User), name: name };
 
-		OpenAPI.BASE = backendEndpoint + '/api';
+		OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 		await ZenoService.updateUser(user);
 		cookies.set('loggedIn', JSON.stringify(user), {
 			path: '/',
