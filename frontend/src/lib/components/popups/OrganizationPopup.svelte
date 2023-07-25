@@ -63,7 +63,7 @@
 			{#if members.length > 0}
 				<table>
 					<thead>
-						<th style="width: 200px;">Name</th>
+						<th style="width: 200px;">Email</th>
 						<th>Admin</th>
 						<th style="width: auto;" />
 					</thead>
@@ -71,7 +71,7 @@
 						{#each members as member}
 							<tr>
 								<td>
-									{member.name}
+									{member.email}
 								</td>
 								<td>
 									<Checkbox

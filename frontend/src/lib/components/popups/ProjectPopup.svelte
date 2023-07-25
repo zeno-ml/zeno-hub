@@ -110,7 +110,6 @@
 					{#if currentUsers.length > 0}
 						<table>
 							<thead>
-								<th>Name</th>
 								<th>Email</th>
 								<th>Admin</th>
 								<th />
@@ -121,12 +120,9 @@
 									else if (b.id === user.id) return 1;
 									else if (a.admin && !b.admin) return -1;
 									else if (!a.admin && b.admin) return 1;
-									return a.name && b.name ? a.name.localeCompare(b.name) : 0;
+									else return 0;
 								}) as member}
 									<tr>
-										<td>
-											{member.name}
-										</td>
 										<td>
 											{member.email}
 										</td>

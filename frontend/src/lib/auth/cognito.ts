@@ -5,18 +5,20 @@ import {
 	CognitoUser,
 	CognitoUserAttribute,
 	CognitoUserPool,
-	CognitoUserSession,
+	type CognitoUserSession,
 	type ISignUpResult
 } from 'amazon-cognito-identity-js';
 import { noop } from 'svelte/internal';
 
 export type CognitoUserSessionType = CognitoUserSession;
 
-const CONFIGS = {
-	UserPoolId: env.ZENO_USER_POOL_ID,
-	ClientId: env.ZENO_USER_POOL_CLIENT_ID
-};
-const Pool = new CognitoUserPool(CONFIGS);
+function getPool() {
+	const CONFIGS = {
+		UserPoolId: env.ZENO_USER_POOL_ID ?? '',
+		ClientId: env.ZENO_USER_POOL_CLIENT_ID ?? ''
+	};
+	return new CognitoUserPool(CONFIGS);
+}
 
 /**
  * Login to Cognito User Pool using the provided credentials.
@@ -28,7 +30,7 @@ const Pool = new CognitoUserPool(CONFIGS);
  */
 export const getSession = (Username: string, Password: string): Promise<CognitoUserSession> => {
 	return new Promise((resolve, reject) => {
-		const user = new CognitoUser({ Username, Pool });
+		const user = new CognitoUser({ Username, Pool: getPool() });
 		user.authenticateUser(new AuthenticationDetails({ Username, Password }), {
 			onSuccess: resolve,
 			onFailure: reject
@@ -37,7 +39,7 @@ export const getSession = (Username: string, Password: string): Promise<CognitoU
 };
 
 export function verify(Username: string, code: string) {
-	const user = new CognitoUser({ Username, Pool });
+	const user = new CognitoUser({ Username, Pool: getPool() });
 	return new Promise((resolve, reject) => {
 		user.confirmRegistration(code, false, function (err, result) {
 			if (err) reject(err);
@@ -47,7 +49,7 @@ export function verify(Username: string, code: string) {
 }
 
 export const resendCode = (Username: string) => {
-	const user = new CognitoUser({ Username, Pool });
+	const user = new CognitoUser({ Username, Pool: getPool() });
 	user.resendConfirmationCode(noop);
 };
 
@@ -60,7 +62,7 @@ export const resendCode = (Username: string) => {
 export const refreshAccessToken = async (sessionData: {
 	refreshToken: string;
 }): Promise<CognitoUserSession> => {
-	const cognitoUser = Pool.getCurrentUser();
+	const cognitoUser = getPool().getCurrentUser();
 	// Check if the user is logged in
 	if (!cognitoUser) {
 		throw new Error('No user found');
@@ -89,7 +91,7 @@ export async function signUpUserWithEmail(
 			})
 		];
 
-		Pool.signUp(username, password, attributeList, [], function (err, res) {
+		getPool().signUp(username, password, attributeList, [], function (err, res) {
 			if (err) {
 				reject(err);
 			} else {
@@ -105,7 +107,7 @@ export async function resetPassword(
 	password: string
 ): Promise<unknown> {
 	return new Promise(function (resolve, reject) {
-		const user = new CognitoUser({ Username: username, Pool });
+		const user = new CognitoUser({ Username: username, Pool: getPool() });
 		user.confirmPassword(validation, password, {
 			onSuccess: resolve,
 			onFailure: reject
@@ -114,6 +116,6 @@ export async function resetPassword(
 }
 
 export async function sendPasswordResetCode(username: string) {
-	const user = new CognitoUser({ Username: username, Pool });
+	const user = new CognitoUser({ Username: username, Pool: getPool() });
 	user.forgotPassword({ onSuccess: noop, onFailure: noop });
 }
