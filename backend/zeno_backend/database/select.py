@@ -588,25 +588,23 @@ def tags(project: str) -> List[Tag]:
 
 
 def user(email: str) -> Optional[User]:
-    """Get the secret of a user with a specific email address.
+    """Get the user with a specific email address.
 
     Args:
-        email (str): the email address of the user for which to fetch the secret.
+        email (str): the email address of the user for which to fetch the user.
 
     Returns:
-        Optional[str]: the secret of the user.
+        Optional[User]: the requested user.
     """
     db = Database()
     user = db.connect_execute_return(
-        "SELECT id, user_name, email, secret FROM users WHERE email = %s", [email]
+        "SELECT id, email FROM users WHERE email = %s", [email]
     )
     if user is None:
         return None
     return User(
         id=user[0] if isinstance(user[0], int) else -1,
-        name=str(user[1]),
-        email=str(user[2]),
-        secret=str(user[3]),
+        email=str(user[1]),
         admin=None,
     )
 
@@ -618,15 +616,11 @@ def users() -> List[User]:
         List[User]: all registered users.
     """
     db = Database()
-    users = db.connect_execute_return(
-        "SELECT id, user_name, email FROM users;", return_all=True
-    )
+    users = db.connect_execute_return("SELECT id, email FROM users;", return_all=True)
     return (
         list(
             map(
-                lambda user: User(
-                    id=user[0], name=user[1], email=user[2], secret=None, admin=None
-                ),
+                lambda user: User(id=user[0], email=user[1], admin=None),
                 users,
             )
         )
@@ -683,7 +677,7 @@ def organizations(user: User) -> List[Organization]:
             return organizations
         for org in organizations_result:
             members = db.execute_return(
-                "SELECT u.id, u.user_name, u.email, uo.admin FROM users as u "
+                "SELECT u.id, u.email, uo.admin FROM users as u "
                 "JOIN user_organization as uo ON u.id = uo.user_id "
                 "WHERE uo.organization_id = %s;",
                 [org[0]],
@@ -700,10 +694,8 @@ def organizations(user: User) -> List[Organization]:
                         map(
                             lambda member: User(
                                 id=member[0],
-                                name=member[1],
-                                email=member[2],
-                                secret=None,
-                                admin=member[3],
+                                email=member[1],
+                                admin=member[2],
                             ),
                             members,
                         )
@@ -728,7 +720,7 @@ def project_users(project: str) -> List[User]:
     """
     db = Database()
     project_users = db.connect_execute_return(
-        "SELECT u.id, u.user_name, u.email, up.editor FROM users as u "
+        "SELECT u.id, u.email, up.editor FROM users as u "
         "JOIN user_project AS up ON u.id = up.user_id WHERE up.project_uuid = %s",
         [project],
         return_all=True,
@@ -736,9 +728,7 @@ def project_users(project: str) -> List[User]:
     return (
         list(
             map(
-                lambda user: User(
-                    id=user[0], name=user[1], email=user[2], secret=None, admin=user[3]
-                ),
+                lambda user: User(id=user[0], email=user[1], admin=user[2]),
                 project_users,
             )
         )

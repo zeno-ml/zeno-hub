@@ -550,16 +550,17 @@ export class ZenoService {
 
 	/**
 	 * Login
-	 * @param requestBody
+	 * @param email
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static login(requestBody: User): CancelablePromise<User> {
+	public static login(email: string): CancelablePromise<User> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/login',
-			body: requestBody,
-			mediaType: 'application/json',
+			query: {
+				email: email
+			},
 			errors: {
 				422: `Validation Error`
 			}

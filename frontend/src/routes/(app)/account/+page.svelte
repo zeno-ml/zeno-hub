@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { AuthUser } from '$lib/auth/types';
 	import Account from '$lib/components/settings/Account.svelte';
 	import OrganizationsTable from '$lib/components/settings/OrganizationsTable.svelte';
 	import { getEndpoint } from '$lib/util/util';
@@ -7,6 +8,7 @@
 	export let data;
 
 	$: user = data.user as User;
+	$: cognitoUser = data.cognitoUser as AuthUser;
 	$: organizations = data.organizations as Organization[];
 
 	OpenAPI.BASE = `${getEndpoint()}/api`;
@@ -14,7 +16,7 @@
 
 <div class="container">
 	<h1>Account management</h1>
-	<Account {user} />
+	<Account name={cognitoUser.name} email={cognitoUser.email} />
 	<OrganizationsTable {organizations} {user} />
 </div>
 

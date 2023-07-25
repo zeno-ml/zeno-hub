@@ -1,22 +1,13 @@
 <script lang="ts">
-	import type { User } from '$lib/zenoapi';
-	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
-	export let user: User;
+	export let email: string;
+	export let name: string;
 </script>
 
 <div class="horizontal">
-	<form method="POST" action="?/updateUser">
-		<Textfield
-			input$name="name"
-			label="Username"
-			bind:value={user.name}
-			style="margin-right: 40px;"
-		/>
-		<Textfield label="Email" value={user.email} disabled style="margin-right: 40px;" />
-		<Button type="submit" variant="raised">Update</Button>
-	</form>
+	<Textfield label="Username" value={name} disabled style="margin-right: 40px;" />
+	<Textfield label="Email" value={email} disabled style="margin-right: 40px;" />
 </div>
 
 <style>

@@ -1,14 +1,9 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
-	export let form;
+	let errorMessage: string | undefined = undefined;
 </script>
-
-<svelte:head>
-	<title>Register</title>
-</svelte:head>
 
 <div class="login-container">
 	<div class="login-left">
@@ -22,32 +17,18 @@
 		</div>
 	</div>
 	<div class="login-right">
-		<form method="POST" class="login-form" action="?/signup" use:enhance>
+		<form class="login-form" method="POST" action="?/login">
 			<div class="form-container">
-				<Textfield input$name="username" value={form ? `${form.name}` : ''} label="User name" />
-				<Textfield
-					input$name="email"
-					type="email"
-					value={form ? `${form.email}` : ''}
-					label="Email address"
-				/>
-				<Textfield
-					input$name="password"
-					type="password"
-					value={form ? `${form.password}` : ''}
-					label="Password"
-				/>
-				<Textfield
-					input$name="repeatPassword"
-					type="password"
-					value={form ? `${form.repeat}` : ''}
-					label="Repeat password"
-				/>
-				<Button type="submit">Sign Up</Button>
-				{#if form?.error}
-					<p>{form.error}</p>
-				{/if}
+				<Textfield input$name="username" label="Username" value={''} />
+				<Textfield type="password" input$name="password" value={''} label="Password" />
+				<Button type="submit">Login</Button>
 			</div>
+			<div>
+				Don't have an account? <a href="/signup">Sign up now!</a>
+			</div>
+			{#if errorMessage}
+				<p>{errorMessage}</p>
+			{/if}
 		</form>
 	</div>
 </div>

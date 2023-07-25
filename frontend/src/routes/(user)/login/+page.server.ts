@@ -1,22 +1,21 @@
 import { dev } from '$app/environment';
-import { env } from '$env/dynamic/public';
-import { OpenAPI, ZenoService } from '$lib/zenoapi';
+import { getSession, type CognitoUserSessionType } from '$lib/auth/cognito';
+import type { AuthUser } from '$lib/auth/types';
 import { fail, redirect } from '@sveltejs/kit';
-import { Md5 } from 'ts-md5';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
 	login: async ({ request, cookies, url }) => {
 		const data = await request.formData();
-		const email = data.get('email');
+		const username = data.get('username');
 		const password = data.get('password');
 		const failProps = {
-			email: email,
+			username: username,
 			password: password,
 			error: 'Failed to log in.'
 		};
 
-		if (!email) {
+		if (!username) {
 			return fail(400, {
 				...failProps,
 				error: 'Please enter your email address.'
@@ -30,14 +29,9 @@ export const actions: Actions = {
 			});
 		}
 
-		const secret = Md5.hashStr(password as string);
 		try {
-			OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-			const user = await ZenoService.login({
-				id: -1,
-				secret: secret,
-				email: email as string
-			});
+			const res = await getSession(username as string, password as string);
+			const user = extractUserFromSession(res);
 			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
 				httpOnly: true,
@@ -48,9 +42,23 @@ export const actions: Actions = {
 		} catch (error) {
 			return fail(400, {
 				...failProps,
-				error: error
+				error: (error as Error).message
 			});
 		}
 		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
 	}
+};
+
+const extractUserFromSession = (session: CognitoUserSessionType): AuthUser => {
+	if (!session?.isValid?.()) throw new Error('Invalid session');
+	const user = session.getIdToken().payload;
+	return {
+		id: user.sub,
+		name: user['cognito:username'],
+		email: user.email,
+		image: user.picture,
+		accessToken: session.getAccessToken().getJwtToken(),
+		accessTokenExpires: session.getAccessToken().getExpiration(),
+		refreshToken: session.getRefreshToken().getToken()
+	};
 };

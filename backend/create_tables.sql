@@ -2,7 +2,6 @@
 
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_name text NOT NULL,
     email text NOT NULL UNIQUE,
     secret text NOT NULL
 );

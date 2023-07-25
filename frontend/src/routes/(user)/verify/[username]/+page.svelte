@@ -1,8 +1,10 @@
-<script>
+<script lang="ts">
+	import { enhance } from '$app/forms';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
 	export let form;
+	export let data;
 </script>
 
 <div class="login-container">
@@ -17,23 +19,17 @@
 		</div>
 	</div>
 	<div class="login-right">
-		<form method="POST" class="login-form" action="?/login">
+		<form class="login-form" method="POST" action="?/verify" use:enhance>
 			<div class="form-container">
-				<Textfield input$name="email" value={form?.email ?? ''} type="email" label="Email" />
-				<Textfield
-					type="password"
-					input$name="password"
-					value={form?.password ?? ''}
-					label="Password"
-				/>
-				<Button type="submit">Login</Button>
-				{#if form?.error}
-					<p>{form.error}</p>
-				{/if}
+				<span>
+					Hi {data.username}, please enter the verification code that we sent to you.
+				</span>
+				<Textfield input$name="code" label="Verification Code" value={form ? `${form.code}` : ''} />
+				<Button type="submit">Verify</Button>
 			</div>
-			<div>
-				Don't have an account? <a href="/signup">Sign up now!</a>
-			</div>
+			{#if form?.error}
+				<p>{form.error}</p>
+			{/if}
 		</form>
 	</div>
 </div>
