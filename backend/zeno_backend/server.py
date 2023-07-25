@@ -202,10 +202,7 @@ def get_server() -> FastAPI:
     @api_app.post("/register", response_model=User, tags=["zeno"])
     def register_user(user: User):
         try:
-            print("insert")
-            print(user)
             insert.user(user)
-            print("inserted")
             return select.user(user.email)
         except Exception as exc:
             raise HTTPException(

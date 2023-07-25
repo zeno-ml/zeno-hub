@@ -144,7 +144,6 @@ def project(project: str, user: User) -> Union[ProjectConfig, None]:
         editor = (bool(org_editor[0]) if org_editor is not None else False) or (
             bool(user_editor) if user_editor is not None else False
         )
-        print(editor)
         return (
             ProjectConfig(
                 uuid=str(project_result[0]),
