@@ -1,5 +1,5 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
-
+import os
 from pathlib import Path
 from typing import List, Union
 
@@ -400,4 +400,9 @@ def get_server() -> FastAPI:
 def serve():
     """Serve the FastAPI application for the backend."""
     app = get_server()
-    uvicorn.run(app, host="localhost", port=8000, log_level="error")
+    uvicorn.run(
+        app,
+        host=os.environ["BACKEND_HOST"] if "BACKEND_HOST" in os.environ else "0.0.0.0",
+        port=int(os.environ["BACKEND_PORT"]) if "BACKEND_PORT" in os.environ else 80,
+        log_level="error",
+    )

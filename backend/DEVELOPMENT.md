@@ -19,7 +19,7 @@ user=[usename for DB login]
 password=[password for DB login]
 ```
 
-Then, the backend can be started with poetry, from within the backend folder, run: `poetry run backend`
+For a debug setup, you can also run `uvicorn zeno_backend.server:get_server --reload` from within the poetry shell.
 
 ### Static Analysis Tools
 
@@ -39,3 +39,5 @@ pytest
 
 To deploy the backend, you can either use the same setup as outlined for local development, or set environment variables instead of creating ad `database.ini`.
 You will have to set the following variables: `DB_HOST`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
+Additionally, you can configure the host and port for the backend using `BACKEND_HOST` and `BACKEND_PORT`, if not set, these default to `0.0.0.0` and `80`, respectively.
+The backend can be started with poetry, from within the backend folder, run: `poetry run backend`.
