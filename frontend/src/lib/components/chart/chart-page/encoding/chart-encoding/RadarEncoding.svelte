@@ -7,6 +7,7 @@
 	} from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
+	import EncodingSection from './EncodingSection.svelte';
 
 	export let chart: Chart;
 
@@ -108,8 +109,8 @@
 	}
 </script>
 
-<div class="encoding-section">
-	<div class="parameters">
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>axis</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -122,20 +123,21 @@
 			searchable={false}
 			on:change={refreshAxisParams}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.axisChannel].multi}
+		slot="component"
 		on:selected={(e) => selected(e, Dimensions.axis)}
 		numberValues={parameters.axisChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices
-			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
+			: parameters.axisChannel === SlicesMetricsOrModels.METRICS
 			? parameters.metrics
 			: []}
 		stringValues={parameters.axisChannel === SlicesMetricsOrModels.MODELS ? parameters.models : []}
 	/>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>color</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -147,16 +149,17 @@
 			searchable={false}
 			on:change={refreshLayerParams}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.layerChannel].multi}
+		slot="component"
 		on:selected={(e) => selected(e, Dimensions.layer)}
 		numberValues={parameters.layerChannel === SlicesOrModels.SLICES ? parameters.slices : []}
 		stringValues={parameters.layerChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>value</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -169,9 +172,10 @@
 			searchable={false}
 			on:change={refreshFixedParams}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.fixedChannel].fixed}
+		slot="component"
 		on:selected={fixedSelected}
 		numberValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices[0]
@@ -182,19 +186,4 @@
 			? parameters.models[0]
 			: ''}
 	/>
-</div>
-
-<style>
-	.encoding-section {
-		margin-bottom: 15px;
-	}
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-	.parameters h4 {
-		margin: 5px;
-	}
-</style>
+</EncodingSection>

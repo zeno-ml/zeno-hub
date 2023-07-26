@@ -31,14 +31,18 @@
 	};
 </script>
 
-<div class="chart" on:click={() => goto(`${$page.url}/${chart.id}`)} on:keydown={() => ({})}>
-	<div class="inline">
-		<div class="chart-type">
+<div
+	class="flex flex-col items-center border-2 border-grey-lighter rounded-lg m-2 cursor-pointer hover:bg-primary-light"
+	on:click={() => goto(`${$page.url}/${chart.id}`)}
+	on:keydown={() => ({})}
+>
+	<div class="flex justify-between items-center w-full">
+		<div class="w-5 h-5 m-4">
 			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
 		</div>
-		<p class="chart-name">{chart.name}</p>
+		<p class="color-black">{chart.name}</p>
 		<div>
 			<IconButton
 				on:click={(e) => {
@@ -51,11 +55,11 @@
 				</Icon>
 			</IconButton>
 			{#if showOptions}
-				<div id="options-container" use:clickOutside={() => (showOptions = !showOptions)}>
+				<div class="z-10 absolute ml-5" use:clickOutside={() => (showOptions = !showOptions)}>
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
 							<div
-								class="option"
+								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();
@@ -73,10 +77,10 @@
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">content_copy</Icon>&nbsp;
-								<span>Make a copy</span>
+								<span class="text-sm">Make a copy</span>
 							</div>
 							<div
-								class="option"
+								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();
@@ -89,7 +93,7 @@
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;
-								<span>Remove</span>
+								<span class="text-sm">Delete</span>
 							</div>
 						</Content>
 					</Paper>
@@ -98,63 +102,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.chart {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		border: 1px solid var(--G4);
-		border-radius: 10px;
-		margin: 5px 5px 5px 5px;
-		padding-left: 10px;
-		padding-right: 10px;
-		overflow: visible;
-		cursor: pointer;
-		width: 225px;
-		height: 100px;
-	}
-	.chart:hover {
-		background: var(--P3);
-	}
-	.inline {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-	}
-	.chart-type {
-		width: 24px;
-		height: 24px;
-		margin: 14px;
-	}
-	.chart-name {
-		font-size: 16px;
-		color: black;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		max-width: 100%;
-		white-space: nowrap;
-	}
-	#options-container {
-		z-index: 5;
-		margin-top: -7px;
-		margin-left: 20px;
-		position: absolute;
-	}
-	.option {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		width: 110px;
-		padding: 2px 10px 2px 10px;
-	}
-	.option span {
-		font-size: 13px;
-	}
-	.option:hover {
-		background: var(--G5);
-	}
-</style>

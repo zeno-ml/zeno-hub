@@ -19,23 +19,9 @@
 	};
 </script>
 
-<div id="encoding">
-	<h4 class="edit-type">Encoding</h4>
-	<div id="encoding-flex">
+<div class="mb-20">
+	<h4 class="border-b-2 border-grey-light mb-2">Chart Type</h4>
+	<div id="flex flex-col">
 		<svelte:component this={encodingMap[chart.type]} bind:chart />
 	</div>
 </div>
-
-<style>
-	.edit-type {
-		border-bottom: 1px solid var(--G4);
-	}
-	#encoding {
-		margin-bottom: 50px;
-	}
-	#encoding-flex {
-		display: flex;
-		flex-direction: column;
-		margin-bottom: 80px;
-	}
-</style>

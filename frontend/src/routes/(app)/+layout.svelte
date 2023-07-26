@@ -5,34 +5,13 @@
 	export let data;
 </script>
 
-<main>
+<main class="flex text-left w-full h-full">
 	<Header user={data.user} />
 	{#if Boolean($navigating)}
-		<div class="container centered">
+		<div class="w-full h-full flex items-center justify-center">
 			<p>Loading...</p>
 		</div>
 	{:else}
 		<slot />
 	{/if}
 </main>
-
-<style>
-	main {
-		display: flex;
-		flex-direction: row;
-		text-align: left;
-		width: 100%;
-		height: 100%;
-	}
-
-	.container {
-		width: 100%;
-		height: 100%;
-	}
-
-	.centered {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-</style>

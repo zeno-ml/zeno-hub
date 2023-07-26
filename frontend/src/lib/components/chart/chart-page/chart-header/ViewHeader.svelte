@@ -15,9 +15,9 @@
 	};
 </script>
 
-<div class="header">
+<div class="flex flex-col p-3">
 	<div
-		class="return-link"
+		class="flex items-center cursor-pointer mb-2"
 		on:keydown={() => ({})}
 		on:click={() => {
 			goto($page.url.href.substring(0, $page.url.href.lastIndexOf('/')));
@@ -34,9 +34,9 @@
 		<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
 			<path fill={ishover ? 'black' : 'var(--G2)'} d={mdiArrowCollapseLeft} />
 		</Svg>
-		<h4 style={ishover ? 'color:black' : 'color:var(--G2)'}>Back to Chart Home</h4>
+		<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 	</div>
-	<div class="title-flex">
+	<div class="flex items-center">
 		<h2 style="margin:0px 20px 0px 0px; color: var(--G2)">
 			{chart.name}
 		</h2>
@@ -50,30 +50,3 @@
 		</Button>
 	</div>
 </div>
-
-<style>
-	.header {
-		width: calc(50vw);
-		display: flex;
-		flex-direction: column;
-		width: 353px;
-		min-width: 353px;
-		max-width: 353px;
-		padding-top: 10px;
-		padding-bottom: 0px;
-		padding-left: 15px;
-		padding-right: 15px;
-	}
-
-	.return-link {
-		display: flex;
-		align-items: center;
-		cursor: pointer;
-		width: fit-content;
-		margin-bottom: 5px;
-	}
-	.title-flex {
-		display: flex;
-		align-items: center;
-	}
-</style>

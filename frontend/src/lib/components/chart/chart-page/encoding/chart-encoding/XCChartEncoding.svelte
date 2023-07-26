@@ -2,6 +2,7 @@
 	import { SlicesOrModels, type Chart, type XCParameters } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
+	import EncodingSection from './EncodingSection.svelte';
 	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
 
 	export let chart: Chart;
@@ -57,8 +58,8 @@
 	}
 </script>
 
-<div class="encoding-section">
-	<div class="parameters">
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>x</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -70,22 +71,23 @@
 			searchable={false}
 			on:change={xChanged}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.xChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.x)}
+		slot="component"
 		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? parameters.slices : []}
 		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>y</h4>
 		<MetricsEncodingDropdown on:selected={ySelected} numberValue={parameters.metric} />
-	</div>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+	</svelte:fragment>
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>color</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -97,26 +99,12 @@
 			searchable={false}
 			on:change={colorChaned}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.colorChannel].multi}
 		on:selected={(e) => selected(e, Dimensions.color)}
-		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? parameters.slices : []}
-		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? parameters.models : []}
+		numberValues={parameters.colorChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+		stringValues={parameters.colorChannel === SlicesOrModels.MODELS ? parameters.models : []}
+		slot="component"
 	/>
-</div>
-
-<style>
-	.encoding-section {
-		margin-bottom: 15px;
-	}
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-	.parameters h4 {
-		margin: 5px;
-	}
-</style>
+</EncodingSection>

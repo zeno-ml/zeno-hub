@@ -37,9 +37,9 @@
 	}
 </script>
 
-<div class={isChartEdit ? 'row-flex chart-panel' : 'col-flex chart-panel'}>
+<div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
 	{#if isChartEdit}
-		<div class="edit-bar">
+		<div class="h-full pt-5 pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-96">
 			<EditHeader bind:isChartEdit bind:chart {updateChart} />
 			<ViewSelection bind:chart bind:chartData />
 			<Encoding bind:chart />
@@ -48,50 +48,8 @@
 		<ViewHeader bind:isChartEdit {chart} />
 	{/if}
 	{#if chartData}
-		<div class={isChartEdit ? 'edit-charts charts' : 'charts'}>
+		<div class={`overflow-auto flex flex-col pt-3 pl-2 ${isChartEdit ? 'w-full' : ''}`}>
 			<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
 		</div>
 	{/if}
 </div>
-
-<style>
-	.chart-panel {
-		width: 100%;
-		display: flex;
-		overflow: hidden;
-	}
-
-	.row-flex {
-		flex-direction: row;
-	}
-
-	.col-flex {
-		flex-direction: column;
-	}
-
-	.edit-bar {
-		height: calc(100vh - 15px);
-		width: 370px;
-		min-width: 370px;
-		max-width: 370px;
-		padding-top: 10px;
-		padding-bottom: 0px;
-		padding-left: 15px;
-		padding-right: 15px;
-		overflow-y: scroll;
-		background-color: var(--Y2);
-	}
-
-	.charts {
-		height: calc(100vh - 15px);
-		overflow: auto;
-		display: flex;
-		flex-direction: column;
-		padding-top: 10px;
-		padding-left: 15px;
-	}
-
-	.edit-charts {
-		width: 100%;
-	}
-</style>

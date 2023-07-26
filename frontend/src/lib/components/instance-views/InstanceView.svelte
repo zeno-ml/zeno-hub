@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { getMetricsForSlicesAndTags } from '$lib/api/slice';
 	import {
 		comparisonModel,
@@ -24,6 +23,8 @@
 	import ListView from './ListView.svelte';
 	import TableView from './TableView.svelte';
 	import { optionsMap } from './views/viewMap';
+
+	export let compare: boolean;
 
 	let selected = 'list';
 	let viewOptions: Record<string, unknown> | undefined = undefined;
@@ -81,7 +82,7 @@
 				{/if}
 			</SelectionBar>
 		</div>
-		{#if $page.url.href.includes('compare')}
+		{#if compare}
 			{#if $comparisonModel !== undefined}
 				{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
 					{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}
