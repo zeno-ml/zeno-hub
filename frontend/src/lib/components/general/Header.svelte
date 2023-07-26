@@ -60,7 +60,7 @@
 							goto(`${getProjectRouteFromURL($page.url)}/compare`);
 						}}
 						use:tooltip={{
-							content: 'Qualitatively compare model outputs',
+							content: 'Qualitatively compare model outputs.',
 							position: 'right',
 							theme: 'zeno-tooltip'
 						}}
