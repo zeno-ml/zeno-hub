@@ -6,6 +6,7 @@ from typing import List, Union
 import pandas as pd
 import uvicorn
 from fastapi import FastAPI, File, HTTPException, Response, UploadFile, status
+from fastapi.middleware.cors import CORSMiddleware
 
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
@@ -54,6 +55,16 @@ def get_server() -> FastAPI:
         FastAPI: FastAPI endpoint
     """
     app = FastAPI(title="Frontend API")
+
+    if "CORS_ORIGIN" in os.environ:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=[os.environ["CORS_ORIGIN"]],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
     api_app = FastAPI(
         title="Backend API", generate_unique_id_function=lambda route: route.name
     )
