@@ -38,11 +38,12 @@
 </script>
 
 {#if histogram}
-	<div class="binary-button-wrapper">
-		<div class="binary-button-single" style:width="{widthScale(histogram[0].filteredCount ?? 0)}%">
+	<div class="flex px-1 w-full">
+		<div style:width="{widthScale(histogram[0].filteredCount ?? 0)}%">
 			<div
-				class="binary-button left {selectedValue !== null && selectedValue === true
-					? 'selected'
+				class="flex px-1 py-5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold {selectedValue !==
+					null && selectedValue === true
+					? 'border-primary'
 					: ''}"
 				style="color: white; background-color: {$metricRangeColorScale(histogram[0].metric ?? 0)}"
 				on:click={() => setSelection(true)}
@@ -50,12 +51,13 @@
 			>
 				<Label>True</Label>
 			</div>
-			<small>{histogram[0].filteredCount} / {histogram[0].count}</small>
+			<span class="text-xs">{histogram[0].filteredCount} / {histogram[0].count}</span>
 		</div>
-		<div class="binary-button-single" style:width="{widthScale(histogram[1].filteredCount ?? 0)}%">
+		<div style:width="{widthScale(histogram[1].filteredCount ?? 0)}%">
 			<div
-				class="binary-button right {selectedValue !== null && selectedValue === false
-					? 'selected'
+				class="flex px-1 py-5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold {selectedValue !==
+					null && selectedValue === true
+					? 'border-primary'
 					: ''}"
 				style="color: white; background-color: {$metricRangeColorScale(histogram[1].metric ?? 0)}"
 				on:click={() => setSelection(false)}
@@ -63,41 +65,7 @@
 			>
 				<Label>False</Label>
 			</div>
-			<small>{histogram[1].filteredCount} / {histogram[1].count}</small>
+			<span class="text-xs">{histogram[1].filteredCount} / {histogram[1].count}</span>
 		</div>
 	</div>
 {/if}
-
-<style>
-	.binary-button {
-		display: flex;
-		padding: 5px 20px 5px 20px;
-		cursor: pointer;
-		flex-direction: column;
-		align-items: center;
-		box-sizing: border-box;
-		border: 3px solid transparent;
-		font-weight: 700;
-	}
-	.right {
-		border-top-right-radius: 5px;
-		border-bottom-right-radius: 5px;
-	}
-	.left {
-		border-top-left-radius: 5px;
-		border-bottom-left-radius: 5px;
-	}
-	.selected {
-		box-sizing: border-box;
-		border: 3px solid var(--P1);
-	}
-	.binary-button-wrapper {
-		display: flex;
-		padding-left: 5px;
-		padding-right: 5px;
-		width: 100%;
-	}
-	small {
-		font-size: 12px;
-	}
-</style>

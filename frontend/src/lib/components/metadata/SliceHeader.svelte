@@ -29,8 +29,8 @@
 {#if showNewFolder}
 	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
-<div class="slice-header inline">
-	<div class="inline">
+<div class="sticky top-16 bg-yellowish-light flex items-center justify-between">
+	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
 			class="information-tooltip"
@@ -45,7 +45,7 @@
 			</Icon>
 		</div>
 	</div>
-	<div class="inline">
+	<div class="flex items-center justify-between">
 		<div
 			use:tooltip={{
 				content: !$page.url.href.includes('compare')
@@ -110,18 +110,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.slice-header {
-		position: sticky;
-		top: 60px;
-		z-index: 3;
-		background-color: var(--Y2);
-	}
-
-	.inline {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-</style>

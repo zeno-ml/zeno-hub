@@ -218,39 +218,44 @@
 		on:change={columnSelected}
 	/>
 </div>
-<div class="table-container" bind:this={instanceContainer}>
+<div class="w-full overflow-auto" bind:this={instanceContainer}>
 	{#if table}
-		<table>
-			<thead>
-				<th>
+		<table class="mt-2">
+			<thead
+				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top"
+			>
+				<th class="pr-10 cursor-pointer">
 					<div>{$model}</div>
 					<div>
-						<span class="metric">
-							{$metric ? $metric + ':' : ''}
+						<span class="font-normal text-sm mr-3.5 text-grey-dark">
+							{$metric ? $metric.name + ':' : ''}
 						</span>
-						<span class="metric-value">
+						<span class="font-normal mr-3.5 text-primary">
 							{metricA}
 						</span>
 					</div>
 				</th>
-				<th>
+				<th class="pr-10 cursor-pointer">
 					<div>{$comparisonModel}</div>
 					<div>
-						<span class="metric">
-							{$metric ? $metric + ':' : ''}
+						<span class="font-normal text-sm mr-3.5 text-grey-dark">
+							{$metric ? $metric.name + ':' : ''}
 						</span>
-						<span class="metric-value">
+						<span class="font-normal text-sm mr-3.5 text-primary">
 							{metricB}
 						</span>
 					</div>
 				</th>
-				<th on:click={() => updateSort(selectColumn, $model)}>
+				<th on:click={() => updateSort(selectColumn, $model)} class="pr-10 cursor-pointer">
 					<ComparisonViewTableHeader {selectColumn} {sortModel} header={$model} />
 				</th>
-				<th on:click={() => updateSort(selectColumn, $comparisonModel)}>
+				<th
+					on:click={() => updateSort(selectColumn, $comparisonModel)}
+					class="pr-10 cursor-pointer"
+				>
 					<ComparisonViewTableHeader {selectColumn} {sortModel} header={$comparisonModel} />
 				</th>
-				<th on:click={() => updateSort(selectColumn, '')}>
+				<th on:click={() => updateSort(selectColumn, '')} class="pr-10 cursor-pointer">
 					<ComparisonViewTableHeader {selectColumn} {sortModel} header={''} />
 				</th>
 			</thead>
@@ -258,7 +263,7 @@
 				{#each table as tableContent (tableContent['item'])}
 					<tr>
 						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
-							<td>
+							<td class="pr-2.5">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$projectConfig.view]}
@@ -273,7 +278,7 @@
 									/>
 								</div>
 							</td>
-							<td>
+							<td class="pr-2.5">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$projectConfig.view]}
@@ -290,9 +295,9 @@
 							</td>
 						{/if}
 						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td>{modelValueAndDiff($model, false, tableContent)}</td>
-							<td>{modelValueAndDiff($comparisonModel, false, tableContent)}</td>
-							<td>{modelValueAndDiff($model, true, tableContent)}</td>
+							<td class="pr-2.5">{modelValueAndDiff($model, false, tableContent)}</td>
+							<td class="pr-2.5">{modelValueAndDiff($comparisonModel, false, tableContent)}</td>
+							<td class="pr-2.5">{modelValueAndDiff($model, true, tableContent)}</td>
 						{/if}
 					</tr>
 				{/each}
@@ -345,45 +350,3 @@
 		disabled={currentPage >= lastPage}>last_page</IconButton
 	>
 </Pagination>
-
-<style>
-	table {
-		margin-top: 5px;
-	}
-	th {
-		width: 160px;
-		text-align: left;
-		border-bottom: 1px solid var(--G5);
-		padding-bottom: 5px;
-		top: 0;
-		left: 0;
-		position: sticky;
-		background-color: var(--G6);
-		min-width: 70px;
-		padding-right: 1.6vw;
-		vertical-align: top;
-		cursor: pointer;
-		font-weight: 600;
-		z-index: 5;
-	}
-	td {
-		padding-right: 10px;
-	}
-	.metric {
-		font-weight: 400;
-		font-size: 15px;
-		color: var(--G2);
-		margin-right: 15px;
-	}
-	.metric-value {
-		font-weight: 400;
-		color: var(--logo);
-		margin-right: 15px;
-	}
-	.table-container {
-		max-width: calc(100vw - 440px);
-		height: calc(100vh - 180px);
-		max-height: calc(100vh - 180px);
-		overflow: auto;
-	}
-</style>

@@ -8,33 +8,18 @@
 	export let modelColumn: string;
 </script>
 
-<div id="container">
+<div id="w-min p-2 border border-grey-lighter">
 	{#if entry['item']}
 		<HighlightAuto code={entry['item']} />
 	{/if}
 	{#if entry['label']}
 		<hr />
-		<pre class="label">label</pre>
+		<pre class="mt-2 mb-0">label</pre>
 		<HighlightAuto code={entry['label']} />
 	{/if}
 	{#if entry[modelColumn]}
 		<hr />
-		<pre class="label">model prediction</pre>
+		<pre class="mt-2 mb-0">model prediction</pre>
 		<HighlightAuto code={entry[modelColumn]} />
 	{/if}
 </div>
-
-<style>
-	#container {
-		width: min-content;
-		padding: 5px;
-		border: 0.5px solid rgb(224, 224, 224);
-	}
-	.label {
-		margin-top: 5px;
-		margin-bottom: 0px;
-	}
-	:global(pre code.hljs) {
-		background: var(--Y2);
-	}
-</style>

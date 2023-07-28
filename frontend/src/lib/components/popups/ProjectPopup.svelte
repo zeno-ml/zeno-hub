@@ -79,7 +79,7 @@
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
 		<h2>Project Aministration</h2>
-		<div class="element">
+		<div class="mb-5 flex flex-col">
 			<div>
 				<Textfield bind:value={project.name} label="Name" bind:this={input} />
 			</div>
@@ -91,25 +91,27 @@
 					type="number"
 				/>
 			</div>
-			<div class="horizontal">
+			<div class="flex items-center">
 				<span>Calculate histogram metrics</span>
 				<Checkbox
 					checked={project.calculateHistogramMetrics}
 					on:click={() => (project.calculateHistogramMetrics = !project.calculateHistogramMetrics)}
 				/>
 			</div>
-			<div class="horizontal">
+			<div class="flex items-center">
 				<span>Public project</span>
 				<Checkbox checked={project.public} on:click={() => (project.public = !project.public)} />
 			</div>
 		</div>
 		{#if !project.public && userRequest}
 			{#await userRequest then currentUsers}
-				<div class="element" transition:fade>
+				<div class="mb-5 flex flex-col" transition:fade>
 					<h3>Users</h3>
 					{#if currentUsers.length > 0}
 						<table>
-							<thead>
+							<thead
+								class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+							>
 								<th>Email</th>
 								<th>Admin</th>
 								<th />
@@ -188,7 +190,7 @@
 		{/if}
 		{#if !project.public && organizationRequest}
 			{#await organizationRequest then currentOrgs}
-				<div class="element" transition:fade>
+				<div class="mb-5 flex flex-col" transition:fade>
 					<h3>Organizations</h3>
 					{#if currentOrgs.length > 0}
 						<table>
@@ -260,7 +262,7 @@
 				</div>
 			{/await}
 		{/if}
-		<div id="submit">
+		<div class="flex items-center self-end">
 			<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
 				>Cancel</Button
 			>
@@ -273,37 +275,3 @@
 		</div>
 	</Content>
 </Popup>
-
-<style>
-	#submit {
-		display: flex;
-		align-items: center;
-		align-self: end;
-	}
-
-	.horizontal {
-		display: flex;
-		align-items: center;
-	}
-
-	.element {
-		margin-bottom: 20px;
-		display: flex;
-		flex-direction: column;
-	}
-
-	th {
-		text-align: left;
-		border-bottom: 1px solid var(--G5);
-		padding-bottom: 5px;
-		top: 0;
-		left: 0;
-		position: sticky;
-		background-color: var(--G6);
-		min-width: 70px;
-		padding-right: 1.6vw;
-		vertical-align: top;
-		font-weight: 600;
-		z-index: 5;
-	}
-</style>

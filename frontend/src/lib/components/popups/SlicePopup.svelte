@@ -147,7 +147,7 @@
 	<Content>
 		<Textfield bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
-		<div id="submit">
+		<div class="flex items-center flex-row-reverse">
 			<Button
 				variant="outlined"
 				on:click={saveSlice}
@@ -168,11 +168,3 @@
 		</div>
 	</Content>
 </Popup>
-
-<style>
-	#submit {
-		display: flex;
-		flex-direction: row-reverse;
-		align-items: center;
-	}
-</style>

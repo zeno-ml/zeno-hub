@@ -68,7 +68,7 @@
 
 <svelte:window on:keydown={submit} />
 
-<div class="slice">
+<div class="ml-5 flex mt-2.5 mb-2.5 items-center justify-between">
 	<span style="display: inline-block;">
 		<SliceDetails predicateGroup={slice.filterPredicates} />
 	</span>
@@ -76,7 +76,7 @@
 		<span style="margin-right: 10px; margin-left: 10px">
 			{metric}
 		</span>
-		<span id="size">
+		<span class="italic text-grey-dark mr-2.5">
 			({size})
 		</span>
 		{#if created}
@@ -98,11 +98,11 @@
 		{/if}
 	</div>
 	{#if showSliceName}
-		<div id="slice-name" use:clickOutside={() => (showSliceName = false)} on:keydown={submit}>
+		<div id="right-8 absolute" use:clickOutside={() => (showSliceName = false)} on:keydown={submit}>
 			<Paper elevation={7}>
 				<Content style="display:flex; flex-direction:column">
 					<Textfield bind:value={newSliceName} label="Slice Name" bind:this={input} />
-					<div class="buttons">
+					<div class="mt-2.5">
 						<Button
 							style="margin-left: 10px;"
 							variant="outlined"
@@ -124,27 +124,3 @@
 		</div>
 	{/if}
 </div>
-
-<style>
-	.slice {
-		margin-left: 20px;
-		display: flex;
-		margin-top: 10px;
-		margin-bottom: 10px;
-		align-items: center;
-		justify-content: space-between;
-	}
-	#slice-name {
-		right: 30px;
-		z-index: 5;
-		position: absolute;
-	}
-	#size {
-		font-style: italic;
-		color: var(--G3);
-		margin-right: 10px;
-	}
-	.buttons {
-		margin-top: 10px;
-	}
-</style>

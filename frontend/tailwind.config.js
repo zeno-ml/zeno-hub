@@ -16,6 +16,10 @@ export default {
 				DEFAULT: '#f2f2ee',
 				light: '#fbfbfa'
 			},
+			greenish: {
+				DEFAULT: '#61988e',
+				light: '#d0ebe6'
+			},
 			grey: {
 				DEFAULT: '#333333',
 				dark: '#73726f',

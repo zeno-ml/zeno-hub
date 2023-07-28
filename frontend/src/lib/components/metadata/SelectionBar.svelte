@@ -33,9 +33,9 @@
 </script>
 
 <div style:width="100%">
-	<div class="between">
+	<div class="pt-2.5 flex justify-between w-full border-b border-grey-lighter">
 		<ChipsWrapper />
-		<div class="status inline">
+		<div class="status flex items-center">
 			{#if runningAnalysis}
 				<CircularProgress
 					class="status-circle"
@@ -52,7 +52,7 @@
 						theme: 'zeno-tooltip'
 					}}
 				>
-					<div class="icon">
+					<div class="cursor-pointer w-6 h-6 fill-grey">
 						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 							<path d={mdiRefresh} />
 						</Icon>
@@ -62,21 +62,25 @@
 		</div>
 	</div>
 	{#if !$page.url.href.includes('compare')}
-		<div class="options">
+		<div
+			class="flex flex-wrap justify-between w-full items-center py-2.5 border-b border-grey-lighter"
+		>
 			<div>
 				{#if currentResult}
 					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
-						<span class="metric">
+						<span class="text-grey-dark mr-3">
 							{$metric ? $metric.name + ':' : ''}
 						</span>
-						<span class="metric-value">
+						<span class="text-primary mr-3">
 							{currentResult[0].metric.toFixed(2)}
 						</span>
 					{/if}
-					<span id="size">({currentResult[0].size.toLocaleString()} instances)</span>
+					<span class="italic text-grey-darker mr-2.5"
+						>({currentResult[0].size.toLocaleString()} instances)</span
+					>
 				{/if}
 			</div>
-			<div class="inline">
+			<div class="flex items-center">
 				{#if $editTag === undefined}
 					<slot />
 					<Group>
@@ -91,73 +95,14 @@
 						{/if}
 					</Group>
 				{:else}
-					<div class="inline" style="margin-right: 10px">
+					<div class="flex items-center" style="margin-right: 10px">
 						<p style="margin: auto; margin-right: 10px">Editing</p>
-						<div class="meta-chip">{$editTag.tagName}</div>
+						<div class="py-1 px-2.5 bg-greenish-light mx-1 my rounded width-fit margin-auto">
+							{$editTag.tagName}
+						</div>
 					</div>
 				{/if}
 			</div>
 		</div>
 	{/if}
 </div>
-
-<style>
-	p {
-		margin: 0px;
-	}
-	.icon {
-		cursor: pointer;
-		width: 24px;
-		height: 24px;
-		fill: var(--G1);
-	}
-	.between {
-		padding-top: 10px;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		width: 100%;
-		border-bottom: 1px solid var(--G5);
-	}
-	.options {
-		display: flex;
-		flex-direction: inline;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		width: 100%;
-		align-items: center;
-		padding-top: 10px;
-		padding-bottom: 10px;
-		border-bottom: 1px solid var(--G5);
-	}
-	.metric {
-		font-weight: 400;
-		color: var(--G2);
-		margin-right: 15px;
-	}
-	.metric-value {
-		font-weight: 400;
-		color: var(--logo);
-		margin-right: 15px;
-	}
-	#size {
-		font-style: italic;
-		color: var(--G3);
-		margin-right: 10px;
-	}
-	.inline {
-		display: flex;
-		align-items: center;
-	}
-	.meta-chip {
-		padding: 5px 10px;
-		background: var(--N2);
-		margin-left: 5px;
-		margin-right: 5px;
-		margin-top: 2px;
-		margin-bottom: 2px;
-		border-radius: 4px;
-		width: fit-content;
-		margin: auto;
-	}
-</style>

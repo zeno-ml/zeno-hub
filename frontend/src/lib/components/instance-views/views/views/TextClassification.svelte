@@ -7,30 +7,16 @@
 	$: textData = entry['data'] as string;
 </script>
 
-<div class="box">
+<div class="p-2.5 border border-grey-lighter">
 	<span>{textData}</span>
 	<br />
-	<span class="label">label: </span><span class="value">
+	<span class="text-xs">label: </span>
+	<span class="text-xs">
 		{entry['label']}
 	</span>
 	{#if modelColumn && entry[modelColumn] !== undefined}
 		<br />
-		<span class="label">output: </span>
-		<span class="value">{entry[modelColumn]} </span>
+		<span class="text-xs">output: </span>
+		<span class="text-xs">{entry[modelColumn]} </span>
 	{/if}
 </div>
-
-<style>
-	.label {
-		font-size: 12px;
-		color: rgba(0, 0, 0, 0.5);
-		font-variant: small-caps;
-	}
-	.value {
-		font-size: 12px;
-	}
-	.box {
-		padding: 10px;
-		border: 0.5px solid rgb(224, 224, 224);
-	}
-</style>

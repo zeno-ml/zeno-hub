@@ -17,29 +17,16 @@
 	$: sliceVsSlice = parameters.xChannel === parameters.yChannel;
 </script>
 
-<div class="main">
-	<div class="model-result">
-		{#if sliceVsSlice}
-			<h4>{parameters.model}</h4>
-		{/if}
-		<VegaLite
-			spec={generateSpec(parameters)}
-			{data}
-			options={{
-				actions: { source: false, editor: false, compiled: false },
-				scaleFactor: {
-					png: 3
-				}
-			}}
-		/>
-	</div>
-</div>
-
-<style>
-	.main {
-		margin-left: 20px;
-	}
-	.model-result {
-		margin-top: 30px;
-	}
-</style>
+{#if sliceVsSlice}
+	<h4>{parameters.model}</h4>
+{/if}
+<VegaLite
+	spec={generateSpec(parameters)}
+	{data}
+	options={{
+		actions: { source: false, editor: false, compiled: false },
+		scaleFactor: {
+			png: 3
+		}
+	}}
+/>

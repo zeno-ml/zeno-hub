@@ -29,8 +29,8 @@
 	}
 </script>
 
-<div class="group">
-	<div class="group-join">
+<div class="flex">
+	<div class="mt-1 mr-2.5">
 		{#if index > 0}
 			<Svelecte
 				placeholder={''}
@@ -50,8 +50,8 @@
 			</IconButton>
 		{/if}
 	</div>
-	<div class="{index === -1 ? 'no-bg' : 'bg'} main">
-		<ul use:autoAnimate>
+	<div class="{index === -1 ? '' : 'mb-2.5 ml-2.5'} rounded mt-1">
+		<ul use:autoAnimate class="list-none mr-2.5">
 			{#each predicateGroup.predicates as p, i}
 				{#if !('predicates' in p)}
 					<li>
@@ -70,7 +70,7 @@
 				{/if}
 			{/each}
 		</ul>
-		<div id="buttons">
+		<div class="mb-2.5">
 			<Button
 				color="secondary"
 				on:click={() => {
@@ -107,36 +107,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	.group {
-		display: flex;
-	}
-	.group-join {
-		margin-top: 5px;
-		margin-right: 10px;
-	}
-	.no-bg {
-		background: none;
-		padding-left: 0px;
-		margin-bottom: 0px;
-	}
-	.bg {
-		margin-bottom: 10px;
-		padding-left: 10px;
-		background: rgba(0, 0, 0, 0.025);
-	}
-	#buttons {
-		margin-bottom: 10px;
-	}
-	.main {
-		border-radius: 4px;
-		margin-top: 5px;
-	}
-	ul {
-		list-style-type: none;
-		margin-right: 10px;
-		margin-bottom: 0px;
-		padding-left: 0px;
-	}
-</style>

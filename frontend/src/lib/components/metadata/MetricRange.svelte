@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { metric, metrics, metricRange } from '$lib/stores';
+	import { metric, metricRange, metrics } from '$lib/stores';
 </script>
 
 {#if $metrics.length !== 0 && $metricRange[0] !== Infinity}
-	<div id="legend-container">
+	<div class="flex items-center mr-1 text-grey-dark">
 		<span style:margin-right="15px">
 			{$metric?.name}:
 		</span>
@@ -17,7 +17,7 @@
 		>
 			{$metricRange[0].toFixed(2)}
 		</span>
-		<div id="legend" />
+		<div class="w-10 h-4 mx-2.5 bg-gradient-to-r from-primary-lighter to-primary" />
 		<span
 			contenteditable="true"
 			on:blur={(e) =>
@@ -30,19 +30,3 @@
 		</span>
 	</div>
 {/if}
-
-<style>
-	#legend-container {
-		display: flex;
-		align-items: center;
-		margin-right: 5px;
-		color: var(--G2);
-	}
-	#legend {
-		width: 40px;
-		height: 15px;
-		margin-left: 10px;
-		margin-right: 10px;
-		background-image: linear-gradient(to right, var(--P4), var(--logo));
-	}
-</style>

@@ -11,7 +11,7 @@
 		.map(([key, value]) => [key, value.predicates as unknown] as [string, FilterPredicate[]]);
 </script>
 
-<div class="chips">
+<div class="flex flex-wrap height-fit items-center py-1">
 	{#if $selections.slices.length + $selections.tags.length + filters.length === 0 && $selectionIds === undefined}
 		<p style="margin: 0px">Filter with the selected predicates.</p>
 	{:else}
@@ -29,7 +29,7 @@
 		{/if}
 		{#if $selectionPredicates !== undefined || $tagIds !== undefined || $selectionIds !== undefined}
 			<span
-				class="clear"
+				class="p-1 ml-2.5 cursor-pointer hover:bg-yellowish hover:rounded"
 				on:keydown={() => ({})}
 				on:click={() => {
 					selections.update((m) => {
@@ -50,25 +50,3 @@
 		{/if}
 	{/if}
 </div>
-
-<style>
-	.chips {
-		display: flex;
-		flex-wrap: wrap;
-		height: fit-content;
-		align-items: center;
-		min-height: 40px;
-		padding-bottom: 5px;
-		padding-top: 5px;
-	}
-	.clear {
-		padding: 5px;
-		margin-left: 10px;
-		cursor: pointer;
-		color: var(--G3);
-	}
-	.clear:hover {
-		background: var(--Y1);
-		border-radius: 4px;
-	}
-</style>

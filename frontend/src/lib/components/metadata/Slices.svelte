@@ -13,9 +13,9 @@
 
 <SliceHeader />
 <div
-	class="overview
-			{$selectionPredicates === undefined ? 'selected' : ''}
-			{$page.url.href.includes('compare') ? 'compare-slice-cell' : ''}"
+	class="flex items-center border border-grey-lighter rounded px-2.5 justify-between cursor-pointer text-grey
+			{$selectionPredicates === undefined ? 'bg-grey-darker' : ''}
+			{$page.url.href.includes('compare') ? 'py-1' : ''}"
 	on:keydown={() => ({})}
 	on:click={() => {
 		selections.update((m) => {
@@ -27,9 +27,9 @@
 		tagIds.set(undefined);
 	}}
 >
-	<div class="inline">All instances</div>
+	<div class="flex items-center justify-between">All instances</div>
 	{#if $model}
-		<div class="inline">
+		<div class="flex items-center justify-between">
 			<SliceCellResult
 				compare={$page.url.href.includes('compare')}
 				slice={{
@@ -62,30 +62,3 @@
 {#each $slices.filter((s) => s.folderId === null && s.sliceName !== 'All Instances') as s (s.sliceName)}
 	<SliceCell compare={$page.url.href.includes('compare')} slice={s} />
 {/each}
-
-<style>
-	.inline {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.compare-slice-cell {
-		padding-top: 5px;
-		padding-bottom: 5px;
-	}
-	.overview {
-		display: flex;
-		align-items: center;
-		border: 1px solid var(--G5);
-		border-radius: 4px;
-		padding-left: 10px;
-		justify-content: space-between;
-		padding-right: 10px;
-		min-height: 36px;
-		cursor: pointer;
-		color: var(--G1);
-	}
-	.selected {
-		background: var(--P3);
-	}
-</style>

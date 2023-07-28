@@ -55,60 +55,44 @@
 	}
 </script>
 
-<div class="main">
-	<div class="model-result">
-		{#each rows as row}
-			<h4>
-				{parameters.fixedDimension === 'y'
-					? parameters.yChannel === SlicesOrModels.MODELS
-						? parameters.models[0]
-						: $slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
-					: row}
-			</h4>
-			<Vega
-				spec={generateSpec(
-					parameters,
-					parameters.fixedDimension === 'y'
-						? row
-						: $metrics.find((met) => met.id === parameters.metrics[0])?.name ?? ''
-				)}
-				data={dataFilter(
-					data,
-					parameters.fixedDimension === 'y'
-						? row
-						: $metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
-					parameters.colorChannel === SlicesOrModels.MODELS
-						? parameters.fixedDimension === 'y'
-							? $slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
-							: row
-						: undefined,
-					parameters.colorChannel === SlicesOrModels.SLICES
-						? parameters.fixedDimension === 'y'
-							? parameters.models[0]
-							: row
-						: undefined
-				)}
-				options={{
-					actions: { source: false, editor: false, compiled: false },
-					width: 800,
-					height: 100,
-					scaleFactor: {
-						png: 3
-					}
-				}}
-			/>
-		{/each}
-	</div>
-</div>
-
-<style>
-	.main {
-		margin-left: 20px;
-	}
-	.model-result {
-		margin-top: 30px;
-	}
-	.model-result h4 {
-		margin: 0px 0px 10px 0px;
-	}
-</style>
+{#each rows as row}
+	<h4 class="mb-2.5">
+		{parameters.fixedDimension === 'y'
+			? parameters.yChannel === SlicesOrModels.MODELS
+				? parameters.models[0]
+				: $slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
+			: row}
+	</h4>
+	<Vega
+		spec={generateSpec(
+			parameters,
+			parameters.fixedDimension === 'y'
+				? row
+				: $metrics.find((met) => met.id === parameters.metrics[0])?.name ?? ''
+		)}
+		data={dataFilter(
+			data,
+			parameters.fixedDimension === 'y'
+				? row
+				: $metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
+			parameters.colorChannel === SlicesOrModels.MODELS
+				? parameters.fixedDimension === 'y'
+					? $slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
+					: row
+				: undefined,
+			parameters.colorChannel === SlicesOrModels.SLICES
+				? parameters.fixedDimension === 'y'
+					? parameters.models[0]
+					: row
+				: undefined
+		)}
+		options={{
+			actions: { source: false, editor: false, compiled: false },
+			width: 800,
+			height: 100,
+			scaleFactor: {
+				png: 3
+			}
+		}}
+	/>
+{/each}

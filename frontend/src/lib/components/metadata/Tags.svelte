@@ -42,11 +42,14 @@
 {#if showNewTag}
 	<TagPopup on:close={() => (showNewTag = false)} />
 {/if}
-<div id="tag-header" class="inline" style:margin-top="10px">
-	<div class="inline">
+<div
+	class=" border-b border-grey-lighter flex items-center justify-between"
+	style:margin-top="10px"
+>
+	<div class="flex items-center justify-between">
 		<h4>Tags</h4>
 		<div
-			class="information-tooltip"
+			class="w-6 h-6 cursor-help fill-grey-darker"
 			use:tooltip={{
 				content: 'Tags are named sets of data instances.',
 				position: 'right',
@@ -59,7 +62,7 @@
 		</div>
 	</div>
 	{#if !$page.url.href.includes('compare')}
-		<div class="inline">
+		<div class="flex items-center justify-between">
 			<div>
 				<div
 					use:tooltip={{
@@ -98,21 +101,3 @@
 		<TagCell tag={t} />
 	{/if}
 {/each}
-
-<style>
-	#tag-header {
-		border-bottom: 0.5px solid var(--G5);
-		background-color: var(--Y2);
-	}
-	.inline {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.information-tooltip {
-		width: 24px;
-		height: 24px;
-		cursor: help;
-		fill: var(--G2);
-	}
-</style>

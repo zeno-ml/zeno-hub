@@ -45,8 +45,8 @@
 </script>
 
 {#if histogram}
-	<div class="cell">
-		<div class="info">
+	<div class="border-t border-b border-grey-lighter py-2.5 flex flex-col">
+		<div class="flex justify-between items-center ml-1 mb-2.5 text-grey-darker">
 			<div class="label top-text">
 				<span>
 					{col.name}
@@ -63,21 +63,3 @@
 		/>
 	</div>
 {/if}
-
-<style>
-	.cell {
-		border-top: 0.5px solid #ebebea;
-		border-bottom: 0.5px solid #ebebea;
-		padding: 10px 0px 10px 0px;
-		display: flex;
-		flex-direction: column;
-	}
-	.info {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-left: 5px;
-		margin-bottom: 10px;
-		color: var(--G2);
-	}
-</style>

@@ -138,7 +138,11 @@
 </script>
 
 <div
-	class="{inFolder ? 'in-folder' : ''} cell parent {selected ? 'selected' : ''}"
+	class="{inFolder
+		? 'mr-9'
+		: ''} relative overflow-auto border border-grey-light rounded-lg mt flex px-2.5 parent {selected
+		? 'bg-greenish-light'
+		: ''}"
 	on:click={setSelected}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}
@@ -148,26 +152,26 @@
 	on:dragstart={dragStart}
 	on:keydown={() => ({})}
 >
-	<div class="group" style:width="100%">
-		<div class="group" style:width="100%">
-			<div class="inline">
-				<div class="group" style:color="var(--G1)">
+	<div class="flex justify-between items-center cursor-pointer" style:width="100%">
+		<div class="flex justify-between items-center cursor-pointer" style:width="100%">
+			<div class="flex">
+				<div class="flex justify-between items-center cursor-pointer" style:color="var(--G1)">
 					{tag.tagName}
 				</div>
 			</div>
 			<div
-				class="group"
+				class="flex justify-between items-center cursor-pointer"
 				use:clickOutside={() => {
 					showOptions = false;
 				}}
 			>
 				{#if showOptions}
-					<div id="options-container">
+					<div class="top-0 right-0 absolute mt-9">
 						<Paper style="padding: 3px 0px;" elevation={7}>
 							<Content>
 								{#if $editTag === undefined}
 									<div
-										class="option"
+										class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 										on:keydown={() => ({})}
 										on:click={(e) => {
 											e.stopPropagation();
@@ -176,11 +180,11 @@
 										}}
 									>
 										<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
-										<span>Edit</span>
+										<span class="text-xs">Edit</span>
 									</div>
 								{/if}
 								<div
-									class="option"
+									class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 									on:keydown={() => ({})}
 									on:click={(e) => {
 										e.stopPropagation();
@@ -189,7 +193,7 @@
 									}}
 								>
 									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span>Remove</span>
+									<span class="text-xs">Remove</span>
 								</div>
 							</Content>
 						</Paper>
@@ -200,13 +204,13 @@
 						<span style:margin-right="10px">
 							{res.metric !== undefined ? res.metric.toFixed(2) : ''}
 						</span>
-						<span id="size">
+						<span class="italic text-grey-darker mr-2.5">
 							({res.size.toLocaleString()})
 						</span>
 					{/if}
 				{/await}
 				{#if $editTag === undefined || $editTag.id !== tag.id}
-					<div class="inline" style:cursor="pointer">
+					<div class="flex" style:cursor="pointer">
 						<div
 							style:width="36px"
 							use:clickOutside={() => {
@@ -234,62 +238,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	#size {
-		font-style: italic;
-		color: var(--G3);
-		margin-right: 10px;
-	}
-	.cell {
-		position: relative;
-		overflow: visible;
-		border: 0.5px solid var(--G4);
-		border-radius: 15px;
-		margin-top: 5px;
-		display: flex;
-		padding-left: 10px;
-		padding-right: 10px;
-		min-height: 36px;
-	}
-	.group {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		cursor: pointer;
-	}
-	.selected {
-		background: var(--N2);
-	}
-	.inline {
-		display: flex;
-		flex-direction: row;
-	}
-	.in-folder {
-		margin-left: 35px;
-		margin-top: 0px;
-		margin-bottom: 0px;
-	}
-	#options-container {
-		top: 0px;
-		right: 0px;
-		z-index: 5;
-		position: absolute;
-		margin-top: 35px;
-	}
-	.option {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		width: 73px;
-		padding: 1px 6px;
-	}
-	.option span {
-		font-size: 12px;
-	}
-	.option:hover {
-		background: var(--G5);
-	}
-</style>

@@ -90,11 +90,11 @@
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <div
-	class=" cell parent
-	{inFolder ? 'in-folder' : ''}
-	{selected ? 'selected' : ''} 
-	{compare ? 'compare-slice-cell' : ''}
-	{compare && compareButton ? '' : 'pointer'}"
+	class=" relative overflow-auto border border-grey-light rounded mt-1 flex px-2.5 parent
+	{inFolder ? 'ml-9 my-0' : ''}
+	{selected ? 'bg-grey-darker' : ''} 
+	{compare ? 'py-1' : ''}
+	{compare && compareButton ? '' : 'cursor-pointer'}"
 	on:click={(e) => setSelected(e)}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}
@@ -106,18 +106,18 @@
 	on:dragend={dragEnd}
 >
 	{#if showTooltip}
-		<div class="tooltip-container">
-			<div class="tooltip">
+		<div class="bg-grey-background absolute w-fit z-10 left-0 top-full">
+			<div class="bg-grey-lighter p-2.5 rounded">
 				<SliceDetails predicateGroup={slice.filterPredicates} />
 			</div>
 		</div>
 	{/if}
 
-	<div class="group" style:width="100%">
-		<div class="group" style:width="100%">
-			<div class="inline">
+	<div class="flex items-center cursor-pointer w-20 py px-2" style:width="100%">
+		<div class="flex items-center cursor-pointer w-20 py px-2" style:width="100%">
+			<div class="flex">
 				<div
-					class="group"
+					class="flex items-center cursor-pointer w-20 py px-2"
 					style:color="var(--G1)"
 					on:mouseover={() => (showTooltip = true)}
 					on:mouseout={() => (showTooltip = false)}
@@ -128,18 +128,17 @@
 				</div>
 			</div>
 			<div
-				class="group"
+				class="flex items-center cursor-pointer w-20 py px-2"
 				use:clickOutside={() => {
 					showOptions = false;
 				}}
 			>
 				{#if showOptions}
-					<div id="options-container">
+					<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter">
 						<Paper style="padding: 3px 0px;" elevation={7}>
 							<Content>
-								<div
-									class="option"
-									on:keydown={() => ({})}
+								<button
+									class="flex items-center w-20 py px-2"
 									on:click={(e) => {
 										e.stopPropagation();
 										showOptions = false;
@@ -147,11 +146,10 @@
 									}}
 								>
 									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
-									<span>Edit</span>
-								</div>
-								<div
-									class="option"
-									on:keydown={() => ({})}
+									<span class="text-xs">Edit</span>
+								</button>
+								<button
+									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
 									on:click={(e) => {
 										e.stopPropagation();
 										showOptions = false;
@@ -159,8 +157,8 @@
 									}}
 								>
 									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span>Remove</span>
-								</div>
+									<span class="text-xs">Remove</span>
+								</button>
 							</Content>
 						</Paper>
 					</div>
@@ -169,7 +167,7 @@
 				{#if compare}
 					<SliceCellResult {compare} {slice} sliceModel={$comparisonModel ?? ''} />
 				{/if}
-				<div class="inline" style:cursor="pointer">
+				<div class="flex" style:cursor="cursor-pointer">
 					<div
 						style:width="36px"
 						use:clickOutside={() => {
@@ -215,82 +213,3 @@
 		</Button>
 	</Actions>
 </Dialog>
-
-<style>
-	.tooltip-container {
-		background: var(--G6);
-		position: absolute;
-		top: 100%;
-		max-width: 1000px;
-		width: fit-content;
-		background: var(--G6);
-		z-index: 10;
-		left: 0px;
-	}
-	.tooltip {
-		background: var(--G6);
-		padding-left: 10px;
-		padding-right: 10px;
-		box-shadow: 1px 1px 3px 1px var(--G3);
-		border-radius: 4px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-	}
-	.cell {
-		position: relative;
-		overflow: visible;
-		border: 0.5px solid var(--G4);
-		border-radius: 4px;
-		margin-top: 5px;
-		display: flex;
-		padding-left: 10px;
-		padding-right: 10px;
-		min-height: 36px;
-	}
-	.compare-slice-cell {
-		padding-top: 5px;
-		padding-bottom: 5px;
-	}
-	.group {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.pointer {
-		cursor: pointer;
-	}
-	.selected {
-		background: var(--P3);
-	}
-	.inline {
-		display: flex;
-		flex-direction: row;
-	}
-	.in-folder {
-		margin-left: 35px;
-		margin-top: 0px;
-		margin-bottom: 0px;
-	}
-	#options-container {
-		top: 0px;
-		right: 0px;
-		z-index: 5;
-		position: absolute;
-		margin-top: 35px;
-	}
-	.option {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		width: 73px;
-		padding: 1px 6px;
-	}
-	.option span {
-		font-size: 12px;
-	}
-	.option:hover {
-		background: var(--G5);
-	}
-</style>

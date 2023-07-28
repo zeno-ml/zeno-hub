@@ -75,7 +75,7 @@
 {#if $model && $metric}
 	{@const metricKeys = getMetricKeys($model, $metric, $selectionPredicates)}
 	{#await getMetricsForSlicesAndTags(metricKeys, [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
-		<div class="heading">
+		<div class="flex justify-between align-center">
 			<SelectionBar bind:selected {currentResult}>
 				{#if $projectConfig !== undefined && optionsMap[$projectConfig.view] !== undefined}
 					<svelte:component this={optionsMap[$projectConfig.view]} bind:viewOptions />
@@ -102,12 +102,3 @@
 		{/if}
 	{/await}
 {/if}
-
-<style>
-	.heading {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
-</style>

@@ -24,9 +24,9 @@
 		}}
 	/>
 {/if}
-<div class="vertical mt">
-	<div class="horizontal">
-		<h2 class="mr">Organizations ({organizations.length})</h2>
+<div class="flex flex-col mt-7">
+	<div class="flex items-center">
+		<h2 class="mr-2.5">Organizations ({organizations.length})</h2>
 		<IconButton
 			on:click={() => {
 				ZenoService.addOrganization({
@@ -45,11 +45,11 @@
 		</IconButton>
 	</div>
 	{#if organizations.length > 0}
-		<table>
-			<thead>
+		<table class="mt-1">
+			<thead class="border-b border-grey-lighter pb-2 top-0 left-0 sticky bg-background">
 				<th>Name</th>
 				<th># Members</th>
-				<th style="text-align: right;">Admin</th>
+				<th class="text-right">Admin</th>
 			</thead>
 			<tbody>
 				{#each organizations.sort((a, b) => {
@@ -61,14 +61,14 @@
 					return a.name.localeCompare(b.name);
 				}) as organization}
 					<tr>
-						<td>
+						<td class="pr-2.5">
 							{organization.name}
 						</td>
-						<td>
+						<td class="pr-2.5">
 							{organization.members.length}
 						</td>
-						<td>
-							<div class="horizontal justify-end">
+						<td class="pr-2.5">
+							<div class="flex items-center justify-end">
 								<div
 									use:tooltip={{
 										content: 'Manage this organization. You can only do this if you are an admin.',
@@ -152,50 +152,3 @@
 		</table>
 	{/if}
 </div>
-
-<style>
-	.horizontal {
-		display: flex;
-		align-items: center;
-	}
-
-	.vertical {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.mt {
-		margin-top: 30px;
-	}
-
-	.mr {
-		margin-right: 10px;
-	}
-
-	table {
-		margin-top: 5px;
-	}
-
-	th {
-		text-align: left;
-		border-bottom: 1px solid var(--G5);
-		padding-bottom: 5px;
-		top: 0;
-		left: 0;
-		position: sticky;
-		background-color: var(--G6);
-		min-width: 70px;
-		padding-right: 1.6vw;
-		vertical-align: top;
-		font-weight: 600;
-		z-index: 5;
-	}
-
-	td {
-		padding-right: 10px;
-	}
-
-	.justify-end {
-		justify-content: end;
-	}
-</style>

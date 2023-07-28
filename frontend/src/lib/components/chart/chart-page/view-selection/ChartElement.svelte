@@ -42,6 +42,3 @@
 	<svelte:component this={iconMap[type]} />
 	<h4 class="mt-1">{titleMap[type]}</h4>
 </div>
-
-<style>
-</style>

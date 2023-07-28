@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
@@ -48,8 +49,10 @@
 		<ViewHeader bind:isChartEdit {chart} />
 	{/if}
 	{#if chartData}
-		<div class={`overflow-auto flex flex-col pt-3 pl-2 ${isChartEdit ? 'w-full' : ''}`}>
-			<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
+		<div class={`overflow-auto flex flex-col pt-3 pl-2 h-full ${isChartEdit ? 'w-full' : ''}`}>
+			<ChartContainer>
+				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
+			</ChartContainer>
 		</div>
 	{/if}
 </div>
