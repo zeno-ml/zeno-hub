@@ -2,8 +2,7 @@
 
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    email text NOT NULL UNIQUE,
-    secret text NOT NULL
+    email text NOT NULL UNIQUE
 );
 
 -- Indices -------------------------------------------------------
