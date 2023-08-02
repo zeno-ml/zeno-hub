@@ -23,7 +23,7 @@
 	}}
 >
 	<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
-		<path fill={isHover ? 'black' : 'var(--G2)'} d={mdiArrowCollapseLeft} />
+		<path class="fill-{isHover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
 	</Svg>
 	<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 </a>

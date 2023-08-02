@@ -32,12 +32,12 @@
 		}}
 	>
 		<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
-			<path fill={ishover ? 'black' : 'var(--G2)'} d={mdiArrowCollapseLeft} />
+			<path class="fill-{ishover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
 		</Svg>
 		<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 	</div>
 	<div class="flex items-center">
-		<h2 style="margin:0px 20px 0px 0px; color: var(--G2)">
+		<h2 class="mr-5 text-grey-dark">
 			{chart.name}
 		</h2>
 		<Button

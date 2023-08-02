@@ -8,7 +8,6 @@
 	import Paper, { Content } from '@smui/paper';
 
 	export let tag: Tag;
-	export let inFolder = false;
 
 	let hovering = false;
 	let showOptions = false;
