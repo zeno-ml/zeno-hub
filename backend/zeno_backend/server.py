@@ -207,7 +207,6 @@ def get_server() -> FastAPI:
     def register_user(user: User):
         try:
             insert.user(user)
-            return Response(status.HTTP_200_OK)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -245,7 +244,6 @@ def get_server() -> FastAPI:
                 detail=("ERROR: Project already exists."),
             ) from exc
         insert.setup_project(description)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/item/{project}", tags=["zeno"])
     async def add_item(project: str, name: str, file: UploadFile = File(...)):
@@ -255,144 +253,116 @@ def get_server() -> FastAPI:
         if not parent_path.exists():
             parent_path.mkdir(parents=True)
         await save_file(file_path, file)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/label/{project}", tags=["zeno"])
     def add_label(project: str, label_spec: LabelSpec):
         insert.label(label_spec, project)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/output/{project}", tags=["zeno"])
     def add_output(project: str, output_spec: OutputSpec):
         insert.output(output_spec, project)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/predistill/{project}", tags=["zeno"])
     def add_predistill(project: str, predistill_spec: PredistillSpec):
         insert.predistill(predistill_spec, project)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/postdistill/{project}", tags=["zeno"])
     def add_postdistill(project: str, postdistill_spec: PostdistillSpec):
         insert.postdistill(postdistill_spec, project)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/folder/{project}", tags=["zeno"])
     def add_folder(project: str, name: str):
         insert.folder(project, name)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/slice/{project}", tags=["zeno"])
     def add_slice(project: str, req: Slice):
         insert.slice(project, req)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/chart/{project}", tags=["zeno"])
     def add_chart(project: str, chart: Chart):
         insert.chart(project, chart)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/tag/{project}", tags=["zeno"])
     def add_tag(tag: Tag, project: str):
         insert.tag(project, tag)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/add_organization", tags=["zeno"])
     def add_organization(user: User, organization: Organization):
         insert.organization(user, organization)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/add_project_user/{project}", tags=["zeno"])
     def add_project_user(project: str, user: User):
         insert.project_user(project, user)
-        return Response(status.HTTP_201_CREATED)
 
     @api_app.post("/add_project_org/{project}", tags=["zeno"])
     def add_project_org(project: str, organization: Organization):
         insert.project_org(project, organization)
-        return Response(status.HTTP_201_CREATED)
 
     ####################################################################### Update
     @api_app.post("/slice/update/{project}", tags=["zeno"])
     def update_slice(req: Slice, project: str):
         update.slice(req, project)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/chart/update/{project}", tags=["zeno"])
     def update_chart(chart: Chart, project: str):
         update.chart(chart, project)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/folder/update/{project}", tags=["zeno"])
     def update_folder(folder: Folder, project: str):
         update.folder(folder, project)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/tag/update/{project}", tags=["zeno"])
     def update_tag(tag: Tag, project: str):
         update.tag(tag, project)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/user/update", tags=["zeno"])
     def update_user(user: User):
         update.user(user)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/organization/update", tags=["zeno"])
     def update_organization(organization: Organization):
         update.organization(organization)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/project/update", tags=["zeno"])
     def update_project(project: ProjectConfig):
         update.project(project)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/project_user/update/{project}", tags=["zeno"])
     def update_project_user(project: str, user: User):
         update.project_user(project, user)
-        return Response(status.HTTP_200_OK)
 
     @api_app.post("/project_org/update/{project}", tags=["zeno"])
     def update_project_org(project: str, organization: Organization):
         update.project_org(project, organization)
-        return Response(status.HTTP_200_OK)
 
     ####################################################################### Delete
     @api_app.delete("/slice", tags=["zeno"])
     def delete_slice(req: Slice):
         delete.slice(req)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/chart", tags=["zeno"])
     def delete_chart(chart: Chart):
         delete.chart(chart)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/folder", tags=["zeno"])
     def delete_folder(folder: Folder):
         delete.folder(folder)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/tag", tags=["zeno"])
     def delete_tag(tag: Tag):
         delete.tag(tag)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/organization", tags=["zeno"])
     def delete_organization(organization: Organization):
         delete.organization(organization)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/project_user/{project}", tags=["zeno"])
     def delete_project_user(project: str, user: User):
         delete.project_user(project, user)
-        return Response(status.HTTP_200_OK)
 
     @api_app.delete("/project_org/{project}", tags=["zeno"])
     def delete_project_org(project: str, organization: Organization):
         delete.project_org(project, organization)
-        return Response(status.HTTP_200_OK)
 
     return app
 
