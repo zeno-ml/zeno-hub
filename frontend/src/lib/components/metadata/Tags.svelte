@@ -42,10 +42,7 @@
 {#if showNewTag}
 	<TagPopup on:close={() => (showNewTag = false)} />
 {/if}
-<div
-	class=" border-b border-grey-lighter flex items-center justify-between"
-	style:margin-top="10px"
->
+<div class=" flex items-center justify-between" style:margin-top="10px">
 	<div class="flex items-center justify-between">
 		<h4>Tags</h4>
 		<div

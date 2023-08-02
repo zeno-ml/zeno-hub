@@ -130,10 +130,10 @@
 </script>
 
 {#if table}
-	<div class="overflow-auto flex flex-wrap content-baseline">
-		<table id="column-table">
+	<div class="overflow-auto flex flex-grow flex-wrap content-baseline">
+		<table>
 			<thead
-				class="border-b-2 border-grey-lighter text-left pb-1 mb-5 sticky top-0 bg-background cursor-pointer"
+				class="border-b border-grey-lighter text-left pb-1 mb-5 sticky top-0 bg-background cursor-pointer"
 			>
 				<tr>
 					{#if $editTag !== undefined}

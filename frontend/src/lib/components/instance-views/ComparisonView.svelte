@@ -222,7 +222,7 @@
 	{#if table}
 		<table class="mt-2">
 			<thead
-				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top"
+				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background"
 			>
 				<th class="pr-10 cursor-pointer">
 					<div>{$model}</div>

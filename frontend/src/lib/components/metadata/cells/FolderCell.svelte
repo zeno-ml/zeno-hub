@@ -139,9 +139,9 @@
 	</div>
 </div>
 {#if expandFolder}
-	<div transition:slide>
+	<div transition:slide class="ml-9">
 		{#each sls as s}
-			<SliceCell compare={$page.url.href.includes('compare')} slice={s} inFolder={true} />
+			<SliceCell compare={$page.url.href.includes('compare')} slice={s} />
 		{/each}
 	</div>
 {/if}

@@ -4,6 +4,6 @@
 	export let data;
 </script>
 
-<div class="mx-5 flex flex-col">
+<div class="mx-5 flex flex-col flex-grow">
 	<InstanceView compare={data.compare} />
 </div>

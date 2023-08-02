@@ -178,7 +178,7 @@
 
 {#if !$page.url.href.includes('compare')}
 	<div
-		class="flex items-center justify-between mt-2.5 sticky top-28 border-b border-grey-lighter bg-yellowish-light"
+		class="flex items-center justify-between pt-2.5 sticky top-24 border-b border-grey-lighter bg-yellowish-light z-10"
 	>
 		<div class="flex items-center justify-between">
 			<h4>Metadata</h4>

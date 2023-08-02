@@ -12,11 +12,10 @@
 </script>
 
 <SliceHeader />
-<div
-	class="flex items-center border border-grey-lighter rounded px-2.5 justify-between cursor-pointer text-grey
-			{$selectionPredicates === undefined ? 'bg-grey-darker' : ''}
+<button
+	class="flex items-center border border-grey-lighter rounded px-2.5 justify-between cursor-pointer text-grey w-full h-9
+			{$selectionPredicates === undefined ? 'bg-primary-light' : ''}
 			{$page.url.href.includes('compare') ? 'py-1' : ''}"
-	on:keydown={() => ({})}
 	on:click={() => {
 		selections.update((m) => {
 			Object.keys(m.metadata).forEach((key) => {
@@ -27,7 +26,7 @@
 		tagIds.set(undefined);
 	}}
 >
-	<div class="flex items-center justify-between">All instances</div>
+	<span>All instances</span>
 	{#if $model}
 		<div class="flex items-center justify-between">
 			<SliceCellResult
@@ -55,7 +54,7 @@
 			<div style:width="36px" />
 		</div>
 	{/if}
-</div>
+</button>
 {#each $folders as folder}
 	<FolderCell {folder} />
 {/each}

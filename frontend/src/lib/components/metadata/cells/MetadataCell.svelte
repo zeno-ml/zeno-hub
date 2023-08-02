@@ -45,7 +45,7 @@
 </script>
 
 {#if histogram}
-	<div class="border-t border-b border-grey-lighter py-2.5 flex flex-col">
+	<div class="border-b border-grey-lighter p-2.5 flex flex-col">
 		<div class="flex justify-between items-center ml-1 mb-2.5 text-grey-darker">
 			<div class="label top-text">
 				<span>
@@ -53,7 +53,6 @@
 				</span>
 			</div>
 		</div>
-
 		<svelte:component
 			this={columnMap[col.dataType]}
 			filterPredicates={predicates}

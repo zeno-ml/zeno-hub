@@ -104,7 +104,9 @@
 
 {#if table}
 	{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
-		<div class="container flex-grow overflow-y-auto flex flex-wrap border-b-2 border-grey-lighter">
+		<div
+			class="container flex-grow overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start"
+		>
 			{#each table as inst (inst['item'])}
 				<div class="mr-2 mt-1">
 					<svelte:component

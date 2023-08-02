@@ -137,10 +137,8 @@
 	}
 </script>
 
-<div
-	class="{inFolder
-		? 'mr-9'
-		: ''} relative overflow-auto border border-grey-light rounded-lg mt flex px-2.5 parent {selected
+<button
+	class="relative border border-grey-lighter rounded-2xl mt-1 flex items-center justify-between px-2.5 parent h-9 overflow-visible w-full {selected
 		? 'bg-greenish-light'
 		: ''}"
 	on:click={setSelected}
@@ -150,91 +148,86 @@
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
 	on:dragstart={dragStart}
-	on:keydown={() => ({})}
 >
-	<div class="flex justify-between items-center cursor-pointer" style:width="100%">
-		<div class="flex justify-between items-center cursor-pointer" style:width="100%">
-			<div class="flex">
-				<div class="flex justify-between items-center cursor-pointer" style:color="var(--G1)">
-					{tag.tagName}
-				</div>
-			</div>
-			<div
-				class="flex justify-between items-center cursor-pointer"
-				use:clickOutside={() => {
-					showOptions = false;
-				}}
-			>
-				{#if showOptions}
-					<div class="top-0 right-0 absolute mt-9">
-						<Paper style="padding: 3px 0px;" elevation={7}>
-							<Content>
-								{#if $editTag === undefined}
-									<div
-										class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
-										on:keydown={() => ({})}
-										on:click={(e) => {
-											e.stopPropagation();
-											showOptions = false;
-											editTag.set(tag);
-										}}
-									>
-										<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
-										<span class="text-xs">Edit</span>
-									</div>
-								{/if}
+	<div class="flex justify-between items-center w-full">
+		<span>
+			{tag.tagName}
+		</span>
+		<div
+			class="flex justify-between items-center"
+			use:clickOutside={() => {
+				showOptions = false;
+			}}
+		>
+			{#if showOptions}
+				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+					<Paper style="padding: 3px 0px;" elevation={7}>
+						<Content>
+							{#if $editTag === undefined}
 								<div
-									class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
+									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
 									on:keydown={() => ({})}
 									on:click={(e) => {
 										e.stopPropagation();
 										showOptions = false;
-										removeTag();
+										editTag.set(tag);
 									}}
 								>
-									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span class="text-xs">Remove</span>
+									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
+									<span class="text-xs">Edit</span>
 								</div>
-							</Content>
-						</Paper>
-					</div>
-				{/if}
-				{#await result then res}
-					{#if res !== null}
-						<span style:margin-right="10px">
-							{res.metric !== undefined ? res.metric.toFixed(2) : ''}
-						</span>
-						<span class="italic text-grey-darker mr-2.5">
-							({res.size.toLocaleString()})
-						</span>
-					{/if}
-				{/await}
-				{#if $editTag === undefined || $editTag.id !== tag.id}
-					<div class="flex" style:cursor="pointer">
-						<div
-							style:width="36px"
-							use:clickOutside={() => {
-								hovering = false;
-							}}
-						>
-							{#if hovering}
-								<IconButton
-									size="button"
-									style="padding: 0px"
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = !showOptions;
-									}}
-								>
-									<Icon tag="svg" viewBox="0 0 24 24">
-										<path fill="black" d={mdiDotsHorizontal} />
-									</Icon>
-								</IconButton>
 							{/if}
-						</div>
-					</div>
+							<div
+								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								on:keydown={() => ({})}
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = false;
+									removeTag();
+								}}
+							>
+								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+								<span class="text-xs">Remove</span>
+							</div>
+						</Content>
+					</Paper>
+				</div>
+			{/if}
+			{#await result then res}
+				{#if res !== null}
+					<span style:margin-right="10px">
+						{res.metric !== undefined ? res.metric.toFixed(2) : ''}
+					</span>
+					<span class="italic text-grey-darker mr-2.5">
+						({res.size.toLocaleString()})
+					</span>
 				{/if}
-			</div>
+			{/await}
+			{#if $editTag === undefined || $editTag.id !== tag.id}
+				<div class="flex">
+					<div
+						style:width="36px"
+						use:clickOutside={() => {
+							hovering = false;
+						}}
+					>
+						{#if hovering}
+							<IconButton
+								size="button"
+								style="padding: 0px"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = !showOptions;
+								}}
+							>
+								<Icon tag="svg" viewBox="0 0 24 24">
+									<path fill="black" d={mdiDotsHorizontal} />
+								</Icon>
+							</IconButton>
+						{/if}
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
-</div>
+</button>

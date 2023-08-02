@@ -12,8 +12,8 @@
 </script>
 
 {#if sli !== undefined}
-	<div
-		class="text-primary cursor-pointer"
+	<button
+		class="text-primary"
 		on:click={() => {
 			selections.update((sel) => ({
 				slices: sli !== undefined && sli.sliceName !== 'All Instances' ? [sli.id] : [],
@@ -26,10 +26,9 @@
 		on:mouseout={() => (showTooltip = false)}
 		on:focus={() => (showTooltip = true)}
 		on:blur={() => (showTooltip = false)}
-		on:keydown={() => ({})}
 	>
 		{sli.sliceName}
-	</div>
+	</button>
 	{#if sli.sliceName !== 'All Instances' && showTooltip}
 		<div class="z-10 absolute">
 			<div class="bg-background p-2.5 rounded-lg shadow-xl">

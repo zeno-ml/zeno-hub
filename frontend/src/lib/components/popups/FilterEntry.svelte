@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { columns, model } from '$lib/stores';
+	import { getOperation, inverseOperationMap } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -14,37 +15,6 @@
 	export let predicate: FilterPredicate;
 	export let deletePredicate: () => void;
 	export let index: number;
-
-	function getOperation(representation: string) {
-		switch (representation) {
-			case '==':
-				return Operation.EQUAL;
-			case '!=':
-				return Operation.DIFFERENT;
-			case '>':
-				return Operation.GT;
-			case '<':
-				return Operation.LT;
-			case '>=':
-				return Operation.GTE;
-			case '<=':
-				return Operation.LTE;
-			case 'LIKE':
-				return Operation.LIKE;
-			default:
-				return Operation.EQUAL;
-		}
-	}
-
-	let inverseOperationMap = {
-		[Operation.EQUAL]: '==',
-		[Operation.DIFFERENT]: '!=',
-		[Operation.GT]: '>',
-		[Operation.LT]: '<',
-		[Operation.GTE]: '>=',
-		[Operation.LTE]: '<=',
-		[Operation.LIKE]: 'LIKE'
-	};
 
 	function joinChange(e: CustomEvent) {
 		// avoid backspace or delete

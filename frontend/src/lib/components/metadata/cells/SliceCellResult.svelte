@@ -19,7 +19,7 @@
 		{#if res !== null}
 			<div
 				class={compare
-					? 'flex flex-col items-center mr-2.5 p ' + compareButtonstyle
+					? 'flex flex-col items-center mr-2.5 p text-xs ' + compareButtonstyle
 					: 'flex items-center'}
 				on:keydown={() => ({})}
 			>

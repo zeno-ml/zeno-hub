@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { inverseOperationMap } from '$lib/util/util';
 	import type { FilterPredicateGroup } from '$lib/zenoapi';
 	import MetaChip from './MetaChip.svelte';
 
@@ -19,13 +20,11 @@
 				<MetaChip content={pred.join} />
 			{/if}
 			<MetaChip
-				content={pred.column.name +
-					pred.operation +
-					`${
-						!isNaN(Number(pred.value)) && typeof pred.value !== 'boolean'
-							? Number(pred.value).toFixed(2)
-							: pred.value
-					}`}
+				content={`${pred.column.name} ${inverseOperationMap[pred.operation]} ${
+					!isNaN(Number(pred.value)) && typeof pred.value !== 'boolean'
+						? Number(pred.value).toFixed(2)
+						: pred.value
+				}`}
 			/>
 		{/if}
 	{/each}

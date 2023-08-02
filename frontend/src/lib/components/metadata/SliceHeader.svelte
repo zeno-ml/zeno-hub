@@ -29,11 +29,11 @@
 {#if showNewFolder}
 	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
-<div class="sticky top-16 bg-yellowish-light flex items-center justify-between">
+<div class="sticky top-14 bg-yellowish-light flex items-center justify-between z-10">
 	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
-			class="information-tooltip"
+			class="w-6 h-6 cursor-help fill-grey-dark"
 			use:tooltip={{
 				content: 'Slices are named combinations of filters.',
 				position: 'right',

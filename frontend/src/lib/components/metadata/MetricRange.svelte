@@ -17,7 +17,7 @@
 		>
 			{$metricRange[0].toFixed(2)}
 		</span>
-		<div class="w-10 h-4 mx-2.5 bg-gradient-to-r from-primary-lighter to-primary" />
+		<div class="w-10 h-4 mx-2.5 bg-gradient-to-r from-primary-light to-primary" />
 		<span
 			contenteditable="true"
 			on:blur={(e) =>

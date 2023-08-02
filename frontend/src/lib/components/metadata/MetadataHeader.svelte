@@ -24,14 +24,14 @@
 	}
 </script>
 
-<div id="sticky bg-yellowish-light -top-2.5 flex items-center pb-2.5 pt-1">
+<div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1 w-96">
 	{#if $model !== undefined && $models.length > 1}
-		<div style="margin-right: 10px;">
-			<div class="my-1 text-grey-dark">
+		<div class="mr-2.5 flex flex-col w-1/2">
+			<span class="my-1 text-grey-dark w-fit">
 				{$page.url.href.includes('compare') ? 'Model A' : 'Model'}
-			</div>
+			</span>
 			<select
-				class="w-40 h-9 border border-grey-light rounded text-sm text-grey"
+				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$model}
 			>
 				{#each $models as mod}
@@ -41,10 +41,10 @@
 		</div>
 	{/if}
 	{#if !$page.url.href.includes('compare') && $metric !== undefined}
-		<div>
-			<div class="my-1 text-grey-dark">Metric</div>
+		<div class="flex flex-col w-1/2">
+			<span class="my-1 text-grey-dark">Metric</span>
 			<select
-				class="w-40 h-9 border border-grey-light rounded text-sm text-grey"
+				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$metric}
 			>
 				{#each $metrics as met}
@@ -54,10 +54,10 @@
 		</div>
 	{/if}
 	{#if $page.url.href.includes('compare')}
-		<div>
-			<div class="my-1 text-grey-dark">Model B</div>
+		<div class="flex flex-col w-1/2">
+			<span class="my-1 text-grey-dark">Model B</span>
 			<select
-				class="w-40 h-9 border border-grey-light rounded text-sm text-grey"
+				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$comparisonModel}
 			>
 				{#each exludeModels as mod}
@@ -68,10 +68,10 @@
 	{/if}
 </div>
 {#if $page.url.href.includes('compare') && $metric !== undefined}
-	<div>
-		<div class="my-1 text-grey-dark">Metric</div>
+	<div class="flex flex-col w-full">
+		<span class="my-1 text-grey-dark">Metric</span>
 		<select
-			class="w-80 h-9 border border-grey-light rounded text-sm text-grey"
+			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 			bind:value={$metric}
 		>
 			{#each $metrics as met}
