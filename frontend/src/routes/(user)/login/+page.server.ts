@@ -1,6 +1,7 @@
 import { dev } from '$app/environment';
 import { getSession, type CognitoUserSessionType } from '$lib/auth/cognito';
 import type { AuthUser } from '$lib/auth/types';
+import { OpenAPI } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -33,6 +34,9 @@ export const actions: Actions = {
 		try {
 			const res = await getSession(username, password);
 			const user = extractUserFromSession(res);
+			OpenAPI.HEADERS = {
+				Authorization: 'Bearer ' + user.accessToken
+			};
 			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
 				httpOnly: true,

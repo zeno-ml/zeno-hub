@@ -24,7 +24,8 @@ Once set up, this database needs some tables.
 You can bootstrap the database using [this sript](./create_tables.sql).
 To inspect your data, you can install the [Postico GUI](https://eggerapps.at/postico2/) with brew `brew install --cask postico`.
 
-Once this backend database is set up, the backend needs information on how to connect to it. therefore, add a `database.ini` in [./zeno_backend/database](./zeno_backend/database/) as follows:
+Once this backend database is set up, the backend needs information on how to connect to it.
+Therefore, add a `database.ini` in [./zeno_backend/database](./zeno_backend/database/) as follows:
 
 ```
 [postgresql]
@@ -34,7 +35,10 @@ user=[usename for DB login]
 password=[password for DB login]
 ```
 
-For a debug setup, you can also run `uvicorn zeno_backend.server:get_server --reload` from within the poetry shell.
+For the backend to be able to verify user status, the `ZENO_USER_POOL_AUTH_REGION`, `ZENO_USER_POOL_ID`, and `ZENO_USER_POOL_CLIENT_ID` environment variables are needed.
+To simplify the dev setup, the zeno backend will try to read these from `../frontend/.env`.
+
+For a debug setup, you can run `uvicorn zeno_backend.server:get_server --reload` from within the poetry shell.
 
 ### Static Analysis Tools
 

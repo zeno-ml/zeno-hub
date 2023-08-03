@@ -8,7 +8,7 @@ class User(CamelModel):
     """Representation of a user in Zeno."""
 
     id: int
-    email: str
+    name: str
     admin: Optional[bool]
 
 
