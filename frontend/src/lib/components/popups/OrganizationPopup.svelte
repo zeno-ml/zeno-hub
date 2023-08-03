@@ -55,14 +55,16 @@
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column;">
 		<h2>Organization Aministration</h2>
-		<div class="element">
+		<div class="flex flex-col mb-5">
 			<Textfield bind:value={organizationToEdit.name} label="Name" bind:this={input} />
 		</div>
-		<div class="element">
+		<div class="flex flex-col mb-5">
 			<h3>Members</h3>
 			{#if members.length > 0}
 				<table>
-					<thead>
+					<thead
+						class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+					>
 						<th style="width: 200px;">Email</th>
 						<th>Admin</th>
 						<th style="width: auto;" />
@@ -124,7 +126,7 @@
 				{/if}
 			{/await}
 		</div>
-		<div id="submit">
+		<div class="flex items-center self-end">
 			<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
 				>Cancel</Button
 			>
@@ -137,32 +139,3 @@
 		</div>
 	</Content>
 </Popup>
-
-<style>
-	#submit {
-		display: flex;
-		align-items: center;
-		align-self: end;
-	}
-
-	.element {
-		margin-bottom: 20px;
-		display: flex;
-		flex-direction: column;
-	}
-
-	th {
-		text-align: left;
-		border-bottom: 1px solid var(--G5);
-		padding-bottom: 5px;
-		top: 0;
-		left: 0;
-		position: sticky;
-		background-color: var(--G6);
-		min-width: 70px;
-		padding-right: 1.6vw;
-		vertical-align: top;
-		font-weight: 600;
-		z-index: 5;
-	}
-</style>

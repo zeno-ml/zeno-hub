@@ -12,8 +12,8 @@
 </script>
 
 {#if sli !== undefined}
-	<div
-		class="slice-link"
+	<button
+		class="text-primary"
 		on:click={() => {
 			selections.update((sel) => ({
 				slices: sli !== undefined && sli.sliceName !== 'All Instances' ? [sli.id] : [],
@@ -26,37 +26,14 @@
 		on:mouseout={() => (showTooltip = false)}
 		on:focus={() => (showTooltip = true)}
 		on:blur={() => (showTooltip = false)}
-		on:keydown={() => ({})}
 	>
 		{sli.sliceName}
-	</div>
+	</button>
 	{#if sli.sliceName !== 'All Instances' && showTooltip}
-		<div class="tooltip-container">
-			<div class="tooltip">
+		<div class="z-10 absolute">
+			<div class="bg-background p-2.5 rounded-lg shadow-xl">
 				<SliceDetails predicateGroup={sli.filterPredicates} />
 			</div>
 		</div>
 	{/if}
 {/if}
-
-<style>
-	.tooltip-container {
-		z-index: 10;
-		width: fit-content;
-		position: absolute;
-		transform: translateY(10%);
-	}
-	.tooltip {
-		background: var(--G6);
-		padding-left: 10px;
-		padding-right: 10px;
-		box-shadow: 1px 1px 3px 1px var(--G3);
-		border-radius: 4px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-	}
-	.slice-link {
-		color: #6a1b9a;
-		cursor: pointer;
-	}
-</style>

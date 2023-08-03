@@ -14,16 +14,16 @@
 	}
 </script>
 
-<div class="charts-container">
-	<div class="header">
+<div class="flex flex-col m-5 w-full">
+	<div class="flex justify-between align-center">
 		<h3>Charts</h3>
 	</div>
-	<div class="charts">
+	<div class="flex flex-wrap overflow-y-auto">
 		{#each $charts as chart}
 			<ChartHomeBlock {chart} />
 		{/each}
-		<div
-			class="add-charts"
+		<button
+			class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg m-2 px-2.5 w-48 h-24 hover:bg-primary-light"
 			on:click={() => {
 				ZenoService.addChart(
 					$projectConfig ? $projectConfig.uuid : '',
@@ -34,55 +34,12 @@
 					);
 				});
 			}}
-			on:keydown={() => ({})}
 		>
-			<div class="add-button">
+			<div class="w-6 h-6">
 				<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiPlus} />
 				</Icon>
 			</div>
-		</div>
+		</button>
 	</div>
 </div>
-
-<style>
-	.charts-container {
-		display: flex;
-		flex-direction: column;
-		margin: 20px;
-		width: 100%;
-	}
-	.charts {
-		display: flex;
-		flex-wrap: wrap;
-		overflow-y: auto;
-	}
-	.header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.add-charts {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-around;
-		align-items: center;
-		border: 1px solid var(--G4);
-		border-radius: 10px;
-		margin: 5px 5px 5px 5px;
-		padding-left: 10px;
-		padding-right: 10px;
-		overflow: visible;
-		cursor: pointer;
-		width: 225px;
-		height: 100px;
-	}
-	.add-charts:hover {
-		background: #f0ebf4;
-	}
-	.add-button {
-		width: 24px;
-		height: 24px;
-		margin: 14px;
-	}
-</style>

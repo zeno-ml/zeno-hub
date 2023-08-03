@@ -29,11 +29,11 @@
 {#if showNewFolder}
 	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
-<div class="slice-header inline">
-	<div class="inline">
+<div class="sticky top-14 bg-yellowish-light flex items-center justify-between z-10">
+	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
-			class="information-tooltip"
+			class="w-6 h-6 cursor-help fill-grey-dark"
 			use:tooltip={{
 				content: 'Slices are named combinations of filters.',
 				position: 'right',
@@ -45,7 +45,7 @@
 			</Icon>
 		</div>
 	</div>
-	<div class="inline">
+	<div class="flex items-center justify-between">
 		<div
 			use:tooltip={{
 				content: !$page.url.href.includes('compare')
@@ -63,9 +63,9 @@
 			>
 				<Icon tag="svg" viewBox="0 0 24 24">
 					{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || ($selectionIds !== undefined && $selectionIds.length > 0)}
-						<path fill="#6a1a9a" d={mdiCreation} />
+						<path class="fill-primary" d={mdiCreation} />
 					{:else}
-						<path fill="var(--G1)" d={mdiCreationOutline} />
+						<path class="fill-grey" d={mdiCreationOutline} />
 					{/if}
 				</Icon>
 			</IconButton>
@@ -83,7 +83,7 @@
 				}}
 			>
 				<Icon tag="svg" viewBox="0 0 24 24">
-					<path fill="var(--G1)" d={mdiFolderPlusOutline} />
+					<path class="fill-grey" d={mdiFolderPlusOutline} />
 				</Icon>
 			</IconButton>
 		</div>
@@ -101,27 +101,12 @@
 			>
 				<Icon tag="svg" viewBox="0 0 24 24">
 					{#if $selectionPredicates !== undefined}
-						<path fill="#6a1a9a" d={mdiPlusCircle} />
+						<path class="fill-primary" d={mdiPlusCircle} />
 					{:else}
-						<path fill="var(--G1)" d={mdiPlus} />
+						<path class="fill-grey" d={mdiPlus} />
 					{/if}
 				</Icon>
 			</IconButton>
 		</div>
 	</div>
 </div>
-
-<style>
-	.slice-header {
-		position: sticky;
-		top: 60px;
-		z-index: 3;
-		background-color: var(--Y2);
-	}
-
-	.inline {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-</style>

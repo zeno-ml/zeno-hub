@@ -14,17 +14,8 @@
 	OpenAPI.BASE = `${getEndpoint()}/api`;
 </script>
 
-<div class="container">
+<div class="flex flex-col w-full m-5">
 	<h1>Account management</h1>
 	<Account name={cognitoUser.name} email={cognitoUser.email} />
 	<OrganizationsTable {organizations} {user} />
 </div>
-
-<style>
-	.container {
-		display: flex;
-		flex-direction: column;
-		margin: 20px;
-		width: 100%;
-	}
-</style>

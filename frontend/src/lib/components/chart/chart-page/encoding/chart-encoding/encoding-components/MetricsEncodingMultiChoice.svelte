@@ -3,6 +3,7 @@
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
+	import EncodingContainer from './EncodingContainer.svelte';
 
 	export let numberValues: number[];
 
@@ -27,8 +28,7 @@
 	$: updateDragOrder(value);
 </script>
 
-<div class="parameters">
-	<h4 class="select-label">&nbsp;</h4>
+<EncodingContainer>
 	<Svelecte
 		style="width: 280px; flex:none;"
 		bind:value
@@ -37,16 +37,4 @@
 		multiple={true}
 		placeholder="Select Metrics..."
 	/>
-</div>
-
-<style>
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-	.select-label {
-		margin: 5px;
-	}
-</style>
+</EncodingContainer>

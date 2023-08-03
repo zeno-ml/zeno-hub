@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { Icon } from '@smui/button';
 	import { compareSort } from '$lib/stores';
 	import type { ZenoColumn } from '$lib/zenoapi';
+	import { Icon } from '@smui/button';
+
 	export let header: string | undefined;
 	export let selectColumn: ZenoColumn;
 	export let sortModel: string;
@@ -10,7 +11,7 @@
 <div style="display: flex; align-items:center;">
 	<div>
 		<div>{header ? header : 'difference'}</div>
-		<div class="header">{selectColumn.name}</div>
+		<div class="font-normal text-grey-dark">{selectColumn.name}</div>
 	</div>
 	{#if sortModel === header}
 		<Icon class="material-icons" style="font-size: 25px; padding-top:3px;">
@@ -22,10 +23,3 @@
 		</Icon>
 	{/if}
 </div>
-
-<style>
-	.header {
-		font-weight: 400;
-		color: var(--G2);
-	}
-</style>

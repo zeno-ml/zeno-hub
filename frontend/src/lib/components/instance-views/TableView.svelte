@@ -130,20 +130,22 @@
 </script>
 
 {#if table}
-	<div class="sample-container">
-		<table id="column-table">
-			<thead>
+	<div class="overflow-auto flex flex-grow flex-wrap content-baseline">
+		<table>
+			<thead
+				class="border-b border-grey-lighter text-left pb-1 mb-5 sticky top-0 bg-background cursor-pointer"
+			>
 				<tr>
 					{#if $editTag !== undefined}
-						<th>Included</th>
+						<th class="mr-5">Included</th>
 					{/if}
 					{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
-						<th>instance</th>
+						<th class="mr-5">instance</th>
 					{/if}
 					{#each columnHeader as header}
 						{#if header.name !== 'item'}
-							<th on:click={() => updateSort(header)}>
-								<div class="inline-header">
+							<th class="mr-5" on:click={() => updateSort(header)}>
+								<div class="flex">
 									{header.name}
 									<Icon
 										class="material-icons"
@@ -165,10 +167,12 @@
 				{#each table as tableContent (tableContent['item'])}
 					<tr>
 						{#if $editTag !== undefined}
-							<td><Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} /></td>
+							<td class="pr-3.5"
+								><Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} /></td
+							>
 						{/if}
 						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
-							<td>
+							<td class="pr-3.5">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$projectConfig.view]}
@@ -186,9 +190,9 @@
 						{/if}
 						{#each columnHeader as header}
 							{#if header.dataType === MetadataType.CONTINUOUS}
-								<td>{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
+								<td class="pr-3.5">{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
 							{:else}
-								<td>{tableContent[header.id]}</td>
+								<td class="pr-3.5">{tableContent[header.id]}</td>
 							{/if}
 						{/each}
 					</tr>
@@ -241,37 +245,3 @@
 		>
 	</Pagination>
 {/if}
-
-<style>
-	.inline-header {
-		display: flex;
-	}
-	.sample-container {
-		height: calc(100vh - 180px);
-		overflow: auto;
-		align-content: baseline;
-		border-bottom: 1px solid var(--G5);
-		display: flex;
-		flex-wrap: wrap;
-		min-width: 75px;
-	}
-	th {
-		text-align: left;
-		border-bottom: 1px solid var(--G5);
-		padding-bottom: 5px;
-		margin-bottom: 20px;
-		margin-right: 20px;
-		top: 2px;
-		position: sticky;
-		background-color: var(--G6);
-		min-width: 70px;
-		margin-bottom: 5px;
-		padding-right: 1.6vw;
-		cursor: pointer;
-		font-weight: 600;
-		z-index: 5;
-	}
-	td {
-		padding-right: 15px;
-	}
-</style>

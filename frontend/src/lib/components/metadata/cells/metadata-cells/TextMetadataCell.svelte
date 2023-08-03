@@ -10,8 +10,8 @@
 	import Button from '@smui/button';
 	import { TrailingIcon } from '@smui/chips';
 	import { Label } from '@smui/common';
-	import { tooltip } from '@svelte-plugins/tooltips';
 	import AutoComplete from 'simple-svelte-autocomplete';
+	import SearchOption from './SearchOption.svelte';
 	import MatchWholeWordIcon from './static/MatchWholeWordIcon.svelte';
 	import RegexIcon from './static/RegexIcon.svelte';
 
@@ -111,7 +111,7 @@
 	}
 </script>
 
-<div class="container">
+<div class="flex items-center ml-1">
 	{#key refresh}
 		<AutoComplete
 			id="autoinput"
@@ -130,49 +130,29 @@
 			</div>
 		</AutoComplete>
 	{/key}
-	<div class="option-box">
-		<div
-			id="caseMatch"
-			class="search-option"
-			style:background={caseMatch ? 'var(--P2)' : ''}
-			on:keydown={() => ({})}
+	<div class="ml-2.5 flex items-center">
+		<SearchOption
+			id={'caseMatch'}
+			highlighted={caseMatch}
 			on:click={optionClick}
-			use:tooltip={{
-				content: 'Match Case',
-				theme: 'zeno-tooltip',
-				autoPosition: true
-			}}
+			tooltipContent={'Match Case'}>Aa</SearchOption
 		>
-			Aa
-		</div>
-		<div
-			id="wholeWordMatch"
-			class="search-option"
-			style:background={wholeWordMatch ? 'var(--P2)' : ''}
-			on:keydown={() => ({})}
+		<SearchOption
+			id={'wholeWordMatch'}
+			highlighted={wholeWordMatch}
 			on:click={optionClick}
-			use:tooltip={{
-				content: 'Match Whole Word',
-				theme: 'zeno-tooltip',
-				autoPosition: true
-			}}
+			tooltipContent={'Match Whole Word'}
 		>
 			<svelte:component this={MatchWholeWordIcon} />
-		</div>
-		<div
-			id="typeSelection"
-			class="search-option"
-			style:background={isRegex ? 'var(--P2)' : ''}
-			on:keydown={() => ({})}
+		</SearchOption>
+		<SearchOption
+			id={'typeSelection'}
+			highlighted={isRegex}
 			on:click={optionClick}
-			use:tooltip={{
-				content: 'Use Regular Expression',
-				theme: 'zeno-tooltip',
-				autoPosition: true
-			}}
+			tooltipContent={'Use Regular Expression'}
 		>
 			<svelte:component this={RegexIcon} />
-		</div>
+		</SearchOption>
 	</div>
 	<Button
 		style="margin-left: 10px; height: 32px"
@@ -185,9 +165,9 @@
 	</Button>
 </div>
 
-<div class="chips">
+<div class="flex flex-wrap height-fit items-center py-1">
 	{#each filterPredicates as pred}
-		<div class="meta-chip">
+		<div class="px-1 py-2.5 bg-primary-light mx-1 my rouded width-fit">
 			<span>
 				{pred.operation === Operation.LIKE ? '/' : ''}
 				{pred.value}
@@ -208,49 +188,3 @@
 		</div>
 	{/each}
 </div>
-
-<style>
-	.container {
-		display: flex;
-		align-items: center;
-		margin-left: 5px;
-	}
-	.option-box {
-		margin-left: 10px;
-		display: flex;
-		align-items: center;
-		border: 1px solid var(--mdc-outlined-button-outline-color, rgba(0, 0, 0, 0.12));
-		border-radius: var(--mdc-outlined-button-container-shape, var(--mdc-shape-small, 4px));
-	}
-	.search-option {
-		display: flex;
-		align-items: center;
-		padding: 2px 3px;
-		padding-left: 6px;
-		padding-right: 6px;
-		height: 26px;
-		cursor: pointer;
-	}
-	.search-option:hover {
-		background: var(--Y1);
-	}
-	.chips {
-		display: flex;
-		flex-direction: inline;
-		flex-wrap: wrap;
-		height: fit-content;
-		align-items: center;
-		padding-bottom: 5px;
-		padding-top: 5px;
-	}
-	.meta-chip {
-		padding: 5px 10px;
-		background: var(--P3);
-		margin-left: 5px;
-		margin-right: 5px;
-		margin-top: 2px;
-		margin-bottom: 2px;
-		border-radius: 5px;
-		width: fit-content;
-	}
-</style>

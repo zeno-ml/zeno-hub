@@ -9,8 +9,8 @@
 		viewOptions['mask'] && (viewOptions['mask'] as string).includes('Label') ? 'label' : 'model';
 </script>
 
-<div class="box">
-	<div id="overlays">
+<div class="p-2.5 border border-grey-lighter">
+	<div class="relative">
 		<img
 			src={imageURL}
 			style:width="150px"
@@ -19,7 +19,7 @@
 		/>
 		{#if maskOption === 'label'}
 			<img
-				class="overlay"
+				class="absolute left-0 filter invert opacity-40"
 				src="/labels/{entry['label']}"
 				style:width="150px"
 				style:height="150px"
@@ -28,7 +28,7 @@
 		{/if}
 		{#if entry[modelColumn] && maskOption === 'model'}
 			<img
-				class="overlay"
+				class="absolute left-0 filter invert opacity-40"
 				src="/cache/{modelColumn}/{entry[modelColumn]}"
 				style:width="150px"
 				style:height="150px"
@@ -37,18 +37,3 @@
 		{/if}
 	</div>
 </div>
-
-<style>
-	#overlays {
-		position: relative;
-	}
-	.overlay {
-		filter: invert(100%) opacity(40%);
-		left: 0px;
-		position: absolute;
-	}
-	.box {
-		padding: 10px;
-		border: 0.5px solid rgb(224, 224, 224);
-	}
-</style>

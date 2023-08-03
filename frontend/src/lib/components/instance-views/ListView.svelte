@@ -104,9 +104,11 @@
 
 {#if table}
 	{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
-		<div class="container sample-container">
+		<div
+			class="container flex-grow overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start"
+		>
 			{#each table as inst (inst['item'])}
-				<div class="instance">
+				<div class="mr-2 mt-1">
 					<svelte:component
 						this={viewMap[$projectConfig.view]}
 						options={viewOptions}
@@ -167,19 +169,3 @@
 		>
 	</Pagination>
 {/if}
-
-<style>
-	.sample-container {
-		height: calc(100vh - 180px);
-		overflow-y: auto;
-		align-content: baseline;
-		border-bottom: 1px solid rgb(224, 224, 224);
-		display: flex;
-		flex-wrap: wrap;
-	}
-	.instance {
-		margin-right: 5px;
-		margin-top: 2.5px;
-		margin-bottom: 2.5px;
-	}
-</style>

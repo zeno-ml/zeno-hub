@@ -2,7 +2,7 @@ import { env } from '$env/dynamic/public';
 import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
 import { slicesForComparison } from '../stores';
 
-import { ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
+import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
 export function getProjectRouteFromURL(url: URL) {
@@ -104,3 +104,34 @@ export function getEndpoint() {
 	if (env.PUBLIC_BACKEND_ENDPOINT === 'http://127.0.0.1:8000') return '/localzeno';
 	return env.PUBLIC_BACKEND_ENDPOINT;
 }
+
+export function getOperation(representation: string) {
+	switch (representation) {
+		case '==':
+			return Operation.EQUAL;
+		case '!=':
+			return Operation.DIFFERENT;
+		case '>':
+			return Operation.GT;
+		case '<':
+			return Operation.LT;
+		case '>=':
+			return Operation.GTE;
+		case '<=':
+			return Operation.LTE;
+		case 'LIKE':
+			return Operation.LIKE;
+		default:
+			return Operation.EQUAL;
+	}
+}
+
+export const inverseOperationMap = {
+	[Operation.EQUAL]: '==',
+	[Operation.DIFFERENT]: '!=',
+	[Operation.GT]: '>',
+	[Operation.LT]: '<',
+	[Operation.GTE]: '>=',
+	[Operation.LTE]: '<=',
+	[Operation.LIKE]: 'LIKE'
+};

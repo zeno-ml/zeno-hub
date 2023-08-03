@@ -14,7 +14,6 @@
 	import { selectSliceCell } from './sliceCellUtil';
 
 	export let slice: Slice;
-	export let inFolder = false;
 	export let compare: boolean;
 
 	let confirmDelete = false;
@@ -89,12 +88,10 @@
 {#if editing}
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
-<div
-	class=" cell parent
-	{inFolder ? 'in-folder' : ''}
-	{selected ? 'selected' : ''} 
-	{compare ? 'compare-slice-cell' : ''}
-	{compare && compareButton ? '' : 'pointer'}"
+<button
+	class="overflow-auto border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	{selected ? ' bg-primary-light' : ''} 
+	{compare ? ' py-1' : ''}"
 	on:click={(e) => setSelected(e)}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}
@@ -102,100 +99,88 @@
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
 	on:dragstart={dragStart}
-	on:keydown={() => ({})}
 	on:dragend={dragEnd}
 >
 	{#if showTooltip}
-		<div class="tooltip-container">
-			<div class="tooltip">
-				<SliceDetails predicateGroup={slice.filterPredicates} />
-			</div>
+		<div
+			class="bg-background absolute w-fit z-10 left-0 top-full p-2 rounded border border-grey-lighter shadow-xl"
+		>
+			<SliceDetails predicateGroup={slice.filterPredicates} />
 		</div>
 	{/if}
-
-	<div class="group" style:width="100%">
-		<div class="group" style:width="100%">
-			<div class="inline">
-				<div
-					class="group"
-					style:color="var(--G1)"
-					on:mouseover={() => (showTooltip = true)}
-					on:mouseout={() => (showTooltip = false)}
-					on:focus={() => (showTooltip = true)}
-					on:blur={() => (showTooltip = false)}
-				>
-					{slice.sliceName}
-				</div>
-			</div>
-			<div
-				class="group"
-				use:clickOutside={() => {
-					showOptions = false;
-				}}
-			>
-				{#if showOptions}
-					<div id="options-container">
-						<Paper style="padding: 3px 0px;" elevation={7}>
-							<Content>
-								<div
-									class="option"
-									on:keydown={() => ({})}
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = false;
-										editing = true;
-									}}
-								>
-									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
-									<span>Edit</span>
-								</div>
-								<div
-									class="option"
-									on:keydown={() => ({})}
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = false;
-										removeSlice();
-									}}
-								>
-									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span>Remove</span>
-								</div>
-							</Content>
-						</Paper>
-					</div>
-				{/if}
-				<SliceCellResult {compare} {slice} sliceModel={$model ?? ''} />
-				{#if compare}
-					<SliceCellResult {compare} {slice} sliceModel={$comparisonModel ?? ''} />
-				{/if}
-				<div class="inline" style:cursor="pointer">
-					<div
-						style:width="36px"
-						use:clickOutside={() => {
-							hovering = false;
-						}}
-					>
-						{#if hovering}
-							<IconButton
-								size="button"
-								style="padding: 0px"
+	<div class="flex items-center w-full justify-between">
+		<span
+			on:mouseover={() => (showTooltip = true)}
+			on:mouseout={() => (showTooltip = false)}
+			on:focus={() => (showTooltip = true)}
+			on:blur={() => (showTooltip = false)}
+		>
+			{slice.sliceName}
+		</span>
+		<div
+			class="flex items-center"
+			use:clickOutside={() => {
+				showOptions = false;
+			}}
+		>
+			{#if showOptions}
+				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+					<Paper style="padding: 3px 0px;" elevation={7}>
+						<Content>
+							<button
+								class="flex items-center w-20 py px-2"
 								on:click={(e) => {
 									e.stopPropagation();
-									showOptions = !showOptions;
+									showOptions = false;
+									editing = true;
 								}}
 							>
-								<Icon tag="svg" viewBox="0 0 24 24">
-									<path fill="black" d={mdiDotsHorizontal} />
-								</Icon>
-							</IconButton>
-						{/if}
-					</div>
+								<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
+								<span class="text-xs">Edit</span>
+							</button>
+							<button
+								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = false;
+									removeSlice();
+								}}
+							>
+								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+								<span class="text-xs">Remove</span>
+							</button>
+						</Content>
+					</Paper>
 				</div>
+			{/if}
+			<SliceCellResult {compare} {slice} sliceModel={$model ?? ''} />
+			{#if compare}
+				<SliceCellResult {compare} {slice} sliceModel={$comparisonModel ?? ''} />
+			{/if}
+			<div
+				style:width="36px"
+				use:clickOutside={() => {
+					hovering = false;
+				}}
+			>
+				{#if hovering}
+					<IconButton
+						size="button"
+						style="padding: 0px"
+						on:click={(e) => {
+							e.stopPropagation();
+							showOptions = !showOptions;
+						}}
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path fill="black" d={mdiDotsHorizontal} />
+						</Icon>
+					</IconButton>
+				{/if}
 			</div>
 		</div>
 	</div>
-</div>
+</button>
 
 <Dialog
 	bind:open={confirmDelete}
@@ -215,82 +200,3 @@
 		</Button>
 	</Actions>
 </Dialog>
-
-<style>
-	.tooltip-container {
-		background: var(--G6);
-		position: absolute;
-		top: 100%;
-		max-width: 1000px;
-		width: fit-content;
-		background: var(--G6);
-		z-index: 10;
-		left: 0px;
-	}
-	.tooltip {
-		background: var(--G6);
-		padding-left: 10px;
-		padding-right: 10px;
-		box-shadow: 1px 1px 3px 1px var(--G3);
-		border-radius: 4px;
-		padding-top: 10px;
-		padding-bottom: 10px;
-	}
-	.cell {
-		position: relative;
-		overflow: visible;
-		border: 0.5px solid var(--G4);
-		border-radius: 4px;
-		margin-top: 5px;
-		display: flex;
-		padding-left: 10px;
-		padding-right: 10px;
-		min-height: 36px;
-	}
-	.compare-slice-cell {
-		padding-top: 5px;
-		padding-bottom: 5px;
-	}
-	.group {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.pointer {
-		cursor: pointer;
-	}
-	.selected {
-		background: var(--P3);
-	}
-	.inline {
-		display: flex;
-		flex-direction: row;
-	}
-	.in-folder {
-		margin-left: 35px;
-		margin-top: 0px;
-		margin-bottom: 0px;
-	}
-	#options-container {
-		top: 0px;
-		right: 0px;
-		z-index: 5;
-		position: absolute;
-		margin-top: 35px;
-	}
-	.option {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		width: 73px;
-		padding: 1px 6px;
-	}
-	.option span {
-		font-size: 12px;
-	}
-	.option:hover {
-		background: var(--G5);
-	}
-</style>

@@ -8,6 +8,7 @@
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
+	import EncodingSection from './EncodingSection.svelte';
 	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
 	import MetricsEncodingMultiChoice from './encoding-components/MetricsEncodingMultiChoice.svelte';
 
@@ -78,10 +79,10 @@
 	}
 </script>
 
-<div class="encoding-section">
-	<div class="parameters">
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>metric</h4>
-		<div class="fixed-container">
+		<div class="flex items-center">
 			<span>fixed</span>
 			<Checkbox
 				checked={fixedDimension === 'metric'}
@@ -89,58 +90,65 @@
 					(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
 			/>
 		</div>
-	</div>
-	{#if fixedDimension === 'metric'}
-		<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metrics[0]} />
-	{:else}
-		<MetricsEncodingMultiChoice
-			on:selected={(e) => selected(e, Dimensions.metric)}
-			numberValues={parameters.metrics}
-		/>
-	{/if}
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+	</svelte:fragment>
+	<svelte:fragment slot="component">
+		{#if fixedDimension === 'metric'}
+			<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metrics[0]} />
+		{:else}
+			<MetricsEncodingMultiChoice
+				on:selected={(e) => selected(e, Dimensions.metric)}
+				numberValues={parameters.metrics}
+			/>
+		{/if}
+	</svelte:fragment>
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>y</h4>
-		<div class="fixed-container">
-			<span>fixed</span>
-			<Checkbox
-				checked={fixedDimension === 'y'}
-				on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+		<div class="flex flex-col">
+			<div class="flex items-center">
+				<span>fixed</span>
+				<Checkbox
+					checked={fixedDimension === 'y'}
+					on:click={() =>
+						(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+				/>
+			</div>
+		</div>
+	</svelte:fragment>
+	<svelte:fragment slot="component">
+		<div class="flex justify-between px-3">
+			<h4 class="m-2">&nbsp;</h4>
+			<Svelecte
+				style="width: 280px; height: 30px; flex:none;"
+				value={parameters.yChannel}
+				options={[
+					{ label: 'slices', value: SlicesOrModels.SLICES },
+					{ label: 'models', value: SlicesOrModels.MODELS }
+				]}
+				searchable={false}
+				on:change={refreshY}
 			/>
 		</div>
-	</div>
-	<div class="parameters">
-		<h4 class="select-label">&nbsp;</h4>
-		<Svelecte
-			style="width: 280px; height: 30px; flex:none;"
-			value={parameters.yChannel}
-			options={[
-				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
-			]}
-			searchable={false}
-			on:change={refreshY}
-		/>
-	</div>
-	{#if fixedDimension === 'y'}
-		<svelte:component
-			this={EncodingMap[parameters.yChannel].fixed}
-			on:selected={fixedSelected}
-			numberValue={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices[0] : 0}
-			stringValue={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models[0] : ''}
-		/>
-	{:else}
-		<svelte:component
-			this={EncodingMap[parameters.yChannel].multi}
-			on:selected={(e) => selected(e, Dimensions.y)}
-			numberValues={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : []}
-			stringValues={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models : []}
-		/>
-	{/if}
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+		{#if fixedDimension === 'y'}
+			<svelte:component
+				this={EncodingMap[parameters.yChannel].fixed}
+				on:selected={fixedSelected}
+				numberValue={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices[0] : 0}
+				stringValue={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models[0] : ''}
+			/>
+		{:else}
+			<svelte:component
+				this={EncodingMap[parameters.yChannel].multi}
+				on:selected={(e) => selected(e, Dimensions.y)}
+				numberValues={parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : []}
+				stringValues={parameters.yChannel === SlicesOrModels.MODELS ? parameters.models : []}
+			/>
+		{/if}
+	</svelte:fragment>
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>color</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -152,36 +160,12 @@
 			searchable={false}
 			on:change={refreshColor}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.colorChannel].multi}
+		slot="component"
 		on:selected={(e) => selected(e, Dimensions.color)}
 		numberValues={parameters.colorChannel === SlicesOrModels.SLICES ? parameters.slices : []}
 		stringValues={parameters.colorChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
-</div>
-
-<style>
-	.encoding-section {
-		margin-bottom: 15px;
-	}
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-	.parameters h4 {
-		margin: 5px;
-	}
-	.fixed-container {
-		display: flex;
-		align-items: center;
-	}
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-</style>
+</EncodingSection>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { getMetricsForSlicesAndTags } from '$lib/api/slice';
 	import {
 		comparisonModel,
@@ -24,6 +23,8 @@
 	import ListView from './ListView.svelte';
 	import TableView from './TableView.svelte';
 	import { optionsMap } from './views/viewMap';
+
+	export let compare: boolean;
 
 	let selected = 'list';
 	let viewOptions: Record<string, unknown> | undefined = undefined;
@@ -74,14 +75,14 @@
 {#if $model && $metric}
 	{@const metricKeys = getMetricKeys($model, $metric, $selectionPredicates)}
 	{#await getMetricsForSlicesAndTags(metricKeys, [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
-		<div class="heading">
+		<div class="flex justify-between align-center">
 			<SelectionBar bind:selected {currentResult}>
 				{#if $projectConfig !== undefined && optionsMap[$projectConfig.view] !== undefined}
 					<svelte:component this={optionsMap[$projectConfig.view]} bind:viewOptions />
 				{/if}
 			</SelectionBar>
 		</div>
-		{#if $page.url.href.includes('compare')}
+		{#if compare}
 			{#if $comparisonModel !== undefined}
 				{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
 					{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}
@@ -101,12 +102,3 @@
 		{/if}
 	{/await}
 {/if}
-
-<style>
-	.heading {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-	}
-</style>

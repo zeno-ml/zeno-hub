@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { columns, model } from '$lib/stores';
+	import { getOperation, inverseOperationMap } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -15,37 +16,6 @@
 	export let deletePredicate: () => void;
 	export let index: number;
 
-	function getOperation(representation: string) {
-		switch (representation) {
-			case '==':
-				return Operation.EQUAL;
-			case '!=':
-				return Operation.DIFFERENT;
-			case '>':
-				return Operation.GT;
-			case '<':
-				return Operation.LT;
-			case '>=':
-				return Operation.GTE;
-			case '<=':
-				return Operation.LTE;
-			case 'LIKE':
-				return Operation.LIKE;
-			default:
-				return Operation.EQUAL;
-		}
-	}
-
-	let inverseOperationMap = {
-		[Operation.EQUAL]: '==',
-		[Operation.DIFFERENT]: '!=',
-		[Operation.GT]: '>',
-		[Operation.LT]: '<',
-		[Operation.GTE]: '>=',
-		[Operation.LTE]: '<=',
-		[Operation.LIKE]: 'LIKE'
-	};
-
 	function joinChange(e: CustomEvent) {
 		// avoid backspace or delete
 		predicate.join = e.detail !== null ? e.detail.label : Join.AND;
@@ -60,9 +30,9 @@
 	}
 </script>
 
-<div id="group">
+<div class="flex mb-1 mt-1">
 	{#if index !== 0}
-		<div class="selector">
+		<div class="mr-2.5">
 			<Svelecte
 				style={'width: 80px'}
 				value={predicate.join}
@@ -74,10 +44,10 @@
 		</div>
 	{:else}
 		<div style="width: 90px">
-			<p>where</p>
+			<p class="ml-1 mt-1">where</p>
 		</div>
 	{/if}
-	<div class="selector">
+	<div class="mr-2.5">
 		<Svelecte
 			bind:value={predicate.column}
 			placeholder={'Column'}
@@ -99,7 +69,7 @@
 			}}
 		/>
 	</div>
-	<div class="selector">
+	<div class="mr-2.5">
 		{#if predicate.column}
 			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
@@ -135,13 +105,17 @@
 					options={['true', 'false']}
 				/>
 			{:else if predicate.column.dataType !== MetadataType.OTHER}
-				<input type="text" bind:value={predicate.value} />
+				<input
+					type="text"
+					bind:value={predicate.value}
+					class="h-8 border border-grey-lighter rounded"
+				/>
 			{/if}
 		{:else}
 			<Svelecte />
 		{/if}
 	</div>
-	<div class="selector">
+	<div class="mr-2.5">
 		<IconButton on:click={deletePredicate} style="height:10px; margin-top: 5px; color: var(--G2)">
 			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="currentColor" d={mdiTrashCanOutline} />
@@ -149,25 +123,3 @@
 		</IconButton>
 	</div>
 </div>
-
-<style>
-	.selector {
-		margin-right: 10px;
-	}
-	#group {
-		display: flex;
-		flex-direction: inline;
-		margin-bottom: 5px;
-		margin-top: 5px;
-	}
-	input {
-		height: 34px;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-	}
-	p {
-		margin: 0px;
-		margin-left: 5px;
-		margin-top: 5px;
-	}
-</style>

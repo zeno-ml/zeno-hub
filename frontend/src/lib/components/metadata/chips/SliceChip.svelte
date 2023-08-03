@@ -8,7 +8,7 @@
 	$: slice = $slices.find((slice) => slice.id === sliceIdx);
 </script>
 
-<div class="meta-chip">
+<div class="px-1 py-2.5 bg-primary-light mx-1 my rounded w-fit">
 	{slice !== undefined ? slice.sliceName : ''}
 	<TrailingIcon
 		class="remove material-icons"
@@ -21,16 +21,3 @@
 		cancel
 	</TrailingIcon>
 </div>
-
-<style>
-	.meta-chip {
-		padding: 5px 10px;
-		background: var(--P3);
-		margin-left: 5px;
-		margin-right: 5px;
-		margin-top: 2px;
-		margin-bottom: 2px;
-		border-radius: 4px;
-		width: fit-content;
-	}
-</style>

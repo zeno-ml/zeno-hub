@@ -24,20 +24,7 @@
 	}
 </script>
 
-<div class="meta-chip">
+<div class="px-1 py-2.5 bg-greenish-light mx-1 my rounded-lg w-fit">
 	{tagId}
 	<TrailingIcon class="remove material-icons" on:click={cancelClicked}>cancel</TrailingIcon>
 </div>
-
-<style>
-	.meta-chip {
-		padding: 5px 10px;
-		background: var(--N2);
-		margin-left: 5px;
-		margin-right: 5px;
-		margin-top: 2px;
-		margin-bottom: 2px;
-		border-radius: 15px;
-		width: fit-content;
-	}
-</style>

@@ -177,11 +177,13 @@
 </script>
 
 {#if !$page.url.href.includes('compare')}
-	<div id="metric-header" class="inline" style:margin-top="10px">
-		<div class="inline">
+	<div
+		class="flex items-center justify-between pt-2.5 sticky top-24 border-b border-grey-lighter bg-yellowish-light z-10"
+	>
+		<div class="flex items-center justify-between">
 			<h4>Metadata</h4>
 			<div
-				class="information-tooltip"
+				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content:
 						'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data. Add new metadata with @distill functions.',
@@ -229,24 +231,3 @@
 		{/if}
 	{/if}
 {/if}
-
-<style>
-	#metric-header {
-		position: sticky;
-		top: 110px;
-		z-index: 2;
-		border-bottom: 0.5px solid var(--G5);
-		background-color: var(--Y2);
-	}
-	.inline {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.information-tooltip {
-		width: 24px;
-		height: 24px;
-		cursor: help;
-		fill: var(--G2);
-	}
-</style>

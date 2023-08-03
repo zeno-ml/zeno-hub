@@ -135,11 +135,11 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<div class="inline-justify">
-		<div class="inline">
-			<h3 class="title">Slice Finder</h3>
+	<div class="flex items-center justify-between">
+		<div class="flex items-center">
+			<h3 class="text-left pl-5 mb-0 mt-0">Slice Finder</h3>
 			<div
-				class="information-tooltip"
+				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content: $page.url.href.includes('compare')
 						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two models.'
@@ -160,14 +160,14 @@
 			</Icon>
 		</IconButton>
 	</div>
-	<div class="inline">
+	<div class="flex items-center">
 		<div style:margin-left={'20px'}>
 			<div style="display:flex">
-				<div class="options-header">
+				<div class="mt-2 mb-2">
 					{$page.url.href.includes('compare') ? 'Difference Column' : 'Metric Column'}
 				</div>
 				<div
-					class="information-tooltip"
+					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: $page.url.href.includes('compare')
@@ -195,9 +195,9 @@
 		</div>
 		<div style:width="100%">
 			<div style="display:flex">
-				<div class="options-header">Search Columns</div>
+				<div class="mb-2 mt-2">Search Columns</div>
 				<div
-					class="information-tooltip"
+					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: 'Metadata columns used to create slices',
@@ -224,9 +224,9 @@
 		</div>
 		<div>
 			<div style="display:flex">
-				<div class="options-header">Alpha</div>
+				<div class="mb-2 mt-2">Alpha</div>
 				<div
-					class="information-tooltip"
+					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content:
@@ -251,9 +251,9 @@
 		</div>
 		<div>
 			<div style="display:flex">
-				<div class="options-header">Max. Lattice</div>
+				<div class="mb-2 mt-2">Max. Lattice</div>
 				<div
-					class="information-tooltip"
+					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: 'Maximum number of predicates',
@@ -275,9 +275,9 @@
 		</div>
 		<div>
 			<div style="display:flex">
-				<div class="options-header">Order By</div>
+				<div class="mb-2 mt-2">Order By</div>
 				<div
-					class="information-tooltip"
+					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: $page.url.href.includes('compare')
@@ -305,14 +305,14 @@
 	</div>
 	{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || $selectionIds !== undefined}
 		<div style="margin-left: 20px;margin-right: 20px">
-			<div class="options-header">Search for slices in:</div>
-			<div class="chipbar">
+			<div class="mb-2 mt-2">Search for slices in:</div>
+			<div class="flex border border-grey-lighter rounded">
 				<ChipsWrapper />
 			</div>
 		</div>
 	{/if}
 	{#if sliceFinderReturn.slices.length > 0}
-		<div class="generation">
+		<div class="flex justify-between items-center m-5">
 			<Button
 				variant="outlined"
 				style="color:white; background-color: var(--logo);"
@@ -322,22 +322,22 @@
 			>
 				Generate Slices
 			</Button>
-			<span class="message">{sliceFinderMessage}</span>
+			<span class="m-2.5">{sliceFinderMessage}</span>
 			<div>
-				<span class="average"> Overall Average: </span>
+				<span class="mr-3"> Overall Average: </span>
 				<span class="average-value" style="color: var(--logo);">
 					{sliceFinderReturn.overallMetric ? sliceFinderReturn.overallMetric.toFixed(2) : ''}
 				</span>
 			</div>
 		</div>
-		<div class="generation" style="margin-bottom:0px;">
+		<div class="flex justify-between items-center m-5" style="margin-bottom:0px;">
 			<h4 style="margin-bottom:0px;">Filter Predicates</h4>
 			<h4 style="margin-bottom:0px;">
 				Average Slice Metric {$page.url.href.includes('compare') ? 'difference' : ''}
 			</h4>
 		</div>
 	{:else}
-		<div id="initial">
+		<div class="flex flex-col items-center justify-center m-5">
 			<Button
 				variant="outlined"
 				style="color:white; background-color: var(--logo);"
@@ -347,15 +347,15 @@
 			>
 				Generate Slices
 			</Button>
-			<span class="intial-text">
+			<span class="m-2.5 ml-5">
 				Find slices with {$page.url.href.includes('compare')
 					? 'the largest difference'
 					: 'the lowest performance'}
 			</span>
-			<span class="message">{sliceFinderMessage}</span>
+			<span class="m-2.5">{sliceFinderMessage}</span>
 		</div>
 	{/if}
-	<div class="slices">
+	<div class="flex flex-col overflow-y-auto">
 		{#each sliceFinderReturn.slices as slice, idx}
 			{@const metric = sliceFinderReturn.metrics[idx].toFixed(2)}
 			{@const size = sliceFinderReturn.sizes[idx]}
@@ -363,70 +363,3 @@
 		{/each}
 	</div>
 </Popup>
-
-<style>
-	.intial-text {
-		margin: 20px 10px 10px 10px;
-		font-size: 16px;
-	}
-	.message {
-		font-size: 14px;
-		margin: 10px;
-	}
-	.chipbar {
-		display: flex;
-		flex-direction: row;
-		border: 1px solid var(--G4);
-		border-radius: 4px;
-	}
-	.average {
-		font-weight: 400;
-		color: var(--G2);
-		margin-right: 15px;
-	}
-	#initial {
-		display: flex;
-		flex-direction: column;
-		height: 28vh;
-		margin: 20px;
-		align-items: center;
-		justify-content: center;
-	}
-	.generation {
-		margin: 20px;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-	.options-header {
-		margin-top: 5px;
-		margin-bottom: 5px;
-		color: var(--G2);
-	}
-	.title {
-		text-align: left;
-		padding-left: 20px;
-		margin-bottom: 0px;
-		margin-top: 0px;
-	}
-	.inline {
-		display: flex;
-		align-items: center;
-	}
-	.inline-justify {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-	.information-tooltip {
-		width: 24px;
-		height: 24px;
-		cursor: help;
-		fill: var(--G2);
-	}
-	.slices {
-		display: flex;
-		flex-direction: column;
-		overflow-y: auto;
-	}
-</style>

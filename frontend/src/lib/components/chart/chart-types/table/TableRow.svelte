@@ -32,12 +32,3 @@
 		{/if}
 	{/each}
 </Row>
-
-<style>
-	:global(.sticky) {
-		overflow: visible;
-		left: 0px;
-		background: var(--G6);
-		z-index: 0;
-	}
-</style>

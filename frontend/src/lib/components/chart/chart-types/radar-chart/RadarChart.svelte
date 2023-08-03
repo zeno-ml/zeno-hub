@@ -28,32 +28,16 @@
 	}
 </script>
 
-<div class="main">
-	<div class="model-result">
-		<h4>{getFixedName()}</h4>
-		<Vega
-			spec={generateSpec(parameters)}
-			{data}
-			options={{
-				actions: { source: false, editor: false, compiled: false },
-				width: 800,
-				height: 700,
-				scaleFactor: {
-					png: 3
-				}
-			}}
-		/>
-	</div>
-</div>
-
-<style>
-	.main {
-		margin-left: 20px;
-	}
-	.model-result {
-		margin-top: 30px;
-	}
-	.model-result h4 {
-		margin: 0px;
-	}
-</style>
+<h4 class="m-0">{getFixedName()}</h4>
+<Vega
+	spec={generateSpec(parameters)}
+	{data}
+	options={{
+		actions: { source: false, editor: false, compiled: false },
+		width: 800,
+		height: 700,
+		scaleFactor: {
+			png: 3
+		}
+	}}
+/>

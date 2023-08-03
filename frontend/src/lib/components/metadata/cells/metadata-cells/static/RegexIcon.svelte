@@ -1,5 +1,10 @@
 <!-- Referece: https://www.iconbolt.com/iconsets/codicons/regex -->
-<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="var(--G2)"
+<svg
+	width="16"
+	height="16"
+	viewBox="0 0 16 16"
+	xmlns="http://www.w3.org/2000/svg"
+	class="fill-grey-dark"
 	><path
 		fill-rule="evenodd"
 		clip-rule="evenodd"

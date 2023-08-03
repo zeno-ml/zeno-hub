@@ -9,28 +9,15 @@
 	$: parameters = chart.parameters as XCParameters;
 </script>
 
-<div class="main">
-	<div class="model-result">
-		<VegaLite
-			spec={generateSpec(parameters)}
-			{data}
-			options={{
-				actions: { source: false, editor: false, compiled: false },
-				width: 1000,
-				height: 400,
-				scaleFactor: {
-					png: 3
-				}
-			}}
-		/>
-	</div>
-</div>
-
-<style>
-	.main {
-		margin-left: 20px;
-	}
-	.model-result {
-		margin-top: 30px;
-	}
-</style>
+<VegaLite
+	spec={generateSpec(parameters)}
+	{data}
+	options={{
+		actions: { source: false, editor: false, compiled: false },
+		width: 1000,
+		height: 400,
+		scaleFactor: {
+			png: 3
+		}
+	}}
+/>

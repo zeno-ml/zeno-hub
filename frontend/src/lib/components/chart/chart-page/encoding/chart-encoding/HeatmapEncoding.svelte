@@ -3,6 +3,7 @@
 	import { SlicesOrModels, type Chart, type HeatmapParameters } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
+	import EncodingSection from './EncodingSection.svelte';
 	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
 
 	export let chart: Chart;
@@ -69,8 +70,8 @@
 	}
 </script>
 
-<div class="encoding-section">
-	<div class="parameters">
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>x</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -82,16 +83,17 @@
 			searchable={false}
 			on:change={refreshX}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.xChannel].multi}
+		slot="component"
 		on:selected={(e) => selected(e, Dimensions.x)}
 		numberValues={parameters.xChannel === SlicesOrModels.SLICES ? numberValues : []}
 		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>y</h4>
 		<Svelecte
 			style="width: 280px; height: 30px; flex:none"
@@ -103,32 +105,22 @@
 			searchable={false}
 			on:change={refreshY}
 		/>
-	</div>
+	</svelte:fragment>
 	<svelte:component
 		this={EncodingMap[parameters.yChannel].multi}
+		slot="component"
 		on:selected={(e) => selected(e, Dimensions.y)}
 		numberValues={parameters.yChannel === SlicesOrModels.SLICES ? numberValues : []}
 		stringValues={parameters.yChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
-</div>
-<div class="encoding-section">
-	<div class="parameters">
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
 		<h4>color</h4>
-		<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metric} />
-	</div>
-</div>
-
-<style>
-	.encoding-section {
-		margin-bottom: 15px;
-	}
-	.parameters {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 10px;
-	}
-	.parameters h4 {
-		margin: 5px;
-	}
-</style>
+		<MetricsEncodingDropdown
+			on:selected={fixedSelected}
+			numberValue={parameters.metric}
+			container={false}
+		/>
+	</svelte:fragment>
+</EncodingSection>

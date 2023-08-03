@@ -49,7 +49,9 @@
 	<NewFolderPopup on:close={() => (editing = false)} folderToEdit={folder} />
 {/if}
 <div
-	class="cell {dragOver ? 'hover' : ''} {expandFolder ? 'expanded' : ''}"
+	class="relative flex justify-between px-2.5 mt-1 rounded h-9 bg-grey-lighter {dragOver
+		? 'bg-grey-light'
+		: ''} {expandFolder ? 'mb-0' : ''}"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
@@ -59,7 +61,7 @@
 	on:dragleave={() => (dragOver = false)}
 	on:drop={dragDropped}
 >
-	<div class="inline">
+	<div class="flex items-center">
 		<div
 			style="width: 24px; height: 24px; cursor: pointer; margin-right: 10px;"
 			on:keydown={() => ({})}
@@ -71,13 +73,13 @@
 		</div>
 		{folder.name}
 	</div>
-	<div class="inline" use:clickOutside={() => (showOptions = false)}>
+	<div class="flex items-center" use:clickOutside={() => (showOptions = false)}>
 		{#if showOptions}
-			<div id="options-container">
+			<div class="top-0 right-0 absolute mt-9">
 				<Paper style="padding: 3px 0px;" elevation={7}>
 					<Content>
 						<div
-							class="option"
+							class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 							on:keydown={() => ({})}
 							on:click={(e) => {
 								e.stopPropagation();
@@ -86,10 +88,10 @@
 							}}
 						>
 							<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
-							<span>Edit</span>
+							<span class="text-xs">Edit</span>
 						</div>
 						<div
-							class="option"
+							class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 							on:keydown={() => ({})}
 							on:click={(e) => {
 								e.stopPropagation();
@@ -107,7 +109,7 @@
 							}}
 						>
 							<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-							<span>Remove</span>
+							<span class="text-xs">Remove</span>
 						</div>
 					</Content>
 				</Paper>
@@ -116,7 +118,7 @@
 		<div style:margin-right="10px">
 			{sls.length} slice{sls.length === 1 ? '' : 's'}
 		</div>
-		<div class="inline" style:cursor="pointer">
+		<div class="flex items-center" style:cursor="pointer">
 			<div style:width="36px">
 				{#if hovering}
 					<IconButton
@@ -137,56 +139,9 @@
 	</div>
 </div>
 {#if expandFolder}
-	<div transition:slide>
+	<div transition:slide class="ml-9">
 		{#each sls as s}
-			<SliceCell compare={$page.url.href.includes('compare')} slice={s} inFolder={true} />
+			<SliceCell compare={$page.url.href.includes('compare')} slice={s} />
 		{/each}
 	</div>
 {/if}
-
-<style>
-	.cell {
-		position: relative;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding-left: 10px;
-		padding-right: 10px;
-		margin-top: 5px;
-		border-radius: 4px;
-		height: 36px;
-		background: var(--G5);
-	}
-	#options-container {
-		top: 0px;
-		right: 0px;
-		z-index: 5;
-		position: absolute;
-		margin-top: 35px;
-	}
-	.option {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		cursor: pointer;
-		width: 73px;
-		padding: 1px 6px;
-	}
-	.option span {
-		font-size: 12px;
-	}
-	.option:hover {
-		background: var(--G5);
-	}
-	.expanded {
-		margin-bottom: 0px;
-	}
-	.hover {
-		background: var(--G4);
-	}
-	.inline {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-	}
-</style>

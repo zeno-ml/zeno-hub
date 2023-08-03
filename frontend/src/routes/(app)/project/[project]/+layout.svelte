@@ -27,18 +27,6 @@
 	}
 </script>
 
-<div class="container">
+<div class="w-full h-full flex">
 	<slot />
 </div>
-
-<style>
-	.container {
-		width: 100%;
-		height: 100%;
-		display: flex;
-	}
-
-	* :global(.demo-list) {
-		max-width: 50px;
-	}
-</style>
