@@ -7,7 +7,7 @@
 	export let hash: string;
 </script>
 
-<div class="px-1 py-2.5 bg-primary-light mx-1 my rounded w-fit">
+<div class="px-2.5 py-1.5 bg-primary-light mx-1 my rounded-2xl w-fit">
 	<span>
 		{#if chip[0].column.dataType === MetadataType.CONTINUOUS}
 			{parseFloat(`${chip[0].value}`).toFixed(2)}
