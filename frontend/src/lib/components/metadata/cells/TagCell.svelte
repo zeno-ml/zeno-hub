@@ -195,7 +195,7 @@
 			{#await result then res}
 				{#if res !== null}
 					<span style:margin-right="10px">
-						{res.metric !== undefined ? res.metric.toFixed(2) : ''}
+						{res.metric !== undefined && res.metric !== null ? res.metric.toFixed(2) : ''}
 					</span>
 					<span class="italic text-grey-darker mr-2.5">
 						({res.size.toLocaleString()})

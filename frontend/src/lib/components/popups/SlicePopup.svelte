@@ -66,7 +66,7 @@
 		if (sliceToEdit) {
 			sliceName = sliceToEdit.sliceName;
 			predicateGroup = sliceToEdit.filterPredicates;
-			folderId = sliceToEdit.folderId;
+			folderId = sliceToEdit.folderId === null ? undefined : sliceToEdit.folderId;
 			originalName = sliceName;
 			// deep copy of predicate group to avoid sharing nested objects
 			originalPredicates = JSON.parse(JSON.stringify(predicateGroup));

@@ -15,7 +15,7 @@ export type SliceFinderRequest = {
 	orderBy: string;
 	alpha: number;
 	maxLattice: number;
-	compareColumn?: ZenoColumn;
-	filterPredicates?: FilterPredicateGroup;
-	items?: Array<string>;
+	compareColumn?: ZenoColumn | null;
+	filterPredicates?: FilterPredicateGroup | null;
+	items?: Array<string> | null;
 };

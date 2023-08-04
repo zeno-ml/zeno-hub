@@ -8,5 +8,5 @@
  */
 export type HistogramBucket = {
 	bucket: number | boolean | string;
-	bucketEnd?: number | boolean | string;
+	bucketEnd?: number | boolean | string | null;
 };

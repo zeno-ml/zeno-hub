@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import Any, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 def to_camel(string: str) -> str:
@@ -21,11 +21,7 @@ def to_camel(string: str) -> str:
 class CamelModel(BaseModel):
     """Converting snake_case pydantic models to camelCase models."""
 
-    class Config:
-        """Configuration for a camelCase based model conversion."""
-
-        alias_generator = to_camel
-        allow_population_by_field_name = True
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
 class ProjectConfig(CamelModel):
@@ -83,7 +79,7 @@ class ZenoColumn(CamelModel):
     column_type: ZenoColumnType
     name: str
     data_type: MetadataType
-    model: Optional[str]
+    model: Optional[str] = None
 
 
 class LabelSpec(CamelModel):
@@ -105,7 +101,7 @@ class PredistillSpec(CamelModel):
     """Specification for predistill metadata in Zeno."""
 
     col_name: str
-    value: Any
+    value: Any = None
     item: str
     type: MetadataType
 
@@ -114,7 +110,7 @@ class PostdistillSpec(CamelModel):
     """Specification for postdistill data in Zeno."""
 
     col_name: str
-    value: Any
+    value: Any = None
     item: str
     type: MetadataType
     model: str
@@ -123,5 +119,5 @@ class PostdistillSpec(CamelModel):
 class GroupMetric(CamelModel):
     """Specification for a metric on a group of items."""
 
-    metric: Union[float, None]
+    metric: Union[float, None] = None
     size: int

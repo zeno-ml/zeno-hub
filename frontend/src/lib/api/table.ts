@@ -18,6 +18,7 @@ export async function getFilteredTable(
 		(c) =>
 			c.columnType !== ZenoColumnType.EMBEDDING &&
 			c.model !== undefined &&
+			c.model !== null &&
 			(filterModels.includes(c.model) || c.model === '')
 	);
 

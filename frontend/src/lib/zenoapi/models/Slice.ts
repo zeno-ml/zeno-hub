@@ -11,6 +11,6 @@ import type { FilterPredicateGroup } from './FilterPredicateGroup';
 export type Slice = {
 	id: number;
 	sliceName: string;
-	folderId?: number;
+	folderId?: number | null;
 	filterPredicates: FilterPredicateGroup;
 };

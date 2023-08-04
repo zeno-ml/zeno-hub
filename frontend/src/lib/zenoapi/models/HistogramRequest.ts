@@ -12,8 +12,8 @@ import type { Metric } from './Metric';
  */
 export type HistogramRequest = {
 	columnRequests: Array<HistogramColumnRequest>;
-	filterPredicates?: FilterPredicateGroup;
-	model?: string;
-	metric?: Metric;
-	items?: Array<string>;
+	filterPredicates?: FilterPredicateGroup | null;
+	model?: string | null;
+	metric?: Metric | null;
+	items?: Array<string> | null;
 };

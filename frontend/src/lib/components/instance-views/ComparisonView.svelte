@@ -72,12 +72,12 @@
 	}
 	$: if (modelAResult !== undefined) {
 		lastPage = Math.max(Math.ceil(modelAResult[0].size / $rowsPerPage) - 1, 0);
-		if (modelAResult[0].metric !== undefined)
+		if (modelAResult[0].metric !== undefined && modelAResult[0].metric !== null)
 			metricA = Math.round(modelAResult[0].metric * 100) / 100;
 	}
 	$: if (modelBResult !== undefined) {
 		lastPage = Math.max(Math.ceil(modelBResult[0].size / $rowsPerPage) - 1, 0);
-		if (modelBResult[0].metric !== undefined)
+		if (modelBResult[0].metric !== undefined && modelBResult[0].metric !== null)
 			metricA = Math.round(modelBResult[0].metric * 100) / 100;
 	}
 	$: modelAColumn = $columns.find(

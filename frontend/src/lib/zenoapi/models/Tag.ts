@@ -9,6 +9,6 @@
 export type Tag = {
 	id: number;
 	tagName: string;
-	folderId?: number;
+	folderId?: number | null;
 	items: Array<string>;
 };
