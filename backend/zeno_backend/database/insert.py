@@ -21,7 +21,7 @@ from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
-def setup_project(description: ProjectConfig):
+def setup_project(description: ProjectConfig, user: User):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -31,6 +31,7 @@ def setup_project(description: ProjectConfig):
     Args:
         description (ProjectConfig): the configuration with which to initialize the new
         project.
+        user (User): the user who is setting up the project and becomes its admin.
 
     Raises:
         Exception: something went wrong in the process of creating the new project in
@@ -50,6 +51,11 @@ def setup_project(description: ProjectConfig):
                 description.num_items,
                 description.public,
             ],
+        )
+        db.execute(
+            "INSERT INTO user_project (user_id, project_uuid, editor) "
+            "VALUES (%s,%s,%s)",
+            [user.id, description.uuid, True],
         )
         db.execute(
             sql.SQL("CREATE TABLE {}(item TEXT NOT NULL PRIMARY KEY);").format(

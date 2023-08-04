@@ -348,8 +348,9 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/project", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_project(description: ProjectConfig):
+    @api_app.post("/project", tags=["zeno"])
+    def add_project(description: ProjectConfig, current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
         try:
             Path("data", description.uuid).mkdir()
         except Exception as exc:
@@ -357,7 +358,7 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: Project already exists."),
             ) from exc
-        insert.setup_project(description)
+        insert.setup_project(description, user)
 
     @api_app.post("/item/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     async def add_item(project: str, name: str, file: UploadFile = File(...)):

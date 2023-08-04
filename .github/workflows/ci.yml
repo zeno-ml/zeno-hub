@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  lint-svelte:
+  lint-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,7 +16,7 @@ jobs:
       - name: linting
         run: cd frontend && npm run lint
 
-  check-svelte:
+  check-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -25,7 +25,7 @@ jobs:
       - name: Svelte check
         run: cd frontend && npm run check
 
-  format-python:
+  format-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -34,13 +34,30 @@ jobs:
           options: "--check --verbose"
           src: "backend/zeno_backend/"
 
-  lint-python:
+  lint-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: jpetrucciani/ruff-check@main
         with:
           path: "backend/zeno_backend/"
+
+  format-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "api/zeno_api/"
+
+  lint-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jpetrucciani/ruff-check@main
+        with:
+          path: "api/zeno_api/"
 
   typecheck-python:
     runs-on: ubuntu-latest
