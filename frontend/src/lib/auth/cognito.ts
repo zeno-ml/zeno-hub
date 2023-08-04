@@ -9,6 +9,7 @@ import {
 	type ISignUpResult
 } from 'amazon-cognito-identity-js';
 import { noop } from 'svelte/internal';
+import type { AuthUser } from './types';
 
 export type CognitoUserSessionType = CognitoUserSession;
 
@@ -59,9 +60,7 @@ export const resendCode = (Username: string) => {
  * @param sessionData - Session data of the user with the refresh token
  * @returns - Promise with the new user object with tokens and expiration date
  */
-export const refreshAccessToken = async (sessionData: {
-	refreshToken: string;
-}): Promise<CognitoUserSession> => {
+export const refreshAccessToken = async (refreshToken: string): Promise<CognitoUserSession> => {
 	const cognitoUser = getPool().getCurrentUser();
 	// Check if the user is logged in
 	if (!cognitoUser) {
@@ -69,7 +68,7 @@ export const refreshAccessToken = async (sessionData: {
 	}
 	// Refresh the session
 	const RefreshToken = new CognitoRefreshToken({
-		RefreshToken: sessionData.refreshToken
+		RefreshToken: refreshToken
 	});
 	return new Promise<CognitoUserSession>((resolve) => {
 		cognitoUser.refreshSession(RefreshToken, (_resp, session: CognitoUserSession) => {
@@ -119,3 +118,17 @@ export async function sendPasswordResetCode(username: string) {
 	const user = new CognitoUser({ Username: username, Pool: getPool() });
 	user.forgotPassword({ onSuccess: noop, onFailure: noop });
 }
+
+export const extractUserFromSession = (session: CognitoUserSessionType): AuthUser => {
+	if (!session?.isValid?.()) throw new Error('Invalid session');
+	const user = session.getIdToken().payload;
+	return {
+		id: user.sub,
+		name: user['cognito:username'],
+		email: user.email,
+		image: user.picture,
+		accessToken: session.getAccessToken().getJwtToken(),
+		accessTokenExpires: session.getAccessToken().getExpiration(),
+		refreshToken: session.getRefreshToken().getToken()
+	};
+};
