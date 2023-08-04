@@ -18,7 +18,7 @@ import { get } from 'svelte/store';
 
 export interface HistogramEntry {
 	bucket: number | string | boolean;
-	bucketEnd?: number | string | boolean;
+	bucketEnd?: number | string | boolean | null;
 	count?: number;
 	filteredCount?: number;
 	metric?: number;
@@ -111,7 +111,7 @@ export async function getHistogramCounts(
 
 // Since a user might change the selection before we get metrics,
 // make this fetch request cancellable.
-let histogramMetricRequest: CancelablePromise<Array<Array<number>>>;
+let histogramMetricRequest: CancelablePromise<Array<Array<number | null>>>;
 /**
  * Fetch histogram metrics for the buckets of metadata columns.
  *
@@ -170,7 +170,7 @@ export async function getHistogramMetrics(
 				histograms.set(
 					k,
 					hist.map((h, j) => {
-						h.metric = res[i][j];
+						h.metric = res[i][j] || 0;
 						return h;
 					})
 				);
