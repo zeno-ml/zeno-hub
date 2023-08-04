@@ -431,13 +431,13 @@ export class ZenoService {
 	 * Calculate Histogram Metrics
 	 * @param project
 	 * @param requestBody
-	 * @returns number Successful Response
+	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
 	public static calculateHistogramMetrics(
 		project: string,
 		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
+	): CancelablePromise<Array<Array<number | null>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/histogram-metrics/{project}',

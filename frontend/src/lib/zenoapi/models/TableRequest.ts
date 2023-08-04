@@ -11,11 +11,11 @@ import type { ZenoColumn } from './ZenoColumn';
  */
 export type TableRequest = {
 	columns: Array<ZenoColumn>;
-	diffColumn1?: ZenoColumn;
-	diffColumn2?: ZenoColumn;
+	diffColumn1?: ZenoColumn | null;
+	diffColumn2?: ZenoColumn | null;
 	offset: number;
 	limit: number;
-	filterPredicates?: FilterPredicateGroup;
-	sort: Array<any>;
-	items?: Array<string>;
+	filterPredicates?: FilterPredicateGroup | null;
+	sort: any[];
+	items?: Array<string> | null;
 };

@@ -14,5 +14,5 @@ export type ZenoColumn = {
 	columnType: ZenoColumnType;
 	name: string;
 	dataType: MetadataType;
-	model?: string;
+	model?: string | null;
 };

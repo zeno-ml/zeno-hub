@@ -10,6 +10,7 @@ import type { Tag } from './Tag';
  * Specification of TagMetricKeys in Zeno.
  *
  * TagMetricKeys can be used to calculate metrics for specific tags.
+ *
  */
 export type TagMetricKey = {
 	tag: Tag;

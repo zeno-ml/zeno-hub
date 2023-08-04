@@ -10,7 +10,7 @@ class Tag(CamelModel):
 
     id: int
     tag_name: str
-    folder_id: Optional[int]
+    folder_id: Optional[int] = None
     items: List[str]
 
 

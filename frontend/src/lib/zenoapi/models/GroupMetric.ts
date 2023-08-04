@@ -7,6 +7,6 @@
  * Specification for a metric on a group of items.
  */
 export type GroupMetric = {
-	metric?: number;
+	metric?: number | null;
 	size: number;
 };

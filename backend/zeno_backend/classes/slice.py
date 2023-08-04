@@ -10,5 +10,5 @@ class Slice(CamelModel):
 
     id: int
     slice_name: str
-    folder_id: Optional[int]
+    folder_id: Optional[int] = None
     filter_predicates: FilterPredicateGroup

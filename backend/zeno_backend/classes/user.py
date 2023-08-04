@@ -9,7 +9,7 @@ class User(CamelModel):
 
     id: int
     name: str
-    admin: Optional[bool]
+    admin: Optional[bool] = None
 
 
 class Organization(CamelModel):
