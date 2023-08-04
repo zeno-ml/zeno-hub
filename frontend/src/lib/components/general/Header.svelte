@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { projectConfig } from '$lib/stores';
+	import { authToken, projectConfig } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -69,7 +69,7 @@
 				</Icon>
 			</IconButton>
 			<form method="POST" action="/logout">
-				<IconButton>
+				<IconButton on:click={() => authToken.set(undefined)}>
 					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill="black" d={mdiLogout} />
 					</Icon>

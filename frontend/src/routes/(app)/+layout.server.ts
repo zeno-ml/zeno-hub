@@ -1,4 +1,7 @@
+import { dev } from '$app/environment';
 import { env } from '$env/dynamic/public';
+import { extractUserFromSession, refreshAccessToken } from '$lib/auth/cognito.js';
+import type { AuthUser } from '$lib/auth/types.js';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
@@ -7,16 +10,39 @@ export const load = async ({ cookies, url }) => {
 	if (!userCookie) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
-	const cognitoUser = JSON.parse(userCookie);
+	const cognitoUser = JSON.parse(userCookie) as AuthUser;
+	if (new Date() > new Date(cognitoUser.accessTokenExpires * 1000)) {
+		try {
+			const res = await refreshAccessToken(cognitoUser.refreshToken);
+			const user = extractUserFromSession(res);
+			OpenAPI.HEADERS = {
+				Authorization: 'Bearer ' + user.accessToken
+			};
+			cookies.set('loggedIn', JSON.stringify(user), {
+				path: '/',
+				httpOnly: true,
+				sameSite: 'strict',
+				secure: !dev,
+				maxAge: 60 * 60 * 24 * 30
+			});
+		} catch (error) {
+			cookies.delete('loggedIn', { path: '/' });
+			throw redirect(303, `/login?redirectTo=${url.pathname}`);
+		}
+	}
 	// If the user is not authenticated, redirect to the login page
 	if (!cognitoUser.id || !cognitoUser.accessToken) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-	const user = await ZenoService.login(cognitoUser.email);
+	OpenAPI.HEADERS = {
+		Authorization: 'Bearer ' + cognitoUser.accessToken
+	};
+	const user = await ZenoService.login(cognitoUser.name);
 
 	return {
-		user
+		user,
+		cognitoUser
 	};
 };

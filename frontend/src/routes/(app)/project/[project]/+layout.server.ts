@@ -14,9 +14,11 @@ export async function load({ cookies, params, url }) {
 	}
 
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-	const user = await ZenoService.login(cognitoUser.email);
+	OpenAPI.HEADERS = {
+		Authorization: 'Bearer ' + cognitoUser.accessToken
+	};
 
-	const projectConfig = await ZenoService.getProject(params.project, user);
+	const projectConfig = await ZenoService.getProject(params.project);
 	if (!projectConfig) {
 		throw error(404, 'Could not load project config');
 	}
@@ -52,6 +54,7 @@ export async function load({ cookies, params, url }) {
 		models: models,
 		metrics: metrics,
 		folders: folders,
-		tags: tags
+		tags: tags,
+		cognitoUser: cognitoUser
 	};
 }

@@ -73,7 +73,7 @@
 						{#each members as member}
 							<tr>
 								<td>
-									{member.email}
+									{member.name}
 								</td>
 								<td>
 									<Checkbox

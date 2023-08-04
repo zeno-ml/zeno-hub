@@ -14,6 +14,7 @@ import { interpolate } from 'd3-interpolate';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 
 export const projectConfig: Writable<ProjectConfig | undefined> = writable(undefined);
+export const authToken: Writable<string | undefined> = writable(undefined);
 export const slices: Writable<Slice[]> = writable([]);
 export const columns: Writable<ZenoColumn[]> = writable([]);
 export const models: Writable<string[]> = writable([]);

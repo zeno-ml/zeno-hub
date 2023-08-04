@@ -1,6 +1,6 @@
 import { dev } from '$app/environment';
-import { getSession, type CognitoUserSessionType } from '$lib/auth/cognito';
-import type { AuthUser } from '$lib/auth/types';
+import { extractUserFromSession, getSession } from '$lib/auth/cognito';
+import { OpenAPI } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -33,6 +33,9 @@ export const actions: Actions = {
 		try {
 			const res = await getSession(username, password);
 			const user = extractUserFromSession(res);
+			OpenAPI.HEADERS = {
+				Authorization: 'Bearer ' + user.accessToken
+			};
 			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
 				httpOnly: true,
@@ -50,18 +53,4 @@ export const actions: Actions = {
 		}
 		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
 	}
-};
-
-const extractUserFromSession = (session: CognitoUserSessionType): AuthUser => {
-	if (!session?.isValid?.()) throw new Error('Invalid session');
-	const user = session.getIdToken().payload;
-	return {
-		id: user.sub,
-		name: user['cognito:username'],
-		email: user.email,
-		image: user.picture,
-		accessToken: session.getAccessToken().getJwtToken(),
-		accessTokenExpires: session.getAccessToken().getExpiration(),
-		refreshToken: session.getRefreshToken().getToken()
-	};
 };

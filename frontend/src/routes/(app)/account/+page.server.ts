@@ -14,8 +14,11 @@ export async function load({ cookies, url }) {
 	}
 
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-	const user = await ZenoService.login(cognitoUser.email);
-	const organizations = await ZenoService.getOrganizations(user);
+	OpenAPI.HEADERS = {
+		Authorization: 'Bearer ' + cognitoUser.accessToken
+	};
+	const user = await ZenoService.login(cognitoUser.name);
+	const organizations = await ZenoService.getOrganizations();
 
 	return {
 		cognitoUser: cognitoUser,

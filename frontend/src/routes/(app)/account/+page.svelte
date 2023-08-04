@@ -12,6 +12,9 @@
 	$: organizations = data.organizations as Organization[];
 
 	OpenAPI.BASE = `${getEndpoint()}/api`;
+	$: OpenAPI.HEADERS = {
+		Authorization: 'Bearer ' + cognitoUser.accessToken
+	};
 </script>
 
 <div class="flex flex-col w-full m-5">

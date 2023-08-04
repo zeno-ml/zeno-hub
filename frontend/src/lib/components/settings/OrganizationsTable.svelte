@@ -18,7 +18,7 @@
 		{user}
 		on:close={() => {
 			organizationToEdit = undefined;
-			ZenoService.getOrganizations(user).then(
+			ZenoService.getOrganizations().then(
 				(fetchedOrganizations) => (organizations = fetchedOrganizations)
 			);
 		}}
@@ -33,7 +33,7 @@
 					user: user,
 					organization: { name: 'New Organization', id: -1, members: [], admin: true }
 				}).then(() =>
-					ZenoService.getOrganizations(user).then(
+					ZenoService.getOrganizations().then(
 						(fetchedOrganizations) => (organizations = fetchedOrganizations)
 					)
 				);
@@ -107,7 +107,7 @@
 													...organization.members.slice(memberIndex + 1)
 												]
 											}).then(() =>
-												ZenoService.getOrganizations(user).then((orgs) => (organizations = orgs))
+												ZenoService.getOrganizations().then((orgs) => (organizations = orgs))
 											);
 										}}
 										disabled={organization.admin &&
@@ -134,7 +134,7 @@
 									<IconButton
 										on:click={() => {
 											ZenoService.deleteOrganization(organization).then(() =>
-												ZenoService.getOrganizations(user).then((orgs) => (organizations = orgs))
+												ZenoService.getOrganizations().then((orgs) => (organizations = orgs))
 											);
 										}}
 										disabled={!organization.admin}

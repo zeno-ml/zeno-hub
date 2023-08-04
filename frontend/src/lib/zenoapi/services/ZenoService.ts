@@ -311,38 +311,29 @@ export class ZenoService {
 
 	/**
 	 * Get Organizations
-	 * @param requestBody
 	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getOrganizations(requestBody: User): CancelablePromise<Array<Organization>> {
+	public static getOrganizations(): CancelablePromise<Array<Organization>> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/organizations',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
+			url: '/organizations'
 		});
 	}
 
 	/**
 	 * Get Project
 	 * @param project
-	 * @param requestBody
 	 * @returns ProjectConfig Successful Response
 	 * @throws ApiError
 	 */
-	public static getProject(project: string, requestBody: User): CancelablePromise<ProjectConfig> {
+	public static getProject(project: string): CancelablePromise<ProjectConfig> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/config/{project}',
 			path: {
 				project: project
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}
@@ -351,19 +342,13 @@ export class ZenoService {
 
 	/**
 	 * Get Projects
-	 * @param requestBody
 	 * @returns ProjectConfig Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjects(requestBody: User): CancelablePromise<Array<ProjectConfig>> {
+	public static getProjects(): CancelablePromise<Array<ProjectConfig>> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/projects',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
+			method: 'GET',
+			url: '/projects'
 		});
 	}
 
@@ -531,35 +516,17 @@ export class ZenoService {
 	}
 
 	/**
-	 * Register User
-	 * @param requestBody
-	 * @returns User Successful Response
-	 * @throws ApiError
-	 */
-	public static registerUser(requestBody: User): CancelablePromise<User> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/register',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Login
-	 * @param email
+	 * @param name
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static login(email: string): CancelablePromise<User> {
+	public static login(name: string): CancelablePromise<User> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/login',
 			query: {
-				email: email
+				name: name
 			},
 			errors: {
 				422: `Validation Error`
