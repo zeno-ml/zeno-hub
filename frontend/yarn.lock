@@ -3264,10 +3264,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-svelecte@^3.16.1:
-  version "3.16.2"
-  resolved "https://registry.yarnpkg.com/svelecte/-/svelecte-3.16.2.tgz#47852e7cd684c5c5c76b46886a7e7f33f84e51b7"
-  integrity sha512-t37ZDpt4mQaR0vVhoupEvR+Rw5anoKWBYhWZBCIAQVBQutH+H/DP2osGXiiqGP++5YKEsc0SSWNfVGL/QDBtEw==
+svelecte@^3.16.4:
+  version "3.16.4"
+  resolved "https://registry.yarnpkg.com/svelecte/-/svelecte-3.16.4.tgz#b75e8c022def1501935774d3176a077da19044b9"
+  integrity sha512-/Sv8TzhRDzyJgQF0BayLV/WDjlTAoRsM9aP4Ag6gppbViLrfqsZX6/3oyf3dR/31gSSF1oQ4p1nHYvj4frryCQ==
   dependencies:
     svelte-tiny-virtual-list "^2.0.0"
 
