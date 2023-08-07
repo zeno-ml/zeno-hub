@@ -465,6 +465,17 @@ def get_server() -> FastAPI:
         update.project_org(project, organization)
 
     ####################################################################### Delete
+    @api_app.delete("/project/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def delete_project(project: str):
+        try:
+            Path("data", project).rmdir()
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(f"ERROR: Project {project} could not be deleted."),
+            ) from exc
+        delete.project(project)
+
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_slice(req: Slice):
         delete.slice(req)

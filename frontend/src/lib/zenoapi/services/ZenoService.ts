@@ -1017,6 +1017,25 @@ export class ZenoService {
 	}
 
 	/**
+	 * Delete Project
+	 * @param project
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteProject(project: string): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/project/{project}',
+			path: {
+				project: project
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Delete Slice
 	 * @param requestBody
 	 * @returns any Successful Response
