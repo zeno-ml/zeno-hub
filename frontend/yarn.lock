@@ -876,17 +876,7 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/checkbox@7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@smui/checkbox/-/checkbox-7.0.0-beta.8.tgz#4ac050a496ad81a3f96abd193ac80d81ef3ae4a1"
-  integrity sha512-ODu1VpH3fgle7AmM1BSNHy3nViwAm4ljDhyM64PYPpyCc19dKUsiKDd5uW4PgG02Pe8RmepyQjysLaTPFO326g==
-  dependencies:
-    "@material/checkbox" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.8"
-    "@smui/ripple" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
-
-"@smui/checkbox@^7.0.0-beta.8":
+"@smui/checkbox@7.0.0-beta.14", "@smui/checkbox@^7.0.0-beta.8":
   version "7.0.0-beta.14"
   resolved "https://registry.yarnpkg.com/@smui/checkbox/-/checkbox-7.0.0-beta.14.tgz#35fb7616a245ba0335b258ef58e81cfaeed658d3"
   integrity sha512-tQV/9VJC7cxktR5/pXsK34+FPGmc0tWDHfEQBMK35Pbm1jdp99mbj/5ZaaM/43NYj94ynOo7imRmNkWyXSCJng==
