@@ -247,10 +247,11 @@ def predistill(predistill_spec: PredistillSpec, project: str):
                 ],
             )
             db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} {};").format(
+                sql.SQL(
+                    "ALTER TABLE {} ADD {} " + str(predistill_spec.type) + ";"
+                ).format(
                     sql.Identifier(project),
                     sql.Identifier(col_uuid),
-                    sql.Literal(str(predistill_spec.type)),
                 )
             )
         else:
@@ -309,10 +310,11 @@ def postdistill(postdistill_spec: PostdistillSpec, project: str):
                 ],
             )
             db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} {};").format(
+                sql.SQL(
+                    "ALTER TABLE {} ADD {} " + str(postdistill_spec.type) + ";"
+                ).format(
                     sql.Identifier(project),
                     sql.Identifier(col_uuid),
-                    sql.Literal(str(postdistill_spec.type)),
                 )
             )
         else:

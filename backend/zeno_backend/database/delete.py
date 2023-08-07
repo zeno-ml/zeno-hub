@@ -10,6 +10,14 @@ from zeno_backend.database.database import Database
 
 
 def project(project: str):
+    """Deletes a project with a specific id.
+
+    Args:
+        project (str): the id of the project to be deleted.
+
+    Raises:
+        Exception: something went wrong while deleting the project from the database.
+    """
     db = Database()
     try:
         db.connect()
@@ -17,6 +25,11 @@ def project(project: str):
         db.execute(
             sql.SQL("DROP TABLE {} CASCADE;").format(
                 sql.Identifier(f"{project}_column_map")
+            )
+        )
+        db.execute(
+            sql.SQL("DROP TABLE {} CASCADE;").format(
+                sql.Identifier(f"{project}_tags_items")
             )
         )
         db.execute(
