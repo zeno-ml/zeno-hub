@@ -25,7 +25,7 @@ zeno-sliceline = "^0.0.1"
 toml = "^0.10.2"
 python-multipart = "^0.0.6"
 aiofiles = "^23.1.0"
-psycopg = "^3.1.9"
+psycopg = "^3.1.10"
 fastapi-cloudauth = "^0.4.3"
 python-dotenv = "^1.0.0"
 
