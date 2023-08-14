@@ -1058,17 +1058,7 @@
     "@smui/common" "^7.0.0-beta.8"
     svelte2tsx "^0.6.10"
 
-"@smui/ripple@7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@smui/ripple/-/ripple-7.0.0-beta.8.tgz#53f157ccdf3957a502e5270fe9ae24f0b2550b1c"
-  integrity sha512-f762Wi8ESc6rRDhsmm2WUtEjAmaUB3BlYwMJ9kgOODxIxdk4kaoflUzgJemeLwohsnGfvP+o0cGxR8DM9BE3nA==
-  dependencies:
-    "@material/dom" "^14.0.0"
-    "@material/ripple" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
-
-"@smui/ripple@^7.0.0-beta.14", "@smui/ripple@^7.0.0-beta.8":
+"@smui/ripple@7.0.0-beta.14", "@smui/ripple@^7.0.0-beta.14", "@smui/ripple@^7.0.0-beta.8":
   version "7.0.0-beta.14"
   resolved "https://registry.yarnpkg.com/@smui/ripple/-/ripple-7.0.0-beta.14.tgz#267b1c9655e26a7b27776ffae746f15f2be092b3"
   integrity sha512-EQyZIicnJj3mNCXK1PuGQ4zZOdXrhRtcHGJCrTUNjQzltIQai446Y9aRk5PhY3EIWfTYZuWnqaprC6R00EJOKA==
