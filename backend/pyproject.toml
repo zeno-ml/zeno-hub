@@ -34,7 +34,7 @@ black = "^23.3.0"
 httpx = "^0.24.1"
 pyright = "^1.1.320"
 pytest = "^7.3.2"
-ruff = "^0.0.282"
+ruff = "^0.0.284"
 
 [build-system]
 requires = ["poetry-core"]
