@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pycognito import Cognito
 
 
-def get_access_token(username: str, password: str):
+def get_user(username: str, password: str):
     """Sets the access token from cognito for a certain user to an environment variable.
 
     Args:
@@ -25,4 +25,4 @@ def get_access_token(username: str, password: str):
         username=username,
     )
     user.authenticate(password=password)
-    os.environ["ZENO_ACCESS_TOKEN"] = str(user.access_token)
+    return user
