@@ -13,7 +13,6 @@
 		mdiCompassOutline,
 		mdiLogout
 	} from '@mdi/js';
-	import IconButton, { Icon } from '@smui/icon-button';
 	import HeaderIcon from './HeaderIcon.svelte';
 
 	export let user: User;
@@ -63,17 +62,19 @@
 		</div>
 
 		<div class="m-auto flex flex-col items-center justify-center mb-3">
-			<IconButton on:click={() => goto('/account')}>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					<path fill="black" d={mdiAccount} />
-				</Icon>
-			</IconButton>
+			<HeaderIcon
+				pageName={'account'}
+				tooltipContent={'Manage your account.'}
+				icon={mdiAccount}
+				on:click={() => goto(`/account`)}
+			/>
 			<form method="POST" action="/logout">
-				<IconButton on:click={() => authToken.set(undefined)}>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path fill="black" d={mdiLogout} />
-					</Icon>
-				</IconButton>
+				<HeaderIcon
+					pageName={'logout'}
+					tooltipContent={'Logout.'}
+					icon={mdiLogout}
+					on:click={() => authToken.set(undefined)}
+				/>
 			</form>
 		</div>
 	</header>

@@ -17,7 +17,10 @@
 	use:enhance
 >
 	<div class="flex flex-col items-center">
-		<Textfield input$name="username" bind:value={username} label="Username" />
-		<Button type="submit" disabled={username.length === 0}>Confirm</Button>
+		<a href="/">
+			<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
+		</a>
+		<Textfield input$name="username" bind:value={username} label="Username" class="w-56 mb-3" />
+		<Button type="submit" variant="raised" disabled={username.length === 0}>Send Reset Link</Button>
 	</div>
 </form>
