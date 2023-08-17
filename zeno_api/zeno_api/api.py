@@ -29,7 +29,7 @@ def create_project(
         project_name (str): the name of the project to be created.
         user (Cognito): the cognito user to authenticate the upload.
         view (str, optional): the view that the project uses to display data.
-        Defaults to "image-classification".
+            Defaults to "image-classification".
 
     Returns:
         str: uuid of the newly created project.

@@ -10,6 +10,8 @@ packages = [{include = "zeno_api"}]
 python = "^3.11"
 pycognito = "^2023.5.0"
 python-dotenv = "^1.0.0"
+sphinx = "^7.1.2"
+sphinx-rtd-theme = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
