@@ -2,13 +2,13 @@
 
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username text NOT NULL UNIQUE
+    name text NOT NULL UNIQUE
 );
 
 -- Indices -------------------------------------------------------
 
 CREATE UNIQUE INDEX users_pkey ON users(id int4_ops);
-CREATE UNIQUE INDEX users_username_key ON users(username text_ops);
+CREATE UNIQUE INDEX users_name_key ON users(name text_ops);
 
 
 -- Table Definition ----------------------------------------------
