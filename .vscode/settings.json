@@ -9,9 +9,5 @@
   "editor.formatOnSave": true,
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "prettier.prettierPath": "./frontend/node_modules/prettier"
+  }
 }
