@@ -18,7 +18,7 @@ phases:
       - echo "  repo=${REPOSITORY_URI}"
       - echo "  image=${IMAGE_TAG}"
       - docker --version
-      - docker build -t $REPOSITORY_URI:$IMAGE_TAG ${DOCKER_ROOT_DIR}
+      - docker build -f Dockerfile.prod -t $REPOSITORY_URI:$IMAGE_TAG ${DOCKER_ROOT_DIR}
   post_build:
     commands:
       - echo Build completed on `date`
