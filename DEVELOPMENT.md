@@ -55,14 +55,17 @@ All the TypeScript classes that refer to server functionality used in the fronte
 
 ## Development Installation
 
-After cloning the repository:
+The recommended way to locally develop is to use `Docker` and `docker-compose`. We still recommend you install the frontend and backend locally to enable linting and testing.
 
-- Install [`Poetry`](https://python-poetry.org/docs/master/#installing-with-the-official-installer), [`nodejs`](https://nodejs.org/en/download/) and use [`VSCode`](https://code.visualstudio.com/) as your editor.
-
-We suggest you install the VSCode extensions as specified in `.vscode/extensions.json`.
-
-To make python linting work correctly, we suggest issuing `poetry config virtualenvs.in-project true` to make poetry create a virtualenv in the backend project.
-In vscode, you can then select this venv as the used Python interpreter.
+1. We recommend you use [`VSCode`](https://code.visualstudio.com/) as your editor.
+2. Install [`Docker`](https://docs.docker.com/get-docker/), [`npm`](https://www.npmjs.com/get-npm), and [`poetry`](https://python-poetry.org/docs/#installation).
+3. Install the frontend with `npm install` in the `frontend/` directory.
+4. Get the variables to create a `.env` file in the frontend folder.
+5. Configure Poetry to make local virtualenv with `poetry config virtualenvs.in-project true`. You can select this as the Python interpreter in VSCode.
+6. Install the backend with `poetry install` in the `backend/` directory.
+7. We suggest you install the VSCode extensions as specified in `.vscode/extensions.json`.
+8. Run `docker-compose up -d` in the root directory to start the backend and frontend servers.
+9. Navigate to `localhost:5173` to start using Zeno. Any changes you make to the frontend will be live-reloaded. Changes to the backend will require restarting the server with `docker-compose restart backend`.
 
 ## Making a release
 

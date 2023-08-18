@@ -4,7 +4,7 @@ Zeno's frontend is a SvelteKit application.
 
 ## Development Setup
 
-Please read the [overall development setup](../DEVELOPMENT.md) before reading this.
+**Note:** We recommend you use Docker as detailed in the [overall development setup](../DEVELOPMENT.md) instead of setting this up locally.
 
 Before starting local development, you need a `.env` file.
 You can take inspiration for this from the `.env.example` file in this folder.

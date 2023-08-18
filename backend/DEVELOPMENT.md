@@ -4,6 +4,8 @@ Zeno's backend is a Python FastAPI server.
 
 ## Development Setup
 
+**Note:** We recommend you use Docker as detailed in the [overall development setup](../DEVELOPMENT.md) instead of setting this up locally.
+
 Please read the [overall development setup](../DEVELOPMENT.md) before reading this.
 Then follow the steps outlined here to run the backend locally.
 
@@ -19,7 +21,7 @@ To set up the server:
 4. Exit psql `\q` and re-enter it from that user `psql postgres -U [username]`.
 5. Create a database `CREATE DATABASE zeno;`.
 6. Grant your user privileges `GRANT ALL PRIVILEGES ON DATABASE zeno TO [username];`.
-7. Bootstrap the initial tables by pasting the commands in [create_tables.sql](./create_tables.sql) into the PSQL terminal.
+7. Bootstrap the initial tables by pasting the commands in [init.sql](./init.sql) into the PSQL terminal.
 
 To inspect your data, you can install the [Postico GUI](https://eggerapps.at/postico2/) with brew `brew install --cask postico`.
 The default host is `localhost` and port is `5432`.
