@@ -22,13 +22,13 @@ export const actions: Actions = {
 		if (!repeatPassword) {
 			return fail(422, {
 				...failProps,
-				error: 'Please enter the password twice.'
+				error: 'Please confirm your password.'
 			});
 		}
 		if (password !== repeatPassword) {
 			return fail(422, {
 				...failProps,
-				error: 'Please enter the same password twice.'
+				error: 'Please ensure your passwords match.'
 			});
 		}
 

@@ -13,24 +13,34 @@
 	use:enhance
 >
 	<div class="flex flex-col items-center">
-		<Textfield input$name="username" label="Username" value={form ? form.username : ''} />
+		<a href="/">
+			<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
+		</a>
+		<Textfield
+			input$name="username"
+			label="Username"
+			value={form ? form.username : ''}
+			class="w-56 mb-3"
+		/>
 		<Textfield
 			type="password"
 			input$name="password"
 			value={form ? form.password : ''}
 			label="Password"
+			class="w-56"
 		/>
-		<Button type="submit">Login</Button>
-	</div>
-	<div>
-		Don't have an account? <a href="/signup">Sign up now!</a>
-	</div>
-	{#if form?.error}
-		<p>
-			{form.error}
-			{#if form.showReset}
-				<a href="/forgot">Forgot your password?</a>
-			{/if}
+		<Button type="submit" variant="raised" class="mt-5">Login</Button>
+		{#if form?.error}
+			<p class="mt-5 text-center">
+				{form.error}
+				{#if form.showReset}
+					<br />
+					<a href="/forgot" class="text-primary">Reset your password?</a>
+				{/if}
+			</p>
+		{/if}
+		<p class="mt-7">
+			Don't have an account? <a href="/signup/" class="text-primary">Sign up now!</a>
 		</p>
-	{/if}
+	</div>
 </form>
