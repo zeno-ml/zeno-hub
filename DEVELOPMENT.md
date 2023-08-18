@@ -68,3 +68,12 @@ In vscode, you can then select this venv as the used Python interpreter.
 
 Refer to the DEVELOPMENT.md files in the respective Zeno subsystem that you would like to release.
 It is best to deploy [Zeno's backend](./backend/DEVELOPMENT.md#deployment) first, then deploy the [frontend](./frontend/DEVELOPMENT.md#deployment).
+
+## Building docker images on ECS
+
+You can build docker images on Amazon ECS using the included `buildspec.yml` file.
+To do so, you need to have the following environment variables set:
+- AWS_ACCOUNT_ID: Your account ID
+- AWS_REGION: The region you're building in
+- DOCKER_USERNAME: A username for docker to pull docker images
+- DOCKER_PASSWORD: The password for the username
