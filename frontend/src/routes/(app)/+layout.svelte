@@ -2,9 +2,18 @@
 	import { navigating } from '$app/stores';
 	import Header from '$lib/components/general/Header.svelte';
 	import { authToken } from '$lib/stores.js';
+	import { getEndpoint } from '$lib/util/util.js';
+	import { OpenAPI } from '$lib/zenoapi/index.js';
 
 	export let data;
 	authToken.set(data.cognitoUser.accessToken);
+
+	$: {
+		OpenAPI.BASE = `${getEndpoint()}/api`;
+		OpenAPI.HEADERS = {
+			Authorization: 'Bearer ' + data.cognitoUser.accessToken
+		};
+	}
 </script>
 
 <main class="flex text-left w-full h-full">

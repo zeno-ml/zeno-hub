@@ -41,7 +41,7 @@
 
 	function getMetricKeys(
 		model: string,
-		metric: Metric,
+		metric: Metric | undefined,
 		predicates?: FilterPredicateGroup
 	): MetricKey[] {
 		return [
@@ -56,7 +56,10 @@
 					}
 				},
 				model: model,
-				metric: metric
+				metric: metric ?? {
+					id: -1,
+					name: 'count'
+				}
 			}
 		];
 	}
@@ -72,9 +75,8 @@
 	$: selected = $editTag !== undefined ? 'table' : selected;
 </script>
 
-{#if $model && $metric}
-	{@const metricKeys = getMetricKeys($model, $metric, $selectionPredicates)}
-	{#await getMetricsForSlicesAndTags(metricKeys, [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
+{#if $model}
+	{#await getMetricsForSlicesAndTags(getMetricKeys($model, $metric, $selectionPredicates), [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
 		<div class="flex justify-between align-center">
 			<SelectionBar bind:selected {currentResult}>
 				{#if $projectConfig !== undefined && optionsMap[$projectConfig.view] !== undefined}
@@ -82,7 +84,7 @@
 				{/if}
 			</SelectionBar>
 		</div>
-		{#if compare}
+		{#if compare && $metric}
 			{#if $comparisonModel !== undefined}
 				{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
 					{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}

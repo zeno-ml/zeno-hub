@@ -1,5 +1,7 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import os
+import shutil
+import uuid
 from pathlib import Path
 from typing import List, Union
 
@@ -348,16 +350,20 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/project", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_project(description: ProjectConfig):
+    @api_app.post("/project", tags=["zeno"])
+    def add_project(description: ProjectConfig, current_user=Depends(auth.claim())):
+        project_uuid = uuid.uuid4()
+        description.uuid = str(project_uuid)
+        user = select.user(current_user["username"])
         try:
-            Path("data", description.uuid).mkdir()
+            Path("data", str(project_uuid)).mkdir()
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: Project already exists."),
             ) from exc
-        insert.setup_project(description)
+        insert.setup_project(description, user)
+        return project_uuid
 
     @api_app.post("/item/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     async def add_item(project: str, name: str, file: UploadFile = File(...)):
@@ -464,6 +470,17 @@ def get_server() -> FastAPI:
         update.project_org(project, organization)
 
     ####################################################################### Delete
+    @api_app.delete("/project/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def delete_project(project: str):
+        try:
+            shutil.rmtree(Path("data", project))
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(f"ERROR: Project {project} could not be deleted."),
+            ) from exc
+        delete.project(project)
+
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_slice(req: Slice):
         delete.slice(req)
