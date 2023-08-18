@@ -1,7 +1,5 @@
 {
   "python.defaultInterpreterPath": ".venv/bin/python",
-  "python.formatting.provider": "black",
-  "python.linting.flake8Enabled": true,
   "autoDocstring.docstringFormat": "google",
   "editor.wordWrapColumn": 88,
   "eslint.validate": ["javascript", "javascriptreact", "svelte"],
@@ -10,6 +8,9 @@
   "python.analysis.typeCheckingMode": "basic",
   "editor.formatOnSave": true,
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

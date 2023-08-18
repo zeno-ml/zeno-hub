@@ -3,6 +3,8 @@
     "svelte.svelte-vscode",
     "ms-python.vscode-pylance",
     "ms-python.python",
-    "njpwerner.autodocstring"
+    "njpwerner.autodocstring",
+    "bradlc.vscode-tailwindcss",
+    "ms-python.black-formatter"
   ]
 }

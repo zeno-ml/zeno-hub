@@ -14,11 +14,19 @@
 	use:enhance
 >
 	<div class="flex flex-col items-center">
-		<span>
-			Hi {data.username}, please enter the verification code that we sent to you.
-		</span>
-		<Textfield input$name="code" label="Verification Code" value={form ? `${form.code}` : ''} />
-		<Button type="submit">Verify</Button>
+		<a href="/">
+			<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
+		</a>
+		<p>
+			Welcome {data.username}! please enter the verification code below.
+		</p>
+		<Textfield
+			input$name="code"
+			label="Verification Code"
+			value={form ? `${form.code}` : ''}
+			class="w-56 mb-3"
+		/>
+		<Button type="submit" variant="raised" class="mt-3">Verify Account</Button>
 	</div>
 	{#if form?.error}
 		<p>{form.error}</p>

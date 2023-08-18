@@ -4,12 +4,14 @@ Zeno's backend is a Python FastAPI server.
 
 ## Development Setup
 
+**Note:** We recommend you use Docker as detailed in the [overall development setup](../DEVELOPMENT.md) instead of setting this up locally.
+
 Please read the [overall development setup](../DEVELOPMENT.md) before reading this.
 Then follow the steps outlined here to run the backend locally.
 
 The backend works with a postgres database.
 To install postgres on macOS, use Homebrew: `brew install postgresql`.
-Then, start the postgres service using `brew service start postgresql`.
+Then, start the postgres service using `brew services start postgresql`.
 
 To set up the server:
 
@@ -17,19 +19,19 @@ To set up the server:
 2. Add a new user `CREATE ROLE [username] WITH LOGIN PASSWORD '[password]';`.
 3. Give the user rights to create a database `ALTER ROLE [username] CREATEDB;`.
 4. Exit psql `\q` and re-enter it from that user `psql postgres -U [username]`.
-5. Create a database `CREATE DATABASE zeno`.
+5. Create a database `CREATE DATABASE zeno;`.
 6. Grant your user privileges `GRANT ALL PRIVILEGES ON DATABASE zeno TO [username];`.
+7. Bootstrap the initial tables by pasting the commands in [init.sql](./init.sql) into the PSQL terminal.
 
-Once set up, this database needs some tables.
-You can bootstrap the database using [this sript](./create_tables.sql).
 To inspect your data, you can install the [Postico GUI](https://eggerapps.at/postico2/) with brew `brew install --cask postico`.
+The default host is `localhost` and port is `5432`.
 
 Once this backend database is set up, the backend needs information on how to connect to it.
 Therefore, add a `database.ini` in [./zeno_backend/database](./zeno_backend/database/) as follows:
 
 ```
 [postgresql]
-host=[whereever your DB is running]
+host=[whereever your DB is running, e.g. localhost:5432]
 dbname=[the name of your DB]
 user=[usename for DB login]
 password=[password for DB login]

@@ -1,4 +1,5 @@
 import { dev } from '$app/environment';
+import { env as private_env } from '$env/dynamic/private';
 import { extractUserFromSession, getSession } from '$lib/auth/cognito';
 import { OpenAPI } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
@@ -40,7 +41,7 @@ export const actions: Actions = {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',
-				secure: !dev,
+				secure: !dev && private_env.ALLOW_INSECURE_HTTP != 'true',
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (error) {

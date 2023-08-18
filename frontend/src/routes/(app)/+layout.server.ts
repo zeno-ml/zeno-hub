@@ -1,5 +1,6 @@
 import { dev } from '$app/environment';
-import { env } from '$env/dynamic/public';
+import { env as public_env } from '$env/dynamic/public';
+import { env as private_env } from '$env/dynamic/private';
 import { extractUserFromSession, refreshAccessToken } from '$lib/auth/cognito.js';
 import type { AuthUser } from '$lib/auth/types.js';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
@@ -22,7 +23,7 @@ export const load = async ({ cookies, url }) => {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',
-				secure: !dev,
+				secure: !dev && private_env.ALLOW_INSECURE_HTTP != 'true',
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (error) {
@@ -35,7 +36,7 @@ export const load = async ({ cookies, url }) => {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
+	OpenAPI.BASE = public_env.PUBLIC_BACKEND_ENDPOINT + '/api';
 	OpenAPI.HEADERS = {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};

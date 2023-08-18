@@ -16,28 +16,34 @@
 	action="?/reset"
 	use:enhance
 >
-	<div>We have sent you a validation code to reset your password.</div>
+	<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
+	<div class="mb-3">Please check your email for a verification code to reset your password.</div>
 	<div class="flex flex-col items-center">
 		<Textfield
 			input$name="validation"
 			value={form ? `${form.validation}` : ''}
-			label="Validation code"
+			label="Verification code"
+			class="w-56 mb-3"
 		/>
 		<Textfield
 			input$name="password"
 			type="password"
 			value={form ? `${form.password}` : ''}
 			label="Password"
+			class="w-56 mb-3"
 		/>
 		<Textfield
 			input$name="repeatPassword"
 			type="password"
 			value={form ? `${form.repeat}` : ''}
-			label="Repeat password"
+			label="Confirm password"
+			class="w-56 mb-3"
 		/>
-		<Button type="submit">Reset</Button>
+		<Button type="submit" variant="raised" class="mt-5">Reset</Button>
 		{#if form?.error}
-			<p>{form.error}</p>
+			<p class="mt-5 text-center">
+				{form.error}
+			</p>
 		{/if}
 	</div>
 </form>
