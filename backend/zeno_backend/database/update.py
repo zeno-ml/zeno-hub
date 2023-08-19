@@ -3,7 +3,7 @@ import json
 
 from psycopg import DatabaseError, sql
 
-from zeno_backend.classes.base import ProjectConfig
+from zeno_backend.classes.base import Project
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
@@ -206,7 +206,7 @@ def organization(organization: Organization):
         db.disconnect()
 
 
-def project(project: ProjectConfig):
+def project(project: Project):
     """Update a project's configuration.
 
     Args:

@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 
 from psycopg import DatabaseError, sql
 
-from zeno_backend.classes.base import ProjectConfig, ZenoColumn
+from zeno_backend.classes.base import Project, ZenoColumn
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join
 from zeno_backend.classes.folder import Folder
@@ -38,7 +38,7 @@ def models(project: str) -> List[str]:
     return list(map(itemgetter(0), model_results)) if model_results is not None else []
 
 
-def projects(user: User) -> List[ProjectConfig]:
+def projects(user: User) -> List[Project]:
     """Get all projects available to the user.
 
     Args:
@@ -58,7 +58,7 @@ def projects(user: User) -> List[ProjectConfig]:
     result = (
         list(
             map(
-                lambda project: ProjectConfig(
+                lambda project: Project(
                     uuid=project[0],
                     name=project[1],
                     view=project[2],
@@ -86,7 +86,7 @@ def projects(user: User) -> List[ProjectConfig]:
     org_projects = (
         list(
             map(
-                lambda project: ProjectConfig(
+                lambda project: Project(
                     uuid=project[0],
                     name=project[1],
                     view=project[2],
@@ -111,7 +111,7 @@ def projects(user: User) -> List[ProjectConfig]:
     return result
 
 
-def project(project: str, user: User) -> Union[ProjectConfig, None]:
+def project(project: str, user: User) -> Union[Project, None]:
     """Get the project data for a specific project ID.
 
     Args:
@@ -145,7 +145,7 @@ def project(project: str, user: User) -> Union[ProjectConfig, None]:
             bool(user_editor) if user_editor is not None else False
         )
         return (
-            ProjectConfig(
+            Project(
                 uuid=str(project_result[0]),
                 name=str(project_result[1]),
                 view=str(project_result[2]),

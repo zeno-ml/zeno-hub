@@ -5,12 +5,12 @@ import uuid
 from psycopg import DatabaseError, sql
 
 from zeno_backend.classes.base import (
+    FeatureSpec,
     LabelSpec,
     MetadataType,
     OutputSpec,
     PostdistillSpec,
-    PredistillSpec,
-    ProjectConfig,
+    Project,
     ZenoColumnType,
 )
 from zeno_backend.classes.chart import Chart, ParametersEncoder
@@ -21,7 +21,7 @@ from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
-def setup_project(description: ProjectConfig, user: User):
+def setup_project(description: Project, user: User):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -208,16 +208,15 @@ def output(output_spec: OutputSpec, project: str):
         db.disconnect()
 
 
-def predistill(predistill_spec: PredistillSpec, project: str):
-    """Adds a predistill result to an item in the project's databse.
+def feature(feature_spec: FeatureSpec, project: str):
+    """Adds a feature to an item in the project's databse.
 
     Args:
-        predistill_spec (PredistillSpec): the specification of the predistill
-        calculation to be added.
+        feature_spec: the specification of the feature function.
         project (str): the project the user is currently working with.
 
     Raises:
-        Exception: something went wrong while inserting the predistill data into the
+        Exception: something went wrong while inserting the feature into the
         database.
     """
     db = Database()
@@ -228,8 +227,8 @@ def predistill(predistill_spec: PredistillSpec, project: str):
                 sql.Identifier(f"{project}_column_map")
             ),
             [
-                predistill_spec.col_name,
-                ZenoColumnType.PREDISTILL,
+                feature_spec.col_name,
+                ZenoColumnType.FEATURE,
             ],
         )
         col_uuid: str = str(uuid.uuid4())
@@ -241,15 +240,13 @@ def predistill(predistill_spec: PredistillSpec, project: str):
                 ).format(sql.Identifier(f"{project}_column_map")),
                 [
                     col_uuid,
-                    ZenoColumnType.PREDISTILL,
-                    predistill_spec.type,
-                    predistill_spec.col_name,
+                    ZenoColumnType.FEATURE,
+                    feature_spec.type,
+                    feature_spec.col_name,
                 ],
             )
             db.execute(
-                sql.SQL(
-                    "ALTER TABLE {} ADD {} " + str(predistill_spec.type) + ";"
-                ).format(
+                sql.SQL("ALTER TABLE {} ADD {} " + str(feature_spec.type) + ";").format(
                     sql.Identifier(project),
                     sql.Identifier(col_uuid),
                 )
@@ -260,7 +257,7 @@ def predistill(predistill_spec: PredistillSpec, project: str):
             sql.SQL("UPDATE {} SET {} = %s WHERE item = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [predistill_spec.value, predistill_spec.item],
+            [feature_spec.value, feature_spec.item],
         )
         db.commit()
     except (Exception, DatabaseError) as error:

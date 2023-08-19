@@ -5,12 +5,11 @@ CREATE TABLE users (
 
 CREATE TABLE projects (
     uuid text PRIMARY KEY,
+    name text NOT NULL UNIQUE
     view text NOT NULL,
-    calculate_histogram_metrics boolean DEFAULT true,
+    calculate_histogram_metrics boolean NOT NULL DEFAULT FALSE
     num_items integer NOT NULL DEFAULT 10,
-    name text NOT NULL,
-    public boolean NOT NULL DEFAULT false
-);
+    public boolean NOT NULL DEFAULT false);
 
 CREATE TABLE organizations (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
