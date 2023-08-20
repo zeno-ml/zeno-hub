@@ -41,11 +41,11 @@
 	<div class="flex px-1 w-full">
 		<div style:width="{widthScale(histogram[0].filteredCount ?? 0)}%">
 			<div
-				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl {selectedValue !==
+				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl text-background {selectedValue !==
 					null && selectedValue === true
 					? 'border-primary'
 					: ''}"
-				style="color: white; background-color: {$metricRangeColorScale(histogram[0].metric ?? 0)}"
+				style="background-color: {$metricRangeColorScale(histogram[0].metric ?? 0)}"
 				on:click={() => setSelection(true)}
 				on:keydown={() => setSelection(true)}
 			>
@@ -55,11 +55,11 @@
 		</div>
 		<div style:width="{widthScale(histogram[1].filteredCount ?? 0)}%">
 			<div
-				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl {selectedValue !==
+				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl text-background {selectedValue !==
 					null && selectedValue === true
 					? 'border-primary'
 					: ''}"
-				style="color: white; background-color: {$metricRangeColorScale(histogram[1].metric ?? 0)}"
+				style="background-color: {$metricRangeColorScale(histogram[1].metric ?? 0)}"
 				on:click={() => setSelection(false)}
 				on:keydown={() => setSelection(false)}
 			>

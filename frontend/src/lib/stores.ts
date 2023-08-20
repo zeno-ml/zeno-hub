@@ -96,9 +96,8 @@ export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 		const [min, max] = $metricRange;
 		const colorScale = interpolate('#decbe9', '#6a1b9a');
 		return (n: number) => {
-			if (max - min === 0) {
-				return colorScale(0.5);
-			}
+			if (max === Infinity || min === Infinity) return colorScale(1);
+			if (max - min === 0) return colorScale(0.5);
 			return colorScale((n - min) / (max - min));
 		};
 	}
