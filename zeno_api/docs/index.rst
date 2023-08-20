@@ -5,10 +5,7 @@
 
 Welcome to zeno_api's documentation!
 ====================================
-.. automodule:: zeno_api.cognito
-    :members:
-
-.. automodule:: zeno_api.api
+.. automodule:: zeno_api
     :members:
 
 .. toctree::
