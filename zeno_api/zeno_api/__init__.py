@@ -3,7 +3,7 @@ import os
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import requests
 from dotenv import load_dotenv
@@ -39,7 +39,15 @@ def authenticate(username: str, password: str):
 
 
 class MetadataType(str, Enum):
-    """Enumeration of possible metadata types in Zeno."""
+    """Enumeration of possible metadata types in Zeno.
+
+    Attributes:
+        NOMINAL: Nominal metadata type, e.g. string or small cardinality number.
+        CONTINUOUS: Continuous metadata type, e.g. large cardinality number.
+        BOOLEAN: Boolean metadata type, e.g. True or False.
+        DATETIME: Datetime metadata type, e.g. 2021-01-01 00:00:00.
+        OTHER: Any other metadata type, e.g. strings.
+    """
 
     NOMINAL = "NOMINAL"
     CONTINUOUS = "CONTINUOUS"
@@ -65,39 +73,16 @@ def check_token(func: Callable):
     return wrapper
 
 
-def check_project(func: Callable):
-    """Decorator to check whether the project_uuid is set.
-
-    :meta private:
-
-    Args:
-        func (Callable): the function to be decorated.
-    """
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        args[0].user.check_token()
-        if args[0].project_uuid is not None:
-            return func(*args, **kwargs)
-        else:
-            raise Exception(
-                "Please create a project or set this object's project_uuid first."
-            )
-
-    return wrapper
-
-
 class Zeno:
-    """Provides upload functionality for zeno."""
+    """Used to get or create projects for data uploads."""
 
     user: Cognito
-    project_uuid: Optional[str]
 
     def __init__(self, user: Cognito) -> None:
-        """Initialize the Zeno object for API upload calls.
+        """Initialize the Zeno object for project management.
 
         Args:
-            user (Cognito): the user to issue the upload calls for.
+            user (Cognito): the user to get the project for.
         """
         self.user = user
 
@@ -125,9 +110,34 @@ class Zeno:
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
-        self.project_uuid = uuid.text[1:-1]
+        return Project(self.user, uuid.text[1:-1])
 
-    @check_project
+    def get_project(self, project_uuid: str):
+        """Get a project object by its UUID.
+
+        Args:
+            project_uuid (str): the UUID of the project to be fetched.
+        """
+        return Project(self.user, project_uuid)
+
+
+class Project:
+    """Provides data upload functionality for a Zeno project."""
+
+    user: Cognito
+    project_uuid: str
+
+    def __init__(self, user: Cognito, project_uuid: str) -> None:
+        """Initialize the Project object for API upload calls.
+
+        Args:
+            user (Cognito): the user to authenticate uploads with.
+            project_uuid (str): the ID of the project to add data to.
+        """
+        self.user = user
+        self.project_uuid = project_uuid
+
+    @check_token
     def upload_datapoint(self, file_path: Path, datapoint_name: str):
         """Add a datapoint to an existing project.
 
@@ -147,7 +157,7 @@ class Zeno:
                 headers={"Authorization": "Bearer " + str(self.user.access_token)},
             )
 
-    @check_project
+    @check_token
     def add_label(self, datapoint_name: str, label: str):
         """Add a label to a data point in the backend.
 
@@ -162,7 +172,7 @@ class Zeno:
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
 
-    @check_project
+    @check_token
     def add_output(
         self,
         datapoint_name: str,
@@ -187,7 +197,7 @@ class Zeno:
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
 
-    @check_project
+    @check_token
     def add_predistill(
         self,
         datapoint_name: str,
@@ -215,7 +225,7 @@ class Zeno:
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
 
-    @check_project
+    @check_token
     def add_postdistill(
         self,
         datapoint_name: str,
