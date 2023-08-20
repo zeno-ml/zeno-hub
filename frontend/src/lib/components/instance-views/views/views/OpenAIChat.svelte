@@ -31,7 +31,7 @@
 	<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 {:then data}
 	{@const entries = showall ? data : data.slice(-4)}
-	<div class="flex flex-col border border-grey-light rounded p-2.5 m-1">
+	<div class="flex flex-col border border-grey-light rounded p-2.5 m-1 w-[32rem]">
 		{#if !showall}
 			<button
 				class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"

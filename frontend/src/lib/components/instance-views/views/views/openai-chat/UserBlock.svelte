@@ -1,10 +1,13 @@
 <script lang="ts">
 	export let input: string;
+	// after:content-[''] after:-z-10 after:h-6 after:bottom-0 after:absolute after:rounded-bl-xl
 </script>
 
-<div class="my-1 flex justify-end items-end relative">
+<div class="my-1 flex justify-end items-end relative z-0">
 	<p
-		class="border border-grey-darker rounded m-0 p-2.5 relative self-start bg-background message before:content-[''] before:-z-10 before:h-6 before:bottom-0 before:absolute before:rounded-bl-2xl before:bg-grey-darker before:w-5 before:-right-1.5 after:content-[''] after:-z-10 after:h-6 after:bottom-0 after:absolute after:rounded-bl-xl before:bg-white before:w-2.5 before:-right-2.5"
+		class="border border-grey-darker rounded m-0 p-2.5 relative self-start bg-background max-w-[70%]
+		before:content-[''] before:-z-[1] before:h-6 before:bottom-0 before:absolute before:rounded-bl-2xl before:bg-grey-darker before:w-5 before:-right-2.5
+		after:content-[''] after:-z-[1] after:h-6 after:bottom-0 after:absolute after:rounded-bl-xl after:bg-background after:w-2.5 after:-right-2.5"
 	>
 		{input}
 	</p>
