@@ -105,7 +105,7 @@
 {#if table}
 	{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 		<div
-			class="container flex-grow overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start"
+			class="overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start w-full h-full"
 		>
 			{#each table as inst (inst['item'])}
 				<div class="mr-2 mt-1">
