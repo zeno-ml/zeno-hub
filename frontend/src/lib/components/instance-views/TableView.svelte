@@ -130,10 +130,10 @@
 </script>
 
 {#if table}
-	<div class="overflow-auto flex flex-grow flex-wrap content-baseline">
+	<div class="overflow-auto">
 		<table>
 			<thead
-				class="border-b border-grey-lighter text-left pb-1 mb-5 sticky top-0 bg-background cursor-pointer"
+				class="border-b border-grey-lighter text-left pb-1 mb-5 sticky top-0 bg-background cursor-pointer z-10"
 			>
 				<tr>
 					{#if $editTag !== undefined}
@@ -167,9 +167,9 @@
 				{#each table as tableContent (tableContent['item'])}
 					<tr>
 						{#if $editTag !== undefined}
-							<td class="pr-3.5"
-								><Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} /></td
-							>
+							<td class="pr-3.5">
+								<Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} />
+							</td>
 						{/if}
 						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
 							<td class="pr-3.5">
