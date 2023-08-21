@@ -24,11 +24,11 @@ parser = argparse.ArgumentParser(
     prog="Upload Zeno project data.",
     description="Uploads data for a Zeno project that has been saved as a csv.",
 )
-parser.add_argument("--csv_path")
-parser.add_argument("--connex_username")
-parser.add_argument("--connex_password")
-parser.add_argument("--view")
-parser.add_argument("--project_name")
+parser.add_argument("--csv_path", required=True)
+parser.add_argument("--connex_username", required=True)
+parser.add_argument("--connex_password", required=True)
+parser.add_argument("--view", required=True)
+parser.add_argument("--project_name", required=True)
 args = parser.parse_args()
 
 
@@ -85,7 +85,7 @@ for index, row in data_frame.iterrows():
     for col in predistill_cols:
         col_name = str(col).replace("PREDISTILL", "")
         type = resolve_column_type(data_frame, str(col))
-        project.add_predistill(datapoint_name, col_name, row[str(col)], type)
+        project.add_feature(datapoint_name, col_name, row[str(col)], type)
     for col in postdistill_cols:
         col_name = str(col).replace("POSTDISTILL", "")
         type = resolve_column_type(data_frame, str(col))
@@ -94,6 +94,6 @@ for index, row in data_frame.iterrows():
             if col_name.endswith(m):
                 model = m
                 col_name = col_name.replace(m, "", 1)
-        project.add_postdistill(datapoint_name, col_name, model, row[str(col)], type)
+        project.add_feature(datapoint_name, col_name, row[str(col)], type, model)
 
 file_path.unlink()

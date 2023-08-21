@@ -49,9 +49,9 @@ def projects(user: User) -> List[Project]:
     """
     db = Database()
     project_user_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, p.num_items, "
-        "up.editor, p.public FROM projects AS p JOIN user_project AS up "
-        "ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
+        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, "
+        "p.samples_per_page, up.editor, p.public FROM projects AS p "
+        "JOIN user_project AS up ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
         [user.id],
         return_all=True,
     )
@@ -63,7 +63,7 @@ def projects(user: User) -> List[Project]:
                     name=project[1],
                     view=project[2],
                     calculate_histogram_metrics=bool(project[3]),
-                    num_items=project[4],
+                    samples_per_page=project[4],
                     editor=project[5],
                     public=project[6],
                 ),
@@ -74,8 +74,8 @@ def projects(user: User) -> List[Project]:
         else []
     )
     project_org_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, p.num_items, "
-        "op.editor, p.public FROM projects AS p JOIN "
+        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, "
+        "p.samples_per_page, op.editor, p.public FROM projects AS p JOIN "
         "(SELECT organization_project.project_uuid, user_organization.organization_id, "
         "editor FROM user_organization JOIN organization_project "
         "on user_organization.organization_id = organization_project.organization_id "
@@ -91,7 +91,7 @@ def projects(user: User) -> List[Project]:
                     name=project[1],
                     view=project[2],
                     calculate_histogram_metrics=bool(project[3]),
-                    num_items=project[4],
+                    samples_per_page=project[4],
                     editor=project[5],
                     public=project[6],
                 ),
@@ -125,7 +125,7 @@ def project(project: str, user: User) -> Union[Project, None]:
     try:
         db.connect()
         project_result = db.execute_return(
-            "SELECT uuid, name, view, calculate_histogram_metrics, num_items, "
+            "SELECT uuid, name, view, calculate_histogram_metrics, samples_per_page, "
             "public FROM projects WHERE uuid = %s;",
             [
                 project,
@@ -150,7 +150,7 @@ def project(project: str, user: User) -> Union[Project, None]:
                 name=str(project_result[1]),
                 view=str(project_result[2]),
                 calculate_histogram_metrics=bool(project_result[3]),
-                num_items=project_result[4]
+                samples_per_page=project_result[4]
                 if isinstance(project_result[4], int)
                 else 5,
                 editor=editor,

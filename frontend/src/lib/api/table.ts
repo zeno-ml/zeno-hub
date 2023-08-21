@@ -28,9 +28,10 @@ export async function getFilteredTable(
 	if (diffColumn) {
 		diffColumn1 = Object.assign({}, diffColumn);
 		diffColumn2 = Object.assign({}, diffColumn);
-		const addModel = [ZenoColumnType.POSTDISTILL, ZenoColumnType.OUTPUT].includes(
-			diffColumn.columnType
-		);
+		const addModel =
+			[ZenoColumnType.FEATURE, ZenoColumnType.OUTPUT].includes(diffColumn.columnType) &&
+			diffColumn.model !== undefined &&
+			diffColumn.model !== null;
 		diffColumn1.model = addModel ? filterModels[0] : '';
 		diffColumn2.model = addModel ? filterModels[1] : '';
 	}

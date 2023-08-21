@@ -7,8 +7,8 @@ CREATE TABLE projects (
     uuid text PRIMARY KEY,
     name text NOT NULL UNIQUE
     view text NOT NULL,
-    calculate_histogram_metrics boolean NOT NULL DEFAULT FALSE
-    num_items integer NOT NULL DEFAULT 10,
+    calculate_histogram_metrics boolean NOT NULL DEFAULT false
+    samples_per_page integer NOT NULL DEFAULT 10,
     public boolean NOT NULL DEFAULT false);
 
 CREATE TABLE organizations (

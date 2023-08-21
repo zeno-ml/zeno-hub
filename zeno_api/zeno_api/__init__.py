@@ -3,7 +3,7 @@ import os
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 import requests
 from dotenv import load_dotenv
@@ -24,7 +24,7 @@ def authenticate(username: str, password: str):
         Zeno: the zeno api objec to issue upload commands on.
     """
     # load env vars for cognito if available
-    env_path = Path("../frontend/.env")
+    env_path = Path("../../frontend/.env")
     if env_path.exists():
         load_dotenv(env_path)
 
@@ -103,10 +103,9 @@ class Zeno:
                 "uuid": "",
                 "view": view,
                 "name": project_name,
-                "calculate_histogram_metrics": True,
-                "num_items": 10,
                 "editor": True,
                 "public": False,
+                "samples_per_page": 10,
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
@@ -198,54 +197,27 @@ class Project:
         )
 
     @check_token
-    def add_predistill(
+    def add_feature(
         self,
         datapoint_name: str,
         col_name: str,
         value: Any,
         type: MetadataType,
+        model: Optional[str] = None,
     ):
-        """Add a predistill value to a data point in the backend.
+        """Add a feature value to a data point in the backend.
 
         Args:
-            datapoint_name (str): name of the datapoint to add a predistill value for.
-            col_name (str): the name of the predistill column to add.
-            value (Any): the value of the predistill column to add.
-            type (MetadataType): the type of the predistill column.
+            datapoint_name (str): name of the datapoint to add a feature value for.
+            col_name (str): the name of the feature column to add.
+            value (Any): the value of the feature column to add.
+            type (MetadataType): the type of the feature column.
+            model (Optional[str], optional): model that relates to the feature column.
+                Defaults to None.
         """
         self.user.check_token()
         requests.post(
-            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/predistill/{self.project_uuid}',
-            json={
-                "item": datapoint_name,
-                "col_name": col_name,
-                "value": value,
-                "type": type,
-            },
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
-        )
-
-    @check_token
-    def add_postdistill(
-        self,
-        datapoint_name: str,
-        col_name: str,
-        model: str,
-        value: Any,
-        type: MetadataType,
-    ):
-        """Add a model-dependent postdistill value to a data point in the backend.
-
-        Args:
-            datapoint_name (str): name of the datapoint to add a postdistill value for.
-            col_name (str): the name of the postdistill column to add.
-            model (str): the model for which this value was calculated.
-            value (Any): the value of the postdistill column to add.
-            type (MetadataType): the type of the postdistill column.
-        """
-        self.user.check_token()
-        requests.post(
-            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/postdistill/{self.project_uuid}',
+            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/feature/{self.project_uuid}',
             json={
                 "item": datapoint_name,
                 "col_name": col_name,

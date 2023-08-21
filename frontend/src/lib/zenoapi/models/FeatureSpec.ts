@@ -6,12 +6,12 @@
 import type { MetadataType } from './MetadataType';
 
 /**
- * Specification for postdistill data in Zeno.
+ * Specification for metadata in Zeno.
  */
-export type PostdistillSpec = {
+export type FeatureSpec = {
 	colName: string;
 	value?: any;
 	item: string;
 	type: MetadataType;
-	model: string;
+	model?: string | null;
 };

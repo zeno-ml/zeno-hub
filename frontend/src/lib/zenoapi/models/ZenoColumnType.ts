@@ -5,13 +5,18 @@
 
 /**
  * Enumeration of possible column types in Zeno.
+ *
+ * Attributes:
+ * DATA: Input data instance. Either raw data or filename.
+ * LABEL: Ground truth label.
+ * OUTPUT: Model output.
+ * FEATURE: Metadata feature for an input data instance.
+ * EMBEDDING: Vector embedding representing a data instance or output.
  */
 export enum ZenoColumnType {
-	ITEM = 'ITEM',
+	DATA = 'DATA',
 	LABEL = 'LABEL',
-	METADATA = 'METADATA',
-	PREDISTILL = 'PREDISTILL',
 	OUTPUT = 'OUTPUT',
-	EMBEDDING = 'EMBEDDING',
-	POSTDISTILL = 'POSTDISTILL'
+	FEATURE = 'FEATURE',
+	EMBEDDING = 'EMBEDDING'
 }

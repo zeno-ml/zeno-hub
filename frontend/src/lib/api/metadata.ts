@@ -37,7 +37,7 @@ export async function getHistograms(
 	model: string
 ): Promise<Map<string, HistogramEntry[]>> {
 	const requestedHistograms = completeColumns.filter(
-		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.ITEM
+		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
 	);
 	requestingHistogramCounts.set(true);
 	const project = get(projectConfig);
@@ -49,7 +49,7 @@ export async function getHistograms(
 	const histograms = new Map<string, HistogramEntry[]>(
 		[
 			...new Map<string, HistogramEntry[]>(requestedHistograms.map((col, i) => [col.id, res[i]]))
-		].filter((el) => el[1].length < 20)
+		].filter((el) => el[1].length < 30)
 	);
 	return histograms;
 }

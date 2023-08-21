@@ -17,6 +17,7 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 from zeno_backend.classes.base import (
+    FeatureSpec,
     GroupMetric,
     LabelSpec,
     OutputSpec,
@@ -353,6 +354,11 @@ def get_server() -> FastAPI:
         project_uuid = uuid.uuid4()
         description.uuid = str(project_uuid)
         user = select.user(current_user["username"])
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=("ERROR: User could not be found."),
+            )
         try:
             Path("data", str(project_uuid)).mkdir()
         except Exception as exc:
@@ -381,7 +387,7 @@ def get_server() -> FastAPI:
         insert.output(output_spec, project)
 
     @api_app.post("/feature/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_feature(project: str, predistill_spec: FeatureSpec):
+    def add_feature(project: str, feature_spec: FeatureSpec):
         insert.feature(feature_spec, project)
 
     @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])

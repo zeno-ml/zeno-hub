@@ -48,9 +48,7 @@
 	$: columnHeader = $columns.filter(
 		(c) =>
 			(c.model === undefined || c.model === null || c.model === $model) &&
-			(c.columnType === ZenoColumnType.METADATA ||
-				c.columnType === ZenoColumnType.PREDISTILL ||
-				c.columnType === ZenoColumnType.POSTDISTILL)
+			c.columnType === ZenoColumnType.FEATURE
 	);
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;

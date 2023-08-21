@@ -140,11 +140,14 @@
 		}
 	}
 
-	// set model for postdistill/output column
+	// set model for feature/output column
 	function setColumnModel(col: ZenoColumn, model: string) {
 		let col_copy = Object.assign({}, col);
 		col_copy.model =
-			col.columnType === ZenoColumnType.POSTDISTILL || col.columnType === ZenoColumnType.OUTPUT
+			(col.columnType === ZenoColumnType.FEATURE &&
+				col.model !== undefined &&
+				col.model !== null) ||
+			col.columnType === ZenoColumnType.OUTPUT
 				? model
 				: '';
 		return col_copy;

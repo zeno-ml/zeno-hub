@@ -215,12 +215,12 @@ def project(project: Project):
     db = Database()
     db.connect_execute(
         "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, view = %s, "
-        "num_items = %s, public = %s WHERE uuid = %s;",
+        "samples_per_page = %s, public = %s WHERE uuid = %s;",
         [
             project.name,
             project.calculate_histogram_metrics,
             project.view,
-            project.num_items,
+            project.samples_per_page,
             project.public,
             project.uuid,
         ],

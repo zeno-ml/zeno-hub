@@ -5,6 +5,7 @@
 import type { Body_add_item } from '../models/Body_add_item';
 import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Chart } from '../models/Chart';
+import type { FeatureSpec } from '../models/FeatureSpec';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -14,9 +15,7 @@ import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { OutputSpec } from '../models/OutputSpec';
-import type { PostdistillSpec } from '../models/PostdistillSpec';
-import type { PredistillSpec } from '../models/PredistillSpec';
-import type { ProjectConfig } from '../models/ProjectConfig';
+import type { Project } from '../models/Project';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
@@ -324,10 +323,10 @@ export class ZenoService {
 	/**
 	 * Get Project
 	 * @param project
-	 * @returns ProjectConfig Successful Response
+	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static getProject(project: string): CancelablePromise<ProjectConfig> {
+	public static getProject(project: string): CancelablePromise<Project> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/config/{project}',
@@ -342,10 +341,10 @@ export class ZenoService {
 
 	/**
 	 * Get Projects
-	 * @returns ProjectConfig Successful Response
+	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjects(): CancelablePromise<Array<ProjectConfig>> {
+	public static getProjects(): CancelablePromise<Array<Project>> {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/projects'
@@ -535,24 +534,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static addProject(requestBody: ProjectConfig): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/project',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Add Item
 	 * @param project
 	 * @param name
@@ -627,44 +608,16 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Predistill
+	 * Add Feature
 	 * @param project
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addPredistill(
-		project: string,
-		requestBody: PredistillSpec
-	): CancelablePromise<any> {
+	public static addFeature(project: string, requestBody: FeatureSpec): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/predistill/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Add Postdistill
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static addPostdistill(
-		project: string,
-		requestBody: PostdistillSpec
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/postdistill/{project}',
+			url: '/feature/{project}',
 			path: {
 				project: project
 			},
@@ -957,7 +910,7 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateProject(requestBody: ProjectConfig): CancelablePromise<any> {
+	public static updateProject(requestBody: Project): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/project/update',
