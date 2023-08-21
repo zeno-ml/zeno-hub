@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { HistogramEntry } from '$lib/api/metadata';
 	import { selections } from '$lib/stores';
-	import { columnHash } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -26,8 +25,8 @@
 	};
 
 	let filterPredicates: FilterPredicateGroup;
-	$: filterPredicates = $selections.metadata[columnHash(col)]
-		? $selections.metadata[columnHash(col)]
+	$: filterPredicates = $selections.metadata[col.id]
+		? $selections.metadata[col.id]
 		: { predicates: [], join: Join._ };
 	let predicates: FilterPredicate[] = [];
 	$: predicates = filterPredicates.predicates as FilterPredicate[];
@@ -37,7 +36,7 @@
 			slices: mets.slices,
 			metadata: {
 				...mets.metadata,
-				[columnHash(col)]: { predicates, join: Join._ }
+				[col.id]: { predicates, join: Join._ }
 			},
 			tags: mets.tags
 		}));

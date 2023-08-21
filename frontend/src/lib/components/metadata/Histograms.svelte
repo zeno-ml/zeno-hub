@@ -19,7 +19,7 @@
 		slices,
 		tagIds
 	} from '$lib/stores';
-	import { columnHash, updateModelDependentSlices } from '$lib/util/util';
+	import { updateModelDependentSlices } from '$lib/util/util';
 	import { Join, ZenoColumnType, type FilterPredicateGroup, type Metric } from '$lib/zenoapi';
 	import { mdiInformationOutline } from '@mdi/js';
 	import CircularProgress from '@smui/circular-progress';
@@ -142,7 +142,7 @@
 			});
 	});
 
-	// Calculate histogram counts when model changes for postdistill columns
+	// Calculate histogram counts when model changes for feature columns
 	model.subscribe((model) => {
 		if (metadataHistograms.size === 0) {
 			return;
@@ -186,7 +186,7 @@
 				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content:
-						'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data. Add new metadata with @distill functions.',
+						'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data.',
 					position: 'right',
 					theme: 'zeno-tooltip'
 				}}
@@ -201,25 +201,19 @@
 		</div>
 		<MetricRange />
 	</div>
-	{#each $columns.filter((m) => m.columnType === ZenoColumnType.LABEL) as col (columnHash(col))}
+	{#each $columns.filter((m) => m.columnType === ZenoColumnType.LABEL) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
 		{#if hist}
 			<MetadataCell {col} histogram={hist} />
 		{/if}
 	{/each}
-	{#each $columns.filter((m) => m.columnType === ZenoColumnType.PREDISTILL) as col (columnHash(col))}
+	{#each $columns.filter((m) => m.columnType === ZenoColumnType.FEATURE && (m.model === undefined || m.model === null || m.model === $model)) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
 		{#if hist}
 			<MetadataCell {col} histogram={hist} />
 		{/if}
 	{/each}
 	{#if $model}
-		{#each $columns.filter((m) => m.columnType === ZenoColumnType.POSTDISTILL && m.model === $model) as col (columnHash(col))}
-			{@const hist = metadataHistograms.get(col.id)}
-			{#if hist}
-				<MetadataCell {col} histogram={hist} />
-			{/if}
-		{/each}
 		{@const outputCol = $columns.filter(
 			(m) => m.columnType === ZenoColumnType.OUTPUT && m.model === $model
 		)}

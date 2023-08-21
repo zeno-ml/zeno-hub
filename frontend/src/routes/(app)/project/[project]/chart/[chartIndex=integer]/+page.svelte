@@ -6,7 +6,7 @@
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
 	import { chartMap } from '$lib/components/chart/chartUtil.js';
-	import { charts, projectConfig } from '$lib/stores.js';
+	import { charts, project } from '$lib/stores.js';
 	import { ZenoService, type Chart } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
@@ -21,19 +21,17 @@
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
 	function updateChart() {
-		if ($projectConfig) {
-			ZenoService.updateChart($projectConfig.uuid, chart).then(() => {
-				if ($projectConfig)
-					ZenoService.getCharts($projectConfig.uuid).then((fetchedCharts) =>
-						charts.set(fetchedCharts)
-					);
+		if ($project) {
+			ZenoService.updateChart($project.uuid, chart).then(() => {
+				if ($project)
+					ZenoService.getCharts($project.uuid).then((fetchedCharts) => charts.set(fetchedCharts));
 			});
 		}
 	}
 
 	async function reloadData(chart: Chart) {
-		if ($projectConfig && browser) {
-			chartData = JSON.parse(await ZenoService.getChartData($projectConfig.uuid, chart));
+		if ($project && browser) {
+			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}
 </script>

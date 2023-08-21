@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { folders, projectConfig, slices } from '$lib/stores';
+	import { folders, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
@@ -28,13 +28,13 @@
 			const data = ev.dataTransfer.getData('text/plain').split(',');
 			data.forEach((element) => {
 				const slice = $slices.find((slice) => slice.id === parseInt(element));
-				if (slice && $projectConfig) {
-					ZenoService.updateSlice($projectConfig.uuid, {
+				if (slice && $project) {
+					ZenoService.updateSlice($project.uuid, {
 						...slice,
 						folderId: folder.id
 					}).then(() => {
-						if ($projectConfig) {
-							ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
+						if ($project) {
+							ZenoService.getSlices($project.uuid).then((fetchedSlices) =>
 								slices.set(fetchedSlices)
 							);
 						}
@@ -97,11 +97,11 @@
 								e.stopPropagation();
 								showOptions = false;
 								ZenoService.deleteFolder(folder).then(() => {
-									if ($projectConfig) {
-										ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
+									if ($project) {
+										ZenoService.getSlices($project.uuid).then((fetchedSlices) =>
 											slices.set(fetchedSlices)
 										);
-										ZenoService.getFolders($projectConfig.uuid).then((fetchedFolders) =>
+										ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
 											folders.set(fetchedFolders)
 										);
 									}

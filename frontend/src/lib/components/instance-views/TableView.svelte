@@ -7,7 +7,7 @@
 		editTag,
 		editedIds,
 		model,
-		projectConfig,
+		project,
 		rowsPerPage,
 		selectionIds,
 		selectionPredicates,
@@ -35,8 +35,8 @@
 	let lastPage = 0;
 	let sampleOptions = [
 		...new Set(
-			$projectConfig !== undefined && $projectConfig.numItems !== undefined
-				? [5, 15, 30, 60, 100, $projectConfig.numItems]
+			$project !== undefined && $project.samplesPerPage !== undefined
+				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
 	].sort((a, b) => a - b);
@@ -48,9 +48,7 @@
 	$: columnHeader = $columns.filter(
 		(c) =>
 			(c.model === undefined || c.model === null || c.model === $model) &&
-			(c.columnType === ZenoColumnType.METADATA ||
-				c.columnType === ZenoColumnType.PREDISTILL ||
-				c.columnType === ZenoColumnType.POSTDISTILL)
+			c.columnType === ZenoColumnType.FEATURE
 	);
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;
@@ -139,7 +137,7 @@
 					{#if $editTag !== undefined}
 						<th class="mr-5">Included</th>
 					{/if}
-					{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+					{#if $project !== undefined && viewMap[$project.view] !== undefined}
 						<th class="mr-5">instance</th>
 					{/if}
 					{#each columnHeader as header}
@@ -171,17 +169,17 @@
 								<Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} />
 							</td>
 						{/if}
-						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="pr-3.5">
 								<div class="instance">
 									<svelte:component
-										this={viewMap[$projectConfig.view]}
+										this={viewMap[$project.view]}
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${
-												$projectConfig.uuid
-											}?item=${encodeURIComponent(tableContent['item'])}`
+											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
+												tableContent['item']
+											)}`
 										}}
 										modelColumn={modelColumn?.id}
 									/>

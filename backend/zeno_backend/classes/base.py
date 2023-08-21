@@ -24,32 +24,34 @@ class CamelModel(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
-class ProjectConfig(CamelModel):
-    """Configuration specification of the Zeno project."""
-
-    uuid: str
-    name: str
-    view: str
-    calculate_histogram_metrics: bool = True
-    num_items: int = 10
-    editor: bool
-    public: bool
-
-
 class ZenoColumnType(str, Enum):
-    """Enumeration of possible column types in Zeno."""
+    """Enumeration of possible column types in Zeno.
 
-    ITEM = "ITEM"
+    Attributes:
+        DATA: Input data instance. Either raw data or filename.
+        LABEL: Ground truth label.
+        OUTPUT: Model output.
+        FEATURE: Metadata feature for an input data instance.
+        EMBEDDING: Vector embedding representing a data instance or output.
+    """
+
+    DATA = "DATA"
     LABEL = "LABEL"
-    METADATA = "METADATA"
-    PREDISTILL = "PREDISTILL"
     OUTPUT = "OUTPUT"
+    FEATURE = "FEATURE"
     EMBEDDING = "EMBEDDING"
-    POSTDISTILL = "POSTDISTILL"
 
 
 class MetadataType(str, Enum):
-    """Enumeration of possible metadata types in Zeno."""
+    """Enumeration of possible metadata types in Zeno.
+
+    Attributes:
+        NOMINAL: Nominal metadata type, e.g. string or small cardinality number.
+        CONTINUOUS: Continuous metadata type, e.g. large cardinality number.
+        BOOLEAN: Boolean metadata type, e.g. True or False.
+        DATETIME: Datetime metadata type, e.g. 2021-01-01 00:00:00.
+        OTHER: Any other metadata type, e.g. strings.
+    """
 
     NOMINAL = "NOMINAL"
     CONTINUOUS = "CONTINUOUS"
@@ -72,12 +74,34 @@ class MetadataType(str, Enum):
         return "TEXT"
 
 
+class Project(CamelModel):
+    """Projects with datasets & models.
+
+    Attributes:
+        uuid (str): The UUID of the task.
+        name (str): The name of the task.
+        view (str): The name of the view to use for the task.
+        calculate_histogram_metrics (bool): Whether to calculate histogram metrics.
+        samples_per_page (int): The number of items to show per page.
+        public (bool): Whether the task is public.
+        editor (bool): Whether the current user is an editor of the project.
+    """
+
+    uuid: str
+    name: str
+    view: str
+    calculate_histogram_metrics: bool = True
+    samples_per_page: int = 10
+    editor: bool
+    public: bool
+
+
 class ZenoColumn(CamelModel):
     """Representation of a column in Zeno's project data."""
 
     id: str
-    column_type: ZenoColumnType
     name: str
+    column_type: ZenoColumnType
     data_type: MetadataType
     model: Optional[str] = None
 
@@ -97,23 +121,14 @@ class OutputSpec(CamelModel):
     model: str
 
 
-class PredistillSpec(CamelModel):
-    """Specification for predistill metadata in Zeno."""
+class FeatureSpec(CamelModel):
+    """Specification for metadata in Zeno."""
 
     col_name: str
     value: Any = None
     item: str
     type: MetadataType
-
-
-class PostdistillSpec(CamelModel):
-    """Specification for postdistill data in Zeno."""
-
-    col_name: str
-    value: Any = None
-    item: str
-    type: MetadataType
-    model: str
+    model: Optional[str] = None
 
 
 class GroupMetric(CamelModel):

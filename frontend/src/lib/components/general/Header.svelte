@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { authToken, projectConfig } from '$lib/stores';
+	import { authToken, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -20,8 +20,8 @@
 	let projectEdit = false;
 </script>
 
-{#if projectEdit && $projectConfig}
-	<ProjectPopup project={$projectConfig} on:close={() => (projectEdit = false)} {user} />
+{#if projectEdit && $project}
+	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav>
 	<header class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center">
@@ -49,7 +49,7 @@
 						icon={mdiChartBoxOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
 					/>
-					{#if $projectConfig && $projectConfig.editor}
+					{#if $project && $project.editor}
 						<HeaderIcon
 							pageName={'editProject'}
 							tooltipContent={"Edit your project's configuration."}

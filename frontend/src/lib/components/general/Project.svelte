@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { ZenoService, type ProjectConfig } from '$lib/zenoapi';
+	import { ZenoService, type Project } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 
-	export let project: ProjectConfig;
+	export let project: Project;
 
 	let showOptions = false;
 	let hovering = false;

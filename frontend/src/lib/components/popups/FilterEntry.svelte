@@ -56,9 +56,7 @@
 			options={$columns.filter(
 				(d) =>
 					d.columnType !== ZenoColumnType.EMBEDDING &&
-					(d.model === $model ||
-						d.columnType === ZenoColumnType.METADATA ||
-						d.columnType === ZenoColumnType.PREDISTILL)
+					(d.model === $model || d.columnType === ZenoColumnType.FEATURE)
 			)}
 			on:change={() => {
 				if (predicate.column.dataType === MetadataType.OTHER) {

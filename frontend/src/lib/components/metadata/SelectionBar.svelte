@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { editTag, metric, model, projectConfig } from '$lib/stores';
+	import { editTag, metric, model, project } from '$lib/stores';
 	import type { GroupMetric } from '$lib/zenoapi';
 	import { mdiRefresh } from '@mdi/js';
 	import Button, { Group, Icon } from '@smui/button';
@@ -18,13 +18,13 @@
 
 	$: CHOICES =
 		$editTag === undefined
-			? $projectConfig !== undefined && $projectConfig.view !== ''
+			? $project !== undefined && $project.view !== ''
 				? ['list', 'table']
 				: ['table']
 			: ['table'];
 
 	$: {
-		if ($projectConfig === undefined) {
+		if ($project === undefined) {
 			runningAnalysis = true;
 		} else {
 			runningAnalysis = false;
@@ -84,7 +84,7 @@
 				{#if $editTag === undefined}
 					<slot />
 					<Group>
-						{#if $model !== undefined && $projectConfig !== undefined}
+						{#if $model !== undefined && $project !== undefined}
 							{#each CHOICES as choice}
 								<Button
 									style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"

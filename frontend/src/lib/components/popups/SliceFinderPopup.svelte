@@ -4,7 +4,7 @@
 		columns,
 		comparisonModel,
 		model,
-		projectConfig,
+		project,
 		selectionIds,
 		selectionPredicates,
 		selections,
@@ -36,10 +36,8 @@
 
 	let completeColumns = $columns.filter(
 		(d) =>
-			d.columnType === ZenoColumnType.METADATA ||
-			d.columnType === ZenoColumnType.PREDISTILL ||
-			((d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.POSTDISTILL) &&
-				d.model === $model)
+			(d.columnType === ZenoColumnType.FEATURE || d.columnType === ZenoColumnType.OUTPUT) &&
+			(d.model === undefined || d.model === null || d.model === $model)
 	);
 
 	// Columns to create candidate slices accross
@@ -49,17 +47,18 @@
 			d.dataType !== MetadataType.DATETIME &&
 			completeColumns.includes(d)
 	);
-	let postdistillColumnOptions = searchColumnOptions.filter(
-		(col) => col.columnType === ZenoColumnType.POSTDISTILL
+	let modelFeatureColumns = searchColumnOptions.filter(
+		(col) =>
+			col.columnType === ZenoColumnType.FEATURE && col.model !== null && col.model !== undefined
 	);
 	let searchColumns =
-		postdistillColumnOptions.length > 0 ? postdistillColumnOptions : [searchColumnOptions[0]];
+		modelFeatureColumns.length > 0 ? modelFeatureColumns : [searchColumnOptions[0]];
 
 	// Column to use as the metric to compare slices.
 	let metricColumns = $columns
 		.filter((d) => {
 			return $page.url.href.includes('compare')
-				? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.POSTDISTILL) &&
+				? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.FEATURE) &&
 						d.model === $model
 				: (d.dataType = MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
 						completeColumns.includes(d);
@@ -102,11 +101,11 @@
 			return;
 		}
 		sliceFinderMessage = 'Generating Slices...';
-		if ($projectConfig !== undefined && metricColumn !== undefined) {
+		if ($project !== undefined && metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			sliceFinderReturn = await ZenoService.runSliceFinder($projectConfig.uuid, {
+			sliceFinderReturn = await ZenoService.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,
 				orderBy: orderByOptions[orderByIdx],

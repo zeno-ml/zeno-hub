@@ -1,4 +1,4 @@
-import { projectConfig } from '$lib/stores';
+import { project } from '$lib/stores';
 import { isPredicateGroup } from '$lib/util/typeCheck';
 import {
 	ZenoColumnType,
@@ -20,7 +20,9 @@ export function setModelForFilterPredicateGroup(
 ): FilterPredicate | FilterPredicateGroup {
 	if (instanceOfFilterPredicate(pred)) {
 		if (
-			pred.column.columnType === ZenoColumnType.POSTDISTILL ||
+			(pred.column.columnType === ZenoColumnType.FEATURE &&
+				pred.column.model !== undefined &&
+				pred.column.model !== null) ||
 			pred.column.columnType === ZenoColumnType.OUTPUT
 		) {
 			pred = {
@@ -69,7 +71,7 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		return null;
 	}
 
-	// Update model in predicates if slices are dependent on postdistill or output columns.
+	// Update model in predicates if slices are dependent on feature or output columns.
 	metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	// Check if we have already fetched this metric key
 	const keysToRequest: MetricKey[] = [];
@@ -85,11 +87,11 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		}
 	}
 	if (keysToRequest.length > 0) {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		const res = await ZenoService.getMetricsForSlices(project.uuid, {
+		const res = await ZenoService.getMetricsForSlices(config.uuid, {
 			metricKeys: keysToRequest
 		});
 		keysToRequest.forEach((key, i) => {
@@ -109,23 +111,23 @@ export async function getMetricsForSlicesAndTags(
 	if (metricKeys.length === 0) {
 		return undefined;
 	}
-	// Update model in predicates if slices are dependent on postdistill columns.
+	// Update model in predicates if slices are dependent on feature columns.
 	if (!compare) {
 		metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	}
 	if (metricKeys.length > 0) {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		return await ZenoService.getMetricsForSlices(project.uuid, {
+		return await ZenoService.getMetricsForSlices(config.uuid, {
 			metricKeys,
 			items
 		});
 	}
 }
 
-// check if predicates contain model dependent columns (postdistill or output)
+// check if predicates contain model dependent columns (feature or output)
 export function doesModelDependOnPredicates(
 	predicates: Array<FilterPredicateGroup | FilterPredicate>
 ) {
@@ -134,7 +136,9 @@ export function doesModelDependOnPredicates(
 		isModelDependent.push(
 			isPredicateGroup(p)
 				? doesModelDependOnPredicates(p.predicates)
-				: p.column.columnType === ZenoColumnType.POSTDISTILL ||
+				: (p.column.columnType === ZenoColumnType.FEATURE &&
+						p.column.model !== undefined &&
+						p.column.model !== null) ||
 						p.column.columnType === ZenoColumnType.OUTPUT
 		);
 	});

@@ -11,8 +11,8 @@ import type { ZenoColumnType } from './ZenoColumnType';
  */
 export type ZenoColumn = {
 	id: string;
-	columnType: ZenoColumnType;
 	name: string;
+	columnType: ZenoColumnType;
 	dataType: MetadataType;
 	model?: string | null;
 };

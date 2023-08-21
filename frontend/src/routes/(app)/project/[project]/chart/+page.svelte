@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
 	import { chartDefaults } from '$lib/components/chart/chartUtil';
-	import { projectConfig } from '$lib/stores';
+	import { project } from '$lib/stores';
 	import { charts } from '$lib/stores.js';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
@@ -26,10 +26,10 @@
 			class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg m-2 px-2.5 w-48 h-24 hover:bg-primary-light"
 			on:click={() => {
 				ZenoService.addChart(
-					$projectConfig ? $projectConfig.uuid : '',
+					$project ? $project.uuid : '',
 					chartDefaults('New Chart', 0, ChartType.BAR)
 				).then(() => {
-					ZenoService.getCharts($projectConfig ? $projectConfig.uuid : '').then((fetchedCharts) =>
+					ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
 						charts.set(fetchedCharts)
 					);
 				});

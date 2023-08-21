@@ -15,30 +15,18 @@ export function getProjectRouteFromURL(url: URL) {
 	return projectURL;
 }
 
-export function columnHash(col: ZenoColumn) {
-	return (
-		(col.columnType === ZenoColumnType.METADATA ? '' : col.columnType) +
-		col.name +
-		(col.model ? col.model : '')
-	);
-}
-
 function columnTypeOrder(colType: ZenoColumnType) {
 	switch (colType) {
-		case ZenoColumnType.POSTDISTILL:
+		case ZenoColumnType.FEATURE:
 			return 0;
-		case ZenoColumnType.PREDISTILL:
-			return 1;
 		case ZenoColumnType.OUTPUT:
+			return 1;
+		case ZenoColumnType.DATA:
 			return 2;
-		case ZenoColumnType.METADATA:
-			return 3;
-		case ZenoColumnType.ITEM:
-			return 4;
 		case ZenoColumnType.LABEL:
-			return 4;
+			return 2;
 		case ZenoColumnType.EMBEDDING:
-			return 4;
+			return 2;
 	}
 }
 

@@ -3,7 +3,7 @@ import json
 
 from psycopg import DatabaseError, sql
 
-from zeno_backend.classes.base import ProjectConfig
+from zeno_backend.classes.base import Project
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
@@ -206,21 +206,21 @@ def organization(organization: Organization):
         db.disconnect()
 
 
-def project(project: ProjectConfig):
+def project(project: Project):
     """Update a project's configuration.
 
     Args:
-        project (ProjectConfig): the configuration of the project.
+        project (Project): the configuration of the project.
     """
     db = Database()
     db.connect_execute(
         "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, view = %s, "
-        "num_items = %s, public = %s WHERE uuid = %s;",
+        "samples_per_page = %s, public = %s WHERE uuid = %s;",
         [
             project.name,
             project.calculate_histogram_metrics,
             project.view,
-            project.num_items,
+            project.samples_per_page,
             project.public,
             project.uuid,
         ],

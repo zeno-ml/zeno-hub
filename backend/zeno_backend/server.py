@@ -17,12 +17,11 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 from zeno_backend.classes.base import (
+    FeatureSpec,
     GroupMetric,
     LabelSpec,
     OutputSpec,
-    PostdistillSpec,
-    PredistillSpec,
-    ProjectConfig,
+    Project,
     ZenoColumn,
 )
 from zeno_backend.classes.chart import Chart
@@ -237,7 +236,7 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return select.organizations(user)
 
-    @api_app.post("/config/{project}", response_model=ProjectConfig, tags=["zeno"])
+    @api_app.post("/config/{project}", response_model=Project, tags=["zeno"])
     def get_project(project: str, current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
@@ -246,7 +245,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/projects",
-        response_model=List[ProjectConfig],
+        response_model=List[Project],
         tags=["zeno"],
     )
     def get_projects(current_user=Depends(auth.claim())):
@@ -351,10 +350,15 @@ def get_server() -> FastAPI:
             return fetched_user
 
     @api_app.post("/project", tags=["zeno"])
-    def add_project(description: ProjectConfig, current_user=Depends(auth.claim())):
+    def add_project(description: Project, current_user=Depends(auth.claim())):
         project_uuid = uuid.uuid4()
         description.uuid = str(project_uuid)
         user = select.user(current_user["username"])
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=("ERROR: User could not be found."),
+            )
         try:
             Path("data", str(project_uuid)).mkdir()
         except Exception as exc:
@@ -382,13 +386,9 @@ def get_server() -> FastAPI:
     def add_output(project: str, output_spec: OutputSpec):
         insert.output(output_spec, project)
 
-    @api_app.post("/predistill/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_predistill(project: str, predistill_spec: PredistillSpec):
-        insert.predistill(predistill_spec, project)
-
-    @api_app.post("/postdistill/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_postdistill(project: str, postdistill_spec: PostdistillSpec):
-        insert.postdistill(postdistill_spec, project)
+    @api_app.post("/feature/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_feature(project: str, feature_spec: FeatureSpec):
+        insert.feature(feature_spec, project)
 
     @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_folder(project: str, name: str):
@@ -454,7 +454,7 @@ def get_server() -> FastAPI:
         update.organization(organization)
 
     @api_app.post("/project/update", tags=["zeno"], dependencies=[Depends(auth)])
-    def update_project(project: ProjectConfig):
+    def update_project(project: Project):
         update.project(project)
 
     @api_app.post(

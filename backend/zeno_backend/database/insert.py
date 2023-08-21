@@ -5,12 +5,11 @@ import uuid
 from psycopg import DatabaseError, sql
 
 from zeno_backend.classes.base import (
+    FeatureSpec,
     LabelSpec,
     MetadataType,
     OutputSpec,
-    PostdistillSpec,
-    PredistillSpec,
-    ProjectConfig,
+    Project,
     ZenoColumnType,
 )
 from zeno_backend.classes.chart import Chart, ParametersEncoder
@@ -21,7 +20,7 @@ from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
-def setup_project(description: ProjectConfig, user: User):
+def setup_project(description: Project, user: User):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -29,7 +28,7 @@ def setup_project(description: ProjectConfig, user: User):
     all tags of the project.
 
     Args:
-        description (ProjectConfig): the configuration with which to initialize the new
+        description (Project): the configuration with which to initialize the new
         project.
         user (User): the user who is setting up the project and becomes its admin.
 
@@ -42,13 +41,13 @@ def setup_project(description: ProjectConfig, user: User):
         db.connect()
         db.execute(
             "INSERT INTO projects (uuid, name, view, calculate_histogram_metrics, "
-            "num_items, public) VALUES (%s,%s,%s,%s,%s,%s);",
+            "samples_per_page, public) VALUES (%s,%s,%s,%s,%s,%s);",
             [
                 description.uuid,
                 description.name,
                 description.view,
                 description.calculate_histogram_metrics,
-                description.num_items,
+                description.samples_per_page,
                 description.public,
             ],
         )
@@ -74,7 +73,7 @@ def setup_project(description: ProjectConfig, user: User):
                 "INSERT INTO {} (column_id, name, type, data_type) "
                 "VALUES (%s,%s,%s,%s);"
             ).format(sql.Identifier(f"{description.uuid}_column_map")),
-            ["item", "item", ZenoColumnType.ITEM, MetadataType.NOMINAL],
+            ["item", "item", ZenoColumnType.DATA, MetadataType.NOMINAL],
         )
         db.execute(
             sql.SQL(
@@ -208,92 +207,34 @@ def output(output_spec: OutputSpec, project: str):
         db.disconnect()
 
 
-def predistill(predistill_spec: PredistillSpec, project: str):
-    """Adds a predistill result to an item in the project's databse.
+def feature(feature_spec: FeatureSpec, project: str):
+    """Adds a feature to an item in the project's databse.
 
     Args:
-        predistill_spec (PredistillSpec): the specification of the predistill
-        calculation to be added.
+        feature_spec: the specification of the feature function.
         project (str): the project the user is currently working with.
 
     Raises:
-        Exception: something went wrong while inserting the predistill data into the
+        Exception: something went wrong while inserting the feature into the
         database.
     """
     db = Database()
     try:
         db.connect()
-        exists = db.execute_return(
-            sql.SQL("SELECT * FROM {} WHERE name = %s AND type = %s").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [
-                predistill_spec.col_name,
-                ZenoColumnType.PREDISTILL,
-            ],
-        )
-        col_uuid: str = str(uuid.uuid4())
-        if exists is None:
-            db.execute(
+        if feature_spec.model is not None:
+            exists = db.execute_return(
                 sql.SQL(
-                    "INSERT INTO {} (column_id, type, data_type, name) "
-                    "VALUES (%s,%s,%s,%s);"
+                    "SELECT * FROM {} WHERE name = %s AND type = %s AND model = %s;"
                 ).format(sql.Identifier(f"{project}_column_map")),
-                [
-                    col_uuid,
-                    ZenoColumnType.PREDISTILL,
-                    predistill_spec.type,
-                    predistill_spec.col_name,
-                ],
-            )
-            db.execute(
-                sql.SQL(
-                    "ALTER TABLE {} ADD {} " + str(predistill_spec.type) + ";"
-                ).format(
-                    sql.Identifier(project),
-                    sql.Identifier(col_uuid),
-                )
+                [feature_spec.col_name, ZenoColumnType.FEATURE, feature_spec.model],
             )
         else:
-            col_uuid = str(exists[0])
-        db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE item = %s;").format(
-                sql.Identifier(project), sql.Identifier(col_uuid)
-            ),
-            [predistill_spec.value, predistill_spec.item],
-        )
-        db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
-
-
-def postdistill(postdistill_spec: PostdistillSpec, project: str):
-    """Adds a postdistill result to an item in the project's databse.
-
-    Args:
-        postdistill_spec (PostdistillSpec): the specification of the postdistill
-        calculation to be added.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the postdistill data into the
-        database.
-    """
-    db = Database()
-    try:
-        db.connect()
-        exists = db.execute_return(
-            sql.SQL(
-                "SELECT * FROM {} WHERE name = %s AND type = %s AND model = %s"
-            ).format(sql.Identifier(f"{project}_column_map")),
-            [
-                postdistill_spec.col_name,
-                ZenoColumnType.POSTDISTILL,
-                postdistill_spec.model,
-            ],
-        )
+            exists = db.execute_return(
+                sql.SQL("SELECT * FROM {} WHERE name = %s AND type = %s;").format(
+                    sql.Identifier(f"{project}_column_map")
+                ),
+                [feature_spec.col_name, ZenoColumnType.FEATURE],
+            )
         col_uuid: str = str(uuid.uuid4())
         if exists is None:
             db.execute(
@@ -303,16 +244,14 @@ def postdistill(postdistill_spec: PostdistillSpec, project: str):
                 ).format(sql.Identifier(f"{project}_column_map")),
                 [
                     col_uuid,
-                    ZenoColumnType.POSTDISTILL,
-                    postdistill_spec.type,
-                    postdistill_spec.col_name,
-                    postdistill_spec.model,
+                    ZenoColumnType.FEATURE,
+                    feature_spec.type,
+                    feature_spec.col_name,
+                    feature_spec.model,
                 ],
             )
             db.execute(
-                sql.SQL(
-                    "ALTER TABLE {} ADD {} " + str(postdistill_spec.type) + ";"
-                ).format(
+                sql.SQL("ALTER TABLE {} ADD {} " + str(feature_spec.type) + ";").format(
                     sql.Identifier(project),
                     sql.Identifier(col_uuid),
                 )
@@ -323,7 +262,7 @@ def postdistill(postdistill_spec: PostdistillSpec, project: str):
             sql.SQL("UPDATE {} SET {} = %s WHERE item = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [postdistill_spec.value, postdistill_spec.item],
+            [feature_spec.value, feature_spec.item],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
