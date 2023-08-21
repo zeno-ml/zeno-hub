@@ -1,4 +1,4 @@
-import { projectConfig } from '$lib/stores';
+import { project } from '$lib/stores';
 import type { FilterPredicateGroup, ZenoColumn } from '$lib/zenoapi';
 import { ZenoService } from '$lib/zenoapi';
 import { ZenoColumnType } from '$lib/zenoapi/models/ZenoColumnType';
@@ -36,11 +36,11 @@ export async function getFilteredTable(
 		diffColumn2.model = addModel ? filterModels[1] : '';
 	}
 
-	const project = get(projectConfig);
-	if (!project) {
+	const config = get(project);
+	if (!config) {
 		return Promise.reject('No project selected.');
 	}
-	const res = await ZenoService.getFilteredTable(project.uuid, {
+	const res = await ZenoService.getFilteredTable(config.uuid, {
 		columns: requestedColumns,
 		diffColumn1,
 		diffColumn2,

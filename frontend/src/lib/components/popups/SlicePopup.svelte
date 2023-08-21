@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { columns, projectConfig, selectionPredicates, selections, slices } from '$lib/stores';
+	import { columns, project, selectionPredicates, selections, slices } from '$lib/stores';
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
 		Join,
@@ -107,21 +107,21 @@
 			sliceName = 'Slice ' + $slices.length;
 		}
 
-		if (sliceToEdit && $projectConfig) {
-			ZenoService.updateSlice($projectConfig.uuid, {
+		if (sliceToEdit && $project) {
+			ZenoService.updateSlice($project.uuid, {
 				id: sliceToEdit.id,
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
 			});
 		} else {
-			ZenoService.addSlice($projectConfig ? $projectConfig.uuid : '', {
+			ZenoService.addSlice($project ? $project.uuid : '', {
 				id: 0,
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
 			}).then(() => {
-				ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then((fetchedSlices) => {
+				ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) => {
 					slices.set(fetchedSlices);
 					selections.update(() => ({
 						slices: [],

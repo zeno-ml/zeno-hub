@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { doesModelDependOnPredicates } from '$lib/api/slice';
-	import { comparisonModel, model, projectConfig, selections, slices } from '$lib/stores';
+	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -41,10 +41,8 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($projectConfig) {
-				ZenoService.getSlices($projectConfig.uuid).then((fetchedSlices) =>
-					slices.set(fetchedSlices)
-				);
+			if ($project) {
+				ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
 			}
 		});
 	}
@@ -66,18 +64,16 @@
 	function dragEnd(e: DragEvent) {
 		if (e.dataTransfer !== null) {
 			// If dragged out of a folder, remove from the folder it was in.
-			if (e.dataTransfer.dropEffect === 'none' && $projectConfig) {
+			if (e.dataTransfer.dropEffect === 'none' && $project) {
 				const data = transferData.split(',');
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
-					if (slice && $projectConfig) {
-						ZenoService.updateSlice($projectConfig.uuid, { ...slice, folderId: undefined }).then(
-							() => {
-								ZenoService.getSlices($projectConfig ? $projectConfig.uuid : '').then(
-									(fetchedSlices) => slices.set(fetchedSlices)
-								);
-							}
-						);
+					if (slice && $project) {
+						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() => {
+							ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) =>
+								slices.set(fetchedSlices)
+							);
+						});
 					}
 				});
 			}

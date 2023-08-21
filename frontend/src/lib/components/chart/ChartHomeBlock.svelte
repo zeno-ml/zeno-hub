@@ -11,7 +11,7 @@
 
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { charts, projectConfig } from '$lib/stores';
+	import { charts, project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
@@ -63,14 +63,14 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.addChart($projectConfig ? $projectConfig.uuid : '', {
+									ZenoService.addChart($project ? $project.uuid : '', {
 										id: 0,
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
 										parameters: chart.parameters
 									}).then(() => {
-										ZenoService.getCharts($projectConfig ? $projectConfig.uuid : '').then(
-											(fetchedCharts) => charts.set(fetchedCharts)
+										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
+											charts.set(fetchedCharts)
 										);
 									});
 								}}
@@ -85,8 +85,8 @@
 									e.stopPropagation();
 									showOptions = false;
 									ZenoService.deleteChart(chart).then(() => {
-										ZenoService.getCharts($projectConfig ? $projectConfig.uuid : '').then(
-											(fetchedCharts) => charts.set(fetchedCharts)
+										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
+											charts.set(fetchedCharts)
 										);
 									});
 								}}

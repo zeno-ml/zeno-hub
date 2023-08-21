@@ -5,7 +5,7 @@ import {
 	type FilterPredicateGroup,
 	type Folder,
 	type Metric,
-	type ProjectConfig,
+	type Project,
 	type Slice,
 	type Tag,
 	type ZenoColumn
@@ -13,7 +13,7 @@ import {
 import { interpolate } from 'd3-interpolate';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 
-export const projectConfig: Writable<ProjectConfig | undefined> = writable(undefined);
+export const project: Writable<Project | undefined> = writable(undefined);
 export const authToken: Writable<string | undefined> = writable(undefined);
 export const slices: Writable<Slice[]> = writable([]);
 export const columns: Writable<ZenoColumn[]> = writable([]);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { folders, projectConfig } from '$lib/stores';
+	import { folders, project } from '$lib/stores';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
@@ -21,13 +21,13 @@
 	}
 
 	function editFolder() {
-		if (folderToEdit && $projectConfig) {
-			ZenoService.updateFolder($projectConfig.uuid, {
+		if (folderToEdit && $project) {
+			ZenoService.updateFolder($project.uuid, {
 				...folderToEdit,
 				name: folderName
 			}).then(() => {
-				if ($projectConfig) {
-					ZenoService.getFolders($projectConfig.uuid).then((fetchedFolders) =>
+				if ($project) {
+					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
 						folders.set(fetchedFolders)
 					);
 				}
@@ -38,10 +38,10 @@
 
 	/** Create a folder using the folderName variable **/
 	function createFolder() {
-		if ($projectConfig) {
-			ZenoService.addFolder($projectConfig.uuid, folderName).then(() => {
-				if ($projectConfig) {
-					ZenoService.getFolders($projectConfig.uuid).then((fetchedFolders) =>
+		if ($project) {
+			ZenoService.addFolder($project.uuid, folderName).then(() => {
+				if ($project) {
+					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
 						folders.set(fetchedFolders)
 					);
 				}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { projectConfig } from '$lib/stores';
+	import { project } from '$lib/stores';
 	import {
 		Join,
 		Operation,
@@ -73,8 +73,8 @@
 		}
 
 		try {
-			if ($projectConfig) {
-				results = await ZenoService.filterStringMetadata($projectConfig.uuid, {
+			if ($project) {
+				results = await ZenoService.filterStringMetadata($project.uuid, {
 					column: col,
 					filterString: input,
 					isRegex: isRegex,

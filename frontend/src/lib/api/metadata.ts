@@ -4,7 +4,7 @@
  * can run then asynchronously and provide interactive updates while waiting
  * for more expensive computations like calculating metrics.
  */
-import { columns, metricRange, projectConfig, requestingHistogramCounts } from '$lib/stores';
+import { columns, metricRange, project, requestingHistogramCounts } from '$lib/stores';
 import { getMetricRange } from '$lib/util/util';
 import {
 	CancelablePromise,
@@ -40,11 +40,11 @@ export async function getHistograms(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
 	);
 	requestingHistogramCounts.set(true);
-	const project = get(projectConfig);
-	if (!project) {
+	const config = get(project);
+	if (!config) {
 		return Promise.reject('No project selected.');
 	}
-	const res = await ZenoService.getHistogramBuckets(project.uuid, requestedHistograms);
+	const res = await ZenoService.getHistogramBuckets(config.uuid, requestedHistograms);
 	requestingHistogramCounts.set(false);
 	const histograms = new Map<string, HistogramEntry[]>(
 		[
@@ -77,12 +77,12 @@ export async function getHistogramCounts(
 		histogramCountRequest.cancel();
 	}
 	try {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
 		requestingHistogramCounts.set(true);
-		histogramCountRequest = ZenoService.calculateHistogramCounts(project.uuid, {
+		histogramCountRequest = ZenoService.calculateHistogramCounts(config.uuid, {
 			columnRequests,
 			filterPredicates,
 			items
@@ -130,7 +130,7 @@ export async function getHistogramMetrics(
 	items: string[] | undefined,
 	filterPredicates?: FilterPredicateGroup
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
-	const config = get(projectConfig);
+	const config = get(project);
 	if (metric.name === '' || !config || !config.calculateHistogramMetrics) {
 		return undefined;
 	}
@@ -142,11 +142,11 @@ export async function getHistogramMetrics(
 		histogramMetricRequest.cancel();
 	}
 	try {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		histogramMetricRequest = ZenoService.calculateHistogramMetrics(project.uuid, {
+		histogramMetricRequest = ZenoService.calculateHistogramMetrics(config.uuid, {
 			columnRequests,
 			filterPredicates,
 			model,

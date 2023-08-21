@@ -5,7 +5,7 @@
 		editTag,
 		metric,
 		model,
-		projectConfig,
+		project,
 		selectionIds,
 		selectionPredicates,
 		tagIds
@@ -33,7 +33,7 @@
 	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 
 	onMount(() => {
-		if ($projectConfig === undefined || $projectConfig.view === '') {
+		if ($project === undefined || $project.view === '') {
 			selected = 'table';
 			return;
 		}
@@ -79,8 +79,8 @@
 	{#await getMetricsForSlicesAndTags(getMetricKeys($model, $metric, $selectionPredicates), [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
 		<div class="flex justify-between align-center">
 			<SelectionBar bind:selected {currentResult}>
-				{#if $projectConfig !== undefined && optionsMap[$projectConfig.view] !== undefined}
-					<svelte:component this={optionsMap[$projectConfig.view]} bind:viewOptions />
+				{#if $project !== undefined && optionsMap[$project.view] !== undefined}
+					<svelte:component this={optionsMap[$project.view]} bind:viewOptions />
 				{/if}
 			</SelectionBar>
 		</div>

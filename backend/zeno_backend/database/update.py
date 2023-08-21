@@ -210,7 +210,7 @@ def project(project: Project):
     """Update a project's configuration.
 
     Args:
-        project (ProjectConfig): the configuration of the project.
+        project (Project): the configuration of the project.
     """
     db = Database()
     db.connect_execute(

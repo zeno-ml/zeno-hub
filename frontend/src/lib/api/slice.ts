@@ -1,4 +1,4 @@
-import { projectConfig } from '$lib/stores';
+import { project } from '$lib/stores';
 import { isPredicateGroup } from '$lib/util/typeCheck';
 import {
 	ZenoColumnType,
@@ -87,11 +87,11 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		}
 	}
 	if (keysToRequest.length > 0) {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		const res = await ZenoService.getMetricsForSlices(project.uuid, {
+		const res = await ZenoService.getMetricsForSlices(config.uuid, {
 			metricKeys: keysToRequest
 		});
 		keysToRequest.forEach((key, i) => {
@@ -116,11 +116,11 @@ export async function getMetricsForSlicesAndTags(
 		metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	}
 	if (metricKeys.length > 0) {
-		const project = get(projectConfig);
-		if (!project) {
+		const config = get(project);
+		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		return await ZenoService.getMetricsForSlices(project.uuid, {
+		return await ZenoService.getMetricsForSlices(config.uuid, {
 			metricKeys,
 			items
 		});

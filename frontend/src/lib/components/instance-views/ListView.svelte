@@ -5,7 +5,7 @@
 	import {
 		columns,
 		model,
-		projectConfig,
+		project,
 		rowsPerPage,
 		selectionIds,
 		selectionPredicates,
@@ -31,8 +31,8 @@
 
 	let sampleOptions = [
 		...new Set(
-			$projectConfig !== undefined && $projectConfig.numItems !== undefined
-				? [5, 15, 30, 60, 100, $projectConfig.numItems]
+			$project !== undefined && $project.samplesPerPage !== undefined
+				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
 	].sort((a, b) => a - b);
@@ -103,18 +103,18 @@
 </script>
 
 {#if table}
-	{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+	{#if $project !== undefined && viewMap[$project.view] !== undefined}
 		<div
 			class="overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start w-full h-full"
 		>
 			{#each table as inst (inst['item'])}
 				<div class="mr-2 mt-1">
 					<svelte:component
-						this={viewMap[$projectConfig.view]}
+						this={viewMap[$project.view]}
 						options={viewOptions}
 						entry={{
 							...inst,
-							data: `${getEndpoint()}/api/data/${$projectConfig.uuid}?item=${encodeURIComponent(
+							data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
 								inst['item']
 							)}`
 						}}

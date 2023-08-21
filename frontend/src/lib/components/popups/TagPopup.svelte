@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { projectConfig, selectionIds, tags } from '$lib/stores';
+	import { project, selectionIds, tags } from '$lib/stores';
 	import { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
@@ -26,14 +26,14 @@
 			tagName = 'Tag ' + $tags.length;
 		}
 
-		if ($projectConfig !== undefined) {
-			ZenoService.addTag($projectConfig.uuid, {
+		if ($project !== undefined) {
+			ZenoService.addTag($project.uuid, {
 				id: 0,
 				tagName,
 				items: []
 			}).then(() => {
-				if ($projectConfig !== undefined) {
-					ZenoService.getTags($projectConfig.uuid).then((fetchedTags) => {
+				if ($project !== undefined) {
+					ZenoService.getTags($project.uuid).then((fetchedTags) => {
 						tags.set(fetchedTags);
 						dispatch('close');
 					});

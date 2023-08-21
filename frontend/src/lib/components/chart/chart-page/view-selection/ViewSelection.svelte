@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { projectConfig } from '$lib/stores';
+	import { project } from '$lib/stores';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { chartDefaults } from '../../chartUtil';
 	import ChartElement from './ChartElement.svelte';
@@ -8,10 +8,10 @@
 	export let chartData: { table: Record<string, unknown> } | undefined;
 
 	async function updateChart(chartType: ChartType) {
-		if (chart.type !== chartType && $projectConfig) {
+		if (chart.type !== chartType && $project) {
 			chart = { ...chartDefaults(chart.name, chart.id, chartType) };
 			chartData = undefined;
-			chartData = JSON.parse(await ZenoService.getChartData($projectConfig.uuid, chart));
+			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}
 </script>

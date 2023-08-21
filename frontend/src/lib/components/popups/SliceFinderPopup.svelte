@@ -4,7 +4,7 @@
 		columns,
 		comparisonModel,
 		model,
-		projectConfig,
+		project,
 		selectionIds,
 		selectionPredicates,
 		selections,
@@ -101,11 +101,11 @@
 			return;
 		}
 		sliceFinderMessage = 'Generating Slices...';
-		if ($projectConfig !== undefined && metricColumn !== undefined) {
+		if ($project !== undefined && metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			sliceFinderReturn = await ZenoService.runSliceFinder($projectConfig.uuid, {
+			sliceFinderReturn = await ZenoService.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,
 				orderBy: orderByOptions[orderByIdx],

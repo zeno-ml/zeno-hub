@@ -4,7 +4,7 @@
 		folders,
 		metrics,
 		models,
-		projectConfig,
+		project,
 		rowsPerPage,
 		slices,
 		tags
@@ -15,8 +15,8 @@
 	export let data;
 
 	$: {
-		projectConfig.set(data.projectConfig);
-		rowsPerPage.set(data.projectConfig.numItems ?? 5);
+		project.set(data.project);
+		rowsPerPage.set(data.project.samplesPerPage ?? 5);
 		slices.set(data.slices);
 		columns.set(data.columns);
 		models.set(data.models);

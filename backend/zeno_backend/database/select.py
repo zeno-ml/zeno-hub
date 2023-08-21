@@ -45,7 +45,7 @@ def projects(user: User) -> List[Project]:
         user (User): the user for which to fetch the available projects.
 
     Returns:
-        List[ProjectConfig]: the projects that the user can interact with.
+        List[Project]: the projects that the user can interact with.
     """
     db = Database()
     project_user_result = db.connect_execute_return(
@@ -119,7 +119,7 @@ def project(project: str, user: User) -> Union[Project, None]:
         user (User): the user for which to fetch the project.
 
     Returns:
-        Union[ProjectConfig, None]: the data for the requested project.
+        Union[Project, None]: the data for the requested project.
     """
     db = Database()
     try:

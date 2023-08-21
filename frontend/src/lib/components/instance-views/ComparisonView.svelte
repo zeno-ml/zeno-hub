@@ -9,7 +9,7 @@
 		metric,
 		model,
 		models,
-		projectConfig,
+		project,
 		rowsPerPage,
 		selectionIds,
 		selectionPredicates,
@@ -59,8 +59,8 @@
 
 	let sampleOptions = [
 		...new Set(
-			$projectConfig !== undefined && $projectConfig.numItems !== undefined
-				? [5, 15, 30, 60, 100, $projectConfig.numItems]
+			$project !== undefined && $project.samplesPerPage !== undefined
+				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
 	].sort((a, b) => a - b);
@@ -265,17 +265,17 @@
 			<tbody>
 				{#each table as tableContent (tableContent['item'])}
 					<tr>
-						{#if $projectConfig !== undefined && viewMap[$projectConfig.view] !== undefined}
+						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="pr-2.5">
 								<div class="instance">
 									<svelte:component
-										this={viewMap[$projectConfig.view]}
+										this={viewMap[$project.view]}
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${
-												$projectConfig.uuid
-											}?item=${encodeURIComponent(tableContent['item'])}`
+											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
+												tableContent['item']
+											)}`
 										}}
 										modelColumn={modelAColumn?.id}
 									/>
@@ -284,13 +284,13 @@
 							<td class="pr-2.5">
 								<div class="instance">
 									<svelte:component
-										this={viewMap[$projectConfig.view]}
+										this={viewMap[$project.view]}
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${
-												$projectConfig.uuid
-											}?item=${encodeURIComponent(tableContent['item'])}`
+											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
+												tableContent['item']
+											)}`
 										}}
 										modelColumn={modelBColumn?.id}
 									/>

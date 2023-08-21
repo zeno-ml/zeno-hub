@@ -1,14 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import {
-		editTag,
-		editedIds,
-		projectConfig,
-		selectionIds,
-		selections,
-		tagIds,
-		tags
-	} from '$lib/stores';
+	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
 	import { ZenoService } from '$lib/zenoapi';
 	import { mdiInformationOutline, mdiPlus, mdiPlusCircle } from '@mdi/js';
 	import Button from '@smui/button';
@@ -20,12 +12,12 @@
 	let showNewTag = false;
 
 	function saveChanges() {
-		if ($editTag === undefined || $projectConfig === undefined) return;
-		ZenoService.updateTag($projectConfig.uuid, { ...$editTag, items: $editedIds }).then(() => {
+		if ($editTag === undefined || $project === undefined) return;
+		ZenoService.updateTag($project.uuid, { ...$editTag, items: $editedIds }).then(() => {
 			editTag.set(undefined);
 			editedIds.set([]);
-			if ($projectConfig !== undefined) {
-				ZenoService.getTags($projectConfig.uuid).then((fetchedTags) => {
+			if ($project !== undefined) {
+				ZenoService.getTags($project.uuid).then((fetchedTags) => {
 					tags.set(fetchedTags);
 					let s = new Set<string>();
 					$selections.tags.forEach((tagId) => {
