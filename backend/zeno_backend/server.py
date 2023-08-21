@@ -200,7 +200,9 @@ def get_server() -> FastAPI:
         dependencies=[Depends(auth)],
     )
     def get_metric_for_tag(metric_key: TagMetricKey, project: str):
-        filter_sql = table_filter(project, metric_key.model, None, metric_key.tag.items)
+        filter_sql = table_filter(
+            project, metric_key.model, None, metric_key.tag.data_ids
+        )
         return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
 
     @api_app.post(
@@ -376,12 +378,12 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: Project already exists."),
             ) from exc
-        insert.setup_project(description, user)
+        insert.project(description, user)
         return project_uuid
 
     @api_app.post("/item/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     async def add_item(project: str, name: str, file: UploadFile = File(...)):
-        insert.item(name, project)
+        insert.datapoint(name, project)
         file_path = Path("data", project, name)
         parent_path = file_path.parent
         if not parent_path.exists():

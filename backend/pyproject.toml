@@ -4,12 +4,12 @@ version = "0.1.0"
 description = ""
 authors = ["Zeno"]
 readme = "README.md"
-packages = [{include = "zeno_backend"}]
+packages = [{ include = "zeno_backend" }]
 homepage = "https://zenoml.com"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = ">=0.95.1,<0.102.0"
+fastapi = "0.100.1"
 inquirer = "^3.1.2"
 nest-asyncio = "^1.5.6"
 opentsne = ">=0.7.1,<1.1.0"

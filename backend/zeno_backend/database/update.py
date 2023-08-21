@@ -89,37 +89,39 @@ def tag(tag: Tag, project: str):
                 tag.id,
             ],
         )
-        item_ids_result = db.execute_return(
-            sql.SQL("SELECT item_id FROM {} WHERE tag_id = %s;").format(
-                sql.Identifier(f"{project}_tags_items")
+        data_ids_result = db.execute_return(
+            sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s;").format(
+                sql.Identifier(f"{project}_tags_datapoints")
             ),
             [
                 tag.id,
             ],
             return_all=True,
         )
-        if item_ids_result is None:
+        if data_ids_result is None:
             return
-        existing_items = set(map(lambda item_id: item_id[0], item_ids_result))
-        new_items = set(tag.items)
-        to_remove = list(existing_items.difference(new_items))
-        for item in to_remove:
+
+        existing_data = set(map(lambda d: d[0], data_ids_result))
+        new_data = set(tag.data_ids)
+        to_remove = list(existing_data.difference(new_data))
+        for datapoint in to_remove:
             db.execute(
-                sql.SQL("DELETE FROM {} WHERE tag_id = %s AND item_id = %s;").format(
-                    sql.Identifier(f"{project}_tags_items")
+                sql.SQL("DELETE FROM {} WHERE tag_id = %s AND data_id = %s;").format(
+                    sql.Identifier(f"{project}_tags_datapoints")
                 ),
                 [
                     tag.id,
-                    item,
+                    datapoint,
                 ],
             )
-        to_add = list(new_items.difference(existing_items))
-        for item in to_add:
+
+        to_add = list(new_data.difference(existing_data))
+        for datapoint in to_add:
             db.execute(
-                sql.SQL("INSERT INTO {} (tag_id, item_id) VALUES (%s,%s);").format(
-                    sql.Identifier(f"{project}_tags_items")
+                sql.SQL("INSERT INTO {} (tag_id, data_id) VALUES (%s,%s);").format(
+                    sql.Identifier(f"{project}_tags_datapoints")
                 ),
-                [tag.id, item],
+                [tag.id, datapoint],
             )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -166,23 +168,23 @@ def organization(organization: Organization):
         org_users = set(map(lambda user: user.id, organization.members))
         existing_users = set(map(lambda user: user[0], organization_users))
         to_remove = list(existing_users.difference(org_users))
-        for item in to_remove:
+        for user in to_remove:
             db.execute(
                 "DELETE FROM user_organization "
                 "WHERE user_id = %s AND organization_id = %s;",
                 [
-                    item,
+                    user,
                     organization.id,
                 ],
             )
         to_add = list(
             filter(lambda user: user.id not in existing_users, organization.members)
         )
-        for item in to_add:
+        for user in to_add:
             db.execute(
                 "INSERT INTO user_organization (user_id, organization_id, admin) "
                 "VALUES (%s,%s,%s)",
-                [item.id, organization.id, item.admin],
+                [user.id, organization.id, user.admin],
             )
         to_edit = list(
             filter(
@@ -193,11 +195,11 @@ def organization(organization: Organization):
                 organization.members,
             )
         )
-        for item in to_edit:
+        for user in to_edit:
             db.execute(
                 "UPDATE user_organization SET admin = %s "
                 "WHERE user_id = %s AND organization_id = %s;",
-                [item.admin, item.id, organization.id],
+                [user.admin, user.id, organization.id],
             )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -215,11 +217,12 @@ def project(project: Project):
     db = Database()
     db.connect_execute(
         "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, view = %s, "
-        "samples_per_page = %s, public = %s WHERE uuid = %s;",
+        "data_url = %s, samples_per_page = %s, public = %s WHERE uuid = %s;",
         [
             project.name,
             project.calculate_histogram_metrics,
             project.view,
+            project.data_url,
             project.samples_per_page,
             project.public,
             project.uuid,

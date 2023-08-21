@@ -66,7 +66,7 @@ def table_filter(
     project: str,
     model: Optional[str],
     filter_predicates: Optional[FilterPredicateGroup] = None,
-    items: Optional[List[str]] = None,
+    data: Optional[List[str]] = None,
 ) -> Optional[sql.Composed]:
     """Generate a filter string to filter the data table of a project.
 
@@ -74,9 +74,9 @@ def table_filter(
         project (str): the project the user is currently working with
         model (Optional[str]): the model for which to generate the filter.
         filter_predicates (Optional[FilterPredicateGroup], optional): The filter
-        predicates to apply to the table. Defaults to None.
-        items (Optional[List[str]], optional): a list of items to limit the table
-        output to. Defaults to None.
+        predicates to apply to the table. Default None.
+        data (Optional[List[str]], optional): a list of datapoints to limit the
+            table output to. Default None.
 
     Returns:
         Optional[sql.Composed]: filter to filter a SQL table with.
@@ -85,9 +85,9 @@ def table_filter(
     if filter_predicates is not None and len(filter_predicates.predicates) > 0:
         filter_result = filter_to_sql(filter_predicates, project, model)
 
-    if items is not None and len(items) > 0:
-        items_filter = sql.SQL("item IN ({})").format(
-            sql.SQL(",").join(map(sql.Literal, items))
+    if data is not None and len(data) > 0:
+        items_filter = sql.SQL("datapoint IN ({})").format(
+            sql.SQL(",").join(map(sql.Literal, data))
         )
         if filter_result is not None:
             filter_result += sql.SQL(" AND ") + items_filter

@@ -42,7 +42,7 @@
 	].sort((a, b) => a - b);
 
 	if ($editTag !== undefined) {
-		currentTagIds = $editTag.items;
+		currentTagIds = $editTag.dataIds;
 	}
 
 	$: columnHeader = $columns.filter(

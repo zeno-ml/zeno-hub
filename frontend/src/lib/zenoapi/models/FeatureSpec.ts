@@ -6,12 +6,21 @@
 import type { MetadataType } from './MetadataType';
 
 /**
- * Specification for metadata in Zeno.
+ * Specification for a metadata feature in a Zeno project.
+ *
+ * Attributes:
+ * data_id (str): The ID of the associated data instance.
+ * col_name (str): The name of the associated column.
+ * type (MetadataType): The type of the metadata feature.
+ * value (Any): The value of the metadata feature. Default None.
+ * model (Optional[str]): The name of the model associated with the
+ * metadata feature.
+ *
  */
 export type FeatureSpec = {
+	dataId: string;
 	colName: string;
-	value?: any;
-	item: string;
 	type: MetadataType;
+	value?: any;
 	model?: string | null;
 };

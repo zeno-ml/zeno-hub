@@ -49,7 +49,7 @@ def projects(user: User) -> List[Project]:
     """
     db = Database()
     project_user_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, "
+        "SELECT p.uuid, p.name, p.view, p.data_url, p.calculate_histogram_metrics, "
         "p.samples_per_page, up.editor, p.public FROM projects AS p "
         "JOIN user_project AS up ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
         [user.id],
@@ -62,10 +62,11 @@ def projects(user: User) -> List[Project]:
                     uuid=project[0],
                     name=project[1],
                     view=project[2],
-                    calculate_histogram_metrics=bool(project[3]),
-                    samples_per_page=project[4],
-                    editor=project[5],
-                    public=project[6],
+                    data_url=project[3],
+                    calculate_histogram_metrics=bool(project[4]),
+                    samples_per_page=project[5],
+                    editor=project[6],
+                    public=project[7],
                 ),
                 project_user_result,
             )
@@ -74,7 +75,7 @@ def projects(user: User) -> List[Project]:
         else []
     )
     project_org_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, "
+        "SELECT p.uuid, p.name, p.view, p.calculate_histogram_metrics, p.data_url, "
         "p.samples_per_page, op.editor, p.public FROM projects AS p JOIN "
         "(SELECT organization_project.project_uuid, user_organization.organization_id, "
         "editor FROM user_organization JOIN organization_project "
@@ -90,10 +91,11 @@ def projects(user: User) -> List[Project]:
                     uuid=project[0],
                     name=project[1],
                     view=project[2],
-                    calculate_histogram_metrics=bool(project[3]),
-                    samples_per_page=project[4],
-                    editor=project[5],
-                    public=project[6],
+                    data_url=project[3],
+                    calculate_histogram_metrics=bool(project[4]),
+                    samples_per_page=project[5],
+                    editor=project[6],
+                    public=project[7],
                 ),
                 project_org_result,
             )
@@ -125,8 +127,8 @@ def project(project: str, user: User) -> Union[Project, None]:
     try:
         db.connect()
         project_result = db.execute_return(
-            "SELECT uuid, name, view, calculate_histogram_metrics, samples_per_page, "
-            "public FROM projects WHERE uuid = %s;",
+            "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
+            "samples_per_page, public FROM projects WHERE uuid = %s;",
             [
                 project,
             ],
@@ -149,12 +151,13 @@ def project(project: str, user: User) -> Union[Project, None]:
                 uuid=str(project_result[0]),
                 name=str(project_result[1]),
                 view=str(project_result[2]),
-                calculate_histogram_metrics=bool(project_result[3]),
-                samples_per_page=project_result[4]
-                if isinstance(project_result[4], int)
-                else 5,
+                data_url=str(project_result[3]),
+                calculate_histogram_metrics=bool(project_result[4]),
+                samples_per_page=project_result[5]
+                if isinstance(project_result[5], int)
+                else 10,
                 editor=editor,
-                public=bool(project_result[5]),
+                public=bool(project_result[6]),
             )
             if project_result is not None
             else None
@@ -437,7 +440,7 @@ def table_data_paginated(
             if db.cur is not None:
                 db.cur.execute(
                     sql.SQL(
-                        "SELECT * FROM {} ORDER BY item LIMIT %s OFFSET %s;"
+                        "SELECT * FROM {} ORDER BY data_id LIMIT %s OFFSET %s;"
                     ).format(sql.Identifier(f"{project}")),
                     [
                         limit,
@@ -452,7 +455,7 @@ def table_data_paginated(
                 db.cur.execute(
                     sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
                     + filter_sql
-                    + sql.SQL("ORDER BY item LIMIT {} OFFSET {};").format(
+                    + sql.SQL("ORDER BY data_id LIMIT {} OFFSET {};").format(
                         sql.Literal(limit), sql.Literal(offset)
                     )
                 )
@@ -602,9 +605,9 @@ def tags(project: str) -> List[Tag]:
             return []
         tags: List[Tag] = []
         for tag_result in tags_result:
-            items_result = db.execute_return(
-                sql.SQL("SELECT item_id FROM {} WHERE tag_id = %s").format(
-                    sql.Identifier(f"{project}_tags_items")
+            data_results = db.execute_return(
+                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                    sql.Identifier(f"{project}_tags_datapoints")
                 ),
                 [
                     tag_result[0],
@@ -616,9 +619,9 @@ def tags(project: str) -> List[Tag]:
                     id=tag_result[0],
                     tag_name=tag_result[1],
                     folder_id=tag_result[2],
-                    items=[]
-                    if items_result is None
-                    else list(map(lambda item: item[0], items_result)),
+                    data_ids=[]
+                    if data_results is None
+                    else list(map(lambda d: d[0], data_results)),
                 )
             )
         return tags
