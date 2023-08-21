@@ -22,6 +22,7 @@ from zeno_backend.classes.base import (
     LabelSpec,
     OutputSpec,
     Project,
+    ProjectStats,
     ZenoColumn,
 )
 from zeno_backend.classes.chart import Chart
@@ -119,6 +120,15 @@ def get_server() -> FastAPI:
             return Response(status_code=404)
         blob = open(file_path, "rb").read()
         return Response(blob)
+
+    @api_app.get(
+        "/project_stats/{project}",
+        response_model=ProjectStats,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    def get_project_stats(project: str):
+        return select.project_stats(project)
 
     @api_app.get(
         "/models/{project}",

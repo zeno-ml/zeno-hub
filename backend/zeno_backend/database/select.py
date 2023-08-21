@@ -6,7 +6,7 @@ from typing import List, Optional, Union
 
 from psycopg import DatabaseError, sql
 
-from zeno_backend.classes.base import Project, ZenoColumn
+from zeno_backend.classes.base import Project, ProjectStats, ZenoColumn
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join
 from zeno_backend.classes.folder import Folder
@@ -157,6 +157,48 @@ def project(project: str, user: User) -> Union[Project, None]:
                 public=bool(project_result[5]),
             )
             if project_result is not None
+            else None
+        )
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
+def project_stats(project: str) -> Optional[ProjectStats]:
+    """Get statistics for a specified project.
+
+    Args:
+        project (str): uuid of the project to get statistics for.
+
+    Returns:
+        Optional[ProjectStats]: statistics of the specified project.
+    """
+    db = Database()
+    try:
+        db.connect()
+        num_instances = db.execute_return(
+            sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project))
+        )
+        num_charts = db.execute_return(
+            "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project]
+        )
+        num_models = db.execute_return(
+            sql.SQL("SELECT COUNT(DISTINCT model) " "FROM {};").format(
+                sql.Identifier(f"{project}_column_map")
+            )
+        )
+        return (
+            ProjectStats(
+                num_instances=num_instances[0]
+                if isinstance(num_instances[0], int)
+                else 0,
+                num_charts=num_charts[0] if isinstance(num_charts[0], int) else 0,
+                num_models=num_models[0] if isinstance(num_models[0], int) else 0,
+            )
+            if num_charts is not None
+            and num_instances is not None
+            and num_models is not None
             else None
         )
     except (Exception, DatabaseError) as error:

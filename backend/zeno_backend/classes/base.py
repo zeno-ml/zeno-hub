@@ -78,13 +78,13 @@ class Project(CamelModel):
     """Projects with datasets & models.
 
     Attributes:
-        uuid (str): The UUID of the task.
-        name (str): The name of the task.
-        view (str): The name of the view to use for the task.
-        calculate_histogram_metrics (bool): Whether to calculate histogram metrics.
-        samples_per_page (int): The number of items to show per page.
-        public (bool): Whether the task is public.
-        editor (bool): Whether the current user is an editor of the project.
+        uuid (str): UUID of the task.
+        name (str): name of the task.
+        view (str): name of the view to use for the task.
+        calculate_histogram_metrics (bool): whether to calculate histogram metrics.
+        samples_per_page (int): number of items to show per page.
+        public (bool): whether the task is public.
+        editor (bool): whether the current user is an editor of the project.
     """
 
     uuid: str
@@ -94,6 +94,20 @@ class Project(CamelModel):
     samples_per_page: int = 10
     editor: bool
     public: bool
+
+
+class ProjectStats(CamelModel):
+    """Statistical numbers of a Zeno project.
+
+    Attributes:
+        num_instances (int): number of data instances in the project.
+        num_charts (int): number of charts that have been created for the project.
+        num_models (int): number of models associated with the project
+    """
+
+    num_instances: int
+    num_charts: int
+    num_models: int
 
 
 class ZenoColumn(CamelModel):

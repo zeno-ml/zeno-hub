@@ -16,6 +16,7 @@ import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { OutputSpec } from '../models/OutputSpec';
 import type { Project } from '../models/Project';
+import type { ProjectStats } from '../models/ProjectStats';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
@@ -71,6 +72,25 @@ export class ZenoService {
 			},
 			query: {
 				item: item
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project Stats
+	 * @param project
+	 * @returns ProjectStats Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjectStats(project: string): CancelablePromise<ProjectStats> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project_stats/{project}',
+			path: {
+				project: project
 			},
 			errors: {
 				422: `Validation Error`
