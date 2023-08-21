@@ -925,7 +925,7 @@
     "@smui/common" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/floating-label@^7.0.0-beta.14", "@smui/floating-label@^7.0.0-beta.8":
+"@smui/floating-label@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/floating-label/-/floating-label-7.0.0-beta.14.tgz"
   integrity sha512-VVXWJ15paZlqrnUl2FKsF81KSDjV/uWaTTRIT1kEW/McTce4xPpxk5P/pPF665yNbbBhnSRmnjSI+B63bhJpSg==
@@ -965,7 +965,7 @@
     "@smui/common" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/line-ripple@^7.0.0-beta.14", "@smui/line-ripple@^7.0.0-beta.8":
+"@smui/line-ripple@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/line-ripple/-/line-ripple-7.0.0-beta.14.tgz"
   integrity sha512-9BsByyEizUPG7b4VRX3Wahmb300wlJSxgyY1EYVIna1mnKRXwvBp2TKjAnOZ8y8tKhOlfLJXFI8uVoEGnLK8BA==
@@ -974,7 +974,7 @@
     "@smui/common" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/list@7.0.0-beta.8", "@smui/list@^7.0.0-beta.8":
+"@smui/list@7.0.0-beta.8":
   version "7.0.0-beta.8"
   resolved "https://registry.npmjs.org/@smui/list/-/list-7.0.0-beta.8.tgz"
   integrity sha512-Rh2rpKDgaxzCdqcWZkkrRP+kPyu7Owwbkk8waG06BG9bFyCfov8i1Ai2MQkz6QFG/CVX6fi+rapvWhQaafSsOg==
@@ -998,7 +998,7 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/menu-surface@^7.0.0-beta.14", "@smui/menu-surface@^7.0.0-beta.8":
+"@smui/menu-surface@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/menu-surface/-/menu-surface-7.0.0-beta.14.tgz"
   integrity sha512-2wo7GXNt6+JRiWjy+ocwnkLaFwRMQ0glJusZl/azPO9qCNyjMCisL2iU9wSGExCkjUnCGutCre0Zb63BwRhiQw==
@@ -1008,7 +1008,7 @@
     "@smui/common" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/menu@^7.0.0-beta.8":
+"@smui/menu@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/menu/-/menu-7.0.0-beta.14.tgz"
   integrity sha512-CdHdvy9X+qYTzARD+k3op/j90fSQCKkDINog8Y7O1WNxU6sFIhVTVlQWPq6y94VoOIBENJIsukjpGUuEmjZQZw==
@@ -1020,7 +1020,7 @@
     "@smui/menu-surface" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/notched-outline@^7.0.0-beta.14", "@smui/notched-outline@^7.0.0-beta.8":
+"@smui/notched-outline@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/notched-outline/-/notched-outline-7.0.0-beta.14.tgz"
   integrity sha512-gblu47Jrn6ifEm86FGfkwaR2uG7yyiZgvZb2oxrv/fULFHIVZ5b9hHbHuv3PlDmxT79J+Z2OIxb55dOKxGQ8Ng==
@@ -1065,25 +1065,25 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/select@7.0.0-beta.8", "@smui/select@^7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.npmjs.org/@smui/select/-/select-7.0.0-beta.8.tgz"
-  integrity sha512-3RigAea8A4k3LnDWVBJN6GQQnJsGVraB5FrpW6n4b7CBbVLuia4PBR1ks3YJrKp5UtSJ4eqhWGs4RZuJosKPVw==
+"@smui/select@7.0.0-beta.14", "@smui/select@^7.0.0-beta.8":
+  version "7.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@smui/select/-/select-7.0.0-beta.14.tgz#801e4a14bb4d530fc8108bf337e9fa59dce7b7a6"
+  integrity sha512-pv3xdnbHLYE72qFfTy3Kx/sTsezyHheEdcXNeQ6DKZ9v/2RcJzlQSA/Q/Qj559ZWH1m6XOK9kXk1HjtsaQk6bg==
   dependencies:
     "@material/feature-targeting" "^14.0.0"
     "@material/ripple" "^14.0.0"
     "@material/rtl" "^14.0.0"
     "@material/select" "^14.0.0"
     "@material/theme" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.8"
-    "@smui/floating-label" "^7.0.0-beta.8"
-    "@smui/line-ripple" "^7.0.0-beta.8"
-    "@smui/list" "^7.0.0-beta.8"
-    "@smui/menu" "^7.0.0-beta.8"
-    "@smui/menu-surface" "^7.0.0-beta.8"
-    "@smui/notched-outline" "^7.0.0-beta.8"
-    "@smui/ripple" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
+    "@smui/common" "^7.0.0-beta.14"
+    "@smui/floating-label" "^7.0.0-beta.14"
+    "@smui/line-ripple" "^7.0.0-beta.14"
+    "@smui/list" "^7.0.0-beta.14"
+    "@smui/menu" "^7.0.0-beta.14"
+    "@smui/menu-surface" "^7.0.0-beta.14"
+    "@smui/notched-outline" "^7.0.0-beta.14"
+    "@smui/ripple" "^7.0.0-beta.14"
+    svelte2tsx "^0.6.15"
 
 "@smui/slider@^7.0.0-beta.8":
   version "7.0.0-beta.14"
