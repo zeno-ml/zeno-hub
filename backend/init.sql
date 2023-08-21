@@ -5,7 +5,7 @@ CREATE TABLE users (
 
 CREATE TABLE projects (
     uuid text PRIMARY KEY,
-    name text NOT NULL UNIQUE
+    name text NOT NULL,
     view text NOT NULL,
     calculate_histogram_metrics boolean NOT NULL DEFAULT false
     samples_per_page integer NOT NULL DEFAULT 10,
