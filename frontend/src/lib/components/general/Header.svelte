@@ -21,7 +21,7 @@
 </script>
 
 {#if projectEdit && $project}
-	<ProjectPopup project={$project} on:close={() => (projectEdit = false)} {user} />
+	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav>
 	<header class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center">

@@ -7,7 +7,7 @@ export async function getMetricsForTags(tagMetricKey: TagMetricKey): Promise<Gro
 		return null;
 	}
 	const config = get(project);
-	if (!project) {
+	if (!config) {
 		return Promise.reject('No project selected.');
 	}
 	return await ZenoService.getMetricForTag(config.uuid, tagMetricKey);

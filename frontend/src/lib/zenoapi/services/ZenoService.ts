@@ -534,6 +534,24 @@ export class ZenoService {
 	}
 
 	/**
+	 * Add Project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static addProject(requestBody: Project): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/project',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Add Item
 	 * @param project
 	 * @param name
