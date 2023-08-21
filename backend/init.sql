@@ -7,6 +7,7 @@ CREATE TABLE projects (
     uuid text PRIMARY KEY,
     name text NOT NULL,
     view text NOT NULL,
+    data_url text NOT NULL DEFAULT "",
     calculate_histogram_metrics boolean NOT NULL DEFAULT false
     samples_per_page integer NOT NULL DEFAULT 10,
     public boolean NOT NULL DEFAULT false);
