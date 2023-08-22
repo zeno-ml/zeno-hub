@@ -91,7 +91,13 @@ class Chart(CamelModel):
     id: int
     name: str
     type: ChartType
-    parameters: XCParameters | TableParameters | BeeswarmParameters | RadarParameters | HeatmapParameters
+    parameters: (
+        XCParameters
+        | TableParameters
+        | BeeswarmParameters
+        | RadarParameters
+        | HeatmapParameters
+    )
 
 
 class ParametersEncoder(json.JSONEncoder):
