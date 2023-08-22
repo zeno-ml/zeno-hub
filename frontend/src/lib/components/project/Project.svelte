@@ -2,15 +2,30 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Project } from '$lib/zenoapi';
-	import { mdiDotsHorizontal } from '@mdi/js';
+	import {
+		mdiChartBar,
+		mdiDotsHorizontal,
+		mdiImage,
+		mdiLayersTriple,
+		mdiTag,
+		mdiText
+	} from '@mdi/js';
 	import { Icon } from '@smui/button';
+	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
 
 	let showOptions = false;
 	let hovering = false;
+
+	function getProjectIcon() {
+		if (project.view.includes('image')) return mdiImage;
+		if (project.view.includes('chat') || project.view.includes('text')) return mdiText;
+		else return mdiTag;
+	}
 </script>
 
 <button
@@ -19,10 +34,10 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid p-2 m-1 rounded-lg border-primary-dark border-2"
+	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col"
 >
-	<div class="flex justify-between items-center">
-		<span class="mr-2">{project.name}</span>
+	<div class="flex justify-between items-center w-full px-2 py-1">
+		<span class="mr-2 text-base truncate">{project.name}</span>
 		<div
 			class="w-9 h-9 relative"
 			use:clickOutside={() => {
@@ -63,5 +78,14 @@
 				</div>
 			{/if}
 		</div>
+	</div>
+	<div class="flex items-center w-full px-2 mb-2">
+		{#await ZenoService.getProjectStats(project.uuid)}
+			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
+		{:then stats}
+			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
+			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
+			<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
+		{/await}
 	</div>
 </button>

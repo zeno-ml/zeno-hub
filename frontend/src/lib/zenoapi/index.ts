@@ -32,6 +32,7 @@ export { Operation } from './models/Operation';
 export type { Organization } from './models/Organization';
 export type { OutputSpec } from './models/OutputSpec';
 export type { Project } from './models/Project';
+export type { ProjectStats } from './models/ProjectStats';
 export type { RadarParameters } from './models/RadarParameters';
 export type { Slice } from './models/Slice';
 export type { SliceFinderRequest } from './models/SliceFinderRequest';
