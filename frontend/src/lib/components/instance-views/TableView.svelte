@@ -15,7 +15,6 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
 	import type { GroupMetric, ZenoColumn } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
@@ -89,31 +88,29 @@
 
 	function updateTable() {
 		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
-		if ($model !== undefined) {
-			let predicates =
-				$selectionPredicates === undefined
-					? undefined
-					: setModelForFilterPredicateGroup($selectionPredicates, $model);
-			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
-				predicates = {
-					join: Join._,
-					predicates: [predicates]
-				};
-			}
-			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			getFilteredTable(
-				$columns,
-				[$model],
-				undefined,
-				start,
-				end - start,
-				$sort,
-				dataIds,
-				predicates
-			).then((res) => (table = res));
+		let predicates =
+			$selectionPredicates === undefined || $model === undefined
+				? undefined
+				: setModelForFilterPredicateGroup($selectionPredicates, $model);
+		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
+			predicates = {
+				join: Join._,
+				predicates: [predicates]
+			};
 		}
+		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
+		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
+		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		getFilteredTable(
+			$columns,
+			$model ? [$model] : [],
+			undefined,
+			start,
+			end - start,
+			$sort,
+			dataIds,
+			predicates
+		).then((res) => (table = res));
 	}
 
 	function updateSort(column: ZenoColumn) {
@@ -175,12 +172,7 @@
 									<svelte:component
 										this={viewMap[$project.view]}
 										options={viewOptions}
-										entry={{
-											...tableContent,
-											data: `${getEndpoint()}/api/data/${
-												$project.uuid
-											}?data_id=${encodeURIComponent(tableContent['data_id'])}`
-										}}
+										entry={tableContent}
 										modelColumn={modelColumn?.id}
 									/>
 								</div>

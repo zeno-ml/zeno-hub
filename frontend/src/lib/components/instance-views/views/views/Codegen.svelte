@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolveDataPoint } from '$lib/util/util';
+	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import { HighlightAuto } from 'svelte-highlight';
 	import 'svelte-highlight/styles/github.css';
 
@@ -9,9 +11,11 @@
 </script>
 
 <div id="w-min p-2 border border-grey-lighter">
-	{#if entry['data_id']}
-		<HighlightAuto code={entry['data_id']} />
-	{/if}
+	{#await resolveDataPoint(entry)}
+		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
+	{:then textData}
+		<HighlightAuto code={textData} />
+	{/await}
 	{#if entry['label']}
 		<hr />
 		<pre class="mt-2 mb-0">label</pre>

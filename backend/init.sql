@@ -8,7 +8,7 @@ CREATE TABLE projects (
     name text NOT NULL,
     view text NOT NULL,
     data_url text,
-    calculate_histogram_metrics boolean NOT NULL DEFAULT false
+    calculate_histogram_metrics boolean NOT NULL DEFAULT false,
     samples_per_page integer NOT NULL DEFAULT 10,
     public boolean NOT NULL DEFAULT false);
 

@@ -16,7 +16,7 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
-	import { columnSort, getEndpoint } from '$lib/util/util';
+	import { columnSort } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -271,12 +271,7 @@
 									<svelte:component
 										this={viewMap[$project.view]}
 										options={viewOptions}
-										entry={{
-											...tableContent,
-											data: `${getEndpoint()}/api/data/${$project.uuid}?dataId=${encodeURIComponent(
-												tableContent['dataId']
-											)}`
-										}}
+										entry={tableContent}
 										modelColumn={modelAColumn?.id}
 									/>
 								</div>
@@ -286,12 +281,7 @@
 									<svelte:component
 										this={viewMap[$project.view]}
 										options={viewOptions}
-										entry={{
-											...tableContent,
-											data: `${getEndpoint()}/api/data/${$project.uuid}?dataId=${encodeURIComponent(
-												tableContent['dataId']
-											)}`
-										}}
+										entry={tableContent}
 										modelColumn={modelBColumn?.id}
 									/>
 								</div>

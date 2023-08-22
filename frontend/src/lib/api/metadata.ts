@@ -34,7 +34,7 @@ export interface HistogramEntry {
  */
 export async function getHistograms(
 	completeColumns: ZenoColumn[],
-	model: string
+	model: string | undefined
 ): Promise<Map<string, HistogramEntry[]>> {
 	const requestedHistograms = completeColumns.filter(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
@@ -125,7 +125,7 @@ let histogramMetricRequest: CancelablePromise<Array<Array<number | null>>>;
  */
 export async function getHistogramMetrics(
 	histograms: Map<string, HistogramEntry[]>,
-	model: string,
+	model: string | undefined,
 	metric: Metric,
 	dataIds: string[] | undefined,
 	filterPredicates?: FilterPredicateGroup
@@ -149,7 +149,7 @@ export async function getHistogramMetrics(
 		histogramMetricRequest = ZenoService.calculateHistogramMetrics(config.uuid, {
 			columnRequests,
 			filterPredicates,
-			model,
+			model: model ?? null,
 			metric,
 			dataIds
 		});

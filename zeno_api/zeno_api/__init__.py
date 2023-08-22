@@ -2,7 +2,7 @@
 import os
 from enum import Enum
 from functools import wraps
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Any, Callable, Optional
 
 import requests
@@ -102,11 +102,11 @@ class Zeno:
             json={
                 "uuid": "",
                 "view": view,
+                "dataUrl": None,
                 "name": project_name,
                 "editor": True,
                 "public": False,
-                "samples_per_page": 10,
-                "data_url": None,
+                "samplesPerPage": 10,
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
@@ -138,61 +138,72 @@ class Project:
         self.project_uuid = project_uuid
 
     @check_token
-    def upload_datapoint(self, file_path: Path, datapoint_name: str):
+    def add_datapoint(self, data_id: int | str, data: Optional[Path | str] = None):
         """Add a datapoint to an existing project.
 
-        Requires a file where the data is saved.
-        Has to be in the right format for the project's view.
+        The data parameter can be left empty if a URL (URL part with base_url set for
+        the project) is used for data_id. If data is left empty, you have to set data_id
+        to a valid URL (URL part with base_url set for the project).
+
+        Otherwise, the data parameter can be either a string containing the data
+        directly or a Path to a file to be uploaded.
+        If a file path is provided, it has to be in the right format for the project's
+        view to be displayed.
 
         Args:
-            file_path (Path): path to the data file to be added
-            datapoint_name (str): name of the data point with extension.
+            data_id (int | str): the unique ID of the data point to be added.
+            data (Optional[Path | str]): the path to the file containing the data.
+                Defaults to None.
         """
-        self.user.check_token()
-        with open(file_path, "rb") as file:
+        if isinstance(data, PurePath):
+            with open(data, "rb") as file:
+                requests.post(
+                    f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/upload_datapoint/{self.project_uuid}',
+                    json={"dataId": data_id, "data": None},
+                    files={"file": file},
+                    headers={"Authorization": "Bearer " + str(self.user.access_token)},
+                )
+        else:
             requests.post(
-                f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/datapoint/{self.project_uuid}',
-                params={"name": datapoint_name},
-                files={"file": file},
+                f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/add_datapoint/{self.project_uuid}',
+                json={"dataId": data_id, "data": data},
                 headers={"Authorization": "Bearer " + str(self.user.access_token)},
             )
 
     @check_token
-    def add_label(self, datapoint_name: str, label: str):
+    def add_label(self, data_id: int | str, label: str):
         """Add a label to a data point in the backend.
 
         Args:
-            datapoint_name (str): name of the datapoint to add a label for.
+            data_id (int | str): name of the datapoint to add a label for.
             label (str): label to add to the datapoint.
         """
-        self.user.check_token()
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/label/{self.project_uuid}',
-            json={"data_id": datapoint_name, "label": label},
+            json={"data_id": data_id, "label": label},
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
 
     @check_token
     def add_output(
         self,
-        datapoint_name: str,
-        model: str,
+        data_id: int | str,
         output: Any,
+        model: str,
     ):
         """Add an output value to a data point in the backend.
 
         Args:
-            datapoint_name (str): name of the datapoint to add an output value for.
-            model (str): the model for which to add an output value.
+            data_id (int | str): unique id of the datapoint to add an output value for.
             output (Any): the output value to be added.
+            model (str): the model for which to add an output value.
         """
-        self.user.check_token()
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/output/{self.project_uuid}',
             json={
-                "data_id": datapoint_name,
-                "model": model,
+                "data_id": data_id,
                 "output": output,
+                "model": model,
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
@@ -200,8 +211,8 @@ class Project:
     @check_token
     def add_feature(
         self,
-        datapoint_name: str,
         col_name: str,
+        data_id: int | str,
         value: Any,
         type: MetadataType,
         model: Optional[str] = None,
@@ -209,21 +220,20 @@ class Project:
         """Add a feature value to a data point in the backend.
 
         Args:
-            datapoint_name (str): name of the datapoint to add a feature value for.
+            data_id (int | str): name of the datapoint to add a feature value for.
             col_name (str): the name of the feature column to add.
             value (Any): the value of the feature column to add.
             type (MetadataType): the type of the feature column.
             model (Optional[str], optional): model that relates to the feature column.
                 Defaults to None.
         """
-        self.user.check_token()
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/feature/{self.project_uuid}',
             json={
-                "data_id": datapoint_name,
                 "col_name": col_name,
+                "data_id": data_id,
                 "value": value,
-                "type": type,
+                "type": type.value,
                 "model": model,
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},

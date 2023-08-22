@@ -22,8 +22,8 @@ class Database:
         Raises:
             Exception: the connection to the database failed.
         """
+        params = self.config()
         try:
-            params = self.config()
             self.conn = psycopg.connect(**params)
             self.cur = self.conn.cursor()
         except (Exception, psycopg.DatabaseError) as error:
@@ -180,6 +180,7 @@ class Database:
         else:
             db: Dict[str, Any] = {}
             db["host"] = os.environ["DB_HOST"]
+            db["port"] = os.environ["DB_PORT"]
             db["dbname"] = os.environ["DB_NAME"]
             db["user"] = os.environ["DB_USER"]
             db["password"] = os.environ["DB_PASSWORD"]

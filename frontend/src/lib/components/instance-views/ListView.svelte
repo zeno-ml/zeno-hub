@@ -13,7 +13,6 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
 	import { Join, ZenoColumnType, type GroupMetric } from '$lib/zenoapi';
 	import { Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
@@ -74,31 +73,29 @@
 
 	function updateTable() {
 		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
-		if ($model !== undefined) {
-			let predicates =
-				$selectionPredicates === undefined
-					? undefined
-					: setModelForFilterPredicateGroup($selectionPredicates, $model);
-			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
-				predicates = {
-					join: Join._,
-					predicates: [predicates]
-				};
-			}
-			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			getFilteredTable(
-				$columns,
-				[$model],
-				undefined,
-				start,
-				end - start,
-				$sort,
-				dataIds,
-				predicates
-			).then((res) => (table = res));
+		let predicates =
+			$selectionPredicates === undefined || $model === undefined
+				? undefined
+				: setModelForFilterPredicateGroup($selectionPredicates, $model);
+		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
+			predicates = {
+				join: Join._,
+				predicates: [predicates]
+			};
 		}
+		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
+		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
+		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		getFilteredTable(
+			$columns,
+			$model ? [$model] : [],
+			undefined,
+			start,
+			end - start,
+			$sort,
+			dataIds,
+			predicates
+		).then((res) => (table = res));
 	}
 </script>
 
@@ -112,12 +109,7 @@
 					<svelte:component
 						this={viewMap[$project.view]}
 						options={viewOptions}
-						entry={{
-							...inst,
-							data: `${getEndpoint()}/api/data/${$project.uuid}?data_id=${encodeURIComponent(
-								inst['data_id']
-							)}`
-						}}
+						entry={inst}
 						modelColumn={modelColumn?.id}
 					/>
 				</div>
