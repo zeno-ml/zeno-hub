@@ -55,7 +55,6 @@ def resolve_column_type(df: pd.DataFrame, col: str) -> MetadataType:
 
 zeno = zeno_api.authenticate(args.connex_username, args.connex_password)
 project = zeno.create_project(args.project_name, view=args.view)
-
 data_frame = pd.read_csv(args.csv_path)
 data_frame = data_frame.fillna("")
 output_cols = list(

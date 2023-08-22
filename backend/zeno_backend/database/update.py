@@ -104,24 +104,24 @@ def tag(tag: Tag, project: str):
         existing_data = set(map(lambda d: d[0], data_ids_result))
         new_data = set(tag.data_ids)
         to_remove = list(existing_data.difference(new_data))
-        for datapoint in to_remove:
+        for data_id in to_remove:
             db.execute(
                 sql.SQL("DELETE FROM {} WHERE tag_id = %s AND data_id = %s;").format(
                     sql.Identifier(f"{project}_tags_datapoints")
                 ),
                 [
                     tag.id,
-                    datapoint,
+                    data_id,
                 ],
             )
 
         to_add = list(new_data.difference(existing_data))
-        for datapoint in to_add:
+        for data_id in to_add:
             db.execute(
                 sql.SQL("INSERT INTO {} (tag_id, data_id) VALUES (%s,%s);").format(
                     sql.Identifier(f"{project}_tags_datapoints")
                 ),
-                [tag.id, datapoint],
+                [tag.id, data_id],
             )
         db.commit()
     except (Exception, DatabaseError) as error:

@@ -15,4 +15,4 @@ class TableRequest(CamelModel):
     limit: int
     filter_predicates: Optional[FilterPredicateGroup] = None
     sort: Tuple[Union[ZenoColumn, str, None], bool]
-    items: Optional[List[str]] = None
+    data_ids: Optional[List[str]] = None

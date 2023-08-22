@@ -9,8 +9,8 @@
 </script>
 
 <div id="w-min p-2 border border-grey-lighter">
-	{#if entry['item']}
-		<HighlightAuto code={entry['item']} />
+	{#if entry['data_id']}
+		<HighlightAuto code={entry['data_id']} />
 	{/if}
 	{#if entry['label']}
 		<hr />

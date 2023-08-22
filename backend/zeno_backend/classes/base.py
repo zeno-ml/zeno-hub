@@ -81,18 +81,18 @@ class Project(CamelModel):
         uuid (str): The UUID of the task.
         name (str): The name of the task.
         view (str): The name of the view to use for the task.
-        data_url (str): The base URL from which to read data instances.
+        data_url (Optional[str]): The base URL from which to read data instances.
         editor (bool): Whether the current user is an editor of the project.
         calculate_histogram_metrics (bool): Whether to calculate histogram metrics.
             Default True.
-        samples_per_page (int): The number of items to show per page. Default 10.
+        samples_per_page (int): The number of datapoints to show per page. Default 10.
         public (bool): Whether the task is public. Default False.
     """
 
     uuid: str
     name: str
     view: str
-    data_url: str
+    data_url: Optional[str]
     editor: bool
     calculate_histogram_metrics: bool = True
     samples_per_page: int = 10
@@ -177,7 +177,7 @@ class FeatureSpec(CamelModel):
 
 
 class GroupMetric(CamelModel):
-    """Specification for a metric on a group of items."""
+    """Specification for a metric on a group of datapoints."""
 
     metric: Union[float, None] = None
     size: int

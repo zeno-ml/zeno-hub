@@ -67,7 +67,7 @@ let histogramCountRequest: CancelablePromise<Array<Array<number>>>;
 export async function getHistogramCounts(
 	histograms: Map<string, HistogramEntry[]>,
 	filterPredicates?: FilterPredicateGroup,
-	items?: string[]
+	dataIds?: string[]
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
 		column: get(columns).find((col) => col.id === k) ?? get(columns)[0],
@@ -85,7 +85,7 @@ export async function getHistogramCounts(
 		histogramCountRequest = ZenoService.calculateHistogramCounts(config.uuid, {
 			columnRequests,
 			filterPredicates,
-			items
+			dataIds
 		});
 		const out = await histogramCountRequest;
 		requestingHistogramCounts.set(false);
@@ -127,7 +127,7 @@ export async function getHistogramMetrics(
 	histograms: Map<string, HistogramEntry[]>,
 	model: string,
 	metric: Metric,
-	items: string[] | undefined,
+	dataIds: string[] | undefined,
 	filterPredicates?: FilterPredicateGroup
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const config = get(project);
@@ -151,7 +151,7 @@ export async function getHistogramMetrics(
 			filterPredicates,
 			model,
 			metric,
-			items
+			dataIds
 		});
 
 		requestingHistogramCounts.set(true);

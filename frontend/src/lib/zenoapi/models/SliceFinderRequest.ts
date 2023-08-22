@@ -17,5 +17,5 @@ export type SliceFinderRequest = {
 	maxLattice: number;
 	compareColumn?: ZenoColumn | null;
 	filterPredicates?: FilterPredicateGroup | null;
-	items?: Array<string> | null;
+	dataIds?: Array<string> | null;
 };

@@ -27,7 +27,7 @@ class HistogramRequest(CamelModel):
     filter_predicates: Optional[FilterPredicateGroup] = None
     model: Optional[str] = None
     metric: Optional[Metric] = None
-    items: Optional[List[str]] = None
+    data_ids: Optional[List[str]] = None
 
 
 class StringFilterRequest(CamelModel):

@@ -105,7 +105,7 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 
 export async function getMetricsForSlicesAndTags(
 	metricKeys: MetricKey[],
-	items?: string[],
+	dataIds?: string[],
 	compare?: boolean
 ): Promise<GroupMetric[] | undefined> {
 	if (metricKeys.length === 0) {
@@ -122,7 +122,7 @@ export async function getMetricsForSlicesAndTags(
 		}
 		return await ZenoService.getMetricsForSlices(config.uuid, {
 			metricKeys,
-			items
+			dataIds
 		});
 	}
 }

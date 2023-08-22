@@ -22,7 +22,7 @@
 		<img
 			src={URL.createObjectURL(data)}
 			style:max-width="200px"
-			alt="Image thumbnail for instance {entry['item']}"
+			alt="Image thumbnail for instance {entry['data_id']}"
 		/>
 		<br />
 		<div class="flex">

@@ -106,6 +106,7 @@ class Zeno:
                 "editor": True,
                 "public": False,
                 "samples_per_page": 10,
+                "data_url": None,
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
@@ -150,7 +151,7 @@ class Project:
         self.user.check_token()
         with open(file_path, "rb") as file:
             requests.post(
-                f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/item/{self.project_uuid}',
+                f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/datapoint/{self.project_uuid}',
                 params={"name": datapoint_name},
                 files={"file": file},
                 headers={"Authorization": "Bearer " + str(self.user.access_token)},
@@ -167,7 +168,7 @@ class Project:
         self.user.check_token()
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/label/{self.project_uuid}',
-            json={"item": datapoint_name, "label": label},
+            json={"data_id": datapoint_name, "label": label},
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
 
@@ -189,7 +190,7 @@ class Project:
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/output/{self.project_uuid}',
             json={
-                "item": datapoint_name,
+                "data_id": datapoint_name,
                 "model": model,
                 "output": output,
             },
@@ -219,7 +220,7 @@ class Project:
         requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/feature/{self.project_uuid}',
             json={
-                "item": datapoint_name,
+                "data_id": datapoint_name,
                 "col_name": col_name,
                 "value": value,
                 "type": type,

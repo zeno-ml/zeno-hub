@@ -56,7 +56,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
     not_cont_search_col_ids: List[str] = [col.id for col in not_cont_search_cols]
     metric_col: str = "diff" if req.compare_column else req.metric_column.id
 
-    filter_sql = table_filter(project, None, req.filter_predicates, req.items)
+    filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
     sql_table = table_data(project, filter_sql)
     filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
     cont_df = cont_cols_df(filt_df[cont_search_col_ids].dropna(), cont_search_col_ids)

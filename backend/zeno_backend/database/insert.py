@@ -42,7 +42,7 @@ def project(project_config: Project, user: User):
         db.execute(
             "INSERT INTO projects (uuid, name, view, data_url, "
             + "calculate_histogram_metrics, samples_per_page, public) "
-            + "VALUES (%s,%s,%s,%s,%s,%s);",
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s);",
             [
                 project_config.uuid,
                 project_config.name,
@@ -60,7 +60,7 @@ def project(project_config: Project, user: User):
         )
         # Create table to hold project data.
         db.execute(
-            sql.SQL("CREATE TABLE {}(datapoint TEXT NOT NULL PRIMARY KEY);").format(
+            sql.SQL("CREATE TABLE {}(data_id TEXT NOT NULL PRIMARY KEY);").format(
                 sql.Identifier(project_config.uuid)
             )
         )
@@ -77,7 +77,7 @@ def project(project_config: Project, user: User):
                 "INSERT INTO {} (column_id, name, type, data_type) "
                 "VALUES (%s,%s,%s,%s);"
             ).format(sql.Identifier(f"{project_config.uuid}_column_map")),
-            ["datapoint", "datapoint", ZenoColumnType.DATA, MetadataType.NOMINAL],
+            ["data_id", "data_id", ZenoColumnType.DATA, MetadataType.NOMINAL],
         )
 
         # Create table to hold information about tags and associated datapoints.
@@ -85,7 +85,7 @@ def project(project_config: Project, user: User):
             sql.SQL(
                 "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
                 "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
-                "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(datapoint) "
+                "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
                 "ON DELETE CASCADE ON UPDATE CASCADE);"
             ).format(
                 sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
@@ -99,20 +99,20 @@ def project(project_config: Project, user: User):
         db.disconnect()
 
 
-def datapoint(name: str, project: str):
+def datapoint(data_id: str, project: str):
     """Adds a new datapoint to an existing project.
 
     Args:
-        name (str): name of the datapoint to be added to the project data.
+        data_id (str): id of the datapoint to be added to the project data.
         project (str): the project the user is currently working with.
     """
     db = Database()
     db.connect_execute(
-        sql.SQL('INSERT INTO {} ("datapoint") VALUES (%s);').format(
+        sql.SQL('INSERT INTO {} ("data_id") VALUES (%s);').format(
             sql.Identifier(project)
         ),
         [
-            name,
+            data_id,
         ],
     )
 

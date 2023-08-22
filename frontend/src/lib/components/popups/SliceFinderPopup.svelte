@@ -104,7 +104,7 @@
 		if ($project !== undefined && metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
+			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 			sliceFinderReturn = await ZenoService.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,
@@ -113,7 +113,7 @@
 				maxLattice: parseInt(maxlattice[maxlatticeIdx]),
 				compareColumn,
 				filterPredicates: $selectionPredicates,
-				items
+				dataIds
 			});
 		}
 

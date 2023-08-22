@@ -8,7 +8,7 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { BeeswarmParameters } from './models/BeeswarmParameters';
-export type { Body_add_item } from './models/Body_add_item';
+export type { Body_add_datapoint } from './models/Body_add_datapoint';
 export type { Body_add_organization } from './models/Body_add_organization';
 export type { Chart } from './models/Chart';
 export { ChartType } from './models/ChartType';

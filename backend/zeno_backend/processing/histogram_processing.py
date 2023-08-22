@@ -132,7 +132,7 @@ def histogram_metrics(
     if req.metric is None:
         return []
 
-    filter_sql = table_filter(project, req.model, req.filter_predicates, req.items)
+    filter_sql = table_filter(project, req.model, req.filter_predicates, req.data_ids)
     ret: List[List[Union[float, None]]] = []
     for r in req.column_requests:
         loc_ret: List[Union[float, None]] = []
