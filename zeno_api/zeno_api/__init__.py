@@ -98,7 +98,7 @@ class Zeno:
         # TODO: change to not return a UUID, just print if
         # project exists or if it was created successfully.
         uuid = requests.post(
-            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/project',
+            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/project-create',
             json={
                 "uuid": "",
                 "view": view,

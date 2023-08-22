@@ -371,18 +371,17 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/project", tags=["zeno"])
-    def add_project(description: Project, current_user=Depends(auth.claim())):
-        project_uuid = uuid.uuid4()
-        description.uuid = str(project_uuid)
+    @api_app.post("/project-create", tags=["zeno"])
+    def add_project(project: Project, current_user=Depends(auth.claim())):
+        project.uuid = str(uuid.uuid4())
         user = select.user(current_user["username"])
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: User could not be found."),
             )
-        insert.project(description, user)
-        return project_uuid
+        insert.project(project, user)
+        return project.uuid
 
     @api_app.post(
         "/upload_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
