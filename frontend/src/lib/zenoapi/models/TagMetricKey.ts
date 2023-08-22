@@ -11,6 +11,11 @@ import type { Tag } from './Tag';
  *
  * TagMetricKeys can be used to calculate metrics for specific tags.
  *
+ * Attributes:
+ * tag (Tag): The tag to calculate metrics for.
+ * model (str): The model to calculate metrics for.
+ * metric (Metric): The metric to calculate.
+ *
  */
 export type TagMetricKey = {
 	tag: Tag;

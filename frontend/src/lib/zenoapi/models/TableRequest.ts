@@ -17,5 +17,5 @@ export type TableRequest = {
 	limit: number;
 	filterPredicates?: FilterPredicateGroup | null;
 	sort: any[];
-	items?: Array<string> | null;
+	dataIds?: Array<string> | null;
 };

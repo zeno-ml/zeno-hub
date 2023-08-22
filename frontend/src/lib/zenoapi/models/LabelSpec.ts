@@ -4,9 +4,14 @@
 /* eslint-disable */
 
 /**
- * Specification for a label in Zeno's project data.
+ * Specification for a label in a Zeno project.
+ *
+ * Attributes:
+ * data_id (str): The ID of the associated data instance.
+ * label (str): The ground truth label for the data instance.
+ *
  */
 export type LabelSpec = {
-	item: string;
+	dataId: string;
 	label: string;
 };

@@ -43,7 +43,7 @@
 		model: string | undefined,
 		metric: Metric | undefined
 	) {
-		const items =
+		const dataIds =
 			tagIds !== undefined && selectionIds !== undefined
 				? [...new Set([...tagIds, ...selectionIds])]
 				: tagIds !== undefined
@@ -51,13 +51,13 @@
 				: selectionIds;
 		model !== undefined &&
 			getHistograms($columns, model).then((res) => {
-				getHistogramCounts(res, undefined, items).then((res) => {
+				getHistogramCounts(res, undefined, dataIds).then((res) => {
 					if (res === undefined) {
 						return;
 					}
 					metadataHistograms = res;
 					metric !== undefined &&
-						getHistogramMetrics(res, model, metric, items, undefined).then((res) => {
+						getHistogramMetrics(res, model, metric, dataIds, undefined).then((res) => {
 							if (res !== undefined) {
 								metadataHistograms = res;
 							}
@@ -73,7 +73,7 @@
 		metric: Metric | undefined,
 		selectionPredicates: FilterPredicateGroup | undefined
 	) {
-		const items =
+		const dataIds =
 			tagIds !== undefined && selectionIds !== undefined
 				? [...new Set([...tagIds, ...selectionIds])]
 				: tagIds !== undefined
@@ -87,7 +87,7 @@
 						predicates: [selectionPredicates],
 						join: Join.AND
 				  },
-			items
+			dataIds
 		).then((res) => {
 			if (res === undefined) {
 				return;
@@ -100,7 +100,7 @@
 					res,
 					model,
 					metric,
-					items,
+					dataIds,
 					selectionPredicates === undefined
 						? undefined
 						: {
@@ -126,7 +126,7 @@
 			return;
 		}
 		metricRange.set([Infinity, -Infinity]);
-		const items =
+		const dataIds =
 			$tagIds !== undefined && $selectionIds !== undefined
 				? [...new Set([...$tagIds, ...$selectionIds])]
 				: $tagIds !== undefined
@@ -134,7 +134,7 @@
 				: $selectionIds;
 		$model !== undefined &&
 			metric !== undefined &&
-			getHistogramMetrics(metadataHistograms, $model, metric, items, undefined).then((res) => {
+			getHistogramMetrics(metadataHistograms, $model, metric, dataIds, undefined).then((res) => {
 				if (res === undefined) {
 					return;
 				}

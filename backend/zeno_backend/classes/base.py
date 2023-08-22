@@ -78,22 +78,25 @@ class Project(CamelModel):
     """Projects with datasets & models.
 
     Attributes:
-        uuid (str): UUID of the task.
-        name (str): name of the task.
-        view (str): name of the view to use for the task.
-        calculate_histogram_metrics (bool): whether to calculate histogram metrics.
-        samples_per_page (int): number of items to show per page.
-        public (bool): whether the task is public.
-        editor (bool): whether the current user is an editor of the project.
+        uuid (str): The UUID of the task.
+        name (str): The name of the task.
+        view (str): The name of the view to use for the task.
+        data_url (Optional[str]): The base URL from which to read data instances.
+        editor (bool): Whether the current user is an editor of the project.
+        calculate_histogram_metrics (bool): Whether to calculate histogram metrics.
+            Default True.
+        samples_per_page (int): The number of datapoints to show per page. Default 10.
+        public (bool): Whether the task is public. Default False.
     """
 
     uuid: str
     name: str
     view: str
+    data_url: Optional[str]
+    editor: bool
     calculate_histogram_metrics: bool = True
     samples_per_page: int = 10
-    editor: bool
-    public: bool
+    public: bool = False
 
 
 class ProjectStats(CamelModel):
@@ -111,7 +114,15 @@ class ProjectStats(CamelModel):
 
 
 class ZenoColumn(CamelModel):
-    """Representation of a column in Zeno's project data."""
+    """Representation of a column in a Zeno project.
+
+    Attributes:
+        id (str): The ID of the column.
+        name (str): The name of the column.
+        column_type (ZenoColumnType): The type of the column.
+        data_type (MetadataType): The data type of the column.
+        model (Optional[str]): The name of the model that produced the column.
+    """
 
     id: str
     name: str
@@ -121,32 +132,52 @@ class ZenoColumn(CamelModel):
 
 
 class LabelSpec(CamelModel):
-    """Specification for a label in Zeno's project data."""
+    """Specification for a label in a Zeno project.
 
-    item: str
+    Attributes:
+        data_id (str): The ID of the associated data instance.
+        label (str): The ground truth label for the data instance.
+    """
+
+    data_id: str
     label: str
 
 
 class OutputSpec(CamelModel):
-    """Specification for a model output in Zeno's project data."""
+    """Specification for a model output in a Zeno project.
 
-    item: str
-    output: str
+    Attributes:
+        data_id (str): The ID of the associated data instance.
+        model (str): The name of the model that produced the output.
+        output (str): The model's output for the data instance.
+    """
+
+    data_id: str
     model: str
+    output: str
 
 
 class FeatureSpec(CamelModel):
-    """Specification for metadata in Zeno."""
+    """Specification for a metadata feature in a Zeno project.
 
+    Attributes:
+        data_id (str): The ID of the associated data instance.
+        col_name (str): The name of the associated column.
+        type (MetadataType): The type of the metadata feature.
+        value (Any): The value of the metadata feature. Default None.
+        model (Optional[str]): The name of the model associated with the
+            metadata feature.
+    """
+
+    data_id: str
     col_name: str
-    value: Any = None
-    item: str
     type: MetadataType
+    value: Any = None
     model: Optional[str] = None
 
 
 class GroupMetric(CamelModel):
-    """Specification for a metric on a group of items."""
+    """Specification for a metric on a group of datapoints."""
 
     metric: Union[float, None] = None
     size: int

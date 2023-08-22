@@ -40,7 +40,7 @@
 		//this is to catch for the case when you have intersections between tags
 		selectionTags.forEach((tagId) => {
 			const currentTag = $tags.find((tag) => tag.id === tagId);
-			if (currentTag !== undefined) currentTag.items.forEach((id) => s.add(id));
+			if (currentTag !== undefined) currentTag.dataIds.forEach((id) => s.add(id));
 		});
 		tagIds.set([...s]);
 	}
@@ -48,7 +48,7 @@
 	function addTagIdsToTagIds(tag: Tag) {
 		let s = new Set<string>();
 		if ($tagIds !== undefined) $tagIds.forEach((id) => s.add(id));
-		tag.items.forEach((id) => s.add(id));
+		tag.dataIds.forEach((id) => s.add(id));
 		tagIds.set([...s]);
 	}
 

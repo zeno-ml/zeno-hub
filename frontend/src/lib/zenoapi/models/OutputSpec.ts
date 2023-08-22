@@ -4,10 +4,16 @@
 /* eslint-disable */
 
 /**
- * Specification for a model output in Zeno's project data.
+ * Specification for a model output in a Zeno project.
+ *
+ * Attributes:
+ * data_id (str): The ID of the associated data instance.
+ * model (str): The name of the model that produced the output.
+ * output (str): The model's output for the data instance.
+ *
  */
 export type OutputSpec = {
-	item: string;
-	output: string;
+	dataId: string;
 	model: string;
+	output: string;
 };

@@ -13,5 +13,5 @@ import type { MetricKey } from './MetricKey';
  */
 export type MetricRequest = {
 	metricKeys: Array<MetricKey>;
-	items?: Array<string> | null;
+	dataIds?: Array<string> | null;
 };

@@ -277,7 +277,7 @@ def f1(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
 
 
 def count(project: str, filter: Optional[sql.Composed]) -> GroupMetric:
-    """Count the number of items matching a specified filter.
+    """Count the number of datapoints matching a specified filter.
 
     Args:
         project (str): the project the user is currently working with.
@@ -287,7 +287,7 @@ def count(project: str, filter: Optional[sql.Composed]) -> GroupMetric:
         Exception: something in the database processing failed.
 
     Returns:
-        GroupMetric: count of items matching the specified filter.
+        GroupMetric: count of datapoints matching the specified filter.
     """
     db = Database()
     try:

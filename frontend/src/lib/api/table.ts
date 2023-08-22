@@ -11,7 +11,7 @@ export async function getFilteredTable(
 	offset: number,
 	limit: number,
 	sort: [ZenoColumn | undefined, boolean],
-	items: string[],
+	dataIds: string[],
 	filterPredicates?: FilterPredicateGroup
 ) {
 	const requestedColumns = completeColumns.filter(
@@ -48,7 +48,7 @@ export async function getFilteredTable(
 		offset,
 		limit,
 		sort,
-		items
+		dataIds
 	});
 	return JSON.parse(res);
 }

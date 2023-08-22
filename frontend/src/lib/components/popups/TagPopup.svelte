@@ -30,7 +30,7 @@
 			ZenoService.addTag($project.uuid, {
 				id: 0,
 				tagName,
-				items: []
+				dataIds: []
 			}).then(() => {
 				if ($project !== undefined) {
 					ZenoService.getTags($project.uuid).then((fetchedTags) => {

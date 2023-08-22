@@ -42,7 +42,7 @@
 	].sort((a, b) => a - b);
 
 	if ($editTag !== undefined) {
-		currentTagIds = $editTag.items;
+		currentTagIds = $editTag.dataIds;
 	}
 
 	$: columnHeader = $columns.filter(
@@ -102,7 +102,7 @@
 			}
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
+			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 			getFilteredTable(
 				$columns,
 				[$model],
@@ -110,7 +110,7 @@
 				start,
 				end - start,
 				$sort,
-				items,
+				dataIds,
 				predicates
 			).then((res) => (table = res));
 		}
@@ -141,7 +141,7 @@
 						<th class="mr-5">instance</th>
 					{/if}
 					{#each columnHeader as header}
-						{#if header.name !== 'item'}
+						{#if header.name !== 'data_id'}
 							<th class="mr-5" on:click={() => updateSort(header)}>
 								<div class="flex">
 									{header.name}
@@ -162,11 +162,11 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each table as tableContent (tableContent['item'])}
+				{#each table as tableContent (tableContent['data_id'])}
 					<tr>
 						{#if $editTag !== undefined}
 							<td class="pr-3.5">
-								<Checkbox bind:group={currentTagIds} value={String(tableContent['item'])} />
+								<Checkbox bind:group={currentTagIds} value={String(tableContent['data_id'])} />
 							</td>
 						{/if}
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
@@ -177,9 +177,9 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
-												tableContent['item']
-											)}`
+											data: `${getEndpoint()}/api/data/${
+												$project.uuid
+											}?data_id=${encodeURIComponent(tableContent['data_id'])}`
 										}}
 										modelColumn={modelColumn?.id}
 									/>

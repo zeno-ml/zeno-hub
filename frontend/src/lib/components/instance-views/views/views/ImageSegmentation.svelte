@@ -15,7 +15,7 @@
 			src={imageURL}
 			style:width="150px"
 			style:height="150px"
-			alt="Image thumbnail for instance {entry['item']}"
+			alt="Image thumbnail for instance {entry['data_id']}"
 		/>
 		{#if maskOption === 'label'}
 			<img

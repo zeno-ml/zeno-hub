@@ -15,7 +15,7 @@ class SliceFinderRequest(CamelModel):
     max_lattice: int
     compare_column: Optional[ZenoColumn] = None
     filter_predicates: Optional[FilterPredicateGroup] = None
-    items: Optional[List[str]] = None
+    data_ids: Optional[List[str]] = None
 
 
 class SliceFinderReturn(CamelModel):

@@ -67,8 +67,8 @@
 	function getCompareResults(model: string, metric: Metric, predicates?: FilterPredicateGroup) {
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), items, true);
+		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds, true);
 	}
 
 	// change selected to table if a tag is edited

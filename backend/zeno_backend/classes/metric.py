@@ -30,4 +30,4 @@ class MetricRequest(CamelModel):
     """
 
     metric_keys: List[MetricKey]
-    items: Optional[List[str]] = None
+    data_ids: Optional[List[str]] = None

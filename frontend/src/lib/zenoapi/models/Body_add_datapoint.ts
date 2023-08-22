@@ -3,6 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Body_add_item = {
+export type Body_add_datapoint = {
 	file: Blob;
 };

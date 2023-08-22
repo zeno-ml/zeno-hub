@@ -17,7 +17,7 @@
 		$selections.tags.forEach((currId) => {
 			const current = $tags.find((tag) => tag.id === currId);
 			if (current) {
-				current.items.forEach((item) => s.add(item));
+				current.dataIds.forEach((item) => s.add(item));
 			}
 		});
 		tagIds.set([...s]);

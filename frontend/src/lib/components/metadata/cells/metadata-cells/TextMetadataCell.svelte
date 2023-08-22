@@ -61,7 +61,7 @@
 		searchString = '';
 	}
 
-	async function searchItems(input: string): Promise<string[]> {
+	async function searchData(input: string): Promise<string[]> {
 		if (isRegex) {
 			try {
 				new RegExp(input);
@@ -119,7 +119,7 @@
 			placeholder={'Search'}
 			{noResultsText}
 			hideArrow={true}
-			searchFunction={searchItems}
+			searchFunction={searchData}
 			cleanUserText={false}
 			ignoreAccents={false}
 			localFiltering={false}

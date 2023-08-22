@@ -20,7 +20,7 @@ from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
 
 
-def setup_project(description: Project, user: User):
+def project(project_config: Project, user: User):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -28,8 +28,8 @@ def setup_project(description: Project, user: User):
     all tags of the project.
 
     Args:
-        description (Project): the configuration with which to initialize the new
-        project.
+        project_config (Project): the configuration with which to
+            initialize the new project.
         user (User): the user who is setting up the project and becomes its admin.
 
     Raises:
@@ -40,50 +40,56 @@ def setup_project(description: Project, user: User):
     try:
         db.connect()
         db.execute(
-            "INSERT INTO projects (uuid, name, view, calculate_histogram_metrics, "
-            "samples_per_page, public) VALUES (%s,%s,%s,%s,%s,%s);",
+            "INSERT INTO projects (uuid, name, view, data_url, "
+            + "calculate_histogram_metrics, samples_per_page, public) "
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s);",
             [
-                description.uuid,
-                description.name,
-                description.view,
-                description.calculate_histogram_metrics,
-                description.samples_per_page,
-                description.public,
+                project_config.uuid,
+                project_config.name,
+                project_config.view,
+                project_config.data_url,
+                project_config.calculate_histogram_metrics,
+                project_config.samples_per_page,
+                project_config.public,
             ],
         )
         db.execute(
             "INSERT INTO user_project (user_id, project_uuid, editor) "
             "VALUES (%s,%s,%s)",
-            [user.id, description.uuid, True],
+            [user.id, project_config.uuid, True],
         )
+        # Create table to hold project data.
         db.execute(
-            sql.SQL("CREATE TABLE {}(item TEXT NOT NULL PRIMARY KEY);").format(
-                sql.Identifier(description.uuid)
+            sql.SQL("CREATE TABLE {}(data_id TEXT NOT NULL PRIMARY KEY);").format(
+                sql.Identifier(project_config.uuid)
             )
         )
+        # Create table to hold information about the columns in the project data.
         db.execute(
             sql.SQL(
                 "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
                 "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
                 "data_type TEXT NOT NULL);"
-            ).format(sql.Identifier(f"{description.uuid}_column_map"))
+            ).format(sql.Identifier(f"{project_config.uuid}_column_map"))
         )
         db.execute(
             sql.SQL(
                 "INSERT INTO {} (column_id, name, type, data_type) "
                 "VALUES (%s,%s,%s,%s);"
-            ).format(sql.Identifier(f"{description.uuid}_column_map")),
-            ["item", "item", ZenoColumnType.DATA, MetadataType.NOMINAL],
+            ).format(sql.Identifier(f"{project_config.uuid}_column_map")),
+            ["data_id", "data_id", ZenoColumnType.DATA, MetadataType.NOMINAL],
         )
+
+        # Create table to hold information about tags and associated datapoints.
         db.execute(
             sql.SQL(
                 "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
                 "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
-                "ON UPDATE CASCADE, item_id text NOT NULL REFERENCES {}(item) "
+                "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
                 "ON DELETE CASCADE ON UPDATE CASCADE);"
             ).format(
-                sql.Identifier(f"{description.uuid}_tags_items"),
-                sql.Identifier(description.uuid),
+                sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
+                sql.Identifier(project_config.uuid),
             )
         )
         db.commit()
@@ -93,24 +99,26 @@ def setup_project(description: Project, user: User):
         db.disconnect()
 
 
-def item(name: str, project: str):
-    """Adds a new data item to an existing project.
+def datapoint(data_id: str, project: str):
+    """Adds a new datapoint to an existing project.
 
     Args:
-        name (str): name of the item to be added to the project data.
+        data_id (str): id of the datapoint to be added to the project data.
         project (str): the project the user is currently working with.
     """
     db = Database()
     db.connect_execute(
-        sql.SQL('INSERT INTO {} ("item") VALUES (%s);').format(sql.Identifier(project)),
+        sql.SQL('INSERT INTO {} ("data_id") VALUES (%s);').format(
+            sql.Identifier(project)
+        ),
         [
-            name,
+            data_id,
         ],
     )
 
 
 def label(label_spec: LabelSpec, project: str):
-    """Adds a label to an item in the project's databse.
+    """Adds a label to a datapoint in the project's databse.
 
     Args:
         label_spec (LabelSpec): the specification of the label to be added.
@@ -141,10 +149,10 @@ def label(label_spec: LabelSpec, project: str):
                 )
             )
         db.execute(
-            sql.SQL("UPDATE {} SET label = %s WHERE item = %s;").format(
+            sql.SQL("UPDATE {} SET label = %s WHERE data_id = %s;").format(
                 sql.Identifier(project)
             ),
-            [label_spec.label, label_spec.item],
+            [label_spec.label, label_spec.data_id],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -154,7 +162,7 @@ def label(label_spec: LabelSpec, project: str):
 
 
 def output(output_spec: OutputSpec, project: str):
-    """Adds a model output to an item in the project's databse.
+    """Adds a model output to an datapoint in the project's databse.
 
     Args:
         output_spec (OutputSpec): the specification of the output to be added.
@@ -195,10 +203,10 @@ def output(output_spec: OutputSpec, project: str):
         else:
             col_uuid = str(exists[0])
         db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE item = %s;").format(
+            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [output_spec.output, output_spec.item],
+            [output_spec.output, output_spec.data_id],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -208,10 +216,10 @@ def output(output_spec: OutputSpec, project: str):
 
 
 def feature(feature_spec: FeatureSpec, project: str):
-    """Adds a feature to an item in the project's databse.
+    """Adds a feature to a datapoint in the project's databse.
 
     Args:
-        feature_spec: the specification of the feature function.
+        feature_spec (FeatureSpec): the specification of the feature function.
         project (str): the project the user is currently working with.
 
     Raises:
@@ -259,10 +267,10 @@ def feature(feature_spec: FeatureSpec, project: str):
         else:
             col_uuid = str(exists[0])
         db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE item = %s;").format(
+            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [feature_spec.value, feature_spec.item],
+            [feature_spec.value, feature_spec.data_id],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -342,12 +350,12 @@ def tag(project: str, tag: Tag):
         )
         if id is None:
             return
-        for item in tag.items:
+        for datapoint in tag.data_ids:
             db.execute(
-                sql.SQL("INSERT INTO {} (tag_id, item_id) VALUES (%s,%s);").format(
-                    sql.Identifier(f"{project}_tags_items")
+                sql.SQL("INSERT INTO {} (tag_id, data_id) VALUES (%s,%s);").format(
+                    sql.Identifier(f"{project}_tags_datapoints")
                 ),
-                [id[0], item],
+                [id[0], datapoint],
             )
         db.commit()
     except (Exception, DatabaseError) as error:

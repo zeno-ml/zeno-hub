@@ -114,8 +114,8 @@ def get_server() -> FastAPI:
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
-    def get_data(project: str, item: str):
-        file_path = Path("data", project, item)
+    def get_data(project: str, data_id: str):
+        file_path = Path("data", project, data_id)
         if not Path.is_file(file_path):
             return Response(status_code=404)
         blob = open(file_path, "rb").read()
@@ -200,7 +200,9 @@ def get_server() -> FastAPI:
         dependencies=[Depends(auth)],
     )
     def get_metric_for_tag(metric_key: TagMetricKey, project: str):
-        filter_sql = table_filter(project, metric_key.model, None, metric_key.tag.items)
+        filter_sql = table_filter(
+            project, metric_key.model, None, metric_key.tag.data_ids
+        )
         return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
 
     @api_app.post(
@@ -219,7 +221,7 @@ def get_server() -> FastAPI:
         dependencies=[Depends(auth)],
     )
     def get_filtered_table(req: TableRequest, project: str):
-        filter_sql = table_filter(project, None, req.filter_predicates, req.items)
+        filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
         sql_table = select.table_data_paginated(
             project, filter_sql, req.offset, req.limit
         )
@@ -274,7 +276,10 @@ def get_server() -> FastAPI:
         return_metrics: List[GroupMetric] = []
         for metric_key in req.metric_keys:
             filter_sql = table_filter(
-                project, metric_key.model, metric_key.slice.filter_predicates, req.items
+                project,
+                metric_key.model,
+                metric_key.slice.filter_predicates,
+                req.data_ids,
             )
             return_metrics.append(
                 metric_map(metric_key.metric, project, metric_key.model, filter_sql)
@@ -376,12 +381,12 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: Project already exists."),
             ) from exc
-        insert.setup_project(description, user)
+        insert.project(description, user)
         return project_uuid
 
-    @api_app.post("/item/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    async def add_item(project: str, name: str, file: UploadFile = File(...)):
-        insert.item(name, project)
+    @api_app.post("/datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    async def add_datapoint(project: str, name: str, file: UploadFile = File(...)):
+        insert.datapoint(name, project)
         file_path = Path("data", project, name)
         parent_path = file_path.parent
         if not parent_path.exists():

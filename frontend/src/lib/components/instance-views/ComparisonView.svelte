@@ -168,7 +168,7 @@
 			}
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
+			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 			getFilteredTable(
 				$columns,
 				[$model, $comparisonModel],
@@ -176,7 +176,7 @@
 				start,
 				end - start,
 				$compareSort,
-				items,
+				dataIds,
 				predicates
 			).then((res) => {
 				table = res;
@@ -263,7 +263,7 @@
 				</th>
 			</thead>
 			<tbody>
-				{#each table as tableContent (tableContent['item'])}
+				{#each table as tableContent (tableContent['dataId'])}
 					<tr>
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="pr-2.5">
@@ -273,8 +273,8 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
-												tableContent['item']
+											data: `${getEndpoint()}/api/data/${$project.uuid}?dataId=${encodeURIComponent(
+												tableContent['dataId']
 											)}`
 										}}
 										modelColumn={modelAColumn?.id}
@@ -288,8 +288,8 @@
 										options={viewOptions}
 										entry={{
 											...tableContent,
-											data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
-												tableContent['item']
+											data: `${getEndpoint()}/api/data/${$project.uuid}?dataId=${encodeURIComponent(
+												tableContent['dataId']
 											)}`
 										}}
 										modelColumn={modelBColumn?.id}

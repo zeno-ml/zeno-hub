@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 /**
- * Specification for a metric on a group of items.
+ * Specification for a metric on a group of datapoints.
  */
 export type GroupMetric = {
 	metric?: number | null;

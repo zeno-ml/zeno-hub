@@ -87,7 +87,7 @@
 			}
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const items = [...new Set([...secureTagIds, ...secureSelectionIds])];
+			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 			getFilteredTable(
 				$columns,
 				[$model],
@@ -95,7 +95,7 @@
 				start,
 				end - start,
 				$sort,
-				items,
+				dataIds,
 				predicates
 			).then((res) => (table = res));
 		}
@@ -107,15 +107,15 @@
 		<div
 			class="overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start w-full h-full"
 		>
-			{#each table as inst (inst['item'])}
+			{#each table as inst (inst['data_id'])}
 				<div class="mr-2 mt-1">
 					<svelte:component
 						this={viewMap[$project.view]}
 						options={viewOptions}
 						entry={{
 							...inst,
-							data: `${getEndpoint()}/api/data/${$project.uuid}?item=${encodeURIComponent(
-								inst['item']
+							data: `${getEndpoint()}/api/data/${$project.uuid}?data_id=${encodeURIComponent(
+								inst['data_id']
 							)}`
 						}}
 						modelColumn={modelColumn?.id}

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Body_add_item } from '../models/Body_add_item';
+import type { Body_add_datapoint } from '../models/Body_add_datapoint';
 import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Chart } from '../models/Chart';
 import type { FeatureSpec } from '../models/FeatureSpec';
@@ -59,11 +59,11 @@ export class ZenoService {
 	/**
 	 * Get Data
 	 * @param project
-	 * @param item
+	 * @param dataId
 	 * @returns binary Successful Response
 	 * @throws ApiError
 	 */
-	public static getData(project: string, item: string): CancelablePromise<Blob> {
+	public static getData(project: string, dataId: string): CancelablePromise<Blob> {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/data/{project}',
@@ -71,7 +71,7 @@ export class ZenoService {
 				project: project
 			},
 			query: {
-				item: item
+				data_id: dataId
 			},
 			errors: {
 				422: `Validation Error`
@@ -572,21 +572,21 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Item
+	 * Add Datapoint
 	 * @param project
 	 * @param name
 	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addItem(
+	public static addDatapoint(
 		project: string,
 		name: string,
-		formData: Body_add_item
+		formData: Body_add_datapoint
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/item/{project}',
+			url: '/datapoint/{project}',
 			path: {
 				project: project
 			},

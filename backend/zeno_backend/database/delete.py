@@ -21,23 +21,29 @@ def project(project: str):
     db = Database()
     try:
         db.connect()
+
+        # Drop the primary table with project data.
         db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
+        # Drop the table with column properties.
         db.execute(
             sql.SQL("DROP TABLE {} CASCADE;").format(
                 sql.Identifier(f"{project}_column_map")
             )
         )
+        # Drop the table with tag data.
         db.execute(
             sql.SQL("DROP TABLE {} CASCADE;").format(
-                sql.Identifier(f"{project}_tags_items")
+                sql.Identifier(f"{project}_tags_datapoints")
             )
         )
+        # Finally, delete the project from the projects table.
         db.execute(
             "DELETE FROM projects WHERE uuid = %s;",
             [
                 project,
             ],
         )
+
         db.commit()
     except (Exception, DatabaseError) as error:
         raise Exception(error) from error
