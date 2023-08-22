@@ -141,12 +141,14 @@ class Project:
     def add_datapoint(self, data_id: int | str, data: Optional[Path | str] = None):
         """Add a datapoint to an existing project.
 
-        The data parameter can be left empty if the data_id is a URL or URL part
-        (with base_url set in project).
+        The data parameter can be left empty if a URL (URL part with base_url set for
+        the project) is used for data_id. If data is left empty, you have to set data_id
+        to a valid URL (URL part with base_url set for the project).
+
         Otherwise, the data parameter can be either a string containing the data
-        directly or a Path to a file.
+        directly or a Path to a file to be uploaded.
         If a file path is provided, it has to be in the right format for the project's
-        view.
+        view to be displayed.
 
         Args:
             data_id (int | str): the unique ID of the data point to be added.
@@ -156,7 +158,7 @@ class Project:
         if isinstance(data, PurePath):
             with open(data, "rb") as file:
                 requests.post(
-                    f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/add_local_datapoint/{self.project_uuid}',
+                    f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/upload_datapoint/{self.project_uuid}',
                     json={"dataId": data_id, "data": None},
                     files={"file": file},
                     headers={"Authorization": "Bearer " + str(self.user.access_token)},

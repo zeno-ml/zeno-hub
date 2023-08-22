@@ -379,9 +379,9 @@ def get_server() -> FastAPI:
         return project_uuid
 
     @api_app.post(
-        "/local_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/upload_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
-    async def add_local_datapoint(
+    async def upload_datapoint(
         project: str, data_spec: DataSpec, file: UploadFile = File(...)
     ):
         insert.datapoint(data_spec, project)
@@ -391,7 +391,9 @@ def get_server() -> FastAPI:
             parent_path.mkdir(parents=True)
         await save_file(file_path, file)
 
-    @api_app.post("/datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/add_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
     def add_datapoint(project: str, data_spec: DataSpec):
         insert.datapoint(data_spec, project)
 
