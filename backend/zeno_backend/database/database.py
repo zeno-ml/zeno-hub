@@ -62,7 +62,6 @@ class Database:
             if self.cur is not None:
                 self.cur.execute(query, params)
         except (Exception, psycopg.DatabaseError) as error:
-            print(query, params)
             raise Exception(error) from error
 
     def connect_execute(

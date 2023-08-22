@@ -192,7 +192,7 @@ class Project:
         """Add an output value to a data point in the backend.
 
         Args:
-            data_id (int | str): Unique index of the datapoint to add an output value for.
+            data_id (int | str): unique id of the datapoint to add an output value for.
             output (Any): the output value to be added.
             model (str): the model for which to add an output value.
         """
