@@ -17,6 +17,7 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 from zeno_backend.classes.base import (
+    DataSpec,
     FeatureSpec,
     GroupMetric,
     LabelSpec,
@@ -374,24 +375,25 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=("ERROR: User could not be found."),
             )
-        try:
-            Path("data", str(project_uuid)).mkdir()
-        except Exception as exc:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=("ERROR: Project already exists."),
-            ) from exc
         insert.project(description, user)
         return project_uuid
 
-    @api_app.post("/datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    async def add_datapoint(project: str, name: str, file: UploadFile = File(...)):
-        insert.datapoint(name, project)
-        file_path = Path("data", project, name)
+    @api_app.post(
+        "/local_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    async def add_local_datapoint(
+        project: str, data_spec: DataSpec, file: UploadFile = File(...)
+    ):
+        insert.datapoint(data_spec, project)
+        file_path = Path("data", project, str(data_spec.data_id))
         parent_path = file_path.parent
         if not parent_path.exists():
             parent_path.mkdir(parents=True)
         await save_file(file_path, file)
+
+    @api_app.post("/datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_datapoint(project: str, data_spec: DataSpec):
+        insert.datapoint(data_spec, project)
 
     @api_app.post("/label/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_label(project: str, label_spec: LabelSpec):
@@ -538,5 +540,4 @@ def serve():
         app,
         host=os.environ["BACKEND_HOST"] if "BACKEND_HOST" in os.environ else "0.0.0.0",
         port=int(os.environ["BACKEND_PORT"]) if "BACKEND_PORT" in os.environ else 80,
-        log_level="error",
     )

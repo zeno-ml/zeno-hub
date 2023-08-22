@@ -5,6 +5,7 @@ import uuid
 from psycopg import DatabaseError, sql
 
 from zeno_backend.classes.base import (
+    DataSpec,
     FeatureSpec,
     LabelSpec,
     MetadataType,
@@ -60,9 +61,9 @@ def project(project_config: Project, user: User):
         )
         # Create table to hold project data.
         db.execute(
-            sql.SQL("CREATE TABLE {}(data_id TEXT NOT NULL PRIMARY KEY);").format(
-                sql.Identifier(project_config.uuid)
-            )
+            sql.SQL(
+                "CREATE TABLE {}(data_id TEXT NOT NULL PRIMARY KEY, data TEXT);"
+            ).format(sql.Identifier(project_config.uuid))
         )
         # Create table to hold information about the columns in the project data.
         db.execute(
@@ -99,21 +100,20 @@ def project(project_config: Project, user: User):
         db.disconnect()
 
 
-def datapoint(data_id: str, project: str):
+def datapoint(data_spec: DataSpec, project: str):
     """Adds a new datapoint to an existing project.
 
     Args:
-        data_id (str): id of the datapoint to be added to the project data.
+        data_spec (DataSpec): the specification of the datapoint to be added.
         project (str): the project the user is currently working with.
     """
     db = Database()
     db.connect_execute(
-        sql.SQL('INSERT INTO {} ("data_id") VALUES (%s);').format(
-            sql.Identifier(project)
-        ),
-        [
-            data_id,
-        ],
+        sql.SQL(
+            'INSERT INTO {} ("data_id", "data") VALUES (%s, %s) '
+            + 'ON CONFLICT ("data_id") DO UPDATE SET "data" = EXCLUDED.data;'
+        ).format(sql.Identifier(project)),
+        [str(data_spec.data_id), data_spec.data],
     )
 
 
@@ -152,7 +152,7 @@ def label(label_spec: LabelSpec, project: str):
             sql.SQL("UPDATE {} SET label = %s WHERE data_id = %s;").format(
                 sql.Identifier(project)
             ),
-            [label_spec.label, label_spec.data_id],
+            [label_spec.label, str(label_spec.data_id)],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -206,7 +206,7 @@ def output(output_spec: OutputSpec, project: str):
             sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [output_spec.output, output_spec.data_id],
+            [output_spec.output, str(output_spec.data_id)],
         )
         db.commit()
     except (Exception, DatabaseError) as error:
@@ -270,7 +270,7 @@ def feature(feature_spec: FeatureSpec, project: str):
             sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
                 sql.Identifier(project), sql.Identifier(col_uuid)
             ),
-            [feature_spec.value, feature_spec.data_id],
+            [feature_spec.value, str(feature_spec.data_id)],
         )
         db.commit()
     except (Exception, DatabaseError) as error:

@@ -174,6 +174,8 @@
 		}
 		loadCountsAndMetrics($tagIds, $selectionIds, $model, $metric, sels);
 	});
+
+	console.log($columns);
 </script>
 
 {#if !$page.url.href.includes('compare')}

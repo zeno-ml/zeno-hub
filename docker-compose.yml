@@ -27,6 +27,7 @@ services:
       BACKEND_HOST: 0.0.0.0
       BACKEND_PORT: 8000
       DB_HOST: postgres
+      DB_PORT: 5432
       DB_NAME: zeno
       DB_USER: myuser
       DB_PASSWORD: mypassword
@@ -40,4 +41,5 @@ services:
     volumes:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "5432:5432"
+      # Use a different port to avoid clashes with local postgres
+      - "5431:5432"
