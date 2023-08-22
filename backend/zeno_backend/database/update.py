@@ -3,10 +3,10 @@ import json
 
 from psycopg import DatabaseError, sql
 
-from zeno_backend.classes.base import Project
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.project import Project
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User

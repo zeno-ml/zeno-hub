@@ -16,6 +16,6 @@ export type TableRequest = {
 	offset: number;
 	limit: number;
 	filterPredicates?: FilterPredicateGroup | null;
-	sort: any[];
+	sort: any[] | boolean;
 	dataIds?: Array<string> | null;
 };

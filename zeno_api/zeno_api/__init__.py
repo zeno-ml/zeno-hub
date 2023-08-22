@@ -3,7 +3,7 @@ import os
 from enum import Enum
 from functools import wraps
 from pathlib import Path, PurePath
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import requests
 from dotenv import load_dotenv
@@ -90,19 +90,20 @@ class Zeno:
     def create_project(self, project_name: str, view: str = "image-classification"):
         """Creates an empty project in Zeno's backend.
 
-        The returned uuid has to be used to upload data.
-
         Args:
             project_name (str): the name of the project to be created.
             view (str, optional): the view that the project uses to display data.
                 Defaults to "image-classification".
         """
+        # TODO: change to not return a UUID, just print if
+        # project exists or if it was created successfully.
         uuid = requests.post(
             f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/project',
             json={
                 "uuid": "",
                 "view": view,
-                "dataUrl": None,
+                "owner_name": self.user.username,
+                "data_url": None,
                 "name": project_name,
                 "editor": True,
                 "public": False,
@@ -110,15 +111,31 @@ class Zeno:
             },
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
         )
+
         return Project(self.user, uuid.text[1:-1])
 
-    def get_project(self, project_uuid: str):
-        """Get a project object by its UUID.
+    def get_project(self, project_name: str):
+        """Get a project object by its name. Names are split into owner/project_name.
+
+        If no slash is present, user is assumed to be the owner.
 
         Args:
-            project_uuid (str): the UUID of the project to be fetched.
+            project_name (str): The owner/project_name of the project to get.
         """
-        return Project(self.user, project_uuid)
+        split_project_name = project_name.split("/")
+        if len(split_project_name) == 1:
+            user = self.user.username
+            project_name = project_name
+        else:
+            user = split_project_name[0]
+            project_name = split_project_name[1]
+
+        project_uuid = requests.get(
+            f'{os.environ["PUBLIC_BACKEND_ENDPOINT"]}/api/project-uuid/{user}/{project_name}',
+            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+        )
+
+        return Project(self.user, project_uuid.text[1:-1])
 
 
 class Project:
@@ -138,7 +155,7 @@ class Project:
         self.project_uuid = project_uuid
 
     @check_token
-    def add_datapoint(self, data_id: int | str, data: Optional[Path | str] = None):
+    def add_datapoint(self, data_id: int | str, data: Path | str | None = None):
         """Add a datapoint to an existing project.
 
         The data parameter can be left empty if a URL (URL part with base_url set for
@@ -152,7 +169,7 @@ class Project:
 
         Args:
             data_id (int | str): the unique ID of the data point to be added.
-            data (Optional[Path | str]): the path to the file containing the data.
+            data (Path | str | None): the path to the file containing the data.
                 Defaults to None.
         """
         if isinstance(data, PurePath):
@@ -215,7 +232,7 @@ class Project:
         data_id: int | str,
         value: Any,
         type: MetadataType,
-        model: Optional[str] = None,
+        model: str | None = None,
     ):
         """Add a feature value to a data point in the backend.
 
@@ -224,7 +241,7 @@ class Project:
             col_name (str): the name of the feature column to add.
             value (Any): the value of the feature column to add.
             type (MetadataType): the type of the feature column.
-            model (Optional[str], optional): model that relates to the feature column.
+            model (str | None, optional): model that relates to the feature column.
                 Defaults to None.
         """
         requests.post(

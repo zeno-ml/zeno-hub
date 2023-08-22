@@ -6,11 +6,13 @@ CREATE TABLE users (
 CREATE TABLE projects (
     uuid text PRIMARY KEY,
     name text NOT NULL,
+    owner_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     view text NOT NULL,
     data_url text,
     calculate_histogram_metrics boolean NOT NULL DEFAULT false,
     samples_per_page integer NOT NULL DEFAULT 10,
-    public boolean NOT NULL DEFAULT false);
+    public boolean NOT NULL DEFAULT false
+);
 
 CREATE TABLE organizations (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

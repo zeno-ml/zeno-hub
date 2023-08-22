@@ -1,6 +1,4 @@
 """Methods to calculate metrics for model outputs."""
-from typing import Dict, List, Optional
-
 from psycopg import DatabaseError, sql
 
 from zeno_backend.classes.base import GroupMetric
@@ -9,13 +7,13 @@ from zeno_backend.database.database import Database
 from zeno_backend.database.select import column_id_from_name_and_model
 
 
-def accuracy(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
+def accuracy(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
     """Accuracy of the selected model on the selected data.
 
     Args:
         project (str): the project the user is currently working with.
         model (str): the model for which to calulate the accuracy.
-        filter (Optional[sql.Composed]): how to filter the data before calculation.
+        filter (sql.Composed | None): how to filter the data before calculation.
 
     Raises:
         Exception: something in the database processing failed.
@@ -61,7 +59,7 @@ def accuracy(project: str, model: str, filter: Optional[sql.Composed]) -> GroupM
         db.disconnect()
 
 
-def recall(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
+def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
     """Ratio of tp/(tp+fn), intuitively the ability to find all the positive samples.
 
     We use "macro" averaging, which means that we calculate the metric for each label
@@ -70,7 +68,7 @@ def recall(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMet
     Args:
         project (str): the project the user is currently working with.
         model (str): the model from which to take the predictions.
-        filter (Optional[sql.Composed]): filter applied before calculating the metic.
+        filter (sql.Composed | None): filter applied before calculating the metic.
 
     Returns:
         GroupMetric: recall score for the group of filtered instances as specified.
@@ -121,10 +119,10 @@ def recall(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMet
             or not isinstance(num_total[0], int)
         ):
             return GroupMetric(metric=None, size=0)
-        metrics: List[float] = []
-        tp_map: Dict[str, int] = {}
-        fn_map: Dict[str, int] = {}
-        labels: List[str] = []
+        metrics: list[float] = []
+        tp_map: dict[str, int] = {}
+        fn_map: dict[str, int] = {}
+        labels: list[str] = []
         for label in label_result:
             if isinstance(label[0], str):
                 labels.append(label[0])
@@ -152,7 +150,7 @@ def recall(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMet
         db.disconnect()
 
 
-def precision(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
+def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
     """Ratio of tp/(tp+fn), intuitively the ability to find all the positive samples.
 
     We use "macro" averaging, which means that we calculate the metric for each label
@@ -161,7 +159,7 @@ def precision(project: str, model: str, filter: Optional[sql.Composed]) -> Group
     Args:
         project (str): the project the user is currently working with.
         model (str): the model from which to take the predictions.
-        filter (Optional[sql.Composed]): filter applied before calculating the metic.
+        filter (sql.Composed | None): filter applied before calculating the metic.
 
     Returns:
         GroupMetric: recall score for the group of filtered instances as specified.
@@ -215,10 +213,10 @@ def precision(project: str, model: str, filter: Optional[sql.Composed]) -> Group
             or not isinstance(num_total[0], int)
         ):
             return GroupMetric(metric=None, size=0)
-        metrics: List[float] = []
-        tp_map: Dict[str, int] = {}
-        fp_map: Dict[str, int] = {}
-        labels: List[str] = []
+        metrics: list[float] = []
+        tp_map: dict[str, int] = {}
+        fp_map: dict[str, int] = {}
+        labels: list[str] = []
         for label in label_result:
             if isinstance(label[0], str):
                 labels.append(label[0])
@@ -246,7 +244,7 @@ def precision(project: str, model: str, filter: Optional[sql.Composed]) -> Group
         db.disconnect()
 
 
-def f1(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
+def f1(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
     """Compute the F1 score.
 
     We use "macro" averaging, which means that we calculate the metric for each label
@@ -255,7 +253,7 @@ def f1(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
     Args:
         project (str): the project the user is currently working with.
         model (str): the model from which to take the predictions.
-        filter (Optional[sql.Composed]): filter applied before calculating the metic.
+        filter (sql.Composed | None): filter applied before calculating the metic.
 
     Returns:
         GroupMetric: f1 score for the group of filtered instances as specified.
@@ -276,12 +274,12 @@ def f1(project: str, model: str, filter: Optional[sql.Composed]) -> GroupMetric:
         )
 
 
-def count(project: str, filter: Optional[sql.Composed]) -> GroupMetric:
+def count(project: str, filter: sql.Composed | None) -> GroupMetric:
     """Count the number of datapoints matching a specified filter.
 
     Args:
         project (str): the project the user is currently working with.
-        filter (Optional[sql.Composed]): the filter to be applied before counting.
+        filter (sql.Composed | None): the filter to be applied before counting.
 
     Raises:
         Exception: something in the database processing failed.
@@ -317,7 +315,7 @@ def metric_map(
     metric: Metric,
     project: str,
     model: str,
-    sql_filter: Optional[sql.Composed],
+    sql_filter: sql.Composed | None,
 ) -> GroupMetric:
     """Call a metric function based on the selected metric.
 
@@ -325,7 +323,7 @@ def metric_map(
         metric (Metric): the metric for which to call a metric function.
         project (str): the project the user is currently working with.
         model (str): the model for which to calculate the metric.
-        sql_filter (Optional[str]): the filter to apply to the data before metric
+        sql_filter (str | None): the filter to apply to the data before metric
         calculation.
 
     Returns:

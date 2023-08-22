@@ -18,7 +18,7 @@ export async function load({ cookies, params, url }) {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};
 
-	const project = await ZenoService.getProject(params.project);
+	const project = await ZenoService.getProject(params.owner, params.project);
 	if (!project) {
 		throw error(404, 'Could not load project config');
 	}

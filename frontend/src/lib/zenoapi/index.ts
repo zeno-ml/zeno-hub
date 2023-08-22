@@ -8,10 +8,11 @@ export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { BeeswarmParameters } from './models/BeeswarmParameters';
-export type { Body_add_datapoint } from './models/Body_add_datapoint';
 export type { Body_add_organization } from './models/Body_add_organization';
+export type { Body_upload_datapoint } from './models/Body_upload_datapoint';
 export type { Chart } from './models/Chart';
 export { ChartType } from './models/ChartType';
+export type { DataSpec } from './models/DataSpec';
 export type { FeatureSpec } from './models/FeatureSpec';
 export type { FilterPredicate } from './models/FilterPredicate';
 export type { FilterPredicateGroup } from './models/FilterPredicateGroup';
@@ -50,4 +51,5 @@ export type { XCParameters } from './models/XCParameters';
 export type { ZenoColumn } from './models/ZenoColumn';
 export { ZenoColumnType } from './models/ZenoColumnType';
 
+export { DefaultService } from './services/DefaultService';
 export { ZenoService } from './services/ZenoService';

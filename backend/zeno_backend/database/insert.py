@@ -10,11 +10,11 @@ from zeno_backend.classes.base import (
     LabelSpec,
     MetadataType,
     OutputSpec,
-    Project,
     ZenoColumnType,
 )
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
+from zeno_backend.classes.project import Project
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
@@ -41,12 +41,13 @@ def project(project_config: Project, user: User):
     try:
         db.connect()
         db.execute(
-            "INSERT INTO projects (uuid, name, view, data_url, "
+            "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
             + "calculate_histogram_metrics, samples_per_page, public) "
-            + "VALUES (%s,%s,%s,%s,%s,%s,%s);",
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s,%s);",
             [
                 project_config.uuid,
                 project_config.name,
+                user.id,
                 project_config.view,
                 project_config.data_url,
                 project_config.calculate_histogram_metrics,

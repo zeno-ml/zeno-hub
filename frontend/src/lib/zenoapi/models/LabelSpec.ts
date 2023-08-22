@@ -7,11 +7,11 @@
  * Specification for a label in a Zeno project.
  *
  * Attributes:
- * data_id (str): The ID of the associated data instance.
+ * data_id (int | str): The ID of the associated data instance.
  * label (str): The ground truth label for the data instance.
  *
  */
 export type LabelSpec = {
-	dataId: string;
+	dataId: number | string;
 	label: string;
 };

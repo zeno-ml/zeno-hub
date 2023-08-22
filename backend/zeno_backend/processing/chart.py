@@ -1,6 +1,6 @@
 """Functions for extracting chart data from SQL."""
 import json
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from zeno_backend.classes.chart import (
     BeeswarmParameters,
@@ -31,7 +31,7 @@ def xyc_data(chart: Chart, project: str) -> str:
     Returns:
         str: the chart data in JSON representation.
     """
-    elements: List[Dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
     if not (isinstance(chart.parameters, XCParameters)):
         return json.dumps({"table": elements})
     all_metrics = metrics(project)
@@ -70,7 +70,7 @@ def table_data(chart: Chart, project: str) -> str:
     Returns:
         str: the chart data in JSON representation.
     """
-    elements: List[Dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
     params = chart.parameters
     if not isinstance(params, TableParameters):
         return json.dumps({"table": elements})
@@ -114,7 +114,7 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     Returns:
         str: the chart data in JSON representation.
     """
-    elements: List[Dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
     params = chart.parameters
     if not (isinstance(params, BeeswarmParameters)):
         return json.dumps({"table": elements})
@@ -157,7 +157,7 @@ def radar_data(chart: Chart, project: str) -> str:
     Returns:
         str: the chart data in JSON representation.
     """
-    elements: List[Dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
     params = chart.parameters
     if not (isinstance(params, RadarParameters)):
         return json.dumps({"table": elements})
@@ -201,7 +201,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
     Returns:
         str: the chart data in JSON representation.
     """
-    elements: List[Dict[str, Any]] = []
+    elements: list[dict[str, Any]] = []
     params = chart.parameters
     if not (isinstance(params, HeatmapParameters)):
         return json.dumps({"table": elements})
@@ -211,7 +211,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
-    selected_x: Union[List[Slice], List[str]] = (
+    selected_x: list[Slice] | list[str] = (
         slices(project, params.x_values) if x_slice else params.x_values  # type: ignore
     )
     selected_y = (

@@ -3,7 +3,6 @@ import os
 import shutil
 import uuid
 from pathlib import Path
-from typing import List, Union
 
 import pandas as pd
 import uvicorn
@@ -22,14 +21,13 @@ from zeno_backend.classes.base import (
     GroupMetric,
     LabelSpec,
     OutputSpec,
-    Project,
-    ProjectStats,
     ZenoColumn,
 )
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
+from zeno_backend.classes.project import Project, ProjectStats
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -95,14 +93,14 @@ def get_server() -> FastAPI:
 
     ###################################################################### Fetch
     @api_app.get(
-        "/users", response_model=List[User], tags=["zeno"], dependencies=[Depends(auth)]
+        "/users", response_model=list[User], tags=["zeno"], dependencies=[Depends(auth)]
     )
     def get_users():
         return select.users()
 
     @api_app.get(
         "/organization_names",
-        response_model=List[Organization],
+        response_model=list[Organization],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -133,7 +131,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/models/{project}",
-        response_model=List[str],
+        response_model=list[str],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -142,7 +140,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/metrics/{project}",
-        response_model=List[Metric],
+        response_model=list[Metric],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -151,7 +149,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/folders/{project}",
-        response_model=List[Folder],
+        response_model=list[Folder],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -160,7 +158,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/slices/{project}",
-        response_model=List[Slice],
+        response_model=list[Slice],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -169,7 +167,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/charts/{project}",
-        response_model=List[Chart],
+        response_model=list[Chart],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -178,7 +176,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/columns/{project}",
-        response_model=List[ZenoColumn],
+        response_model=list[ZenoColumn],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -187,7 +185,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/tags/{project}",
-        response_model=List[Tag],
+        response_model=list[Tag],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -242,23 +240,31 @@ def get_server() -> FastAPI:
     def get_chart_data(chart: Chart, project: str):
         return chart_data(chart, project)
 
-    @api_app.post("/organizations", tags=["zeno"], response_model=List[Organization])
+    @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
     def get_organizations(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return select.organizations(user)
 
-    @api_app.post("/config/{project}", response_model=Project, tags=["zeno"])
-    def get_project(project: str, current_user=Depends(auth.claim())):
+    @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
+    def get_project(
+        owner_name: str, project_name: str, current_user=Depends(auth.claim())
+    ):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return select.project(project, user)
+        return select.project(project_name, owner_name, user)
+
+    @api_app.get(
+        "/project-uuid/{owner_name}/{project_name}", dependencies=[Depends(auth)]
+    )
+    def get_project_uuid(owner_name: str, project_name: str):
+        return select.project_uuid(owner_name, project_name)
 
     @api_app.get(
         "/projects",
-        response_model=List[Project],
+        response_model=list[Project],
         tags=["zeno"],
     )
     def get_projects(current_user=Depends(auth.claim())):
@@ -269,12 +275,12 @@ def get_server() -> FastAPI:
 
     @api_app.post(
         "/slice-metrics/{project}",
-        response_model=List[GroupMetric],
+        response_model=list[GroupMetric],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
     def get_metrics_for_slices(req: MetricRequest, project: str):
-        return_metrics: List[GroupMetric] = []
+        return_metrics: list[GroupMetric] = []
         for metric_key in req.metric_keys:
             filter_sql = table_filter(
                 project,
@@ -289,16 +295,16 @@ def get_server() -> FastAPI:
 
     @api_app.post(
         "/histograms/{project}",
-        response_model=List[List[HistogramBucket]],
+        response_model=list[list[HistogramBucket]],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
-    def get_histogram_buckets(req: List[ZenoColumn], project: str):
+    def get_histogram_buckets(req: list[ZenoColumn], project: str):
         return histogram_buckets(project, req)
 
     @api_app.post(
         "/histogram-counts/{project}",
-        response_model=List[List[int]],
+        response_model=list[list[int]],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -307,7 +313,7 @@ def get_server() -> FastAPI:
 
     @api_app.post(
         "/histogram-metrics/{project}",
-        response_model=List[List[Union[float, None]]],
+        response_model=list[list[float | None]],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -316,7 +322,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/project_users/{project}",
-        response_model=List[User],
+        response_model=list[User],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -325,7 +331,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/project_organizations/{project}",
-        response_model=List[Organization],
+        response_model=list[Organization],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
@@ -334,7 +340,7 @@ def get_server() -> FastAPI:
 
     @api_app.post(
         "/string-filter/{project}",
-        response_model=List[str],
+        response_model=list[str],
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )

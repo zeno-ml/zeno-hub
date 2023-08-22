@@ -2,7 +2,7 @@
 import os
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Any, Dict, List, LiteralString, Optional, Tuple, Union
+from typing import Any, LiteralString
 
 import psycopg
 from psycopg import sql
@@ -11,8 +11,8 @@ from psycopg import sql
 class Database:
     """Database representation to make SQL interaction simpler."""
 
-    conn: Union[psycopg.Connection[Tuple[Any, ...]], None] = None
-    cur: Union[psycopg.Cursor[Tuple[Any, ...]], None] = None
+    conn: psycopg.Connection[tuple[Any, ...]] | None = None
+    cur: psycopg.Cursor[tuple[Any, ...]] | None = None
 
     def connect(self):
         """Connect to the running database.
@@ -45,14 +45,14 @@ class Database:
 
     def execute(
         self,
-        query: Union[LiteralString, sql.Composed],
-        params: Optional[List[Any]] = None,
+        query: LiteralString | sql.Composed,
+        params: list[Any] | None = None,
     ):
         """Execute a query on the database.
 
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
-            params (List[Any], optional): any parameters to be passed to the query.
+            params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
 
         Raises:
@@ -66,14 +66,14 @@ class Database:
 
     def connect_execute(
         self,
-        query: Union[LiteralString, sql.Composed],
-        params: Optional[List[Any]] = None,
+        query: LiteralString | sql.Composed,
+        params: list[Any] | None = None,
     ):
         """Connect to the database and execute a query, then disconnect.
 
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
-            params (List[Any], optional): any parameters to be passed to the query.
+            params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
 
         Raises:
@@ -90,15 +90,15 @@ class Database:
 
     def execute_return(
         self,
-        query: Union[LiteralString, sql.Composed],
-        params: Optional[List[Any]] = None,
+        query: LiteralString | sql.Composed,
+        params: list[Any] | None = None,
         return_all: bool = False,
     ):
         """Execute a query on the database and then return one or multiple results.
 
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
-            params (List[Any], optional): any parameters to be passed to the query.
+            params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
             return_all (bool, optional): whether to return all results instead of just
             the first. Defaults to False.
@@ -118,15 +118,15 @@ class Database:
 
     def connect_execute_return(
         self,
-        query: Union[LiteralString, sql.Composed],
-        params: Optional[List[Any]] = None,
+        query: LiteralString | sql.Composed,
+        params: list[Any] | None = None,
         return_all: bool = False,
     ):
         """Connect, execute a query, return one or multiple results, and disconnect.
 
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
-            params (List[Any], optional): any parameters to be passed to the query.
+            params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
             return_all (bool, optional): whether to return all results instead of just
             the first. Defaults to False.
@@ -151,7 +151,7 @@ class Database:
         self,
         filename: str = "zeno_backend/database/database.ini",
         section: str = "postgresql",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get the configuration of the database.
 
         Args:
@@ -164,12 +164,12 @@ class Database:
             Exception: reading the configuration failed.
 
         Returns:
-            Dict[str, Any]: the database configuration.
+            dict[str, Any]: the database configuration.
         """
         if Path(filename).exists():
             parser = ConfigParser()
             parser.read(filename)
-            db: Dict[str, Any] = {}
+            db: dict[str, Any] = {}
             if parser.has_section(section):
                 params = parser.items(section)
                 for param in params:
@@ -178,7 +178,7 @@ class Database:
                 raise Exception(f"Section {section} not found in the {filename} file")
             return db
         else:
-            db: Dict[str, Any] = {}
+            db: dict[str, Any] = {}
             db["host"] = os.environ["DB_HOST"]
             db["port"] = os.environ["DB_PORT"]
             db["dbname"] = os.environ["DB_NAME"]

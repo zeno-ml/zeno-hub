@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { Body_add_datapoint } from '../models/Body_add_datapoint';
 import type { Body_add_organization } from '../models/Body_add_organization';
+import type { Body_upload_datapoint } from '../models/Body_upload_datapoint';
 import type { Chart } from '../models/Chart';
+import type { DataSpec } from '../models/DataSpec';
 import type { FeatureSpec } from '../models/FeatureSpec';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
@@ -342,16 +343,18 @@ export class ZenoService {
 
 	/**
 	 * Get Project
-	 * @param project
+	 * @param ownerName
+	 * @param projectName
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static getProject(project: string): CancelablePromise<Project> {
+	public static getProject(ownerName: string, projectName: string): CancelablePromise<Project> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/config/{project}',
-			path: {
-				project: project
+			url: '/project/{owner}/{project}',
+			query: {
+				owner_name: ownerName,
+				project_name: projectName
 			},
 			errors: {
 				422: `Validation Error`
@@ -572,29 +575,46 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Datapoint
+	 * Upload Datapoint
 	 * @param project
-	 * @param name
 	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addDatapoint(
+	public static uploadDatapoint(
 		project: string,
-		name: string,
-		formData: Body_add_datapoint
+		formData: Body_upload_datapoint
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/datapoint/{project}',
+			url: '/upload_datapoint/{project}',
 			path: {
 				project: project
 			},
-			query: {
-				name: name
-			},
 			formData: formData,
 			mediaType: 'multipart/form-data',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Add Datapoint
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static addDatapoint(project: string, requestBody: DataSpec): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/add_datapoint/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}

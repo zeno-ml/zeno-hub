@@ -1,5 +1,4 @@
 """Type representations for table data."""
-from typing import List, Optional, Tuple, Union
 
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 from zeno_backend.classes.slice import FilterPredicateGroup
@@ -8,11 +7,11 @@ from zeno_backend.classes.slice import FilterPredicateGroup
 class TableRequest(CamelModel):
     """A request specification for table data."""
 
-    columns: List[ZenoColumn]
-    diff_column_1: Optional[ZenoColumn] = None
-    diff_column_2: Optional[ZenoColumn] = None
+    columns: list[ZenoColumn]
+    diff_column_1: ZenoColumn | None = None
+    diff_column_2: ZenoColumn | None = None
     offset: int
     limit: int
-    filter_predicates: Optional[FilterPredicateGroup] = None
-    sort: Tuple[Union[ZenoColumn, str, None], bool]
-    data_ids: Optional[List[str]] = None
+    filter_predicates: FilterPredicateGroup | None = None
+    sort: tuple[ZenoColumn | str | None] | bool
+    data_ids: list[str] | None = None
