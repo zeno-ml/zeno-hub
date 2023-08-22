@@ -15,7 +15,6 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
 	import type { GroupMetric, ZenoColumn } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
@@ -175,12 +174,7 @@
 									<svelte:component
 										this={viewMap[$project.view]}
 										options={viewOptions}
-										entry={{
-											...tableContent,
-											data: `${getEndpoint()}/api/data/${
-												$project.uuid
-											}?data_id=${encodeURIComponent(tableContent['data_id'])}`
-										}}
+										entry={tableContent}
 										modelColumn={modelColumn?.id}
 									/>
 								</div>

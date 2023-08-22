@@ -1,16 +1,12 @@
 <script lang="ts">
-	import { authToken } from '$lib/stores';
+	import { resolveDataPoint } from '$lib/util/util';
 	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
 
 	$: fetchImage = (async () => {
-		const response = await fetch(entry['data'] as string, {
-			headers: {
-				Authorization: 'Bearer ' + $authToken
-			}
-		});
+		const response = (await resolveDataPoint(entry)) as Response;
 		return await response.blob();
 	})();
 </script>

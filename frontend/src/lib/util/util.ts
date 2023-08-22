@@ -1,6 +1,7 @@
 import { env } from '$env/dynamic/public';
 import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
-import { slicesForComparison } from '../stores';
+import { authToken, slicesForComparison } from '../stores';
+import { project } from './../stores';
 
 import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
@@ -142,4 +143,33 @@ export function shortenNumber(num: number, digits: number) {
 			return num >= item.value;
 		});
 	return item ? (num / item.value).toFixed(digits).replace(rx, '$1') + item.symbol : '0';
+}
+
+export async function resolveDataPoint(entry: Record<string, unknown>): Promise<Response | string> {
+	if (entry['data'] !== null && entry['data'] !== undefined) {
+		return entry['data'] as string;
+	}
+	if (isValidHttpUrl(get(project)?.dataUrl ?? '' + entry['data_id'])) {
+		return await fetch(get(project)?.dataUrl ?? '' + entry['data_id']);
+	}
+	return await fetch(
+		`${getEndpoint()}/api/data/${get(project)?.uuid}?data_id=${encodeURIComponent(
+			entry['data_id'] as string
+		)}`,
+		{
+			headers: {
+				Authorization: 'Bearer ' + get(authToken)
+			}
+		}
+	);
+}
+
+function isValidHttpUrl(string: string) {
+	let url;
+	try {
+		url = new URL(string);
+	} catch (_) {
+		return false;
+	}
+	return url.protocol === 'http:' || url.protocol === 'https:';
 }

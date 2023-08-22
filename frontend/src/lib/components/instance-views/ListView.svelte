@@ -13,7 +13,6 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
 	import { Join, ZenoColumnType, type GroupMetric } from '$lib/zenoapi';
 	import { Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
@@ -112,12 +111,7 @@
 					<svelte:component
 						this={viewMap[$project.view]}
 						options={viewOptions}
-						entry={{
-							...inst,
-							data: `${getEndpoint()}/api/data/${$project.uuid}?data_id=${encodeURIComponent(
-								inst['data_id']
-							)}`
-						}}
+						entry={inst}
 						modelColumn={modelColumn?.id}
 					/>
 				</div>

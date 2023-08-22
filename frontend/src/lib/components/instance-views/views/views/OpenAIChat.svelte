@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { authToken } from '$lib/stores';
+	import { resolveDataPoint } from '$lib/util/util';
 	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import AssistantBlock from './openai-chat/AssistantBlock.svelte';
 	import SystemBlock from './openai-chat/SystemBlock.svelte';
@@ -10,12 +10,8 @@
 
 	$: showall = false;
 	$: fetchJSON = (async () => {
-		const response = await fetch(entry['data'] as string, {
-			headers: {
-				Authorization: 'Bearer ' + $authToken
-			}
-		});
-		const resp = await response.json();
+		const response = await resolveDataPoint(entry);
+		const resp = await (response as Response).json();
 		showall = resp.length <= 5;
 		return resp;
 	})();
