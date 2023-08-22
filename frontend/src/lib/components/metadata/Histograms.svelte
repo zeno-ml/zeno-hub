@@ -49,21 +49,20 @@
 				: tagIds !== undefined
 				? tagIds
 				: selectionIds;
-		model !== undefined &&
-			getHistograms($columns, model).then((res) => {
-				getHistogramCounts(res, undefined, dataIds).then((res) => {
-					if (res === undefined) {
-						return;
-					}
-					metadataHistograms = res;
-					metric !== undefined &&
-						getHistogramMetrics(res, model, metric, dataIds, undefined).then((res) => {
-							if (res !== undefined) {
-								metadataHistograms = res;
-							}
-						});
-				});
+		getHistograms($columns, model).then((res) => {
+			getHistogramCounts(res, undefined, dataIds).then((res) => {
+				if (res === undefined) {
+					return;
+				}
+				metadataHistograms = res;
+				metric !== undefined &&
+					getHistogramMetrics(res, model, metric, dataIds, undefined).then((res) => {
+						if (res !== undefined) {
+							metadataHistograms = res;
+						}
+					});
 			});
+		});
 	}
 
 	function loadCountsAndMetrics(
