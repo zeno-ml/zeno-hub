@@ -3,20 +3,24 @@ import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, params, url }) {
-	const userCookie = cookies.get('loggedIn');
-	if (!userCookie) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
-	}
-	const cognitoUser = JSON.parse(userCookie);
-	// If the user is not authenticated, redirect to the login page
-	if (!cognitoUser.id || !cognitoUser.accessToken) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
-	}
-
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-	OpenAPI.HEADERS = {
-		Authorization: 'Bearer ' + cognitoUser.accessToken
-	};
+
+	const projectPublic = ZenoService.isProjectPublic(params.project);
+
+	let cognitoUser = null;
+	const userCookie = cookies.get('loggedIn');
+	if (userCookie) {
+		cognitoUser = JSON.parse(userCookie);
+		// If the user is not authenticated, redirect to the login page
+		if (!cognitoUser.id || !cognitoUser.accessToken) {
+			throw redirect(303, `/login?redirectTo=${url.pathname}`);
+		}
+		OpenAPI.HEADERS = {
+			Authorization: 'Bearer ' + cognitoUser.accessToken
+		};
+	} else if (!projectPublic) {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+	}
 
 	const project = await ZenoService.getProject(params.owner, params.project);
 	if (!project) {

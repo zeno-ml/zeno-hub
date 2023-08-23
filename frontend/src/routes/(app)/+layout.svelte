@@ -6,13 +6,17 @@
 	import { OpenAPI } from '$lib/zenoapi/index.js';
 
 	export let data;
-	authToken.set(data.cognitoUser.accessToken);
+	if (data.cognitoUser !== null) {
+		authToken.set(data.cognitoUser.accessToken);
+	}
 
 	$: {
 		OpenAPI.BASE = `${getEndpoint()}/api`;
-		OpenAPI.HEADERS = {
-			Authorization: 'Bearer ' + data.cognitoUser.accessToken
-		};
+		if (data.cognitoUser !== null) {
+			OpenAPI.HEADERS = {
+				Authorization: 'Bearer ' + data.cognitoUser.accessToken
+			};
+		}
 	}
 </script>
 

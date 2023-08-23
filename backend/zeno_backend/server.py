@@ -7,7 +7,16 @@ from pathlib import Path
 import pandas as pd
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, File, HTTPException, Response, UploadFile, status
+from fastapi import (
+    Depends,
+    FastAPI,
+    File,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+    status,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cloudauth.cognito import Cognito
 
@@ -15,6 +24,7 @@ import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
+import zeno_backend.util as util
 from zeno_backend.classes.base import (
     DataSpec,
     FeatureSpec,
@@ -111,9 +121,10 @@ def get_server() -> FastAPI:
         "/data/{project}",
         response_model=bytes,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_data(project: str, data_id: str):
+    def get_data(project: str, data_id: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         file_path = Path("data", project, data_id)
         if not Path.is_file(file_path):
             return Response(status_code=404)
@@ -124,81 +135,90 @@ def get_server() -> FastAPI:
         "/project_stats/{project}",
         response_model=ProjectStats,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_project_stats(project: str):
+    def get_project_stats(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.project_stats(project)
 
     @api_app.get(
         "/models/{project}",
         response_model=list[str],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_models(project: str):
+    def get_models(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.models(project)
 
     @api_app.get(
         "/metrics/{project}",
         response_model=list[Metric],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_metrics(project: str):
+    def get_metrics(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.metrics(project)
 
     @api_app.get(
         "/folders/{project}",
         response_model=list[Folder],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_folders(project: str):
+    def get_folders(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.folders(project)
 
     @api_app.get(
         "/slices/{project}",
         response_model=list[Slice],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_slices(project: str):
+    def get_slices(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.slices(project)
 
     @api_app.get(
         "/charts/{project}",
         response_model=list[Chart],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_charts(project: str):
+    def get_charts(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.charts(project)
 
     @api_app.get(
         "/columns/{project}",
         response_model=list[ZenoColumn],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_columns(project: str):
+    def get_columns(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.columns(project)
 
     @api_app.get(
         "/tags/{project}",
         response_model=list[Tag],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_tags(project: str):
+    def get_tags(project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.tags(project)
 
     @api_app.post(
         "/tag-metric/{project}",
         response_model=GroupMetric,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_metric_for_tag(metric_key: TagMetricKey, project: str):
+    def get_metric_for_tag(metric_key: TagMetricKey, project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         filter_sql = table_filter(
             project, metric_key.model, None, metric_key.tag.data_ids
         )
@@ -217,9 +237,10 @@ def get_server() -> FastAPI:
         "/filtered-table/{project}",
         response_model=str,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_filtered_table(req: TableRequest, project: str):
+    def get_filtered_table(req: TableRequest, project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
         sql_table = select.table_data_paginated(
             project, filter_sql, req.offset, req.limit
@@ -235,9 +256,10 @@ def get_server() -> FastAPI:
         "/chart-data/{project}",
         tags=["zeno"],
         response_model=str,
-        dependencies=[Depends(auth)],
     )
-    def get_chart_data(chart: Chart, project: str):
+    def get_chart_data(chart: Chart, project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return chart_data(chart, project)
 
     @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
@@ -247,14 +269,20 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return select.organizations(user)
 
+    @api_app.get("/project_public/{project_uuid}", response_model=bool, tags=["zeno"])
+    def is_project_public(project_uuid: str):
+        return util.is_project_public(project_uuid)
+
     @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
-    def get_project(
-        owner_name: str, project_name: str, current_user=Depends(auth.claim())
-    ):
-        user = select.user(current_user["username"])
-        if user is None:
+    def get_project(owner_name: str, project_name: str, request: Request):
+        uuid = get_project_uuid(owner_name, project_name)
+        if uuid is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return select.project(owner_name, project_name, user)
+        if not util.access_valid(uuid, request):
+            return Response(status_code=401)
+        return select.project(
+            owner_name, project_name, util.get_user_from_token(request)
+        )
 
     @api_app.get(
         "/project-uuid/{owner_name}/{project_name}",
@@ -287,9 +315,10 @@ def get_server() -> FastAPI:
         "/slice-metrics/{project}",
         response_model=list[GroupMetric],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_metrics_for_slices(req: MetricRequest, project: str):
+    def get_metrics_for_slices(req: MetricRequest, project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
         for metric_key in req.metric_keys:
             filter_sql = table_filter(
@@ -307,27 +336,34 @@ def get_server() -> FastAPI:
         "/histograms/{project}",
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def get_histogram_buckets(req: list[ZenoColumn], project: str):
+    def get_histogram_buckets(req: list[ZenoColumn], project: str, request: Request):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return histogram_buckets(project, req)
 
     @api_app.post(
         "/histogram-counts/{project}",
         response_model=list[list[int]],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def calculate_histogram_counts(req: HistogramRequest, project: str):
+    def calculate_histogram_counts(
+        req: HistogramRequest, project: str, request: Request
+    ):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return histogram_counts(project, req)
 
     @api_app.post(
         "/histogram-metrics/{project}",
         response_model=list[list[float | None]],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def calculate_histogram_metrics(req: HistogramRequest, project: str):
+    def calculate_histogram_metrics(
+        req: HistogramRequest, project: str, request: Request
+    ):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return histogram_metrics(project, req)
 
     @api_app.get(
@@ -352,9 +388,12 @@ def get_server() -> FastAPI:
         "/string-filter/{project}",
         response_model=list[str],
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def filter_string_metadata(project: str, req: StringFilterRequest):
+    def filter_string_metadata(
+        project: str, req: StringFilterRequest, request: Request
+    ):
+        if not util.access_valid(project, request):
+            return Response(status_code=401)
         return select.filered_short_string_column_values(project, req)
 
     ####################################################################### Insert

@@ -24,9 +24,11 @@
 		folders.set(data.folders);
 		tags.set(data.tags);
 		zenoAPI.BASE = `${getEndpoint()}/api`;
-		zenoAPI.HEADERS = {
-			Authorization: 'Bearer ' + data.cognitoUser.accessToken
-		};
+		if (data.cognitoUser) {
+			zenoAPI.HEADERS = {
+				Authorization: 'Bearer ' + data.cognitoUser.accessToken
+			};
+		}
 	}
 </script>
 

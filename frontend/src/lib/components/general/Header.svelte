@@ -15,12 +15,12 @@
 	} from '@mdi/js';
 	import HeaderIcon from './HeaderIcon.svelte';
 
-	export let user: User;
+	export let user: User | null;
 
 	let projectEdit = false;
 </script>
 
-{#if projectEdit && $project}
+{#if projectEdit && $project && user !== null}
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav>

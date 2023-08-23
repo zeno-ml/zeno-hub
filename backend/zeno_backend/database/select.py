@@ -227,13 +227,13 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         db.disconnect()
 
 
-def project(owner_name: str, project_name: str, user: User) -> Project | None:
+def project(owner_name: str, project_name: str, user: User | None) -> Project | None:
     """Get the project data given an owner and project name.
 
     Args:
         owner_name (str): The name of the project owner.
         project_name (str): The name of the project.
-        user (User): The user making the request.
+        user (User | None): The user making the request.
 
     Returns:
         Project | None: the data for the requested project.
@@ -259,7 +259,9 @@ def project(owner_name: str, project_name: str, user: User) -> Project | None:
             raise Exception("Project does not exist.")
         project_uuid = project_result[0][0]
 
-        if owner_name == user.name:
+        if user is None:
+            editor = False
+        elif owner_name == user.name:
             # Owners can always edit projects
             editor = True
         else:
