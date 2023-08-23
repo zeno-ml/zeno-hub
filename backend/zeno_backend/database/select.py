@@ -79,8 +79,7 @@ def projects(user: User) -> list[Project]:
 
     project_org_result = db.connect_execute_return(
         "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
-        " p.data_url, "
-        "p.samples_per_page, op.editor, p.public FROM projects AS p JOIN "
+        " p.data_url, p.samples_per_page, op.editor, p.public FROM projects AS p JOIN "
         "(SELECT organization_project.project_uuid, user_organization.organization_id, "
         "editor FROM user_organization JOIN organization_project "
         "ON user_organization.organization_id = organization_project.organization_id "
