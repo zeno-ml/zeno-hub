@@ -1,15 +1,11 @@
 """Functions to insert new data into Zeno's database."""
 import json
-import uuid
 
+import pandas as pd
 from psycopg import DatabaseError, sql
 
 from zeno_backend.classes.base import (
-    DataSpec,
-    FeatureSpec,
-    LabelSpec,
     MetadataType,
-    OutputSpec,
     ZenoColumnType,
 )
 from zeno_backend.classes.chart import Chart, ParametersEncoder
@@ -101,183 +97,33 @@ def project(project_config: Project, user: User):
         db.disconnect()
 
 
-def datapoint(data_spec: DataSpec, project: str):
-    """Adds a new datapoint to an existing project.
+def dataset(
+    project: str, df: pd.DataFrame, id_column: str, label_column: str, data_column: str
+):
+    """Adds a dataset to an existing project.
 
     Args:
-        data_spec (DataSpec): the specification of the datapoint to be added.
-        project (str): the project the user is currently working with.
+        project (str): The project the user is currently working with.
+        df (pd.DataFrame): The dataset to be added.
+        id_column (str): The name of the column containing the instance IDs.
+        label_column (str): The name of the column containing the instance labels.
+        data_column (str): The name of the column containing the raw data.
     """
-    db = Database()
-    db.connect_execute(
-        sql.SQL(
-            'INSERT INTO {} ("data_id", "data") VALUES (%s, %s) '
-            + 'ON CONFLICT ("data_id") DO UPDATE SET "data" = EXCLUDED.data;'
-        ).format(sql.Identifier(project)),
-        [str(data_spec.data_id), data_spec.data],
-    )
+    # TODO: insert into table using df.to_sql(). Need to use SQLAlchemy.
+    return None
 
 
-def label(label_spec: LabelSpec, project: str):
-    """Adds a label to a datapoint in the project's databse.
+def system(project: str, df: pd.DataFrame, system_name: str, output_column: str):
+    """Adds a dataset to an existing project.
 
     Args:
-        label_spec (LabelSpec): the specification of the label to be added.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the label into the database.
+        project (str): The project the user is currently working with.
+        df (pd.DataFrame): The dataset to be added.
+        system_name (str): The name of the system that produced the output.
+        output_column (str): The name of the column containing the system output.
     """
-    db = Database()
-    try:
-        db.connect()
-        exists = db.execute_return(
-            sql.SQL("SELECT COUNT(1) FROM {} WHERE column_id = 'label'").format(
-                sql.Identifier(f"{project}_column_map")
-            )
-        )
-        if exists is not None and exists[0] == 0:
-            db.execute(
-                sql.SQL(
-                    "INSERT INTO {} (column_id, name, type, data_type) "
-                    "VALUES (%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                ["label", "label", ZenoColumnType.LABEL, MetadataType.NOMINAL],
-            )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD label TEXT;").format(
-                    sql.Identifier(project)
-                )
-            )
-        db.execute(
-            sql.SQL("UPDATE {} SET label = %s WHERE data_id = %s;").format(
-                sql.Identifier(project)
-            ),
-            [label_spec.label, str(label_spec.data_id)],
-        )
-        db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
-
-
-def output(output_spec: OutputSpec, project: str):
-    """Adds a model output to an datapoint in the project's databse.
-
-    Args:
-        output_spec (OutputSpec): the specification of the output to be added.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the output into the database.
-    """
-    db = Database()
-    try:
-        db.connect()
-        exists = db.execute_return(
-            sql.SQL("SELECT * FROM {} WHERE model = %s AND type = %s").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [output_spec.model, ZenoColumnType.OUTPUT],
-        )
-        col_uuid: str = str(uuid.uuid4())
-        if exists is None:
-            db.execute(
-                sql.SQL(
-                    "INSERT INTO {} (column_id, name, type, data_type, model) "
-                    "VALUES (%s,%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [
-                    col_uuid,
-                    "output",
-                    ZenoColumnType.OUTPUT,
-                    MetadataType.NOMINAL,
-                    output_spec.model,
-                ],
-            )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} TEXT;").format(
-                    sql.Identifier(project), sql.Identifier(col_uuid)
-                )
-            )
-        else:
-            col_uuid = str(exists[0])
-        db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
-                sql.Identifier(project), sql.Identifier(col_uuid)
-            ),
-            [output_spec.output, str(output_spec.data_id)],
-        )
-        db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
-
-
-def feature(feature_spec: FeatureSpec, project: str):
-    """Adds a feature to a datapoint in the project's databse.
-
-    Args:
-        feature_spec (FeatureSpec): the specification of the feature function.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the feature into the
-        database.
-    """
-    db = Database()
-    try:
-        db.connect()
-        if feature_spec.model is not None:
-            exists = db.execute_return(
-                sql.SQL(
-                    "SELECT * FROM {} WHERE name = %s AND type = %s AND model = %s;"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [feature_spec.col_name, ZenoColumnType.FEATURE, feature_spec.model],
-            )
-        else:
-            exists = db.execute_return(
-                sql.SQL("SELECT * FROM {} WHERE name = %s AND type = %s;").format(
-                    sql.Identifier(f"{project}_column_map")
-                ),
-                [feature_spec.col_name, ZenoColumnType.FEATURE],
-            )
-        col_uuid: str = str(uuid.uuid4())
-        if exists is None:
-            db.execute(
-                sql.SQL(
-                    "INSERT INTO {} (column_id, type, data_type, name, model) "
-                    "VALUES (%s,%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [
-                    col_uuid,
-                    ZenoColumnType.FEATURE,
-                    feature_spec.type,
-                    feature_spec.col_name,
-                    feature_spec.model,
-                ],
-            )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} " + str(feature_spec.type) + ";").format(
-                    sql.Identifier(project),
-                    sql.Identifier(col_uuid),
-                )
-            )
-        else:
-            col_uuid = str(exists[0])
-        db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
-                sql.Identifier(project), sql.Identifier(col_uuid)
-            ),
-            [feature_spec.value, str(feature_spec.data_id)],
-        )
-        db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
+    # TODO: insert into table.
+    return None
 
 
 def folder(project: str, name: str):

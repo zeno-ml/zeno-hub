@@ -1,6 +1,5 @@
 """Base types used in Zeno's backend."""
 from enum import Enum
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -89,63 +88,6 @@ class ZenoColumn(CamelModel):
     name: str
     column_type: ZenoColumnType
     data_type: MetadataType
-    model: str | None = None
-
-
-class DataSpec(CamelModel):
-    """Specification for a data instance in a Zeno project.
-
-    Attributes:
-        data_id (int | str): The ID of the associated data instance.
-        data (str | None): The raw data if present.
-    """
-
-    data_id: int | str
-    data: str | None = None
-
-
-class LabelSpec(CamelModel):
-    """Specification for a label in a Zeno project.
-
-    Attributes:
-        data_id (int | str): The ID of the associated data instance.
-        label (str): The ground truth label for the data instance.
-    """
-
-    data_id: int | str
-    label: str
-
-
-class OutputSpec(CamelModel):
-    """Specification for a model output in a Zeno project.
-
-    Attributes:
-        data_id (int | str): The ID of the associated data instance.
-        model (str): The name of the model that produced the output.
-        output (str): The model's output for the data instance.
-    """
-
-    data_id: int | str
-    model: str
-    output: str
-
-
-class FeatureSpec(CamelModel):
-    """Specification for a metadata feature in a Zeno project.
-
-    Attributes:
-        data_id (int | str): The ID of the associated data instance.
-        col_name (str): The name of the associated column.
-        type (MetadataType): The type of the metadata feature.
-        value (Any): The value of the metadata feature. Default None.
-        model (str | None): The name of the model associated with the
-            metadata feature.
-    """
-
-    data_id: int | str
-    col_name: str
-    type: MetadataType
-    value: Any = None
     model: str | None = None
 
 

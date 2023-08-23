@@ -1,9 +1,6 @@
 """Utility functions for the zeno backend."""
-from pathlib import Path
 
-import aiofiles
 import pandas as pd
-from fastapi import File, HTTPException, UploadFile, status
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.database.select import column_id_from_name_and_model
@@ -47,26 +44,3 @@ def generate_diff_cols(
     else:
         df.loc[:, "diff"] = df[col1_id] != df[col2_id]
     return df
-
-
-async def save_file(file_path: Path, file: UploadFile = File(...)):
-    """Save a file to a specified path.
-
-    Args:
-        file_path (Path): destination to write the file to.
-        file (UploadFile, optional): file to write to disk. Defaults to File(...).
-
-    Raises:
-        HTTPException: file could not be saved.
-    """
-    try:
-        async with aiofiles.open(file_path, "wb") as out_file:
-            while chunk := await file.read(CHUNK_SIZE):
-                await out_file.write(chunk)
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="There was an error uploading the file",
-        ) from exc
-    finally:
-        await file.close()

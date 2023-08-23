@@ -212,13 +212,11 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
         if owner_id is None:
-            raise Exception("Owner does not exist.")
-        else:
-            owner_id = owner_id[0]
+            return None
 
         project_uuid = db.execute_return(
             "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
-            [project_name, owner_id],
+            [project_name, owner_id[0]],
         )
         return str(project_uuid[0]) if project_uuid is not None else None
     except (Exception, DatabaseError) as error:
@@ -243,6 +241,46 @@ def project_public(project_uuid: str) -> bool:
     if public is not None:
         return bool(public[0])
     return False
+
+
+def project_exists(owner_name: str, project_name: str) -> bool:
+    """Check whether a project exists.
+
+    Args:
+        owner_name (str): The name of the owner of the project.
+        project_name (str): The name of the project.
+
+
+    Returns:
+        bool: Whether the project exists.
+
+
+    Raises:
+        Exception: Something went wrong while checking whether the project exists.
+    """
+    db = Database()
+    try:
+        db.connect()
+        owner_id = db.execute_return(
+            "SELECT id FROM users WHERE name = %s;", [owner_name]
+        )
+        if owner_id is None:
+            raise Exception("Owner does not exist.")
+        else:
+            owner_id = owner_id[0]
+            exists = db.execute_return(
+                "SELECT EXISTS(SELECT 1 FROM projects "
+                "WHERE name = %s AND owner_id = %s);",
+                [project_name, owner_id],
+            )
+            if exists is not None:
+                return bool(exists[0])
+            else:
+                raise Exception("Error while checking whether project exists.")
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
 
 
 def project(owner_name: str, project_name: str, user: User | None) -> Project | None:
