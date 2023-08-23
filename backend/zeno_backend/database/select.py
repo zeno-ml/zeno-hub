@@ -48,75 +48,108 @@ def projects(user: User) -> list[Project]:
         list[Project]: the projects that the user can interact with.
     """
     db = Database()
-    user_projects_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.owner_id, p.view, p.data_url, "
-        "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public "
-        "FROM projects AS p JOIN user_project AS up ON p.uuid = up.project_uuid "
-        "WHERE up.user_id = %s;",
-        [user.id],
-        return_all=True,
-    )
-    user_projects = []
-    if user_projects_result is not None:
-        for res in user_projects_result:
-            owner_name = db.connect_execute_return(
-                "SELECT name FROM users WHERE id = %s", [res[2]]
-            )
-            if owner_name is not None:
-                owner_name = owner_name[0]
-                user_projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=res[3],
-                        data_url=res[4],
-                        calculate_histogram_metrics=bool(res[5]),
-                        samples_per_page=res[6],
-                        editor=res[7],
-                        public=res[8],
-                    )
-                )
-
-    project_org_result = db.connect_execute_return(
-        "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
-        " p.data_url, p.samples_per_page, op.editor, p.public FROM projects AS p JOIN "
-        "(SELECT organization_project.project_uuid, user_organization.organization_id, "
-        "editor FROM user_organization JOIN organization_project "
-        "ON user_organization.organization_id = organization_project.organization_id "
-        "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
-        [user.id],
-        return_all=True,
-    )
-    org_projects = []
-    if project_org_result is not None:
-        for res in project_org_result:
-            owner_name = db.connect_execute_return(
-                "SELECT name FROM users WHERE id = %s", [res[2]]
-            )
-            if owner_name is not None:
-                owner_name = owner_name[0]
-                org_projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=res[3],
-                        calculate_histogram_metrics=bool(res[4]),
-                        data_url=res[5],
-                        samples_per_page=res[6],
-                        editor=res[7],
-                        public=res[8],
-                    )
-                )
-    org_projects = list(
-        filter(
-            lambda project: not any(p.uuid == project.uuid for p in user_projects),
-            org_projects,
+    try:
+        db.connect()
+        own_projects_result = db.execute_return(
+            "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
+            "samples_per_page, public FROM projects WHERE owner_id = %s;",
+            [user.id],
+            return_all=True,
         )
-    )
+        own_projects = (
+            list(
+                map(
+                    lambda project: Project(
+                        uuid=project[0],
+                        name=project[1],
+                        owner_name=user.name,
+                        view=project[2],
+                        data_url=project[3],
+                        calculate_histogram_metrics=bool(project[4]),
+                        samples_per_page=project[5],
+                        editor=True,
+                        public=project[6],
+                    ),
+                    own_projects_result,
+                )
+            )
+            if own_projects_result is not None
+            else []
+        )
 
-    return user_projects + org_projects
+        user_projects_result = db.execute_return(
+            "SELECT p.uuid, p.name, p.owner_id, p.view, p.data_url, "
+            "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public "
+            "FROM projects AS p JOIN user_project AS up ON p.uuid = up.project_uuid "
+            "WHERE up.user_id = %s;",
+            [user.id],
+            return_all=True,
+        )
+        user_projects = []
+        if user_projects_result is not None:
+            for res in user_projects_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s", [res[2]]
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0]
+                    user_projects.append(
+                        Project(
+                            uuid=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            view=res[3],
+                            data_url=res[4],
+                            calculate_histogram_metrics=bool(res[5]),
+                            samples_per_page=res[6],
+                            editor=res[7],
+                            public=res[8],
+                        )
+                    )
+
+        project_org_result = db.execute_return(
+            "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
+            " p.data_url, p.samples_per_page, op.editor, p.public FROM projects AS p "
+            "JOIN (SELECT op.project_uuid, uo.organization_id, editor "
+            "FROM user_organization as uo JOIN organization_project as op"
+            " ON uo.organization_id = op.organization_id "
+            "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
+            [user.id],
+            return_all=True,
+        )
+        org_projects = []
+        if project_org_result is not None:
+            for res in project_org_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s", [res[2]]
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0]
+                    org_projects.append(
+                        Project(
+                            uuid=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            view=res[3],
+                            calculate_histogram_metrics=bool(res[4]),
+                            data_url=res[5],
+                            samples_per_page=res[6],
+                            editor=res[7],
+                            public=res[8],
+                        )
+                    )
+        org_projects = list(
+            filter(
+                lambda project: not any(p.uuid == project.uuid for p in user_projects)
+                and not any(p.uuid == project.uuid for p in own_projects),
+                org_projects,
+            )
+        )
+        return own_projects + user_projects + org_projects
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
 
 
 def project_uuid(owner_name: str, project_name: str) -> str | None:
@@ -132,7 +165,6 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
     db = Database()
     try:
         db.connect()
-
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
@@ -214,6 +246,49 @@ def project(owner_name: str, project_name: str, user: User) -> Project | None:
             if project_result is not None
             else None
         )
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
+def project_from_uuid(project_uuid: str) -> Project | None:
+    """Get the project data given a UUID.
+
+    Args:
+        project_uuid (str): the uuid of the project to be fetched.
+
+    Returns:
+        Project | None: data for the requested project.
+    """
+    db = Database()
+    try:
+        db.connect()
+        project_result = db.execute_return(
+            "SELECT uuid, name, owner_id, view, "
+            "data_url, calculate_histogram_metrics, samples_per_page, public "
+            "FROM projects WHERE uuid = %s;",
+            [project_uuid],
+        )
+        if project_result is None:
+            raise Exception("Project does not exist.")
+        owner_result = db.execute_return(
+            "SELECT name from users WHERE id = %s;", [project_result[2]]
+        )
+        if owner_result is not None:
+            return Project(
+                uuid=str(project_result[0]),
+                name=str(project_result[1]),
+                owner_name=str(owner_result[0]),
+                view=str(project_result[3]),
+                data_url=str(project_result[4]),
+                editor=False,
+                calculate_histogram_metrics=bool(project_result[5]),
+                samples_per_page=project_result[6]
+                if isinstance(project_result[6], int)
+                else 10,
+                public=bool(project_result[7]),
+            )
     except (Exception, DatabaseError) as error:
         raise Exception(error) from error
     finally:

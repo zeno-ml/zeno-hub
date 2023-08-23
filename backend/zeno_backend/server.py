@@ -440,7 +440,9 @@ def get_server() -> FastAPI:
         "/add_project_user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_user(project: str, user: User):
-        insert.project_user(project, user)
+        project_obj = select.project_from_uuid(project)
+        if project_obj is not None and project_obj.owner_name != user.name:
+            insert.project_user(project, user)
 
     @api_app.post(
         "/add_project_org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
