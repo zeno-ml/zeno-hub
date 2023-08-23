@@ -51,5 +51,4 @@ export type { XCParameters } from './models/XCParameters';
 export type { ZenoColumn } from './models/ZenoColumn';
 export { ZenoColumnType } from './models/ZenoColumnType';
 
-export { DefaultService } from './services/DefaultService';
 export { ZenoService } from './services/ZenoService';

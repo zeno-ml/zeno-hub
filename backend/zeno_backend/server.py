@@ -254,10 +254,12 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return select.project(project_name, owner_name, user)
+        return select.project(owner_name, project_name, user)
 
     @api_app.get(
-        "/project-uuid/{owner_name}/{project_name}", dependencies=[Depends(auth)]
+        "/project-uuid/{owner_name}/{project_name}",
+        dependencies=[Depends(auth)],
+        tags=["zeno"],
     )
     def get_project_uuid(owner_name: str, project_name: str):
         return select.project_uuid(owner_name, project_name)

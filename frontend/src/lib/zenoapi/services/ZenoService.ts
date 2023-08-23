@@ -363,6 +363,27 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Project Uuid
+	 * @param ownerName
+	 * @param projectName
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjectUuid(ownerName: string, projectName: string): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project-uuid/{owner_name}/{project_name}',
+			path: {
+				owner_name: ownerName,
+				project_name: projectName
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Projects
 	 * @returns Project Successful Response
 	 * @throws ApiError
@@ -565,7 +586,7 @@ export class ZenoService {
 	public static addProject(requestBody: Project): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/project',
+			url: '/project-create',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
