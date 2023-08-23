@@ -342,6 +342,25 @@ export class ZenoService {
 	}
 
 	/**
+	 * Is Project Public
+	 * @param projectUuid
+	 * @returns boolean Successful Response
+	 * @throws ApiError
+	 */
+	public static isProjectPublic(projectUuid: string): CancelablePromise<boolean> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project_public/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Project
 	 * @param ownerName
 	 * @param projectName
@@ -392,6 +411,18 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/projects'
+		});
+	}
+
+	/**
+	 * Get Public Projects
+	 * @returns Project Successful Response
+	 * @throws ApiError
+	 */
+	public static getPublicProjects(): CancelablePromise<Array<Project>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/public_projects'
 		});
 	}
 

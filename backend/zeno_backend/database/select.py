@@ -152,6 +152,49 @@ def projects(user: User) -> list[Project]:
         db.disconnect()
 
 
+def public_projects() -> list[Project]:
+    """Fetch all publicly accessible projects.
+
+    Returns:
+        list[Project]: all publicly accessible projects.
+    """
+    db = Database()
+    try:
+        db.connect()
+
+        project_result = db.execute_return(
+            "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
+            "samples_per_page FROM projects WHERE public IS TRUE;",
+            return_all=True,
+        )
+        projects = []
+        if project_result is not None:
+            for res in project_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s;", [res[2]]
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0]
+                    projects.append(
+                        Project(
+                            uuid=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            view=res[3],
+                            data_url=res[4],
+                            calculate_histogram_metrics=bool(res[5]),
+                            samples_per_page=res[6],
+                            editor=False,
+                            public=True,
+                        )
+                    )
+        return projects
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+
 def project_uuid(owner_name: str, project_name: str) -> str | None:
     """Get the project uuid given an owner and project name.
 
@@ -184,13 +227,31 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         db.disconnect()
 
 
-def project(owner_name: str, project_name: str, user: User) -> Project | None:
+def project_public(project_uuid: str) -> bool:
+    """Check whether a project is public.
+
+    Args:
+        project_uuid (str): UUID of the project to be checked.
+
+    Returns:
+        bool: Whether the project is public.
+    """
+    db = Database()
+    public = db.connect_execute_return(
+        "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
+    )
+    if public is not None:
+        return bool(public[0])
+    return False
+
+
+def project(owner_name: str, project_name: str, user: User | None) -> Project | None:
     """Get the project data given an owner and project name.
 
     Args:
         owner_name (str): The name of the project owner.
         project_name (str): The name of the project.
-        user (User): The user making the request.
+        user (User | None): The user making the request.
 
     Returns:
         Project | None: the data for the requested project.
@@ -216,7 +277,9 @@ def project(owner_name: str, project_name: str, user: User) -> Project | None:
             raise Exception("Project does not exist.")
         project_uuid = project_result[0][0]
 
-        if owner_name == user.name:
+        if user is None:
+            editor = False
+        elif owner_name == user.name:
             # Owners can always edit projects
             editor = True
         else:
