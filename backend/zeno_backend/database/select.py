@@ -216,19 +216,26 @@ def project(owner_name: str, project_name: str, user: User) -> Project | None:
             raise Exception("Project does not exist.")
         project_uuid = project_result[0][0]
 
-        user_editor = db.execute_return(
-            "SELECT editor FROM user_project WHERE user_id = %s AND project_uuid = %s",
-            [user.id, project_uuid],
-        )
-        org_editor = db.execute_return(
-            "SELECT editor FROM organization_project AS p JOIN user_organization AS o "
-            "ON p.organization_id = o.organization_id "
-            "WHERE p.project_uuid = %s AND o.user_id = %s",
-            [project_uuid, user.id],
-        )
-        editor = (bool(org_editor[0]) if org_editor is not None else False) or (
-            bool(user_editor) if user_editor is not None else False
-        )
+        if owner_name == user.name:
+            # Owners can always edit projects
+            editor = True
+        else:
+            # Check whether the user or an org of the user have project edit rights
+            user_editor = db.execute_return(
+                "SELECT editor FROM user_project WHERE user_id = %s "
+                "AND project_uuid = %s",
+                [user.id, project_uuid],
+            )
+            org_editor = db.execute_return(
+                "SELECT editor FROM organization_project AS p JOIN user_organization "
+                "AS o ON p.organization_id = o.organization_id "
+                "WHERE p.project_uuid = %s AND o.user_id = %s",
+                [project_uuid, user.id],
+            )
+            editor = (bool(org_editor[0]) if org_editor is not None else False) or (
+                bool(user_editor) if user_editor is not None else False
+            )
+
         return (
             Project(
                 uuid=str(project_result[0]),
