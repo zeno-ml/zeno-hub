@@ -40,7 +40,7 @@ def access_valid(project: str, request: Request) -> bool:
     Returns:
         bool: whether or not othe project data can be accessed.
     """
-    if not is_project_public(project):
+    if not select.project_public(project):
         token = request.headers.get("authorization")
         if token is None or not verify_token(token):
             return False
