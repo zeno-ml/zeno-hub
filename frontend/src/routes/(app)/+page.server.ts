@@ -18,8 +18,10 @@ export async function load({ cookies, url }) {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};
 	const projects = await ZenoService.getProjects();
+	const publicProjects = await ZenoService.getPublicProjects();
 
 	return {
-		projects: projects
+		projects: projects,
+		publicProjects: publicProjects
 	};
 }

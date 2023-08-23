@@ -5,19 +5,36 @@
 
 	$: ownProjects = data.projects.filter((proj) => proj.ownerName === data.user.name);
 	$: sharedProjects = data.projects.filter((proj) => proj.ownerName !== data.user.name);
+	$: publicProjects = data.publicProjects.filter(
+		(proj) =>
+			ownProjects.find((own) => own.uuid === proj.uuid) === undefined &&
+			sharedProjects.find((shared) => shared.uuid === proj.uuid) === undefined
+	);
 </script>
 
 <div class="flex flex-col m-2">
-	<h1 class="text-lg">Your projects</h1>
-	<div class="mb-4 flex flex-wrap items-start">
-		{#each ownProjects as project}
-			<Project {project} deletable />
-		{/each}
-	</div>
-	<h1 class="text-lg">Shared projects</h1>
-	<div class="mb-4 flex flex-wrap items-start">
-		{#each sharedProjects as project}
-			<Project {project} />
-		{/each}
-	</div>
+	{#if ownProjects.length > 0}
+		<h1 class="text-lg">Your projects</h1>
+		<div class="mb-4 flex flex-wrap items-start">
+			{#each ownProjects as project}
+				<Project {project} deletable />
+			{/each}
+		</div>
+	{/if}
+	{#if sharedProjects.length > 0}
+		<h1 class="text-lg">Shared projects</h1>
+		<div class="mb-4 flex flex-wrap items-start">
+			{#each sharedProjects as project}
+				<Project {project} />
+			{/each}
+		</div>
+	{/if}
+	{#if publicProjects.length > 0}
+		<h1 class="text-lg">Public projects</h1>
+		<div class="mb-4 flex flex-wrap items-start">
+			{#each publicProjects as project}
+				<Project {project} />
+			{/each}
+		</div>
+	{/if}
 </div>

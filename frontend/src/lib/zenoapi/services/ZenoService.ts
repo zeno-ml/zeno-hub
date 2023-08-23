@@ -396,6 +396,18 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Public Projects
+	 * @returns Project Successful Response
+	 * @throws ApiError
+	 */
+	public static getPublicProjects(): CancelablePromise<Array<Project>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/public_projects'
+		});
+	}
+
+	/**
 	 * Get Metrics For Slices
 	 * @param project
 	 * @param requestBody
