@@ -50,32 +50,33 @@ def projects(user: User) -> list[Project]:
     db = Database()
     user_projects_result = db.connect_execute_return(
         "SELECT p.uuid, p.name, p.owner_id, p.view, p.data_url, "
-        "p.calculate_histogram_metrics, "
-        "p.samples_per_page, up.editor, p.public FROM projects AS p "
-        "JOIN user_project AS up ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
+        "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public "
+        "FROM projects AS p JOIN user_project AS up ON p.uuid = up.project_uuid "
+        "WHERE up.user_id = %s;",
         [user.id],
         return_all=True,
     )
-    user_projects = (
-        list(
-            map(
-                lambda project: Project(
-                    uuid=project[0],
-                    name=project[1],
-                    owner_name=user.name,
-                    view=project[3],
-                    data_url=project[4],
-                    calculate_histogram_metrics=bool(project[5]),
-                    samples_per_page=project[6],
-                    editor=project[7],
-                    public=project[8],
-                ),
-                user_projects_result,
+    user_projects = []
+    if user_projects_result is not None:
+        for res in user_projects_result:
+            owner_name = db.connect_execute_return(
+                "SELECT name FROM users WHERE id = %s", [res[2]]
             )
-        )
-        if user_projects_result is not None
-        else []
-    )
+            if owner_name is not None:
+                owner_name = owner_name[0]
+                user_projects.append(
+                    Project(
+                        uuid=res[0],
+                        name=res[1],
+                        owner_name=str(owner_name),
+                        view=res[3],
+                        data_url=res[4],
+                        calculate_histogram_metrics=bool(res[5]),
+                        samples_per_page=res[6],
+                        editor=res[7],
+                        public=res[8],
+                    )
+                )
 
     project_org_result = db.connect_execute_return(
         "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
@@ -94,12 +95,12 @@ def projects(user: User) -> list[Project]:
                 "SELECT name FROM users WHERE id = %s", [res[2]]
             )
             if owner_name is not None:
-                owner_name = owner_name[0][0]
+                owner_name = owner_name[0]
                 org_projects.append(
                     Project(
                         uuid=res[0],
                         name=res[1],
-                        owner_name=owner_name,
+                        owner_name=str(owner_name),
                         view=res[3],
                         calculate_histogram_metrics=bool(res[4]),
                         data_url=res[5],
