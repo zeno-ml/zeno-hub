@@ -17,7 +17,7 @@
 	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
-	export let deletable: boolean;
+	export let deletable = false;
 
 	let showOptions = false;
 	let hovering = false;
