@@ -76,43 +76,48 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
-		<h2>Project Aministration</h2>
-		<div class="mb-5 flex flex-col">
-			<div>
-				<Textfield bind:value={config.name} label="Name" bind:this={input} />
+		<h2 class="text-xl mb-4">Project Aministration</h2>
+		<h3 class="text-lg">Settings</h3>
+		<div class="mb-12 flex">
+			<div class="flex flex-col mr-8">
+				<div>
+					<Textfield bind:value={config.name} label="Name" bind:this={input} />
+				</div>
+				<div>
+					<Textfield
+						bind:value={config.samplesPerPage}
+						label="Number of displayed items"
+						bind:this={input}
+						type="number"
+					/>
+				</div>
 			</div>
-			<div>
-				<Textfield
-					bind:value={config.samplesPerPage}
-					label="Number of displayed items"
-					bind:this={input}
-					type="number"
-				/>
-			</div>
-			<div class="flex items-center">
-				<span>Calculate histogram metrics</span>
-				<Checkbox
-					checked={config.calculateHistogramMetrics}
-					on:click={() => (config.calculateHistogramMetrics = !config.calculateHistogramMetrics)}
-				/>
-			</div>
-			<div class="flex items-center">
-				<span>Public project</span>
-				<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
+			<div class="flex flex-col">
+				<div class="flex items-center">
+					<Checkbox
+						checked={config.calculateHistogramMetrics}
+						on:click={() => (config.calculateHistogramMetrics = !config.calculateHistogramMetrics)}
+					/>
+					<span>Calculate histogram metrics</span>
+				</div>
+				<div class="flex items-center">
+					<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
+					<span>Public visibility</span>
+				</div>
 			</div>
 		</div>
 		{#if !config.public && userRequest}
 			{#await userRequest then currentUsers}
 				<div class="mb-5 flex flex-col" transition:fade>
-					<h3>Users</h3>
+					<h3 class="text-lg mb-2">Viewers</h3>
 					{#if currentUsers.length > 0}
 						<table>
 							<thead
 								class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
 							>
 								<th>Email</th>
-								<th>Admin</th>
-								<th />
+								<th class="w-1">Admin</th>
+								<th class="w-1" />
 							</thead>
 							<tbody>
 								{#each currentUsers.sort((a, b) => {
@@ -189,13 +194,13 @@
 		{#if !config.public && organizationRequest}
 			{#await organizationRequest then currentOrgs}
 				<div class="mb-5 flex flex-col" transition:fade>
-					<h3>Organizations</h3>
+					<h3 class="text-lg mb-2">Organizations</h3>
 					{#if currentOrgs.length > 0}
 						<table>
 							<thead>
 								<th>Name</th>
-								<th>Admin</th>
-								<th />
+								<th class="w-1">Admin</th>
+								<th class="w-1" />
 							</thead>
 							<tbody>
 								{#each currentOrgs.sort((a, b) => {

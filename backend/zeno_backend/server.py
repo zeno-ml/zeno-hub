@@ -440,7 +440,9 @@ def get_server() -> FastAPI:
         "/add_project_user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_user(project: str, user: User):
-        insert.project_user(project, user)
+        project_obj = select.project_from_uuid(project)
+        if project_obj is not None and project_obj.owner_name != user.name:
+            insert.project_user(project, user)
 
     @api_app.post(
         "/add_project_org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
@@ -496,15 +498,14 @@ def get_server() -> FastAPI:
         update.project_org(project, organization)
 
     ####################################################################### Delete
-    @api_app.delete("/project/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def delete_project(project: str):
-        try:
-            shutil.rmtree(Path("data", project))
-        except Exception as exc:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(f"ERROR: Project {project} could not be deleted."),
-            ) from exc
+    @api_app.delete("/project/{project}", tags=["zeno"])
+    def delete_project(project: str, current_user=Depends(auth.claim())):
+        project_obj = select.project_from_uuid(project)
+        if project_obj is None or project_obj.owner_name != current_user["username"]:
+            return  # make sure only project owners can delete a project
+        data_path = Path("data", project)
+        if data_path.exists():
+            shutil.rmtree(data_path)
         delete.project(project)
 
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
