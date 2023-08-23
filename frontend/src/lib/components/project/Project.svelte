@@ -17,6 +17,7 @@
 	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
+	export let deletable: boolean;
 
 	let showOptions = false;
 	let hovering = false;
@@ -44,7 +45,7 @@
 				showOptions = false;
 			}}
 		>
-			{#if hovering}
+			{#if hovering && deletable}
 				<IconButton
 					size="button"
 					style="padding: 0px"

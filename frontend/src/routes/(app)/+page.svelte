@@ -6,6 +6,6 @@
 
 <div class="m-2 flex flex-wrap items-start">
 	{#each data.projects as project}
-		<Project {project} />
+		<Project {project} deletable={project.ownerName === data.user.name} />
 	{/each}
 </div>
