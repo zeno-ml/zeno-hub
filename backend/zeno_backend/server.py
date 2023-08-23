@@ -275,6 +275,14 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return select.projects(user)
 
+    @api_app.get(
+        "/public_projects",
+        response_model=list[Project],
+        tags=["zeno"],
+    )
+    def get_public_projects():
+        return select.public_projects()
+
     @api_app.post(
         "/slice-metrics/{project}",
         response_model=list[GroupMetric],
