@@ -271,7 +271,7 @@ def get_server() -> FastAPI:
 
     @api_app.get("/project_public/{project_uuid}", response_model=bool, tags=["zeno"])
     def is_project_public(project_uuid: str):
-        return util.is_project_public(project_uuid)
+        return select.project_public(project_uuid)
 
     @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
     def get_project(owner_name: str, project_name: str, request: Request):

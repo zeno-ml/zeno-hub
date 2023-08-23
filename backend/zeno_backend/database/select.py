@@ -153,10 +153,10 @@ def projects(user: User) -> list[Project]:
 
 
 def public_projects() -> list[Project]:
-    """Fetch all publically accessible projects.
+    """Fetch all publicly accessible projects.
 
     Returns:
-        list[Project]: all publically accessible projects.
+        list[Project]: all publicly accessible projects.
     """
     db = Database()
     try:
@@ -225,6 +225,24 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         raise Exception(error) from error
     finally:
         db.disconnect()
+
+
+def project_public(project_uuid: str) -> bool:
+    """Check whether a project is public.
+
+    Args:
+        project_uuid (str): UUID of the project to be checked.
+
+    Returns:
+        bool: Whether the project is public.
+    """
+    db = Database()
+    public = db.connect_execute_return(
+        "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
+    )
+    if public is not None:
+        return bool(public[0])
+    return False
 
 
 def project(owner_name: str, project_name: str, user: User | None) -> Project | None:

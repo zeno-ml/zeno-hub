@@ -6,25 +6,6 @@ from fastapi import Request
 
 from zeno_backend.classes.user import User
 from zeno_backend.database import select
-from zeno_backend.database.database import Database
-
-
-def is_project_public(project_uuid: str) -> bool:
-    """Check whether a project is public.
-
-    Args:
-        project_uuid (str): uuid of the project to be ckecked.
-
-    Returns:
-        bool: whether the project is public.
-    """
-    db = Database()
-    public = db.connect_execute_return(
-        "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
-    )
-    if public is not None:
-        return bool(public[0])
-    return False
 
 
 def verify_token(token: str) -> bool:
