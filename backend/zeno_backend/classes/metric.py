@@ -1,6 +1,4 @@
 """Type representations for metric data."""
-from typing import List, Optional
-
 from zeno_backend.classes.base import CamelModel
 from zeno_backend.classes.slice import Slice
 
@@ -29,5 +27,5 @@ class MetricRequest(CamelModel):
     Can be used to request metric calculation on specific data subsets.
     """
 
-    metric_keys: List[MetricKey]
-    data_ids: Optional[List[str]] = None
+    metric_keys: list[MetricKey]
+    data_ids: list[str] | None = None

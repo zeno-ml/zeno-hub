@@ -1,5 +1,4 @@
 """Type representations for tags."""
-from typing import List, Optional
 
 from zeno_backend.classes.base import CamelModel
 from zeno_backend.classes.metric import Metric
@@ -11,14 +10,14 @@ class Tag(CamelModel):
     Attributes:
         id (int): The id of the tag.
         tag_name (str): The name of the tag.
-        data_ids (List[str]): The ids of the data belonging to the tag.
+        data_ids (list[str]): The ids of the data belonging to the tag.
         folder_id (Optiona[int]): The id of the folder the tag belongs to. Default None.
     """
 
     id: int
     tag_name: str
-    data_ids: List[str]
-    folder_id: Optional[int] = None
+    data_ids: list[str]
+    folder_id: int | None = None
 
 
 class TagMetricKey(CamelModel):

@@ -1,6 +1,4 @@
 """Functions for creating the frontend metadata histograms."""
-from typing import List, Union
-
 import numpy as np
 import pandas as pd
 from psycopg import sql
@@ -16,8 +14,8 @@ from zeno_backend.processing.metrics import metric_map
 
 
 def histogram_buckets(
-    project: str, req: List[ZenoColumn], num_bins: Union[int, str] = "doane"
-) -> List[List[HistogramBucket]]:
+    project: str, req: list[ZenoColumn], num_bins: int | str = "doane"
+) -> list[list[HistogramBucket]]:
     """Calculate the histogram buckets for a list of columns.
 
     Args:
@@ -32,18 +30,18 @@ def histogram_buckets(
     Returns:
         List[List[HistogramBucket]]: for each zeno column return a list of buckets
     """
-    res: List[List[HistogramBucket]] = []
+    res: list[list[HistogramBucket]] = []
     for col in req:
         col_list = column(project, col)
         df_col: pd.Series = pd.DataFrame({"col": col_list})["col"]
         if col.data_type == MetadataType.NOMINAL:
-            ret_hist: List[HistogramBucket] = []
+            ret_hist: list[HistogramBucket] = []
             val_counts: pd.Series = df_col.value_counts()
             for k in val_counts.keys():  # type: ignore
                 ret_hist.append(HistogramBucket(bucket=k))
             res.append(ret_hist)
         elif col.data_type == MetadataType.CONTINUOUS:
-            ret_hist: List[HistogramBucket] = []
+            ret_hist: list[HistogramBucket] = []
             df_col = pd.to_numeric(df_col).fillna(0)  # type: ignore
             bins = np.histogram_bin_edges(df_col, bins=num_bins)
             for i in range(len(bins) - 1):
@@ -68,7 +66,7 @@ def histogram_buckets(
     return res
 
 
-def histogram_counts(project: str, req: HistogramRequest) -> List[List[int]]:
+def histogram_counts(project: str, req: HistogramRequest) -> list[list[int]]:
     """Calculate count for each bucket in each column histogram.
 
     Args:
@@ -78,7 +76,7 @@ def histogram_counts(project: str, req: HistogramRequest) -> List[List[int]]:
     Returns:
         List[List[int]]: counts for the individual buckets of specified histograms.
     """
-    ret: List[List[int]] = []
+    ret: list[list[int]] = []
     for r in req.column_requests:
         col = r.column
         data_frame = pd.DataFrame(
@@ -117,9 +115,7 @@ def histogram_counts(project: str, req: HistogramRequest) -> List[List[int]]:
     return ret
 
 
-def histogram_metrics(
-    project: str, req: HistogramRequest
-) -> List[List[Union[float, None]]]:
+def histogram_metrics(project: str, req: HistogramRequest) -> list[list[float | None]]:
     """Calculate metric for each bucket in each column histogram.
 
     Args:
@@ -133,9 +129,9 @@ def histogram_metrics(
         return []
 
     filter_sql = table_filter(project, req.model, req.filter_predicates, req.data_ids)
-    ret: List[List[Union[float, None]]] = []
+    ret: list[list[float | None]] = []
     for r in req.column_requests:
-        loc_ret: List[Union[float, None]] = []
+        loc_ret: list[float | None] = []
         index = 0
         for bucket in r.buckets:
             if req.model:

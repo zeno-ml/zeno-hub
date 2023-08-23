@@ -1,6 +1,6 @@
 """Base types used in Zeno's backend."""
 from enum import Enum
-from typing import Any, Optional, Union
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
@@ -74,45 +74,6 @@ class MetadataType(str, Enum):
         return "TEXT"
 
 
-class Project(CamelModel):
-    """Projects with datasets & models.
-
-    Attributes:
-        uuid (str): The UUID of the task.
-        name (str): The name of the task.
-        view (str): The name of the view to use for the task.
-        data_url (Optional[str]): The base URL from which to read data instances.
-        editor (bool): Whether the current user is an editor of the project.
-        calculate_histogram_metrics (bool): Whether to calculate histogram metrics.
-            Default True.
-        samples_per_page (int): The number of datapoints to show per page. Default 10.
-        public (bool): Whether the task is public. Default False.
-    """
-
-    uuid: str
-    name: str
-    view: str
-    data_url: Optional[str]
-    editor: bool
-    calculate_histogram_metrics: bool = True
-    samples_per_page: int = 10
-    public: bool = False
-
-
-class ProjectStats(CamelModel):
-    """Statistical numbers of a Zeno project.
-
-    Attributes:
-        num_instances (int): number of data instances in the project.
-        num_charts (int): number of charts that have been created for the project.
-        num_models (int): number of models associated with the project
-    """
-
-    num_instances: int
-    num_charts: int
-    num_models: int
-
-
 class ZenoColumn(CamelModel):
     """Representation of a column in a Zeno project.
 
@@ -121,14 +82,14 @@ class ZenoColumn(CamelModel):
         name (str): The name of the column.
         column_type (ZenoColumnType): The type of the column.
         data_type (MetadataType): The data type of the column.
-        model (Optional[str]): The name of the model that produced the column.
+        model (str | None): The name of the model that produced the column.
     """
 
     id: str
     name: str
     column_type: ZenoColumnType
     data_type: MetadataType
-    model: Optional[str] = None
+    model: str | None = None
 
 
 class DataSpec(CamelModel):
@@ -136,11 +97,11 @@ class DataSpec(CamelModel):
 
     Attributes:
         data_id (int | str): The ID of the associated data instance.
-        data (str): The raw data if present.
+        data (str | None): The raw data if present.
     """
 
     data_id: int | str
-    data: Optional[str] = None
+    data: str | None = None
 
 
 class LabelSpec(CamelModel):
@@ -177,7 +138,7 @@ class FeatureSpec(CamelModel):
         col_name (str): The name of the associated column.
         type (MetadataType): The type of the metadata feature.
         value (Any): The value of the metadata feature. Default None.
-        model (Optional[str]): The name of the model associated with the
+        model (str | None): The name of the model associated with the
             metadata feature.
     """
 
@@ -185,11 +146,11 @@ class FeatureSpec(CamelModel):
     col_name: str
     type: MetadataType
     value: Any = None
-    model: Optional[str] = None
+    model: str | None = None
 
 
 class GroupMetric(CamelModel):
     """Specification for a metric on a group of datapoints."""
 
-    metric: Union[float, None] = None
+    metric: float | None = None
     size: int

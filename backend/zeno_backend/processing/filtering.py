@@ -1,5 +1,4 @@
 """Functions for parsing filter predicates and filtering data."""
-from typing import List, Optional, Union
 
 from psycopg import sql
 
@@ -10,7 +9,7 @@ from zeno_backend.database.select import column_id_from_name_and_model
 
 
 def filter_to_sql(
-    filter: FilterPredicateGroup, project: str, model: Optional[str] = None
+    filter: FilterPredicateGroup, project: str, model: str | None = None
 ) -> sql.Composed:
     """Converting a filter representation to a SQL string for the database.
 
@@ -64,10 +63,10 @@ def filter_to_sql(
 
 def table_filter(
     project: str,
-    model: Optional[str],
-    filter_predicates: Optional[FilterPredicateGroup] = None,
-    data_ids: Optional[List[str]] = None,
-) -> Optional[sql.Composed]:
+    model: str | None,
+    filter_predicates: FilterPredicateGroup | None = None,
+    data_ids: list[str] | None = None,
+) -> sql.Composed | None:
     """Generate a filter string to filter the data table of a project.
 
     Args:
@@ -81,7 +80,7 @@ def table_filter(
     Returns:
         Optional[sql.Composed]: filter to filter a SQL table with.
     """
-    filter_result: Union[sql.Composed, None] = None
+    filter_result: sql.Composed | None = None
     if filter_predicates is not None and len(filter_predicates.predicates) > 0:
         filter_result = filter_to_sql(filter_predicates, project, model)
 
@@ -95,7 +94,7 @@ def table_filter(
     return filter_result
 
 
-def bucket_filter(col: ZenoColumn, bucket: HistogramBucket) -> Optional[sql.Composed]:
+def bucket_filter(col: ZenoColumn, bucket: HistogramBucket) -> sql.Composed | None:
     """Generate a filter string for a specific histogram bucket.
 
     Args:

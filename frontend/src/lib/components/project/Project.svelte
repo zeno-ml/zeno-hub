@@ -29,7 +29,7 @@
 </script>
 
 <button
-	on:click={() => goto(`/project/${project.uuid}`)}
+	on:click={() => goto(`/project/${project.ownerName}/${project.name}`)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}

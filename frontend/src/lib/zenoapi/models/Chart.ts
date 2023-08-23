@@ -11,7 +11,7 @@ import type { TableParameters } from './TableParameters';
 import type { XCParameters } from './XCParameters';
 
 /**
- * Generic chart specifiaction with parameters for specific chart types.
+ * Generic chart specification with parameters for specific chart types.
  */
 export type Chart = {
 	id: number;

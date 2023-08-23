@@ -9,6 +9,7 @@
  * Attributes:
  * uuid (str): The UUID of the task.
  * name (str): The name of the task.
+ * owner_name (str): The name of the user who owns the task.
  * view (str): The name of the view to use for the task.
  * data_url (Optional[str]): The base URL from which to read data instances.
  * editor (bool): Whether the current user is an editor of the project.
@@ -21,6 +22,7 @@
 export type Project = {
 	uuid: string;
 	name: string;
+	ownerName: string;
 	view: string;
 	dataUrl: string | null;
 	editor: boolean;

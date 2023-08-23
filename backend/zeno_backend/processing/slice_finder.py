@@ -1,6 +1,5 @@
 """Methods to run slice-finder in order to slice the user's data."""
 import secrets
-from typing import List, Union
 
 import numpy as np
 import pandas as pd
@@ -15,19 +14,19 @@ from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.util import generate_diff_cols
 
 
-def cont_cols_df(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+def cont_cols_df(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """Discretize continuous valued columns.
 
     Args:
         df (pd.DataFrame): _description_
-        cols (List[str]): _description_
+        cols (list[str]): _description_
 
     Returns:
         pd.DataFrame: _description_
     """
     new_df = pd.DataFrame()
     for col in cols:
-        df_col: List[float] = pd.to_numeric(df.loc[:, col].copy())  # type: ignore
+        df_col: list[float] = pd.to_numeric(df.loc[:, col].copy())  # type: ignore
         bins = list(np.histogram_bin_edges(df_col, bins="doane"))
         bins[0], bins[len(bins) - 1] = bins[0] - 1, bins[len(bins) - 1] + 1
         new_df.loc[:, col + "_encode"] = pd.cut(df_col, bins=bins)
@@ -43,17 +42,17 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
     Returns a SliceFinderMetricReturn Object.
     """
-    cont_search_cols: List[ZenoColumn] = []
-    not_cont_search_cols: List[ZenoColumn] = []
+    cont_search_cols: list[ZenoColumn] = []
+    not_cont_search_cols: list[ZenoColumn] = []
     for col in req.search_columns:
         if col.data_type == MetadataType.CONTINUOUS:
             cont_search_cols.append(col)
         else:
             not_cont_search_cols.append(col)
 
-    search_cols: List[ZenoColumn] = not_cont_search_cols + cont_search_cols
-    cont_search_col_ids: List[str] = [col.id for col in cont_search_cols]
-    not_cont_search_col_ids: List[str] = [col.id for col in not_cont_search_cols]
+    search_cols: list[ZenoColumn] = not_cont_search_cols + cont_search_cols
+    cont_search_col_ids: list[str] = [col.id for col in cont_search_cols]
+    not_cont_search_col_ids: list[str] = [col.id for col in not_cont_search_cols]
     metric_col: str = "diff" if req.compare_column else req.metric_column.id
 
     filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
@@ -86,9 +85,9 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
     if slice_finder.top_slices_ is None or slice_finder.top_slices_statistics_ is None:
         return SliceFinderReturn(slices=[], metrics=[], sizes=[], overall_metric=0)
 
-    discovered_slices: List[Slice] = []
-    slice_metrics: List[float] = []
-    slice_sizes: List[int] = []
+    discovered_slices: list[Slice] = []
+    slice_metrics: list[float] = []
+    slice_sizes: list[int] = []
     not_cont_search_num = len(not_cont_search_cols)
 
     for sli_i, sli in enumerate(slice_finder.top_slices_):
@@ -105,7 +104,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
         slice_sizes.append(slice_finder.top_slices_statistics_[sli_i]["slice_size"])
 
-        predicate_list: List[Union[FilterPredicate, FilterPredicateGroup]] = []
+        predicate_list: list[FilterPredicate | FilterPredicateGroup] = []
         for pred_i, sli_predicate in enumerate(sli):
             if sli_predicate is not None:
                 join_val = Join.OMITTED if len(predicate_list) == 0 else Join.AND

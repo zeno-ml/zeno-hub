@@ -1,7 +1,7 @@
 """Classes required for specifying data filters."""
 import json
 from enum import Enum
-from typing import List, LiteralString, Union
+from typing import LiteralString
 
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 
@@ -51,14 +51,14 @@ class FilterPredicate(CamelModel):
 
     column: ZenoColumn
     operation: Operation
-    value: Union[str, float, int, bool]
+    value: str | float | int | bool
     join: Join
 
 
 class FilterPredicateGroup(CamelModel):
     """Group of filter predicates that might be joined by a Join operator."""
 
-    predicates: List[Union["FilterPredicateGroup", FilterPredicate]]
+    predicates: list["FilterPredicateGroup | FilterPredicate"]
     join: Join
 
 

@@ -1,7 +1,6 @@
 """Type representations for chart data."""
 import json
 from enum import Enum
-from typing import List, Union
 
 from zeno_backend.classes.base import CamelModel
 
@@ -35,9 +34,9 @@ class SlicesMetricsOrModels(str, Enum):
 class XCParameters(CamelModel):
     """Parameter specification for the x and color channels of a chart."""
 
-    slices: List[int]
+    slices: list[int]
     metric: int
-    models: List[str]
+    models: list[str]
     color_channel: SlicesOrModels
     x_channel: SlicesOrModels
 
@@ -45,9 +44,9 @@ class XCParameters(CamelModel):
 class TableParameters(CamelModel):
     """Parameter specification for a tabular visualization."""
 
-    metrics: List[int]
-    slices: List[int]
-    models: List[str]
+    metrics: list[int]
+    slices: list[int]
+    models: list[str]
     y_channel: SlicesOrModels
     x_channel: SlicesMetricsOrModels
     fixed_channel: SlicesMetricsOrModels
@@ -56,9 +55,9 @@ class TableParameters(CamelModel):
 class BeeswarmParameters(CamelModel):
     """Parameter specification for a beeswarm chart."""
 
-    metrics: List[int]
-    slices: List[int]
-    models: List[str]
+    metrics: list[int]
+    slices: list[int]
+    models: list[str]
     y_channel: SlicesOrModels
     color_channel: SlicesOrModels
     fixed_dimension: str
@@ -67,9 +66,9 @@ class BeeswarmParameters(CamelModel):
 class RadarParameters(CamelModel):
     """Parameter specification for a radar chart."""
 
-    metrics: List[int]
-    slices: List[int]
-    models: List[str]
+    metrics: list[int]
+    slices: list[int]
+    models: list[str]
     axis_channel: SlicesMetricsOrModels
     layer_channel: SlicesOrModels
     fixed_channel: SlicesMetricsOrModels
@@ -79,26 +78,26 @@ class HeatmapParameters(CamelModel):
     """Parameter specirication for a heatmap chart."""
 
     metric: int
-    x_values: List[Union[int, str]]
-    y_values: List[Union[int, str]]
+    x_values: list[int | str]
+    y_values: list[int | str]
     model: str
     y_channel: SlicesOrModels
     x_channel: SlicesOrModels
 
 
 class Chart(CamelModel):
-    """Generic chart specifiaction with parameters for specific chart types."""
+    """Generic chart specification with parameters for specific chart types."""
 
     id: int
     name: str
     type: ChartType
-    parameters: Union[
-        XCParameters,
-        TableParameters,
-        BeeswarmParameters,
-        RadarParameters,
-        HeatmapParameters,
-    ]
+    parameters: (
+        XCParameters
+        | TableParameters
+        | BeeswarmParameters
+        | RadarParameters
+        | HeatmapParameters
+    )
 
 
 class ParametersEncoder(json.JSONEncoder):
@@ -106,13 +105,11 @@ class ParametersEncoder(json.JSONEncoder):
 
     def default(
         self,
-        o: Union[
-            XCParameters,
-            TableParameters,
-            BeeswarmParameters,
-            RadarParameters,
-            HeatmapParameters,
-        ],
+        o: XCParameters
+        | TableParameters
+        | BeeswarmParameters
+        | RadarParameters
+        | HeatmapParameters,
     ):
         """Convert chart parameter data into JSON to be saved in the database.
 
