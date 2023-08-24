@@ -207,16 +207,96 @@ def dataset(
     return None
 
 
-def system(project: str, df: pd.DataFrame, system_name: str, output_column: str):
+def system(
+    project: str,
+    data_frame: pd.DataFrame,
+    system_name: str,
+    output_column: str,
+    id_column: str,
+):
     """Adds a dataset to an existing project.
 
     Args:
         project (str): The project the user is currently working with.
-        df (pd.DataFrame): The dataset to be added.
+        data_frame (pd.DataFrame): The dataset to be added.
         system_name (str): The name of the system that produced the output.
         output_column (str): The name of the column containing the system output.
+        id_column (str): The name of the column containing the instance IDs.
     """
-    # TODO: insert into table.
+    # Get column objects from the dataframe.
+    output_col_object: ZenoColumn = ZenoColumn(
+        id=str(uuid.uuid4()),
+        name="output",
+        column_type=ZenoColumnType.OUTPUT,
+        data_type=MetadataType.NOMINAL,
+        model=system_name,
+    )
+    columns: list[ZenoColumn] = []
+    for col in data_frame.columns:
+        if col == id_column or col == output_column:
+            continue
+        columns.append(
+            ZenoColumn(
+                id=str(uuid.uuid4()),
+                name=col,
+                column_type=ZenoColumnType.FEATURE,
+                data_type=resolve_metadata_type(data_frame, col),
+                model=system_name,
+            )
+        )
+
+    # Create a renaming scheme for the DataFrame columns
+    column_rename = {
+        id_column: "data_id",
+        output_column: output_col_object.id,
+    }
+    for col in columns:
+        column_rename[col.name] = col.id
+    data_frame = data_frame.rename(columns=column_rename)
+    data_frame = data_frame.set_index("data_id")
+
+    # Connect to the db engine using SQLAlchemy and write the data to a table.
+    db = Database()
+    config = db.config()
+    engine = create_engine(
+        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
+    )
+    data_frame.to_sql("tmp", con=engine, if_exists="replace", index=True)
+    columns.append(output_col_object)
+
+    try:
+        db.connect()
+        for col in columns:
+            db.execute(
+                sql.SQL("ALTER TABLE {} ADD {}" + str(col.data_type) + ";").format(
+                    sql.Identifier(project), sql.Identifier(col.id)
+                )
+            )
+            db.execute(
+                sql.SQL(
+                    "UPDATE {} SET {} = (SELECT {} FROM tmp "
+                    "WHERE tmp.data_id = {}.data_id)"
+                ).format(
+                    sql.Identifier(project),
+                    sql.Identifier(col.id),
+                    sql.Identifier(col.id),
+                    sql.Identifier(project),
+                )
+            )
+            db.execute(
+                sql.SQL(
+                    "INSERT INTO {} (column_id, name, type, data_type, model) "
+                    "VALUES (%s,%s,%s,%s,%s);"
+                ).format(sql.Identifier(f"{project}_column_map")),
+                [col.id, col.name, col.column_type, col.data_type, col.model],
+            )
+        db.execute("DROP TABLE tmp;")
+        db.commit()
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
     return None
 
 
