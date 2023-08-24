@@ -1,7 +1,7 @@
 """Functions to update data in the database."""
 import json
 
-from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
@@ -76,9 +76,7 @@ def tag(tag: Tag, project: str):
         tag (Tag): the tag data to use for the update.
         project (str): the project the user is currently working with.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         db.execute(
             "UPDATE tags SET project_uuid = %s, name = %s, folder_id = %s "
             "WHERE id = %s;",
@@ -124,10 +122,6 @@ def tag(tag: Tag, project: str):
                 [tag.id, data_id],
             )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def user(user: User):
@@ -151,9 +145,7 @@ def organization(organization: Organization):
     Args:
         organization (Organization): the updated representation of the organization.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         db.execute(
             "UPDATE organizations SET name = %s WHERE id = %s",
             [organization.name, organization.id],
@@ -202,10 +194,6 @@ def organization(organization: Organization):
                 [user.admin, user.id, organization.id],
             )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project(project: Project):

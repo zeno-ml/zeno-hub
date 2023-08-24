@@ -3,7 +3,7 @@ import json
 import re
 from operator import itemgetter
 
-from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.base import ZenoColumn
 from zeno_backend.classes.chart import Chart
@@ -47,9 +47,7 @@ def projects(user: User) -> list[Project]:
     Returns:
         list[Project]: the projects that the user can interact with.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         own_projects_result = db.execute_return(
             "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
             "samples_per_page, public FROM projects WHERE owner_id = %s;",
@@ -146,10 +144,6 @@ def projects(user: User) -> list[Project]:
             )
         )
         return own_projects + user_projects + org_projects
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def public_projects() -> list[Project]:
@@ -158,10 +152,7 @@ def public_projects() -> list[Project]:
     Returns:
         list[Project]: all publicly accessible projects.
     """
-    db = Database()
-    try:
-        db.connect()
-
+    with Database() as db:
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
             "samples_per_page FROM projects WHERE public IS TRUE;",
@@ -189,10 +180,6 @@ def public_projects() -> list[Project]:
                         )
                     )
         return projects
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_uuid(owner_name: str, project_name: str) -> str | None:
@@ -205,9 +192,7 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
     Returns:
         str | None: The uuid of the requested project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
@@ -219,10 +204,6 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
             [project_name, owner_id[0]],
         )
         return str(project_uuid[0]) if project_uuid is not None else None
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_public(project_uuid: str) -> bool:
@@ -294,10 +275,7 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
     Returns:
         Project | None: the data for the requested project.
     """
-    db = Database()
-    try:
-        db.connect()
-
+    with Database() as db:
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
@@ -354,10 +332,6 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
             if project_result is not None
             else None
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_from_uuid(project_uuid: str) -> Project | None:
@@ -369,9 +343,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
     Returns:
         Project | None: data for the requested project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, "
             "data_url, calculate_histogram_metrics, samples_per_page, public "
@@ -397,10 +369,6 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 else 10,
                 public=bool(project_result[7]),
             )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_stats(project: str) -> ProjectStats | None:
@@ -412,9 +380,7 @@ def project_stats(project: str) -> ProjectStats | None:
     Returns:
         ProjectStats | None: statistics of the specified project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         num_instances = db.execute_return(
             sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project))
         )
@@ -439,10 +405,6 @@ def project_stats(project: str) -> ProjectStats | None:
             and num_models is not None
             else None
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def metrics(project: str) -> list[Metric]:
@@ -666,11 +628,9 @@ def table_data_paginated(
     Returns:
         SQLTable: the resulting slice of the data as requested by the user.
     """
-    db = Database()
-    try:
+    with Database() as db:
         filter_results = None
         columns = []
-        db.connect()
         if filter_sql is None:
             if db.cur is not None:
                 db.cur.execute(
@@ -702,10 +662,6 @@ def table_data_paginated(
             if filter_results is not None
             else SQLTable(table=[], columns=[])
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
@@ -721,11 +677,9 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
     Returns:
         SQLTable: the filtered data table for the project.
     """
-    db = Database()
-    try:
+    with Database() as db:
         filter_results = None
         columns = []
-        db.connect()
         if filter_sql is None:
             if db.cur is not None:
                 db.cur.execute(
@@ -748,10 +702,6 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
             if filter_results is not None
             else SQLTable(table=[], columns=[])
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def column_id_from_name_and_model(project: str, column_name: str, model: str) -> str:
@@ -826,9 +776,7 @@ def tags(project: str) -> list[Tag]:
     Returns:
         list[Tag]: the list of tags associated with a project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         tags_result = db.execute_return(
             "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
             [
@@ -860,10 +808,6 @@ def tags(project: str) -> list[Tag]:
                 )
             )
         return tags
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def user(name: str) -> User | None:
@@ -942,9 +886,7 @@ def organizations(user: User) -> list[Organization]:
         list[Organization]: all organizations the user is a member of.
     """
     organizations: list[Organization] = []
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         organizations_result = db.execute_return(
             "SELECT o.id, o.name, uo.admin FROM organizations AS o "
             "JOIN user_organization AS uo ON o.id = uo.organization_id "
@@ -982,10 +924,6 @@ def organizations(user: User) -> list[Organization]:
                 )
             )
         return organizations
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_users(project: str) -> list[User]:

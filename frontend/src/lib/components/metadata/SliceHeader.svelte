@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { selectionIds, selectionPredicates, selections } from '$lib/stores';
+	import { project, selectionIds, selectionPredicates, selections } from '$lib/stores';
 	import {
 		mdiCreation,
 		mdiCreationOutline,
@@ -45,68 +45,70 @@
 			</Icon>
 		</div>
 	</div>
-	<div class="flex items-center justify-between">
-		<div
-			use:tooltip={{
-				content: !$page.url.href.includes('compare')
-					? 'Find underperforming slices.'
-					: 'Find slices with the largest output differences between models',
-				position: 'left',
-				theme: 'zeno-tooltip',
-				maxWidth: '150'
-			}}
-		>
-			<IconButton
-				on:click={() => {
-					showSliceFinder = true;
+	{#if $project && $project.editor}
+		<div class="flex items-center justify-between">
+			<div
+				use:tooltip={{
+					content: !$page.url.href.includes('compare')
+						? 'Find underperforming slices.'
+						: 'Find slices with the largest output differences between models',
+					position: 'left',
+					theme: 'zeno-tooltip',
+					maxWidth: '150'
 				}}
 			>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || ($selectionIds !== undefined && $selectionIds.length > 0)}
-						<path class="fill-primary" d={mdiCreation} />
-					{:else}
-						<path class="fill-grey" d={mdiCreationOutline} />
-					{/if}
-				</Icon>
-			</IconButton>
-		</div>
-		<div
-			use:tooltip={{
-				content: 'Create a new folder.',
-				position: 'left',
-				theme: 'zeno-tooltip'
-			}}
-		>
-			<IconButton
-				on:click={() => {
-					showNewFolder = true;
+				<IconButton
+					on:click={() => {
+						showSliceFinder = true;
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || ($selectionIds !== undefined && $selectionIds.length > 0)}
+							<path class="fill-primary" d={mdiCreation} />
+						{:else}
+							<path class="fill-grey" d={mdiCreationOutline} />
+						{/if}
+					</Icon>
+				</IconButton>
+			</div>
+			<div
+				use:tooltip={{
+					content: 'Create a new folder.',
+					position: 'left',
+					theme: 'zeno-tooltip'
 				}}
 			>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					<path class="fill-grey" d={mdiFolderPlusOutline} />
-				</Icon>
-			</IconButton>
-		</div>
-		<div
-			use:tooltip={{
-				content: 'Create a new slice.',
-				position: 'left',
-				theme: 'zeno-tooltip'
-			}}
-		>
-			<IconButton
-				on:click={() => {
-					showNewSlice = true;
+				<IconButton
+					on:click={() => {
+						showNewFolder = true;
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						<path class="fill-grey" d={mdiFolderPlusOutline} />
+					</Icon>
+				</IconButton>
+			</div>
+			<div
+				use:tooltip={{
+					content: 'Create a new slice.',
+					position: 'left',
+					theme: 'zeno-tooltip'
 				}}
 			>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					{#if $selectionPredicates !== undefined}
-						<path class="fill-primary" d={mdiPlusCircle} />
-					{:else}
-						<path class="fill-grey" d={mdiPlus} />
-					{/if}
-				</Icon>
-			</IconButton>
+				<IconButton
+					on:click={() => {
+						showNewSlice = true;
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						{#if $selectionPredicates !== undefined}
+							<path class="fill-primary" d={mdiPlusCircle} />
+						{:else}
+							<path class="fill-grey" d={mdiPlus} />
+						{/if}
+					</Icon>
+				</IconButton>
+			</div>
 		</div>
-	</div>
+	{/if}
 </div>

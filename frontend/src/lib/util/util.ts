@@ -10,7 +10,7 @@ export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
 	const pathParts = url.pathname.split('/');
 	const projectIndex = pathParts.indexOf('project');
-	for (let i = 1; i < projectIndex + 2; i++) {
+	for (let i = 1; i < projectIndex + 3; i++) {
 		projectURL = projectURL + '/' + pathParts[i];
 	}
 	return projectURL;

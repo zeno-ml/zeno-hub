@@ -1,5 +1,5 @@
 """Methods to calculate metrics for model outputs."""
-from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.base import GroupMetric
 from zeno_backend.classes.metric import Metric
@@ -22,9 +22,7 @@ def accuracy(project: str, model: str, filter: sql.Composed | None) -> GroupMetr
         GroupMetric: accuracy metric calculated as specified.
     """
     output_column_id = column_id_from_name_and_model(project, "output", model)
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         correct_query = sql.SQL("SELECT COUNT(*) FROM {} WHERE {} = label").format(
             sql.Identifier(project), sql.Identifier(output_column_id)
         )
@@ -53,10 +51,6 @@ def accuracy(project: str, model: str, filter: sql.Composed | None) -> GroupMetr
             and isinstance(num_total[0], int)
             else GroupMetric(metric=None, size=0)
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
@@ -74,9 +68,7 @@ def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric
         GroupMetric: recall score for the group of filtered instances as specified.
     """
     output_column_id = column_id_from_name_and_model(project, "output", model)
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         tp_query = sql.SQL("SELECT COUNT(*), label FROM {} WHERE {} = label").format(
             sql.Identifier(project), sql.Identifier(output_column_id)
         )
@@ -144,10 +136,6 @@ def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric
             metric=100 * sum(metrics) / len(metrics) if len(metrics) > 0 else 0,
             size=num_total[0],
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
@@ -165,9 +153,7 @@ def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMet
         GroupMetric: recall score for the group of filtered instances as specified.
     """
     output_column_id = column_id_from_name_and_model(project, "output", model)
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         tp_query = sql.SQL("SELECT COUNT(*), label FROM {} WHERE {} = label").format(
             sql.Identifier(project), sql.Identifier(output_column_id)
         )
@@ -238,10 +224,6 @@ def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMet
             metric=100 * sum(metrics) / len(metrics) if len(metrics) > 0 else 0,
             size=num_total[0],
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def f1(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
@@ -287,9 +269,7 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
     Returns:
         GroupMetric: count of datapoints matching the specified filter.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         num_total = db.execute_return(
             sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
             if filter is None
@@ -305,10 +285,6 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
             if num_total is not None
             else GroupMetric(metric=None, size=0)
         )
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def metric_map(

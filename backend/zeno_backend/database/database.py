@@ -185,3 +185,21 @@ class Database:
             db["user"] = os.environ["DB_USER"]
             db["password"] = os.environ["DB_PASSWORD"]
             return db
+
+    def __enter__(self):
+        """Connect to the database.
+
+        Returns:
+            Database: The database object.
+        """
+        self.connect()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        """Disconnect from the database."""
+        if self.cur is not None:
+            self.cur.close()
+        if self.conn is not None:
+            self.conn.close()
+        self.cur = None
+        self.conn = None

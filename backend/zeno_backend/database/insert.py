@@ -3,6 +3,7 @@ import json
 
 import pandas as pd
 from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.base import (
     MetadataType,
@@ -33,9 +34,7 @@ def project(project_config: Project, user: User):
         Exception: something went wrong in the process of creating the new project in
         the database.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         db.execute(
             "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
             + "calculate_histogram_metrics, samples_per_page, public) "
@@ -91,10 +90,6 @@ def project(project_config: Project, user: User):
             )
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def dataset(
@@ -122,8 +117,34 @@ def system(project: str, df: pd.DataFrame, system_name: str, output_column: str)
         system_name (str): The name of the system that produced the output.
         output_column (str): The name of the column containing the system output.
     """
-    # TODO: insert into table.
-    return None
+    with Database() as db:
+        exists = db.execute_return(
+            sql.SQL("SELECT COUNT(1) FROM {} WHERE column_id = 'label'").format(
+                sql.Identifier(f"{project}_column_map")
+            )
+        )
+        if exists is not None and exists[0] == 0:
+            db.execute(
+                sql.SQL(
+                    "INSERT INTO {} (column_id, name, type, data_type) "
+                    "VALUES (%s,%s,%s,%s);"
+                ).format(sql.Identifier(f"{project}_column_map")),
+                ["label", "label", ZenoColumnType.LABEL, MetadataType.NOMINAL],
+            )
+            db.execute(
+                sql.SQL("ALTER TABLE {} ADD label TEXT;").format(
+                    sql.Identifier(project)
+                )
+            )
+        db.execute(
+            sql.SQL("UPDATE {} SET label = %s WHERE data_id = %s;").format(
+                sql.Identifier(project)
+            ),
+            [label_spec.label, str(label_spec.data_id)],
+        )
+        db.commit()
+
+
 
 
 def folder(project: str, name: str):
@@ -187,9 +208,7 @@ def tag(project: str, tag: Tag):
         project (str): the project the user is currently working with.
         tag (Tag): the tag to be added to the project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         id = db.execute_return(
             "INSERT INTO tags (name, folder_id, project_uuid) VALUES (%s,%s,%s) "
             "RETURNING id;",
@@ -205,10 +224,6 @@ def tag(project: str, tag: Tag):
                 [id[0], datapoint],
             )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def user(user: User):
@@ -231,9 +246,7 @@ def organization(user: User, organization: Organization):
         user (User): the user who created the organization.
         organization (Organization): the organization to be created.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         id = db.execute_return(
             "INSERT INTO organizations (name) VALUES (%s) RETURNING id;",
             [organization.name],
@@ -246,10 +259,6 @@ def organization(user: User, organization: Organization):
             [user.id, id[0], True],
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_user(project: str, user: User):
