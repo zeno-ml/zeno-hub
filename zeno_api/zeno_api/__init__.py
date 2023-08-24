@@ -72,7 +72,7 @@ class ZenoProject:
                 raw data. Only works for small text data. Defaults to None.
         """
         if len(id_column) == 0:
-            raise Exception("ERROR: id_column must be non-empty")
+            raise Exception("ERROR: id_column name must be non-empty")
 
         b = io.BytesIO()
         df.to_feather(b)

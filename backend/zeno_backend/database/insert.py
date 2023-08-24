@@ -3,7 +3,6 @@ import json
 import uuid
 
 import pandas as pd
-from psycopg import DatabaseError, sql
 from psycopg import sql
 from sqlalchemy import create_engine
 
@@ -108,10 +107,7 @@ def dataset(
         label_column (str): The name of the column containing the instance labels.
         data_column (str): The name of the column containing the raw data.
     """
-    db = Database()
-
-    try:
-        db.connect()
+    with Database() as db:
         # Drop the primary table and column_map since they will be recreated.
         db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
         db.execute(
@@ -120,10 +116,6 @@ def dataset(
             )
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
     # Get column objects from the dataframe.
     columns: list[ZenoColumn] = []
@@ -176,8 +168,7 @@ def dataset(
     data_frame.to_sql(project, con=engine, if_exists="replace", index=True)
 
     # Add columns to column_map
-    try:
-        db.connect()
+    with Database() as db:
         db.execute(
             sql.SQL(
                 "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
@@ -194,12 +185,6 @@ def dataset(
                 [column.id, column.name, column.column_type, column.data_type],
             )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
-
-    return None
 
 
 def system(
@@ -209,11 +194,11 @@ def system(
     output_column: str,
     id_column: str,
 ):
-    """Adds a dataset to an existing project.
+    """Adds a system to an existing project.
 
     Args:
         project (str): The project the user is currently working with.
-        data_frame (pd.DataFrame): The dataset to be added.
+        data_frame (pd.DataFrame): The system data to be added.
         system_name (str): The name of the system that produced the output.
         output_column (str): The name of the column containing the system output.
         id_column (str): The name of the column containing the instance IDs.
@@ -259,7 +244,6 @@ def system(
     data_frame.to_sql("tmp", con=engine, if_exists="replace", index=True)
     columns.append(output_col_object)
 
-
     with Database() as db:
         for col in columns:
             db.execute(
@@ -287,7 +271,6 @@ def system(
             )
         db.execute("DROP TABLE tmp;")
         db.commit()
-
 
 
 def folder(project: str, name: str):
