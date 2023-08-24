@@ -263,7 +263,7 @@
 				</th>
 			</thead>
 			<tbody>
-				{#each table as tableContent (tableContent['dataId'])}
+				{#each table as tableContent}
 					<tr>
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="pr-2.5">
