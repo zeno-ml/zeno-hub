@@ -92,14 +92,16 @@ class ZenoProject:
         else:
             raise Exception(response.json()["detail"])
 
-    def upload_system(self, system_name: str, df: pd.DataFrame, output_column: str):
+    def upload_system(
+        self, system_name: str, df: pd.DataFrame, output_column: str, id_column: str
+    ):
         """Upload a system to a Zeno project.
 
         Args:
             df (pd.DataFrame): The dataset to upload.
             system_name (str): The name of the system to upload.
-            output_column (str): The name of the column containing the
-                system output.
+            output_column (str): The name of the column containing the system output.
+            id_column (str): The name of the column containing the instance IDs.
         """
         if len(system_name) == 0 or len(output_column) == 0:
             raise Exception("System_name and output_column must be non-empty.")
@@ -112,6 +114,7 @@ class ZenoProject:
             data={
                 "system_name": system_name,
                 "output_column": output_column,
+                "id_column": id_column,
             },
             files={"file": (b)},
             headers={"Authorization": "Bearer " + str(self.user.access_token)},
@@ -169,8 +172,6 @@ class ZenoClient:
         self,
         name: str,
         view: str,
-        # TODO: Decide what options we need for metrics.
-        metrics: list[str] = [],
         data_url: str = "",
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,

@@ -480,6 +480,7 @@ def get_server() -> FastAPI:
         project: str,
         system_name: str = Form(...),
         output_column: str = Form(...),
+        id_column: str = Form(...),
         file: UploadFile = File(...),
     ):
         try:
@@ -492,7 +493,7 @@ def get_server() -> FastAPI:
             ) from e
 
         try:
-            insert.system(project, system_df, system_name, output_column)
+            insert.system(project, system_df, system_name, output_column, id_column)
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
