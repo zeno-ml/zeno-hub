@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { project } from '$lib/stores';
 	import type { Chart } from '$lib/zenoapi';
 	import { mdiArrowCollapseLeft } from '@mdi/js';
 	import Button, { Label } from '@smui/button';
@@ -40,13 +41,15 @@
 		<h2 class="mr-5 text-grey-dark">
 			{chart.name}
 		</h2>
-		<Button
-			style="width: 24px; height: 24px;background-color:var(--G5)"
-			on:mouseleave={blur}
-			on:focusout={blur}
-			on:click={() => (isChartEdit = !isChartEdit)}
-		>
-			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
-		</Button>
+		{#if $project?.editor}
+			<Button
+				style="width: 24px; height: 24px;background-color:var(--G5)"
+				on:mouseleave={blur}
+				on:focusout={blur}
+				on:click={() => (isChartEdit = !isChartEdit)}
+			>
+				<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
+			</Button>
+		{/if}
 	</div>
 </div>

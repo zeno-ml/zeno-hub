@@ -37,7 +37,7 @@
 </script>
 
 <div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
-	{#if isChartEdit}
+	{#if isChartEdit && $project?.editor}
 		<div class="h-full pt-5 pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-96">
 			<EditHeader bind:isChartEdit bind:chart {updateChart} />
 			<ViewSelection bind:chart bind:chartData />
