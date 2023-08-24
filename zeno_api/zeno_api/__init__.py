@@ -169,8 +169,6 @@ class ZenoClient:
         self,
         name: str,
         view: str,
-        # TODO: Decide what options we need for metrics.
-        metrics: list[str] = [],
         data_url: str = "",
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,

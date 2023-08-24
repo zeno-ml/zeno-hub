@@ -1,13 +1,12 @@
 """Functions to insert new data into Zeno's database."""
 import json
+import uuid
 
 import pandas as pd
 from psycopg import DatabaseError, sql
+from sqlalchemy import create_engine
 
-from zeno_backend.classes.base import (
-    MetadataType,
-    ZenoColumnType,
-)
+from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.project import Project
@@ -15,6 +14,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.util import resolve_metadata_type
 
 
 def project(project_config: Project, user: User):
@@ -98,18 +98,112 @@ def project(project_config: Project, user: User):
 
 
 def dataset(
-    project: str, df: pd.DataFrame, id_column: str, label_column: str, data_column: str
+    project: str,
+    data_frame: pd.DataFrame,
+    id_column: str,
+    label_column: str,
+    data_column: str,
 ):
     """Adds a dataset to an existing project.
 
     Args:
         project (str): The project the user is currently working with.
-        df (pd.DataFrame): The dataset to be added.
+        data_frame (pd.DataFrame): The dataset to be added.
         id_column (str): The name of the column containing the instance IDs.
         label_column (str): The name of the column containing the instance labels.
         data_column (str): The name of the column containing the raw data.
     """
-    # TODO: insert into table using df.to_sql(). Need to use SQLAlchemy.
+    db = Database()
+
+    try:
+        db.connect()
+        # Drop the primary table and column_map since they will be recreated.
+        db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
+        db.execute(
+            sql.SQL("DROP TABLE {} CASCADE;").format(
+                sql.Identifier(project + "_column_map")
+            )
+        )
+        db.commit()
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
+    # Get column objects from the dataframe.
+    columns: list[ZenoColumn] = []
+    for col in data_frame.columns:
+        if col == id_column or col == label_column or col == data_column:
+            continue
+        columns.append(
+            ZenoColumn(
+                id=str(uuid.uuid4()),
+                name=col,
+                column_type=ZenoColumnType.FEATURE,
+                data_type=resolve_metadata_type(data_frame, col),
+            )
+        )
+
+    # Create a renaming scheme for the DataFrame columns
+    column_rename = {
+        id_column: "data_id",
+        label_column: "label",
+        data_column: "data",
+    }
+    for col in columns:
+        column_rename[col.name] = col.id
+    data_frame = data_frame.rename(columns=column_rename)
+    data_frame = data_frame.set_index("data_id")
+
+    # Add the data_id and label columns to the ones to be added to the column_map.
+    columns.append(
+        ZenoColumn(
+            id="data_id",
+            name="data_id",
+            column_type=ZenoColumnType.DATA,
+            data_type=MetadataType.NOMINAL,
+        )
+    )
+    columns.append(
+        ZenoColumn(
+            id="label",
+            name="label",
+            column_type=ZenoColumnType.LABEL,
+            data_type=MetadataType.NOMINAL,
+        )
+    )
+
+    # Connect to the db engine using SQLAlchemy and write the data to a table.
+    config = db.config()
+    engine = create_engine(
+        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
+    )
+    data_frame.to_sql(project, con=engine, if_exists="replace", index=True)
+
+    # Add columns to column_map
+    try:
+        db.connect()
+        db.execute(
+            sql.SQL(
+                "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
+                "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
+                "data_type TEXT NOT NULL);"
+            ).format(sql.Identifier(f"{project}_column_map"))
+        )
+        for column in columns:
+            db.execute(
+                sql.SQL(
+                    "INSERT INTO {} (column_id, name, type, data_type) "
+                    "VALUES (%s,%s,%s,%s);"
+                ).format(sql.Identifier(f"{project}_column_map")),
+                [column.id, column.name, column.column_type, column.data_type],
+            )
+        db.commit()
+    except (Exception, DatabaseError) as error:
+        raise Exception(error) from error
+    finally:
+        db.disconnect()
+
     return None
 
 
