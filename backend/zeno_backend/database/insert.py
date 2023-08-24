@@ -2,7 +2,7 @@
 import json
 import uuid
 
-from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.base import (
     DataSpec,
@@ -37,9 +37,7 @@ def project(project_config: Project, user: User):
         Exception: something went wrong in the process of creating the new project in
         the database.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         db.execute(
             "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
             + "calculate_histogram_metrics, samples_per_page, public) "
@@ -95,10 +93,6 @@ def project(project_config: Project, user: User):
             )
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def datapoint(data_spec: DataSpec, project: str):
@@ -128,9 +122,7 @@ def label(label_spec: LabelSpec, project: str):
     Raises:
         Exception: something went wrong while inserting the label into the database.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         exists = db.execute_return(
             sql.SQL("SELECT COUNT(1) FROM {} WHERE column_id = 'label'").format(
                 sql.Identifier(f"{project}_column_map")
@@ -156,10 +148,6 @@ def label(label_spec: LabelSpec, project: str):
             [label_spec.label, str(label_spec.data_id)],
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def output(output_spec: OutputSpec, project: str):
@@ -172,9 +160,7 @@ def output(output_spec: OutputSpec, project: str):
     Raises:
         Exception: something went wrong while inserting the output into the database.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         exists = db.execute_return(
             sql.SQL("SELECT * FROM {} WHERE model = %s AND type = %s").format(
                 sql.Identifier(f"{project}_column_map")
@@ -210,10 +196,6 @@ def output(output_spec: OutputSpec, project: str):
             [output_spec.output, str(output_spec.data_id)],
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def feature(feature_spec: FeatureSpec, project: str):
@@ -227,9 +209,7 @@ def feature(feature_spec: FeatureSpec, project: str):
         Exception: something went wrong while inserting the feature into the
         database.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         if feature_spec.model is not None:
             exists = db.execute_return(
                 sql.SQL(
@@ -274,10 +254,6 @@ def feature(feature_spec: FeatureSpec, project: str):
             [feature_spec.value, str(feature_spec.data_id)],
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def folder(project: str, name: str):
@@ -341,9 +317,7 @@ def tag(project: str, tag: Tag):
         project (str): the project the user is currently working with.
         tag (Tag): the tag to be added to the project.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         id = db.execute_return(
             "INSERT INTO tags (name, folder_id, project_uuid) VALUES (%s,%s,%s) "
             "RETURNING id;",
@@ -359,10 +333,6 @@ def tag(project: str, tag: Tag):
                 [id[0], datapoint],
             )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def user(user: User):
@@ -385,9 +355,7 @@ def organization(user: User, organization: Organization):
         user (User): the user who created the organization.
         organization (Organization): the organization to be created.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         id = db.execute_return(
             "INSERT INTO organizations (name) VALUES (%s) RETURNING id;",
             [organization.name],
@@ -400,10 +368,6 @@ def organization(user: User, organization: Organization):
             [user.id, id[0], True],
         )
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project_user(project: str, user: User):

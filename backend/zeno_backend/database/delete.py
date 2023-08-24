@@ -1,5 +1,5 @@
 """Functions to delete data from the database."""
-from psycopg import DatabaseError, sql
+from psycopg import sql
 
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.folder import Folder
@@ -18,10 +18,7 @@ def project(project: str):
     Raises:
         Exception: something went wrong while deleting the project from the database.
     """
-    db = Database()
-    try:
-        db.connect()
-
+    with Database() as db:
         # Drop the primary table with project data.
         db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
         # Drop the table with column properties.
@@ -45,10 +42,6 @@ def project(project: str):
         )
 
         db.commit()
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def folder(folder: Folder):
