@@ -385,10 +385,10 @@ export class ZenoService {
 	 * Get Project Uuid
 	 * @param ownerName
 	 * @param projectName
-	 * @returns any Successful Response
+	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectUuid(ownerName: string, projectName: string): CancelablePromise<any> {
+	public static getProjectUuid(ownerName: string, projectName: string): CancelablePromise<string> {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/project-uuid/{owner_name}/{project_name}',

@@ -286,6 +286,7 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/project-uuid/{owner_name}/{project_name}",
+        response_model=str,
         dependencies=[Depends(auth)],
         tags=["zeno"],
     )
