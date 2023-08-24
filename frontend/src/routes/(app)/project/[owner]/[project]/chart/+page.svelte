@@ -22,24 +22,26 @@
 		{#each $charts as chart}
 			<ChartHomeBlock {chart} />
 		{/each}
-		<button
-			class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg m-2 px-2.5 w-48 h-24 hover:bg-primary-light"
-			on:click={() => {
-				ZenoService.addChart(
-					$project ? $project.uuid : '',
-					chartDefaults('New Chart', 0, ChartType.BAR)
-				).then(() => {
-					ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-						charts.set(fetchedCharts)
-					);
-				});
-			}}
-		>
-			<div class="w-6 h-6">
-				<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
-					<path fill="black" d={mdiPlus} />
-				</Icon>
-			</div>
-		</button>
+		{#if $project && $project.editor}
+			<button
+				class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg m-2 px-2.5 w-48 h-24 hover:bg-primary-light"
+				on:click={() => {
+					ZenoService.addChart(
+						$project ? $project.uuid : '',
+						chartDefaults('New Chart', 0, ChartType.BAR)
+					).then(() => {
+						ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
+							charts.set(fetchedCharts)
+						);
+					});
+				}}
+			>
+				<div class="w-6 h-6">
+					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+						<path fill="black" d={mdiPlus} />
+					</Icon>
+				</div>
+			</button>
+		{/if}
 	</div>
 </div>

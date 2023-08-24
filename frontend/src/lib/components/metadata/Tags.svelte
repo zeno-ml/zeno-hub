@@ -50,7 +50,7 @@
 			</Icon>
 		</div>
 	</div>
-	{#if !$page.url.href.includes('compare')}
+	{#if $project && $project.editor && !$page.url.href.includes('compare')}
 		<div class="flex items-center justify-between">
 			<div>
 				<div
