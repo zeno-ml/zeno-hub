@@ -239,9 +239,7 @@ def project_exists(owner_name: str, project_name: str) -> bool:
     Raises:
         Exception: Something went wrong while checking whether the project exists.
     """
-    db = Database()
-    try:
-        db.connect()
+    with Database() as db:
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
@@ -258,10 +256,6 @@ def project_exists(owner_name: str, project_name: str) -> bool:
                 return bool(exists[0])
             else:
                 raise Exception("Error while checking whether project exists.")
-    except (Exception, DatabaseError) as error:
-        raise Exception(error) from error
-    finally:
-        db.disconnect()
 
 
 def project(owner_name: str, project_name: str, user: User | None) -> Project | None:
