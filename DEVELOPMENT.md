@@ -65,7 +65,7 @@ The recommended way to locally develop is to use `Docker` and `docker-compose`. 
 6. Install the backend with `poetry install` in the `backend/` directory.
 7. We suggest you install the VSCode extensions as specified in `.vscode/extensions.json`.
 8. Run `docker-compose up -d` in the root directory to start the backend and frontend servers.
-9. Navigate to `localhost:5173` to start using Zeno. Any changes you make to the frontend will be live-reloaded. Changes to the backend will require restarting the server with `docker-compose restart backend`.
+9. Navigate to `localhost:5173` to start using Zeno. Any changes you make to the frontend or backend code will be live-reloaded.
 
 ## Making a release
 
@@ -76,6 +76,7 @@ It is best to deploy [Zeno's backend](./backend/DEVELOPMENT.md#deployment) first
 
 You can build docker images on Amazon ECS using the included `buildspec.yml` file.
 To do so, you need to have the following environment variables set:
+
 - AWS_ACCOUNT_ID: Your account ID
 - AWS_REGION: The region you're building in
 - DOCKER_USERNAME: A username for docker to pull docker images
