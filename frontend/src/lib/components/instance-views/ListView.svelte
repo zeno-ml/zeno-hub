@@ -111,6 +111,9 @@
 						options={viewOptions}
 						entry={inst}
 						modelColumn={modelColumn?.id}
+						dataColumn={$columns.find((col) => col.columnType === ZenoColumnType.DATA)
+							? $columns.find((col) => col.columnType === ZenoColumnType.DATA)['name']
+							: ''}
 					/>
 				</div>
 			{/each}
