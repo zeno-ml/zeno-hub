@@ -11,6 +11,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.tag import Tag
@@ -168,6 +169,156 @@ def public_projects() -> list[Project]:
                     )
                 )
         return projects
+
+
+def reports(user: User) -> list[Report]:
+    """Get all reports available to the user.
+
+    Args:
+        user (User): the user for which to fetch the available reports.
+
+    Returns:
+        list[Report]: the reports that the user can interact with.
+    """
+    with Database() as db:
+        own_reports_result = db.execute_return(
+            "SELECT id, name, public FROM reports WHERE owner_id = %s;",
+            [user.id],
+        )
+        own_reports = []
+        if own_reports_result is not None:
+            for report in own_reports_result:
+                linked_projects = db.execute_return(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [report[0]],
+                )
+                own_reports.append(
+                    Report(
+                        id=report[0],
+                        name=report[1],
+                        owner_name=user.name,
+                        linked_projects=[]
+                        if linked_projects is None
+                        else list(map(lambda linked: str(linked[0]), linked_projects)),
+                        editor=True,
+                        public=report[2],
+                    )
+                )
+
+        user_reports_result = db.execute_return(
+            "SELECT r.id, r.name, r.owner_id, ur.editor, r.public "
+            "FROM reports AS r JOIN user_report AS ur ON r.id = ur.report_id "
+            "WHERE ur.user_id = %s;",
+            [user.id],
+        )
+        user_reports = []
+        if user_reports_result is not None:
+            for res in user_reports_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s", [res[2]]
+                )
+                linked_projects = db.execute_return(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [res[0]],
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0][0]
+                    user_reports.append(
+                        Report(
+                            id=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            linked_projects=[]
+                            if linked_projects is None
+                            else list(
+                                map(lambda linked: str(linked[0]), linked_projects)
+                            ),
+                            editor=res[4],
+                            public=res[5],
+                        )
+                    )
+
+        report_org_result = db.execute_return(
+            "SELECT r.id, r.name, r.owner_id, op.editor, r.public FROM reports AS r "
+            "JOIN (SELECT op.report_id, uo.organization_id, op.editor "
+            "FROM user_organization as uo JOIN organization_report as op"
+            " ON uo.organization_id = op.organization_id "
+            "WHERE user_id = %s) AS op ON r.id = op.report_id;",
+            [user.id],
+        )
+        org_reports = []
+        if report_org_result is not None:
+            for res in report_org_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s", [res[2]]
+                )
+                linked_projects = db.execute_return(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [res[0]],
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0][0]
+                    org_reports.append(
+                        Report(
+                            id=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            linked_projects=[]
+                            if linked_projects is None
+                            else list(
+                                map(lambda linked: str(linked[0]), linked_projects)
+                            ),
+                            editor=res[4],
+                            public=res[5],
+                        )
+                    )
+        org_reports = list(
+            filter(
+                lambda project: not any(p.uuid == project.uuid for p in user_reports)
+                and not any(p.uuid == project.uuid for p in own_reports),
+                org_reports,
+            )
+        )
+        return own_reports + user_reports + org_reports
+
+
+def public_reports() -> list[Report]:
+    """Fetch all publicly accessible reports.
+
+    Returns:
+        list[Report]: all publicly accessible reports.
+    """
+    with Database() as db:
+        report_result = db.execute_return(
+            "SELECT id, name, owner_id FROM reports WHERE public IS TRUE;",
+        )
+        reports = []
+        if report_result is not None:
+            for res in report_result:
+                owner_name = db.execute_return(
+                    "SELECT name FROM users WHERE id = %s;", [res[2]]
+                )
+                linked_projects = db.execute_return(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [res[0]],
+                )
+                if owner_name is not None:
+                    owner_name = owner_name[0][0]
+                    reports.append(
+                        Report(
+                            id=res[0],
+                            name=res[1],
+                            owner_name=str(owner_name),
+                            linked_projects=[]
+                            if linked_projects is None
+                            else list(
+                                map(lambda linked: str(linked[0]), linked_projects)
+                            ),
+                            editor=False,
+                            public=True,
+                        )
+                    )
+        return reports
 
 
 def project_uuid(owner_name: str, project_name: str) -> str | None:
@@ -343,6 +494,78 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
         )
 
 
+def report(owner_name: str, report_name: str, user: User | None) -> Report | None:
+    """Get the report data given an owner and report name.
+
+    Args:
+        owner_name (str): The name of the report owner.
+        report_name (str): The name of the report.
+        user (User | None): The user making the request.
+
+    Returns:
+        Report | None: the data for the requested report.
+    """
+    with Database() as db:
+        owner_id = db.execute_return(
+            "SELECT id FROM users WHERE name = %s;", [owner_name]
+        )
+        if owner_id is None:
+            raise Exception("Owner does not exist.")
+        else:
+            owner_id = owner_id[0][0]
+
+        report_result = db.execute_return(
+            "SELECT id, name, owner_id, public FROM reports "
+            "WHERE name = %s AND owner_id = %s;",
+            [report_name, owner_id],
+        )
+        if report_result is None:
+            raise Exception("Project does not exist.")
+        id = report_result[0][0]
+
+        if user is None:
+            editor = False
+        elif owner_name == user.name:
+            # Owners can always edit projects
+            editor = True
+        else:
+            # Check whether the user or an org of the user have project edit rights
+            user_editor = db.execute_return(
+                "SELECT editor FROM user_report WHERE user_id = %s "
+                "AND report_id = %s",
+                [user.id, id],
+            )
+            org_editor = db.execute_return(
+                "SELECT editor FROM organization_report AS r JOIN user_organization "
+                "AS o ON r.organization_id = o.organization_id "
+                "WHERE p.report_id = %s AND o.user_id = %s",
+                [project_uuid, user.id],
+            )
+            editor = (bool(org_editor[0]) if org_editor is not None else False) or (
+                bool(user_editor) if user_editor is not None else False
+            )
+
+        linked_projects = db.execute_return(
+            "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+            [id],
+        )
+
+        return (
+            Report(
+                id=report_result[0][0] if isinstance(report_result[0][0], int) else -1,
+                name=str(report_result[0][1]),
+                owner_name=owner_name,
+                linked_projects=[]
+                if linked_projects is None
+                else list(map(lambda linked: str(linked[0]), linked_projects)),
+                editor=editor,
+                public=bool(report_result[0][3]),
+            )
+            if report_result is not None
+            else None
+        )
+
+
 def project_from_uuid(project_uuid: str) -> Project | None:
     """Get the project data given a UUID.
 
@@ -379,6 +602,77 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 else 10,
                 public=bool(project_result[7]),
             )
+
+
+def report_from_id(report_id: int) -> Report | None:
+    """Get the report data given a ID.
+
+    Args:
+        report_id (int): the id of the report to be fetched.
+
+    Returns:
+        Report | None: data for the requested report.
+    """
+    with Database() as db:
+        report_result = db.execute_return(
+            "SELECT id, name, owner_id, public " "FROM reports WHERE id = %s;",
+            [report_id],
+        )
+        if report_result is None:
+            raise Exception("Project does not exist.")
+        owner_result = db.execute_return(
+            "SELECT name from users WHERE id = %s;", [report_result[2]]
+        )
+        if owner_result is not None:
+            linked_projects = db.execute_return(
+                "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                [report_id],
+            )
+
+            return (
+                Report(
+                    id=report_result[0] if isinstance(report_result[0], int) else -1,
+                    name=str(report_result[1]),
+                    owner_name=str(owner_result[0]),
+                    linked_projects=[]
+                    if linked_projects is None
+                    else list(map(lambda linked: str(linked[0]), linked_projects)),
+                    editor=False,
+                    public=bool(report_result[3]),
+                )
+                if report_result is not None
+                else None
+            )
+
+
+def report_elements(report_id: int) -> list[ReportElement] | None:
+    """Get all elements of a report.
+
+    Args:
+        report_id (int): the id of the report to get elements for.
+
+    Returns:
+        list[ReportElement] | None: list of elements in the report.
+    """
+    db = Database()
+    element_result = db.connect_execute_return(
+        "SELECT id, type, data, chart_id, position FROM report_element "
+        "WHERE report_id = %s ORDER BY position;",
+        [report_id],
+    )
+    if element_result is not None:
+        return list(
+            map(
+                lambda element: ReportElement(
+                    id=element[0],
+                    type=element[1],
+                    data=element[2],
+                    chart_id=element[3],
+                    position=element[4],
+                ),
+                element_result,
+            )
+        )
 
 
 def project_stats(project: str) -> ProjectStats | None:

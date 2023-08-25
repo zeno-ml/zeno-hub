@@ -308,6 +308,20 @@ def system(
         db.commit()
 
 
+def report(name: str, user: User):
+    """Adding a report to Zeno.
+
+    Args:
+        name (str): how the report is called.
+        user (User): user who created the report.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
+        [name, user.id, False],
+    )
+
+
 def folder(project: str, name: str):
     """Adding a folder to an existing project.
 

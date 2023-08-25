@@ -15,6 +15,8 @@ import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectStats } from '../models/ProjectStats';
+import type { Report } from '../models/Report';
+import type { ReportElement } from '../models/ReportElement';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
@@ -470,6 +472,46 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Report
+	 * @param ownerName
+	 * @param reportName
+	 * @returns Report Successful Response
+	 * @throws ApiError
+	 */
+	public static getReport(ownerName: string, reportName: string): CancelablePromise<Report> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/report/{owner}/{report}',
+			query: {
+				owner_name: ownerName,
+				report_name: reportName
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Report Elements
+	 * @param reportId
+	 * @returns ReportElement Successful Response
+	 * @throws ApiError
+	 */
+	public static getReportElements(reportId: any): CancelablePromise<Array<ReportElement>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/report-elements/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Project Uuid
 	 * @param ownerName
 	 * @param projectName
@@ -511,6 +553,30 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/public-projects'
+		});
+	}
+
+	/**
+	 * Get Reports
+	 * @returns Report Successful Response
+	 * @throws ApiError
+	 */
+	public static getReports(): CancelablePromise<Array<Report>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/reports'
+		});
+	}
+
+	/**
+	 * Get Public Reports
+	 * @returns Report Successful Response
+	 * @throws ApiError
+	 */
+	public static getPublicReports(): CancelablePromise<Array<Report>> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/public-reports'
 		});
 	}
 
@@ -769,6 +835,25 @@ export class ZenoService {
 			},
 			body: requestBody,
 			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Add Report
+	 * @param name
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static addReport(name: string): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/report/{name}',
+			path: {
+				name: name
+			},
 			errors: {
 				422: `Validation Error`
 			}
@@ -1049,6 +1134,24 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update Report Element
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateReportElement(requestBody: ReportElement): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/report-element/update',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Delete Project
 	 * @param project
 	 * @returns any Successful Response
@@ -1060,6 +1163,25 @@ export class ZenoService {
 			url: '/project/{project}',
 			path: {
 				project: project
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report
+	 * @param reportId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteReport(reportId: number): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/report/{report_id}',
+			path: {
+				report_id: reportId
 			},
 			errors: {
 				422: `Validation Error`
@@ -1198,6 +1320,25 @@ export class ZenoService {
 			},
 			body: requestBody,
 			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report Element
+	 * @param id
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteReportElement(id: number): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/report-element/{id}',
+			path: {
+				id: id
+			},
 			errors: {
 				422: `Validation Error`
 			}

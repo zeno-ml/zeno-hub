@@ -24,6 +24,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -288,6 +289,18 @@ def get_server() -> FastAPI:
             owner_name, project_name, util.get_user_from_token(request)
         )
 
+    @api_app.post("/report/{owner}/{report}", response_model=Report, tags=["zeno"])
+    def get_report(owner_name: str, report_name: str, request: Request):
+        return select.report(owner_name, report_name, util.get_user_from_token(request))
+
+    @api_app.post(
+        "/report-elements/{report_id}",
+        response_model=list[ReportElement],
+        tags=["zeno"],
+    )
+    def get_report_elements(report_id):
+        return select.report_elements(report_id)
+
     @api_app.get(
         "/project-uuid/{owner_name}/{project_name}",
         response_model=str,
@@ -328,6 +341,25 @@ def get_server() -> FastAPI:
     )
     def get_public_projects():
         return select.public_projects()
+
+    @api_app.get(
+        "/reports",
+        response_model=list[Report],
+        tags=["zeno"],
+    )
+    def get_reports(current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return select.reports(user)
+
+    @api_app.get(
+        "/public-reports",
+        response_model=list[Report],
+        tags=["zeno"],
+    )
+    def get_public_reports():
+        return select.public_reports()
 
     @api_app.post(
         "/slice-metrics/{project}",
@@ -467,6 +499,13 @@ def get_server() -> FastAPI:
     def add_chart(project: str, chart: Chart):
         insert.chart(project, chart)
 
+    @api_app.post("/report/{name}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_report(name: str, current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        insert.report(name, user)
+
     @api_app.post("/tag/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_tag(tag: Tag, project: str):
         insert.tag(project, tag)
@@ -536,6 +575,10 @@ def get_server() -> FastAPI:
     def update_project_org(project: str, organization: Organization):
         update.project_org(project, organization)
 
+    @api_app.post("/report-element/update", tags=["zeno"], dependencies=[Depends(auth)])
+    def update_report_element(element: ReportElement):
+        update.report_element(element)
+
     ####################################################################### Delete
     @api_app.delete("/project/{project}", tags=["zeno"])
     def delete_project(project: str, current_user=Depends(auth.claim())):
@@ -546,6 +589,13 @@ def get_server() -> FastAPI:
         if data_path.exists():
             shutil.rmtree(data_path)
         delete.project(project)
+
+    @api_app.delete("/report/{report_id}", tags=["zeno"])
+    def delete_report(report_id: int, current_user=Depends(auth.claim())):
+        report_obj = select.report_from_id(report_id)
+        if report_obj is None or report_obj.owner_name != current_user["username"]:
+            return  # make sure only project owners can delete a project
+        delete.report(report_id)
 
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_slice(req: Slice):
@@ -578,6 +628,10 @@ def get_server() -> FastAPI:
     )
     def delete_project_org(project: str, organization: Organization):
         delete.project_org(project, organization)
+
+    @api_app.delete("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
+    def delete_report_element(id: int):
+        delete.report_element(id)
 
     return app
 

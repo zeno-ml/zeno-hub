@@ -44,6 +44,21 @@ def project(project: str):
         db.commit()
 
 
+def report(report_id: int):
+    """Deletes a report from Zeno.
+
+    Args:
+        report_id (int): the id of the report to be deleted.
+    """
+    db = Database()
+    db.connect_execute(
+        "DELETE FROM reports WHERE id = %s;",
+        [
+            report_id,
+        ],
+    )
+
+
 def folder(folder: Folder):
     """Deletes a folder from an existing project.
 
@@ -141,3 +156,13 @@ def project_org(project: str, organization: Organization):
         "AND project_uuid = %s;",
         [organization.id, project],
     )
+
+
+def report_element(id: int):
+    """Delete an element of a report.
+
+    Args:
+        id (int): ID of the element to be deleted.
+    """
+    db = Database()
+    db.connect_execute("DELETE FROM report_element WHERE id = %s;", [id])

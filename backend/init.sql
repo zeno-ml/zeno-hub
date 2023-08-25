@@ -15,6 +15,21 @@ CREATE TABLE projects (
     public boolean NOT NULL DEFAULT false
 );
 
+CREATE TABLE reports (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name text NOT NULL,
+    owner_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    public boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE report_element (
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    type text NOT NULL,
+    data text,
+    chart_id integer REFERENCES charts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    position integer NOT NULL
+);
+
 CREATE TABLE organizations (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL
@@ -75,5 +90,25 @@ CREATE TABLE organization_project (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     organization_id integer NOT NULL REFERENCES organizations(id) ON DELETE CASCADE ON UPDATE CASCADE,
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    editor boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE report_project (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE user_report (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    editor boolean NOT NULL DEFAULT false
+);
+
+CREATE TABLE organization_report (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    organization_id integer NOT NULL REFERENCES organizations(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
     editor boolean NOT NULL DEFAULT false
 );

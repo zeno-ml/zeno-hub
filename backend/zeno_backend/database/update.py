@@ -7,6 +7,7 @@ from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.project import Project
+from zeno_backend.classes.report import ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
@@ -242,4 +243,23 @@ def project_org(project: str, organization: Organization):
         "UPDATE organization_project SET editor = %s WHERE project_uuid = %s "
         "AND organization_id = %s;",
         [organization.admin, project, organization.id],
+    )
+
+
+def report_element(element: ReportElement):
+    """Update an elements for a report.
+
+    Args:
+        element (ReportElement): the element to be updated.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE report_element SET type = %s, data = %s, chart_id = %s,"
+        " WHERE id = %s;",
+        [
+            element.type,
+            element.data,
+            element.chart_id,
+            element.id,
+        ],
     )
