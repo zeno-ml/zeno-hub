@@ -1,4 +1,5 @@
 """Types for Zeno projects."""
+
 from zeno_backend.classes.base import CamelModel
 
 

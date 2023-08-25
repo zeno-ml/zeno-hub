@@ -2,16 +2,11 @@
 import json
 import uuid
 
+import pandas as pd
 from psycopg import sql
+from sqlalchemy import create_engine
 
-from zeno_backend.classes.base import (
-    DataSpec,
-    FeatureSpec,
-    LabelSpec,
-    MetadataType,
-    OutputSpec,
-    ZenoColumnType,
-)
+from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.project import Project
@@ -19,6 +14,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.util import resolve_metadata_type
 
 
 def project(project_config: Project, user: User):
@@ -95,164 +91,185 @@ def project(project_config: Project, user: User):
         db.commit()
 
 
-def datapoint(data_spec: DataSpec, project: str):
-    """Adds a new datapoint to an existing project.
+def dataset(
+    project: str,
+    data_frame: pd.DataFrame,
+    id_column: str,
+    label_column: str,
+    data_column: str,
+):
+    """Adds a dataset to an existing project.
 
     Args:
-        data_spec (DataSpec): the specification of the datapoint to be added.
-        project (str): the project the user is currently working with.
-    """
-    db = Database()
-    db.connect_execute(
-        sql.SQL(
-            'INSERT INTO {} ("data_id", "data") VALUES (%s, %s) '
-            + 'ON CONFLICT ("data_id") DO UPDATE SET "data" = EXCLUDED.data;'
-        ).format(sql.Identifier(project)),
-        [str(data_spec.data_id), data_spec.data],
-    )
-
-
-def label(label_spec: LabelSpec, project: str):
-    """Adds a label to a datapoint in the project's databse.
-
-    Args:
-        label_spec (LabelSpec): the specification of the label to be added.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the label into the database.
+        project (str): The project the user is currently working with.
+        data_frame (pd.DataFrame): The dataset to be added.
+        id_column (str): The name of the column containing the instance IDs.
+        label_column (str): The name of the column containing the instance labels.
+        data_column (str): The name of the column containing the raw data.
     """
     with Database() as db:
-        exists = db.execute_return(
-            sql.SQL("SELECT COUNT(1) FROM {} WHERE column_id = 'label'").format(
-                sql.Identifier(f"{project}_column_map")
+        # Drop the primary table and column_map since they will be recreated.
+        db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
+        db.execute(
+            sql.SQL("DROP TABLE {} CASCADE;").format(
+                sql.Identifier(project + "_column_map")
             )
         )
-        if exists is not None and exists[0] == 0:
+        db.commit()
+
+    # Get column objects from the dataframe.
+    columns: list[ZenoColumn] = []
+    for col in data_frame.columns:
+        if col == id_column or col == label_column or col == data_column:
+            continue
+        columns.append(
+            ZenoColumn(
+                id=str(uuid.uuid4()),
+                name=col,
+                column_type=ZenoColumnType.FEATURE,
+                data_type=resolve_metadata_type(data_frame, col),
+            )
+        )
+
+    # Create a renaming scheme for the DataFrame columns
+    column_rename = {
+        id_column: "data_id",
+        label_column: "label",
+        data_column: "data",
+    }
+    for col in columns:
+        column_rename[col.name] = col.id
+    data_frame = data_frame.rename(columns=column_rename)
+    data_frame = data_frame.set_index("data_id")
+
+    # Add the data_id and label columns to the ones to be added to the column_map.
+    columns.append(
+        ZenoColumn(
+            id="data_id",
+            name="data_id",
+            column_type=ZenoColumnType.DATA,
+            data_type=MetadataType.NOMINAL,
+        )
+    )
+    columns.append(
+        ZenoColumn(
+            id="label",
+            name="label",
+            column_type=ZenoColumnType.LABEL,
+            data_type=MetadataType.NOMINAL,
+        )
+    )
+
+    # Connect to the db engine using SQLAlchemy and write the data to a table.
+    config = db.config()
+    engine = create_engine(
+        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
+    )
+    data_frame.to_sql(project, con=engine, if_exists="replace", index=True)
+
+    # Add columns to column_map
+    with Database() as db:
+        db.execute(
+            sql.SQL(
+                "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
+                "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
+                "data_type TEXT NOT NULL);"
+            ).format(sql.Identifier(f"{project}_column_map"))
+        )
+        for column in columns:
             db.execute(
                 sql.SQL(
                     "INSERT INTO {} (column_id, name, type, data_type) "
                     "VALUES (%s,%s,%s,%s);"
                 ).format(sql.Identifier(f"{project}_column_map")),
-                ["label", "label", ZenoColumnType.LABEL, MetadataType.NOMINAL],
+                [column.id, column.name, column.column_type, column.data_type],
             )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD label TEXT;").format(
-                    sql.Identifier(project)
-                )
-            )
-        db.execute(
-            sql.SQL("UPDATE {} SET label = %s WHERE data_id = %s;").format(
-                sql.Identifier(project)
-            ),
-            [label_spec.label, str(label_spec.data_id)],
-        )
         db.commit()
 
 
-def output(output_spec: OutputSpec, project: str):
-    """Adds a model output to an datapoint in the project's databse.
+def system(
+    project: str,
+    data_frame: pd.DataFrame,
+    system_name: str,
+    output_column: str,
+    id_column: str,
+):
+    """Adds a system to an existing project.
 
     Args:
-        output_spec (OutputSpec): the specification of the output to be added.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the output into the database.
+        project (str): The project the user is currently working with.
+        data_frame (pd.DataFrame): The system data to be added.
+        system_name (str): The name of the system that produced the output.
+        output_column (str): The name of the column containing the system output.
+        id_column (str): The name of the column containing the instance IDs.
     """
-    with Database() as db:
-        exists = db.execute_return(
-            sql.SQL("SELECT * FROM {} WHERE model = %s AND type = %s").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [output_spec.model, ZenoColumnType.OUTPUT],
+    # Get column objects from the dataframe.
+    output_col_object: ZenoColumn = ZenoColumn(
+        id=str(uuid.uuid4()),
+        name="output",
+        column_type=ZenoColumnType.OUTPUT,
+        data_type=MetadataType.NOMINAL,
+        model=system_name,
+    )
+    columns: list[ZenoColumn] = []
+    for col in data_frame.columns:
+        if col == id_column or col == output_column:
+            continue
+        columns.append(
+            ZenoColumn(
+                id=str(uuid.uuid4()),
+                name=col,
+                column_type=ZenoColumnType.FEATURE,
+                data_type=resolve_metadata_type(data_frame, col),
+                model=system_name,
+            )
         )
-        col_uuid: str = str(uuid.uuid4())
-        if exists is None:
+
+    # Create a renaming scheme for the DataFrame columns
+    column_rename = {
+        id_column: "data_id",
+        output_column: output_col_object.id,
+    }
+    for col in columns:
+        column_rename[col.name] = col.id
+    data_frame = data_frame.rename(columns=column_rename)
+    data_frame = data_frame.set_index("data_id")
+
+    # Connect to the db engine using SQLAlchemy and write the data to a table.
+    db = Database()
+    config = db.config()
+    engine = create_engine(
+        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
+    )
+    data_frame.to_sql("tmp", con=engine, if_exists="replace", index=True)
+    columns.append(output_col_object)
+
+    with Database() as db:
+        for col in columns:
+            db.execute(
+                sql.SQL("ALTER TABLE {} ADD {}" + str(col.data_type) + ";").format(
+                    sql.Identifier(project), sql.Identifier(col.id)
+                )
+            )
+            db.execute(
+                sql.SQL(
+                    "UPDATE {} SET {} = (SELECT {} FROM tmp "
+                    "WHERE tmp.data_id = {}.data_id)"
+                ).format(
+                    sql.Identifier(project),
+                    sql.Identifier(col.id),
+                    sql.Identifier(col.id),
+                    sql.Identifier(project),
+                )
+            )
             db.execute(
                 sql.SQL(
                     "INSERT INTO {} (column_id, name, type, data_type, model) "
                     "VALUES (%s,%s,%s,%s,%s);"
                 ).format(sql.Identifier(f"{project}_column_map")),
-                [
-                    col_uuid,
-                    "output",
-                    ZenoColumnType.OUTPUT,
-                    MetadataType.NOMINAL,
-                    output_spec.model,
-                ],
+                [col.id, col.name, col.column_type, col.data_type, col.model],
             )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} TEXT;").format(
-                    sql.Identifier(project), sql.Identifier(col_uuid)
-                )
-            )
-        else:
-            col_uuid = str(exists[0])
-        db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
-                sql.Identifier(project), sql.Identifier(col_uuid)
-            ),
-            [output_spec.output, str(output_spec.data_id)],
-        )
-        db.commit()
-
-
-def feature(feature_spec: FeatureSpec, project: str):
-    """Adds a feature to a datapoint in the project's databse.
-
-    Args:
-        feature_spec (FeatureSpec): the specification of the feature function.
-        project (str): the project the user is currently working with.
-
-    Raises:
-        Exception: something went wrong while inserting the feature into the
-        database.
-    """
-    with Database() as db:
-        if feature_spec.model is not None:
-            exists = db.execute_return(
-                sql.SQL(
-                    "SELECT * FROM {} WHERE name = %s AND type = %s AND model = %s;"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [feature_spec.col_name, ZenoColumnType.FEATURE, feature_spec.model],
-            )
-        else:
-            exists = db.execute_return(
-                sql.SQL("SELECT * FROM {} WHERE name = %s AND type = %s;").format(
-                    sql.Identifier(f"{project}_column_map")
-                ),
-                [feature_spec.col_name, ZenoColumnType.FEATURE],
-            )
-        col_uuid: str = str(uuid.uuid4())
-        if exists is None:
-            db.execute(
-                sql.SQL(
-                    "INSERT INTO {} (column_id, type, data_type, name, model) "
-                    "VALUES (%s,%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [
-                    col_uuid,
-                    ZenoColumnType.FEATURE,
-                    feature_spec.type,
-                    feature_spec.col_name,
-                    feature_spec.model,
-                ],
-            )
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} " + str(feature_spec.type) + ";").format(
-                    sql.Identifier(project),
-                    sql.Identifier(col_uuid),
-                )
-            )
-        else:
-            col_uuid = str(exists[0])
-        db.execute(
-            sql.SQL("UPDATE {} SET {} = %s WHERE data_id = %s;").format(
-                sql.Identifier(project), sql.Identifier(col_uuid)
-            ),
-            [feature_spec.value, str(feature_spec.data_id)],
-        )
+        db.execute("DROP TABLE tmp;")
         db.commit()
 
 

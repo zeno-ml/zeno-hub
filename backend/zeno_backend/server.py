@@ -1,4 +1,5 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
+import io
 import os
 import shutil
 import uuid
@@ -11,6 +12,7 @@ from fastapi import (
     Depends,
     FastAPI,
     File,
+    Form,
     HTTPException,
     Request,
     Response,
@@ -26,11 +28,7 @@ import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
 from zeno_backend.classes.base import (
-    DataSpec,
-    FeatureSpec,
     GroupMetric,
-    LabelSpec,
-    OutputSpec,
     ZenoColumn,
 )
 from zeno_backend.classes.chart import Chart
@@ -53,7 +51,7 @@ from zeno_backend.processing.histogram_processing import (
 )
 from zeno_backend.processing.metrics import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
-from zeno_backend.processing.util import generate_diff_cols, save_file
+from zeno_backend.processing.util import generate_diff_cols
 
 
 def get_server() -> FastAPI:
@@ -291,7 +289,19 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_project_uuid(owner_name: str, project_name: str):
-        return select.project_uuid(owner_name, project_name)
+        uuid = select.project_uuid(owner_name, project_name)
+        if uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "ERROR: Project "
+                    + owner_name
+                    + "/"
+                    + project_name
+                    + " does not exist."
+                ),
+            )
+        return uuid
 
     @api_app.get(
         "/projects",
@@ -421,48 +431,74 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/project-create", tags=["zeno"])
-    def add_project(project: Project, current_user=Depends(auth.claim())):
+    @api_app.post("/project", tags=["zeno"])
+    def create_project(project: Project, current_user=Depends(auth.claim())):
+        if select.project_exists(project.owner_name, project.name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=("ERROR: Project already exists."),
+            )
+
         project.uuid = str(uuid.uuid4())
         user = select.user(current_user["username"])
         if user is None:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=("ERROR: User could not be found."),
             )
+
         insert.project(project, user)
         return project.uuid
 
-    @api_app.post(
-        "/upload_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
-    async def upload_datapoint(
-        project: str, data_spec: DataSpec, file: UploadFile = File(...)
+    @api_app.post("/dataset/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def upload_dataset(
+        project: str,
+        id_column: str = Form(...),
+        label_column: str = Form(None),
+        data_column: str = Form(None),
+        file: UploadFile = File(...),
     ):
-        insert.datapoint(data_spec, project)
-        file_path = Path("data", project, str(data_spec.data_id))
-        parent_path = file_path.parent
-        if not parent_path.exists():
-            parent_path.mkdir(parents=True)
-        await save_file(file_path, file)
+        try:
+            bytes = file.file.read()
+            dataset_df = pd.read_feather(io.BytesIO(bytes))
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=("ERROR: Unable to read dataset: " + str(e)),
+            ) from e
 
-    @api_app.post(
-        "/add_datapoint/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
-    def add_datapoint(project: str, data_spec: DataSpec):
-        insert.datapoint(data_spec, project)
+        try:
+            insert.dataset(project, dataset_df, id_column, label_column, data_column)
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=("ERROR: Unable to create dataset table: " + str(e)),
+            ) from e
 
-    @api_app.post("/label/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_label(project: str, label_spec: LabelSpec):
-        insert.label(label_spec, project)
+    @api_app.post("/system/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def upload_system(
+        project: str,
+        system_name: str = Form(...),
+        output_column: str = Form(...),
+        id_column: str = Form(...),
+        file: UploadFile = File(...),
+    ):
+        try:
+            bytes = file.file.read()
+            system_df = pd.read_feather(io.BytesIO(bytes))
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=("ERROR: Unable to read system data: " + str(e)),
+            ) from e
 
-    @api_app.post("/output/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_output(project: str, output_spec: OutputSpec):
-        insert.output(output_spec, project)
-
-    @api_app.post("/feature/{project}", tags=["zeno"], dependencies=[Depends(auth)])
-    def add_feature(project: str, feature_spec: FeatureSpec):
-        insert.feature(feature_spec, project)
+        try:
+            insert.system(project, system_df, system_name, output_column, id_column)
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=("ERROR: Unable to create system table: " + str(e)),
+            ) from e
 
     @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_folder(project: str, name: str):

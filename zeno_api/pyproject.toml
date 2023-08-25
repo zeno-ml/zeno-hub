@@ -4,21 +4,23 @@ version = "0.1.0"
 description = ""
 authors = ["Zeno"]
 readme = "README.md"
-packages = [{include = "zeno_api"}]
+packages = [{ include = "zeno_api" }]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+pandas = "^2.0.3"
+pyarrow = "^13.0.0"
 pycognito = "^2023.5.0"
+boto3 = "^1.28.33"
+python = "^3.11"
 python-dotenv = "^1.0.0"
-sphinx = "^7.1.2"
-sphinx-rtd-theme = "^1.2.2"
-ipykernel = "^6.25.1"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
 pyright = "^1.1.320"
 pytest = "^7.3.2"
 ruff = "^0.0.282"
+sphinx = "^7.1.2"
+sphinx-rtd-theme = "^1.2.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -28,7 +30,7 @@ build-backend = "poetry.core.masonry.api"
 include = ["zeno_backend"]
 
 [tool.ruff]
-select = ["E", "F", "I", "PD", "N", "D", "T20"]
+select = ["E", "F", "I", "PD", "N", "D"]
 
 [tool.ruff.pydocstyle]
 convention = "google"
