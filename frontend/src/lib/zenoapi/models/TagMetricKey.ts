@@ -15,7 +15,6 @@ import type { Tag } from './Tag';
  * tag (Tag): The tag to calculate metrics for.
  * model (str): The model to calculate metrics for.
  * metric (Metric): The metric to calculate.
- *
  */
 export type TagMetricKey = {
 	tag: Tag;

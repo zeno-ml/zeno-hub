@@ -17,7 +17,6 @@
  * Default True.
  * samples_per_page (int): The number of datapoints to show per page. Default 10.
  * public (bool): Whether the task is public. Default False.
- *
  */
 export type Project = {
 	uuid: string;

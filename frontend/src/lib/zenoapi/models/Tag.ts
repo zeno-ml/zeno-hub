@@ -11,7 +11,6 @@
  * tag_name (str): The name of the tag.
  * data_ids (list[str]): The ids of the data belonging to the tag.
  * folder_id (Optiona[int]): The id of the folder the tag belongs to. Default None.
- *
  */
 export type Tag = {
 	id: number;
