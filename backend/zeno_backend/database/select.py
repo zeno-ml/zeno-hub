@@ -143,7 +143,6 @@ def projects(user: User) -> list[Project]:
                 org_projects,
             )
         )
-        print(own_projects, user_projects, org_projects)
         return own_projects + user_projects + org_projects
 
 

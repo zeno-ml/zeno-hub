@@ -17,7 +17,7 @@
 	$: setupProject(data);
 
 	// TODO: setup model, metric settings here. For some reason it's not working.
-	function setupProject(setup_data) {
+	function setupProject(setup_data: any) {
 		project.set(setup_data.project);
 		rowsPerPage.set(setup_data.project.samplesPerPage ?? 5);
 		slices.set(setup_data.slices);
