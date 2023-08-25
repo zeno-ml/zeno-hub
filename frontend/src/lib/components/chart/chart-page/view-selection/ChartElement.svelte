@@ -32,7 +32,7 @@
 </script>
 
 <div
-	class="flex flex-col border-2 border-grey-light rounded-lg bg-background h-20 w-24 items-center p-2 m-1 hover:bg-primary-light cursor-pointer {chart.type ===
+	class="flex flex-col border-2 border-grey-light rounded-lg bg-background h-20 w-[105px] items-center p-2 m-1 hover:bg-primary-light cursor-pointer {chart.type ===
 	type
 		? 'bg-primary-light'
 		: ''}"

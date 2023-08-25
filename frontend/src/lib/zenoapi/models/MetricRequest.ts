@@ -9,7 +9,6 @@ import type { MetricKey } from './MetricKey';
  * Specification of a metric request in Zeno.
  *
  * Can be used to request metric calculation on specific data subsets.
- *
  */
 export type MetricRequest = {
 	metricKeys: Array<MetricKey>;

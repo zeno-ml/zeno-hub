@@ -27,10 +27,10 @@ class TagMetricKey(CamelModel):
 
     Attributes:
         tag (Tag): The tag to calculate metrics for.
-        model (str): The model to calculate metrics for.
-        metric (Metric): The metric to calculate.
+        model (str | None): The model to calculate metrics for.
+        metric (Metric | None): The metric to calculate.
     """
 
     tag: Tag
-    model: str
-    metric: Metric
+    model: str | None = None
+    metric: Metric | None = None
