@@ -29,7 +29,6 @@ export const actions: Actions = {
 			await verify(username, code as string);
 		} catch (error) {
 			const err = error as Error;
-			// TODO: if not verified, resend verification code
 			return fail(400, {
 				...failProps,
 				error: err.message

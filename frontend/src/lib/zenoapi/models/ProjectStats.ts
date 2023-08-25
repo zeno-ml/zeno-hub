@@ -10,7 +10,6 @@
  * num_instances (int): number of data instances in the project.
  * num_charts (int): number of charts that have been created for the project.
  * num_models (int): number of models associated with the project
- *
  */
 export type ProjectStats = {
 	numInstances: number;
