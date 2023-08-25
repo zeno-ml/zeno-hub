@@ -273,7 +273,7 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
         num_total = db.execute_return(
             sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
             if filter is None
-            else sql.SQL("SELECT COUNT(*) FROM {} WHERE").format(
+            else sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
                 sql.Identifier(project)
             )
             + filter,
@@ -288,9 +288,9 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
 
 
 def metric_map(
-    metric: Metric,
+    metric: Metric | None,
     project: str,
-    model: str,
+    model: str | None,
     sql_filter: sql.Composed | None,
 ) -> GroupMetric:
     """Call a metric function based on the selected metric.
@@ -305,6 +305,9 @@ def metric_map(
     Returns:
         GroupMetric: the metric result calculated on the data as specified.
     """
+    if metric is None or model is None:
+        return count(project, sql_filter)
+
     if metric.name == "accuracy":
         return accuracy(project, model, sql_filter)
     elif metric.name == "recall":

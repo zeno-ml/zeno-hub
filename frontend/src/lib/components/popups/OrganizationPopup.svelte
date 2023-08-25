@@ -54,7 +54,7 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column;">
-		<h2>Organization Aministration</h2>
+		<h2>Organization Administration</h2>
 		<div class="flex flex-col mb-5">
 			<Textfield bind:value={organizationToEdit.name} label="Name" bind:this={input} />
 		</div>
