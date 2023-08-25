@@ -1,6 +1,7 @@
 version: "3"
 services:
   frontend:
+    container_name: zeno-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -11,6 +12,7 @@ services:
       - "5173:5173"
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
   backend:
+    container_name: zeno-backend
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -31,8 +33,10 @@ services:
       DB_NAME: zeno
       DB_USER: myuser
       DB_PASSWORD: mypassword
-    command: ["poetry", "run", "backend"]
+    command:
+      ["poetry", "run", "uvicorn", "zeno_backend.server:get_server", "--reload"]
   postgres:
+    container_name: zeno-postgres
     image: postgres:latest
     environment:
       POSTGRES_DB: zeno
