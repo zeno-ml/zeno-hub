@@ -3,19 +3,16 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Body_add_organization } from '../models/Body_add_organization';
-import type { Body_upload_datapoint } from '../models/Body_upload_datapoint';
+import type { Body_upload_dataset } from '../models/Body_upload_dataset';
+import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Chart } from '../models/Chart';
-import type { DataSpec } from '../models/DataSpec';
-import type { FeatureSpec } from '../models/FeatureSpec';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
-import type { LabelSpec } from '../models/LabelSpec';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
-import type { OutputSpec } from '../models/OutputSpec';
 import type { Project } from '../models/Project';
 import type { ProjectStats } from '../models/ProjectStats';
 import type { Slice } from '../models/Slice';
@@ -53,7 +50,7 @@ export class ZenoService {
 	public static getOrganizationNames(): CancelablePromise<Array<Organization>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/organization_names'
+			url: '/organization-names'
 		});
 	}
 
@@ -89,7 +86,7 @@ export class ZenoService {
 	public static getProjectStats(project: string): CancelablePromise<ProjectStats> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/project_stats/{project}',
+			url: '/project-stats/{project}',
 			path: {
 				project: project
 			},
@@ -350,7 +347,7 @@ export class ZenoService {
 	public static isProjectPublic(projectUuid: string): CancelablePromise<boolean> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/project_public/{project_uuid}',
+			url: '/project-public/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
 			},
@@ -422,7 +419,7 @@ export class ZenoService {
 	public static getPublicProjects(): CancelablePromise<Array<Project>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/public_projects'
+			url: '/public-projects'
 		});
 	}
 
@@ -535,7 +532,7 @@ export class ZenoService {
 	public static getProjectUsers(project: string): CancelablePromise<Array<User>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/project_users/{project}',
+			url: '/project-users/{project}',
 			path: {
 				project: project
 			},
@@ -554,7 +551,7 @@ export class ZenoService {
 	public static getProjectOrgs(project: string): CancelablePromise<Array<Organization>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/project_organizations/{project}',
+			url: '/project-organizations/{project}',
 			path: {
 				project: project
 			},
@@ -609,15 +606,15 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Project
+	 * Create Project
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addProject(requestBody: Project): CancelablePromise<any> {
+	public static createProject(requestBody: Project): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/project-create',
+			url: '/project',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -627,19 +624,19 @@ export class ZenoService {
 	}
 
 	/**
-	 * Upload Datapoint
+	 * Upload Dataset
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadDatapoint(
+	public static uploadDataset(
 		project: string,
-		formData: Body_upload_datapoint
+		formData: Body_upload_dataset
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/upload_datapoint/{project}',
+			url: '/dataset/{project}',
 			path: {
 				project: project
 			},
@@ -652,87 +649,24 @@ export class ZenoService {
 	}
 
 	/**
-	 * Add Datapoint
+	 * Upload System
 	 * @param project
-	 * @param requestBody
+	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addDatapoint(project: string, requestBody: DataSpec): CancelablePromise<any> {
+	public static uploadSystem(
+		project: string,
+		formData: Body_upload_system
+	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/add_datapoint/{project}',
+			url: '/system/{project}',
 			path: {
 				project: project
 			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Add Label
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static addLabel(project: string, requestBody: LabelSpec): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/label/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Add Output
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static addOutput(project: string, requestBody: OutputSpec): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/output/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Add Feature
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static addFeature(project: string, requestBody: FeatureSpec): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/feature/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
+			formData: formData,
+			mediaType: 'multipart/form-data',
 			errors: {
 				422: `Validation Error`
 			}
@@ -837,7 +771,7 @@ export class ZenoService {
 	public static addOrganization(requestBody: Body_add_organization): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/add_organization',
+			url: '/add-organization',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -856,7 +790,7 @@ export class ZenoService {
 	public static addProjectUser(project: string, requestBody: User): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/add_project_user/{project}',
+			url: '/add-project-user/{project}',
 			path: {
 				project: project
 			},
@@ -878,7 +812,7 @@ export class ZenoService {
 	public static addProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/add_project_org/{project}',
+			url: '/add-project-org/{project}',
 			path: {
 				project: project
 			},
@@ -1042,7 +976,7 @@ export class ZenoService {
 	public static updateProjectUser(project: string, requestBody: User): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/project_user/update/{project}',
+			url: '/project-user/update/{project}',
 			path: {
 				project: project
 			},
@@ -1067,7 +1001,7 @@ export class ZenoService {
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/project_org/update/{project}',
+			url: '/project-org/update/{project}',
 			path: {
 				project: project
 			},
@@ -1198,7 +1132,7 @@ export class ZenoService {
 	public static deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'DELETE',
-			url: '/project_user/{project}',
+			url: '/project-user/{project}',
 			path: {
 				project: project
 			},
@@ -1223,7 +1157,7 @@ export class ZenoService {
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'DELETE',
-			url: '/project_org/{project}',
+			url: '/project-org/{project}',
 			path: {
 				project: project
 			},
