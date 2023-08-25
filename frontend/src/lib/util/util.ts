@@ -93,7 +93,7 @@ export function getEndpoint() {
 	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://localhost:8000') {
 		return '/localzeno';
 	}
-	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://backend:8000') {
+	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://zeno-backend:8000') {
 		return '/dockerzeno';
 	}
 	return env.PUBLIC_BACKEND_ENDPOINT;

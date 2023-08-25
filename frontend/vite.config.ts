@@ -5,7 +5,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			'/dockerzeno': {
-				target: 'http://backend:8000',
+				target: 'http://zeno-backend:8000',
 				changeOrigin: true,
 				secure: false,
 				rewrite: (path) => path.replace(/^\/dockerzeno/, '')
