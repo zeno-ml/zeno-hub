@@ -89,7 +89,7 @@ def projects(user: User) -> list[Project]:
                 owner_name = db.execute_return(
                     "SELECT name FROM users WHERE id = %s", [res[2]]
                 )
-                if owner_name is not None:
+                if owner_name is not None and owner_name[0] != user.name:
                     owner_name = owner_name[0]
                     user_projects.append(
                         Project(

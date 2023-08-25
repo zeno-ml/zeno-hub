@@ -107,7 +107,7 @@ def get_server() -> FastAPI:
         return select.users()
 
     @api_app.get(
-        "/organization_names",
+        "/organization-names",
         response_model=list[Organization],
         tags=["zeno"],
         dependencies=[Depends(auth)],
@@ -130,7 +130,7 @@ def get_server() -> FastAPI:
         return Response(blob)
 
     @api_app.get(
-        "/project_stats/{project}",
+        "/project-stats/{project}",
         response_model=ProjectStats,
         tags=["zeno"],
     )
@@ -267,7 +267,7 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         return select.organizations(user)
 
-    @api_app.get("/project_public/{project_uuid}", response_model=bool, tags=["zeno"])
+    @api_app.get("/project-public/{project_uuid}", response_model=bool, tags=["zeno"])
     def is_project_public(project_uuid: str):
         return select.project_public(project_uuid)
 
@@ -315,7 +315,7 @@ def get_server() -> FastAPI:
         return select.projects(user)
 
     @api_app.get(
-        "/public_projects",
+        "/public-projects",
         response_model=list[Project],
         tags=["zeno"],
     )
@@ -378,7 +378,7 @@ def get_server() -> FastAPI:
         return histogram_metrics(project, req)
 
     @api_app.get(
-        "/project_users/{project}",
+        "/project-users/{project}",
         response_model=list[User],
         tags=["zeno"],
         dependencies=[Depends(auth)],
@@ -396,7 +396,7 @@ def get_server() -> FastAPI:
         return select.api_key(user)
 
     @api_app.get(
-        "/project_organizations/{project}",
+        "/project-organizations/{project}",
         response_model=list[Organization],
         tags=["zeno"],
         dependencies=[Depends(auth)],
@@ -525,12 +525,12 @@ def get_server() -> FastAPI:
     def add_tag(tag: Tag, project: str):
         insert.tag(project, tag)
 
-    @api_app.post("/add_organization", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post("/add-organization", tags=["zeno"], dependencies=[Depends(auth)])
     def add_organization(user: User, organization: Organization):
         insert.organization(user, organization)
 
     @api_app.post(
-        "/add_project_user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/add-project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_user(project: str, user: User):
         project_obj = select.project_from_uuid(project)
@@ -538,7 +538,7 @@ def get_server() -> FastAPI:
             insert.project_user(project, user)
 
     @api_app.post(
-        "/add_project_org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/add-project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_org(project: str, organization: Organization):
         insert.project_org(project, organization)
@@ -579,13 +579,13 @@ def get_server() -> FastAPI:
         update.project(project)
 
     @api_app.post(
-        "/project_user/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-user/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def update_project_user(project: str, user: User):
         update.project_user(project, user)
 
     @api_app.post(
-        "/project_org/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-org/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def update_project_org(project: str, organization: Organization):
         update.project_org(project, organization)
@@ -622,13 +622,13 @@ def get_server() -> FastAPI:
         delete.organization(organization)
 
     @api_app.delete(
-        "/project_user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def delete_project_user(project: str, user: User):
         delete.project_user(project, user)
 
     @api_app.delete(
-        "/project_org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def delete_project_org(project: str, organization: Organization):
         delete.project_org(project, organization)

@@ -3,9 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { DataSpec } from './DataSpec';
-
-export type Body_upload_datapoint = {
-	data_spec: DataSpec;
+export type Body_upload_system = {
+	system_name: string;
+	output_column: string;
+	id_column: string;
 	file: Blob;
 };
