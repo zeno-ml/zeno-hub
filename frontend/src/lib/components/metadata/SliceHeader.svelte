@@ -29,7 +29,7 @@
 {#if showNewFolder}
 	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
-<div class="sticky bg-yellowish-light flex items-center justify-between z-10">
+<div class="sticky top-14 bg-yellowish-light flex items-center justify-between z-10">
 	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
