@@ -1,9 +1,8 @@
 <script lang="ts">
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
-	export let dataColumn: string;
 
-	$: audioURL = entry[dataColumn] as string;
+	$: audioURL = entry['data_id'] as string;
 </script>
 
 <div id="flex flex-wrap">

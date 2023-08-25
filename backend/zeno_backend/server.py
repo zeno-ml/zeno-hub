@@ -249,9 +249,8 @@ def get_server() -> FastAPI:
 
         # Prepend the DATA_URL to the data column if it exists
         project = select.project_from_uuid(project_uuid)
-        data_col = select.project_data_column(project_uuid)
-        if data_col and project and project.data_url:
-            filt_df[data_col] = project.data_url + filt_df[data_col]
+        if project and project.data_url:
+            filt_df["data_id"] = project.data_url + filt_df["data_id"]
 
         if req.diff_column_1 and req.diff_column_2:
             filt_df = generate_diff_cols(
