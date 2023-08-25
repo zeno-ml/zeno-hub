@@ -387,6 +387,15 @@ def get_server() -> FastAPI:
         return select.project_users(project)
 
     @api_app.get(
+        "/api-key/", response_model=str, tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def get_api_key(current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return select.api_key(user)
+
+    @api_app.get(
         "/project_organizations/{project}",
         response_model=list[Organization],
         tags=["zeno"],

@@ -1,6 +1,7 @@
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL UNIQUE
+    api_key text NOT NULL UNIQUE,
 );
 
 CREATE TABLE projects (
