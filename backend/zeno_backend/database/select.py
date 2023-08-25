@@ -350,7 +350,7 @@ def project_stats(project: str) -> ProjectStats | None:
             "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project]
         )
         num_models = db.execute_return(
-            sql.SQL("SELECT COUNT(DISTINCT model) " "FROM {};").format(
+            sql.SQL("SELECT COUNT(DISTINCT model) FROM {};").format(
                 sql.Identifier(f"{project}_column_map")
             )
         )
