@@ -59,6 +59,23 @@ jobs:
         with:
           path: "zeno_api/zeno_api/"
 
+  format-metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "zeno_metrics/zeno_metrics/"
+
+  lint-metrics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jpetrucciani/ruff-check@main
+        with:
+          path: "zeno_metrics/zeno_metrics/"
+
   typecheck-python:
     runs-on: ubuntu-latest
     steps:

@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "zeno-metrics"
+version = "0.1.0"
+description = ""
+authors = ["Zeno"]
+readme = "README.md"
+packages = [{include = "zeno_metrics"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+psycopg = "^3.1.10"
+
+[tool.poetry.dev-dependencies]
+black = "^23.3.0"
+pyright = "^1.1.320"
+pytest = "^7.3.2"
+ruff = "^0.0.282"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+include = ["zeno_backend"]
+
+[tool.ruff]
+select = ["E", "F", "I", "PD", "N", "D", "T20"]
+
+[tool.ruff.pydocstyle]
+convention = "google"
+
