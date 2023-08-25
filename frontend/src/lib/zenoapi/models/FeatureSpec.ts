@@ -15,7 +15,6 @@ import type { MetadataType } from './MetadataType';
  * value (Any): The value of the metadata feature. Default None.
  * model (str | None): The name of the model associated with the
  * metadata feature.
- *
  */
 export type FeatureSpec = {
 	dataId: number | string;

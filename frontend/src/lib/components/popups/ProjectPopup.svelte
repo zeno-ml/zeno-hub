@@ -76,7 +76,7 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
-		<h2 class="text-xl mb-4">Project Aministration</h2>
+		<h2 class="text-xl mb-4">Project Administration</h2>
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex">
 			<div class="flex flex-col mr-8">

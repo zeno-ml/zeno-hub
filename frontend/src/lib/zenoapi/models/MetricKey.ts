@@ -10,7 +10,6 @@ import type { Slice } from './Slice';
  * Specification of metric keys in zeno.
  *
  * Metric keys map to a specific slice, model, and metric.
- *
  */
 export type MetricKey = {
 	slice: Slice;

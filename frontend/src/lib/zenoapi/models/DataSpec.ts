@@ -9,7 +9,6 @@
  * Attributes:
  * data_id (int | str): The ID of the associated data instance.
  * data (str | None): The raw data if present.
- *
  */
 export type DataSpec = {
 	dataId: number | string;

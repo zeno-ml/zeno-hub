@@ -10,7 +10,6 @@
  * data_id (int | str): The ID of the associated data instance.
  * model (str): The name of the model that produced the output.
  * output (str): The model's output for the data instance.
- *
  */
 export type OutputSpec = {
 	dataId: number | string;
