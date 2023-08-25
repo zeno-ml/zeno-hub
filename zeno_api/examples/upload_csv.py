@@ -18,7 +18,7 @@ from pandas.api.types import (
 )
 
 import zeno_api
-from zeno_api import MetadataType
+from zeno_api import ZenoMetadataType
 
 parser = argparse.ArgumentParser(
     prog="Upload Zeno project data.",
@@ -32,7 +32,7 @@ parser.add_argument("--project_name", required=True)
 args = parser.parse_args()
 
 
-def resolve_column_type(df: pd.DataFrame, col: str) -> MetadataType:
+def resolve_column_type(df: pd.DataFrame, col: str) -> ZenoMetadataType:
     """Get the Zeno MetadataType of a pandas dataframe column.
 
     Args:
@@ -43,14 +43,14 @@ def resolve_column_type(df: pd.DataFrame, col: str) -> MetadataType:
         MetadataType: the metadata type of the column.
     """
     if is_bool_dtype(df[col]):
-        return MetadataType.BOOLEAN
+        return ZenoMetadataType.BOOLEAN
     if is_datetime64_any_dtype(df[col]):
-        return MetadataType.DATETIME
+        return ZenoMetadataType.DATETIME
     if is_string_dtype(df[col]):
-        return MetadataType.NOMINAL
+        return ZenoMetadataType.NOMINAL
     if is_numeric_dtype(df[col]):
-        return MetadataType.CONTINUOUS
-    return MetadataType.OTHER
+        return ZenoMetadataType.CONTINUOUS
+    return ZenoMetadataType.OTHER
 
 
 zeno = zeno_api.authenticate(args.connex_username, args.connex_password)
