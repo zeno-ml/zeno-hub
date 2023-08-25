@@ -232,21 +232,30 @@ def get_server() -> FastAPI:
         return slice_finder(project, req)
 
     @api_app.post(
-        "/filtered-table/{project}",
+        "/filtered-table/{project_uuid}",
         response_model=str,
         tags=["zeno"],
     )
-    def get_filtered_table(req: TableRequest, project: str, request: Request):
-        if not util.access_valid(project, request):
+    def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
+        filter_sql = table_filter(
+            project_uuid, None, req.filter_predicates, req.data_ids
+        )
         sql_table = select.table_data_paginated(
-            project, filter_sql, req.offset, req.limit
+            project_uuid, filter_sql, req.offset, req.limit
         )
         filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
+
+        # Prepend the DATA_URL to the data column if it exists
+        project = select.project_from_uuid(project_uuid)
+        data_col = select.project_data_column(project_uuid)
+        if data_col and project and project.data_url:
+            filt_df[data_col] = project.data_url + filt_df[data_col]
+
         if req.diff_column_1 and req.diff_column_2:
             filt_df = generate_diff_cols(
-                filt_df, req.diff_column_1, req.diff_column_2, project
+                filt_df, req.diff_column_1, req.diff_column_2, project_uuid
             )
         return filt_df.to_json(orient="records")
 
@@ -431,7 +440,7 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/project", tags=["zeno"])
+    @api_app.post("/new-project", tags=["zeno"])
     def create_project(project: Project, current_user=Depends(auth.claim())):
         if select.project_exists(project.owner_name, project.name):
             raise HTTPException(

@@ -401,6 +401,24 @@ def project_stats(project: str) -> ProjectStats | None:
         )
 
 
+def project_data_column(project_uuid: str) -> str:
+    """Get the name of the project's data column.
+
+    Args:
+        project_uuid (str): uuid of the project to get the data column name for.
+
+    Returns:
+        str: name of the project's data column.
+    """
+    with Database() as db:
+        column_name = db.execute_return(
+            sql.SQL("SELECT column_id FROM {} WHERE type = 'DATA';").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            )
+        )
+        return str(column_name[0]) if column_name is not None else ""
+
+
 def metrics(project: str) -> list[Metric]:
     """Get a list of all metrics that are used in the project.
 
