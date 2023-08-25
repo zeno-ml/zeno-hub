@@ -203,14 +203,7 @@ def system(
         output_column (str): The name of the column containing the system output.
         id_column (str): The name of the column containing the instance IDs.
     """
-    # Get column objects from the dataframe.
-    output_col_object: ZenoColumn = ZenoColumn(
-        id=str(uuid.uuid4()),
-        name="output",
-        column_type=ZenoColumnType.OUTPUT,
-        data_type=MetadataType.NOMINAL,
-        model=system_name,
-    )
+    # Add all non-id and non-output columns to the column list.
     columns: list[ZenoColumn] = []
     for col in data_frame.columns:
         if col == id_column or col == output_column:
@@ -225,6 +218,14 @@ def system(
             )
         )
 
+    # Get column objects from the dataframe.
+    output_col_object: ZenoColumn = ZenoColumn(
+        id=str(uuid.uuid4()),
+        name="output",
+        column_type=ZenoColumnType.OUTPUT,
+        data_type=MetadataType.NOMINAL,
+        model=system_name,
+    )
     # Create a renaming scheme for the DataFrame columns
     column_rename = {
         id_column: "data_id",
