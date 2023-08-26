@@ -804,22 +804,6 @@ def tags(project: str) -> list[Tag]:
         return tags
 
 
-def api_key(user: User) -> str | None:
-    """Get the API key for a user.
-
-    Args:
-        user (User): The user for which to fetch the API key.
-
-    Returns:
-        str | None: The API key of the user.
-    """
-    with Database() as db:
-        api_key_result = db.execute_return(
-            "SELECT api_key FROM users WHERE id = %s;", [user.id]
-        )
-        return str(api_key_result[0]) if api_key_result is not None else None
-
-
 def user(name: str) -> User | None:
     """Get the user with a specific name.
 

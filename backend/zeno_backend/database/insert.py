@@ -1,5 +1,6 @@
 """Functions to insert new data into Zeno's database."""
 import json
+import secrets
 import uuid
 
 import pandas as pd
@@ -14,7 +15,28 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
-from zeno_backend.database.util import resolve_metadata_type
+from zeno_backend.database.util import hash_api_key, resolve_metadata_type
+
+
+def api_key(user: User) -> str | None:
+    """Generate an API key for the user and save the hash.
+
+    Args:
+        user (User): The user for which to fetch the API key.
+
+    Returns:
+        str | None: The API key of the user.
+    """
+    with Database() as db:
+        # Generate a new API key for the user.
+        api_key = "zen_" + secrets.token_urlsafe(32)
+        hashed_api_key = hash_api_key(api_key)
+        # Set the API key hash in the database.
+        db.execute(
+            "UPDATE users SET api_key_hash = %s WHERE id = %s;",
+            [hashed_api_key, user.id],
+        )
+        return api_key
 
 
 def project(project_config: Project, user: User):
