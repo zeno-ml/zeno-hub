@@ -1,31 +1,12 @@
 """Functions to upload data to Zeno's backend."""
 import io
 import os
-from functools import wraps
 from pathlib import Path
-from typing import Callable
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 from pycognito import Cognito
-
-
-def _check_token(func: Callable):
-    """Decorator to check whether the user token is valid.
-
-    :meta private:
-
-    Args:
-        func (Callable): the function to be decorated.
-    """
-
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        args[0].user.check_token()
-        return func(*args, **kwargs)
-
-    return wrapper
 
 
 class ZenoProject:
@@ -163,7 +144,6 @@ class ZenoClient:
         self.username = username
         self.endpoint = endpoint
 
-    @_check_token
     def create_project(
         self,
         name: str,
@@ -203,6 +183,8 @@ class ZenoClient:
             raise Exception(
                 "ERROR: User not authenticated. Please try creating the client again."
             )
+        else:
+            self.user.check_token()
 
         response = requests.post(
             f"{self.endpoint}/api/project",
