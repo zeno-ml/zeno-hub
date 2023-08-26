@@ -27,16 +27,18 @@ def api_key(user: User) -> str | None:
     Returns:
         str | None: The API key of the user.
     """
-    with Database() as db:
-        # Generate a new API key for the user.
-        api_key = "zen_" + secrets.token_urlsafe(32)
-        hashed_api_key = hash_api_key(api_key)
-        # Set the API key hash in the database.
-        db.execute(
-            "UPDATE users SET api_key_hash = %s WHERE id = %s;",
-            [hashed_api_key, user.id],
-        )
-        return api_key
+    # Generate a new API key for the user.
+    api_key = "zen_" + secrets.token_urlsafe(32)
+    hashed_api_key = hash_api_key(api_key)
+
+    # Set the API key hash in the database.
+    db = Database()
+    db.connect_execute(
+        "UPDATE users SET api_key_hash = %s WHERE id = %s;",
+        [hashed_api_key, user.id],
+    )
+
+    return api_key
 
 
 def project(project_config: Project, user: User):

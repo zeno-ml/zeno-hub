@@ -1,11 +1,9 @@
 """Functions to upload data to Zeno's backend."""
 import io
 import os
-from pathlib import Path
 
 import pandas as pd
 import requests
-from dotenv import load_dotenv
 from pycognito import Cognito
 
 
@@ -18,7 +16,6 @@ class ZenoProject:
         endpoint (str): The base URL of the Zeno backend.
     """
 
-    user: Cognito
     project_uuid: str
     endpoint: str
 
@@ -114,34 +111,20 @@ class ZenoClient:
         endpoint (str): The base URL of the Zeno backend.
     """
 
-    user: Cognito | None
-    username: str
+    api_key: str
     endpoint: str
 
     def __init__(
-        self, *, username, password, endpoint=os.environ["PUBLIC_BACKEND_ENDPOINT"]
+        self, *, api_key, endpoint=os.environ["PUBLIC_BACKEND_ENDPOINT"]
     ) -> None:
         """Initialize the ZenoClient object for API upload calls.
 
         Args:
-            username (str): the username of the user to authenticate with.
-            password (str): the password of the user to authenticate with.
+            api_key (str): the API key to authenticate uploads with.
             endpoint (str, optional): the base URL of the Zeno backend.
                 Defaults to os.environ["PUBLIC_BACKEND_ENDPOINT"].
         """
-        env_path = Path("../../frontend/.env")
-        if env_path.exists():
-            load_dotenv(env_path)
-
-        user = Cognito(
-            os.environ["ZENO_USER_POOL_ID"],
-            os.environ["ZENO_USER_POOL_CLIENT_ID"],
-            username=username,
-        )
-        user.authenticate(password=password)
-
-        self.user = user
-        self.username = username
+        self.api_key = api_key
         self.endpoint = endpoint
 
     def create_project(
@@ -179,30 +162,23 @@ class ZenoClient:
             ValidationError: If the config does not match the ProjectConfig schema.
             HTTPError: If the project could not be created.
         """
-        if self.user is None:
-            raise Exception(
-                "ERROR: User not authenticated. Please try creating the client again."
-            )
-        else:
-            self.user.check_token()
-
         response = requests.post(
             f"{self.endpoint}/api/project",
             json={
                 "uuid": "",
                 "name": name,
                 "view": view,
-                "owner_name": self.username,
+                "owner_name": "",
                 "data_url": data_url,
                 "calculate_histogram_metrics": calculate_histogram_metrics,
                 "samplesPerPage": samples_per_page,
                 "public": public,
                 "editor": True,
             },
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+            headers={"Authorization": "Bearer " + self.api_key},
         )
         if response.status_code == 200:
-            print("Successfully created project", self.username + "/" + name)
+            print("Successfully created project ", response.text[1:-1])
             return ZenoProject(self.user, response.text[1:-1], self.endpoint)
         else:
             raise Exception(response.json()["detail"])

@@ -389,7 +389,7 @@ def get_server() -> FastAPI:
     @api_app.post(
         "/api-key/", response_model=str, tags=["zeno"], dependencies=[Depends(auth)]
     )
-    def get_api_key(current_user=Depends(auth.claim())):
+    def create_api_key(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
