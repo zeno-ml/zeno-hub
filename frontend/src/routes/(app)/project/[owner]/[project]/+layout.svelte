@@ -14,19 +14,21 @@
 
 	export let data;
 
-	$: {
-		project.set(data.project);
-		rowsPerPage.set(data.project.samplesPerPage ?? 5);
-		slices.set(data.slices);
-		columns.set(data.columns);
-		models.set(data.models);
-		metrics.set(data.metrics);
-		folders.set(data.folders);
-		tags.set(data.tags);
+	$: setupProject(data);
+
+	function setupProject(setup_data: any) {
+		project.set(setup_data.project);
+		rowsPerPage.set(setup_data.project.samplesPerPage ?? 5);
+		slices.set(setup_data.slices);
+		columns.set(setup_data.columns);
+		models.set(setup_data.models);
+		metrics.set(setup_data.metrics);
+		folders.set(setup_data.folders);
+		tags.set(setup_data.tags);
 		zenoAPI.BASE = `${getEndpoint()}/api`;
-		if (data.cognitoUser) {
+		if (setup_data.cognitoUser) {
 			zenoAPI.HEADERS = {
-				Authorization: 'Bearer ' + data.cognitoUser.accessToken
+				Authorization: 'Bearer ' + setup_data.cognitoUser.accessToken
 			};
 		}
 	}

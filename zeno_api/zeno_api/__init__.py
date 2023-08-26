@@ -28,7 +28,6 @@ def _check_token(func: Callable):
     return wrapper
 
 
-# TODO: Do not export the Project class, only make it available through the ZenoClient.
 class ZenoProject:
     """Provides data upload functionality for a Zeno project.
 
@@ -149,13 +148,10 @@ class ZenoClient:
             endpoint (str, optional): the base URL of the Zeno backend.
                 Defaults to os.environ["PUBLIC_BACKEND_ENDPOINT"].
         """
-        # TODO: remove env vars loading.
-        # load env vars for cognito if available
         env_path = Path("../../frontend/.env")
         if env_path.exists():
             load_dotenv(env_path)
 
-        # TODO: Figure out how to package without providing env vars
         user = Cognito(
             os.environ["ZENO_USER_POOL_ID"],
             os.environ["ZENO_USER_POOL_CLIENT_ID"],
