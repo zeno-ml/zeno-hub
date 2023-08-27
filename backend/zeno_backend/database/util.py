@@ -35,7 +35,7 @@ def hash_api_key(api_key: str) -> str:
         api_key (str): API key to hash.
 
     Returns:
-        str: Hashed API key.
+        str: hashed API key.
     """
     hasher = hashlib.sha256()
 

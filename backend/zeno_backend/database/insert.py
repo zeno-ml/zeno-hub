@@ -22,10 +22,10 @@ def api_key(user: User) -> str | None:
     """Generate an API key for the user and save the hash.
 
     Args:
-        user (User): The user for which to fetch the API key.
+        user (User): the user for which to fetch the API key.
 
     Returns:
-        str | None: The API key of the user.
+        str | None: the API key of the user.
     """
     # Generate a new API key for the user.
     api_key = "zen_" + secrets.token_urlsafe(32)
@@ -49,9 +49,9 @@ def project(project_config: Project, owner_id: int):
     all tags of the project.
 
     Args:
-        project_config (Project): The configuration with which to
+        project_config (Project): the configuration with which to
             initialize the new project.
-        owner_id (int): The id of the user who owns the project.
+        owner_id (int): the id of the user who owns the project.
 
     Raises:
         Exception: something went wrong in the process of creating the new project in

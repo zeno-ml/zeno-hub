@@ -26,7 +26,7 @@ class APIKeyBearer(HTTPBearer):
         """Initialize the APIKeyBearer class.
 
         Args:
-            auto_error (bool, optional): Automatically report errors.
+            auto_error (bool, optional): automatically report errors.
                 Defaults to True.
         """
         super(APIKeyBearer, self).__init__(auto_error=auto_error)
@@ -35,7 +35,7 @@ class APIKeyBearer(HTTPBearer):
         """Verify that the API key is valid.
 
         Args:
-            request (Request): Request object.
+            request (Request): request object.
         """
         credentials: HTTPAuthorizationCredentials | None = await super(
             APIKeyBearer, self
@@ -108,13 +108,13 @@ def upload_dataset(
     """Upload a dataset to a Zeno project.
 
     Args:
-        project (str): The UUID of the project to add data to.
-        id_column (str): The name of the column containing the instance IDs.
-        label_column (str | None, optional): The name of the column containing the
+        project (str): the UUID of the project to add data to.
+        id_column (str): the name of the column containing the instance IDs.
+        label_column (str | None, optional): the name of the column containing the
             instance labels. Defaults to None.
-        data_column (str | None, optional): The name of the column containing the
+        data_column (str | None, optional): the name of the column containing the
             raw data. Only works for small text data. Defaults to None.
-        file (UploadFile): The dataset to upload.
+        file (UploadFile): the dataset to upload.
     """
     try:
         bytes = file.file.read()
@@ -145,11 +145,11 @@ def upload_system(
     """Upload a system to a Zeno project.
 
     Args:
-        project (str): The UUID of the project to add data to.
-        system_name (str): The name of the system to upload.
-        output_column (str): The name of the column containing the system output.
-        id_column (str): The name of the column containing the instance IDs.
-        file (UploadFile): The dataset to upload.
+        project (str): the UUID of the project to add data to.
+        system_name (str): the name of the system to upload.
+        output_column (str): the name of the column containing the system output.
+        id_column (str): the name of the column containing the instance IDs.
+        file (UploadFile): the dataset to upload.
     """
     try:
         bytes = file.file.read()

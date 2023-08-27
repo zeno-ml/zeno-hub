@@ -229,10 +229,10 @@ def api_key_exists(api_key: str) -> bool:
     """Check whether an API key exists.
 
     Args:
-        api_key (str): The API key to check for.
+        api_key (str): the API key to check for.
 
     Returns:
-        bool: Whether the API key exists.
+        bool: whether the API key exists.
     """
     db = Database()
     api_key_hash = hash_api_key(api_key)
@@ -249,11 +249,11 @@ def user_id_by_api_key(api_key: str) -> int | None:
     """Get the user ID given an API key.
 
     Args:
-        api_key (str): The API key to get the user ID for.
+        api_key (str): the API key to get the user ID for.
 
 
     Returns:
-        int | None: The user ID of the user with the given API key.
+        int | None: the user ID of the user with the given API key.
     """
     db = Database()
     api_key_hash = hash_api_key(api_key)
@@ -267,7 +267,7 @@ def project_exists(owner_id: int, project_name: str) -> bool:
     """Check whether a project exists.
 
     Args:
-        owner_id (int): The ID of the owner of the project.
+        owner_id (int): the ID of the owner of the project.
         project_name (str): The name of the project.
 
 
