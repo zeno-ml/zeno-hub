@@ -2,7 +2,7 @@
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
 
-	$: audioURL = entry['data'] as string;
+	$: audioURL = entry['data_id'] as string;
 </script>
 
 <div id="flex flex-wrap">

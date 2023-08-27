@@ -160,7 +160,7 @@ class ZenoClient:
             HTTPError: If the project could not be created.
         """
         response = requests.post(
-            f"{self.endpoint}/api/project",
+            f"{self.endpoint}/api/new-project/",
             json={
                 "uuid": "",
                 "name": name,
