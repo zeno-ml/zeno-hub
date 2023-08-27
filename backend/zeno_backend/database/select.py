@@ -280,8 +280,7 @@ def project_exists(owner_id: int, project_name: str) -> bool:
     """
     db = Database()
     exists = db.connect_execute_return(
-        "SELECT EXISTS(SELECT 1 FROM projects "
-        "WHERE name = %s AND owner_id = %s);",
+        "SELECT EXISTS(SELECT 1 FROM projects " "WHERE name = %s AND owner_id = %s);",
         [project_name, owner_id],
     )
     if exists is not None:

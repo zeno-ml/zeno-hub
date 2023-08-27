@@ -46,8 +46,6 @@ class APIKeyBearer(HTTPBearer):
                 raise HTTPException(
                     status_code=403, detail="Invalid authentication scheme."
                 )
-
-            print(credentials.credentials)
             if not self.verify_api_key(credentials.credentials):
                 raise HTTPException(
                     status_code=403, detail="Invalid token or expired token."
@@ -75,6 +73,12 @@ router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
 
 @router.post("/project")
 def create_project(project: Project, api_key=Depends(APIKeyBearer())):
+    """Create a new project.
+
+    Args:
+        project (Project): Project object.
+        api_key (str, optional): API key.
+    """
     user_id = select.user_id_by_api_key(api_key)
     if user_id is None:
         raise HTTPException(
@@ -101,6 +105,17 @@ def upload_dataset(
     data_column: str = Form(None),
     file: UploadFile = File(...),
 ):
+    """Upload a dataset to a Zeno project.
+
+    Args:
+        project (str): The UUID of the project to add data to.
+        id_column (str): The name of the column containing the instance IDs.
+        label_column (str | None, optional): The name of the column containing the
+            instance labels. Defaults to None.
+        data_column (str | None, optional): The name of the column containing the
+            raw data. Only works for small text data. Defaults to None.
+        file (UploadFile): The dataset to upload.
+    """
     try:
         bytes = file.file.read()
         dataset_df = pd.read_feather(io.BytesIO(bytes))
@@ -127,6 +142,15 @@ def upload_system(
     id_column: str = Form(...),
     file: UploadFile = File(...),
 ):
+    """Upload a system to a Zeno project.
+
+    Args:
+        project (str): The UUID of the project to add data to.
+        system_name (str): The name of the system to upload.
+        output_column (str): The name of the column containing the system output.
+        id_column (str): The name of the column containing the instance IDs.
+        file (UploadFile): The dataset to upload.
+    """
     try:
         bytes = file.file.read()
         system_df = pd.read_feather(io.BytesIO(bytes))
