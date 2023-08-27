@@ -3,12 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { Metric } from './Metric';
+
 /**
  * Projects with datasets & models.
  *
  * Attributes:
  * uuid (str): The UUID of the task.
  * name (str): The name of the task.
+ * metrics (list[Metric]): The metrics to calculate for the task.
  * owner_name (str): The name of the user who owns the task.
  * view (str): The name of the view to use for the task.
  * data_url (Optional[str]): The base URL from which to read data instances.
@@ -21,6 +24,7 @@
 export type Project = {
 	uuid: string;
 	name: string;
+	metrics?: Array<Metric>;
 	ownerName: string;
 	view: string;
 	dataUrl: string | null;

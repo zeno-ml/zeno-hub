@@ -4,6 +4,21 @@ import os
 
 import pandas as pd
 import requests
+from pydantic import BaseModel
+
+
+class ZenoMetric(BaseModel):
+    """A metric to calculate for a Zeno project.
+
+    Attributes:
+        name (str): The name of the metric.
+        type (str): The type of metric to calculate.
+        columns (list[str]): The columns to calculate the metric on.
+    """
+
+    name: str
+    type: str
+    columns: list[str]
 
 
 class ZenoProject:
@@ -128,6 +143,7 @@ class ZenoClient:
         self,
         name: str,
         view: str,
+        metrics: list[ZenoMetric] = [],
         data_url: str = "",
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
@@ -140,8 +156,8 @@ class ZenoClient:
                 created under the current user, e.g. username/name.
                 project: str,
             view (str): The view to use for the project.
-            metrics (list[str], optional): The metrics to calculate for the project.
-                Defaults to [].
+            metrics (list[ZenoMetric], optional): The metrics to calculate for the
+                project. Defaults to [].
             data_url (str, optional): The URL to the data to use for the project.
                 Defaults to "".
             calculate_histogram_metrics (bool, optional): Whether to calculate histogram
@@ -160,11 +176,12 @@ class ZenoClient:
             HTTPError: If the project could not be created.
         """
         response = requests.post(
-            f"{self.endpoint}/api/new-project/",
+            f"{self.endpoint}/api/project/",
             json={
                 "uuid": "",
                 "name": name,
                 "view": view,
+                "metrics": [m.model_dump() for m in metrics],
                 "owner_name": "",
                 "data_url": data_url,
                 "calculate_histogram_metrics": calculate_histogram_metrics,

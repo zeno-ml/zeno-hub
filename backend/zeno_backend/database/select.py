@@ -432,27 +432,31 @@ def project_stats(project: str) -> ProjectStats | None:
         )
 
 
-def metrics(project: str) -> list[Metric]:
+def metrics(project_uuid: str) -> list[Metric]:
     """Get a list of all metrics that are used in the project.
 
     Args:
-        project (str): the project the user is currently working with.
+        project_uuid (str): the project the user is currently working with.
 
     Returns:
         list[Metric]: list of metrics used with the project.
     """
     db = Database()
     metric_results = db.connect_execute_return(
-        "SELECT metrics.id, metrics.name FROM metrics INNER JOIN project_metrics ON "
-        "metrics.id = project_metrics.metric_id "
-        "WHERE project_metrics.project_uuid = %s;",
-        [
-            project,
-        ],
-        return_all=True,
+        "SELECT name, type, columns FROM metrics WHERE project_uuid = %s;",
+        [project_uuid],
     )
+    if metric_results is not None and type(metric_results) is tuple:
+        metric_results = [metric_results]
     return (
-        list(map(lambda metric: Metric(id=metric[0], name=metric[1]), metric_results))
+        list(
+            map(
+                lambda metric: Metric(
+                    name=metric[0], type=metric[1], columns=metric[2]
+                ),
+                metric_results,
+            )
+        )
         if metric_results is not None
         else []
     )

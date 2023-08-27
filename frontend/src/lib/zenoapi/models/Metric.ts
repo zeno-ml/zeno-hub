@@ -4,9 +4,15 @@
 /* eslint-disable */
 
 /**
- * Specification of metric data in Zeno.
+ * Metric to calculate for a Zeno project.
+ *
+ * Attributes:
+ * name (str): The name of the metric.
+ * type (str): The type of metric to calculate.
+ * columns (list[str]): The columns to calculate the metric on.
  */
 export type Metric = {
-	id: number;
 	name: string;
+	type: string;
+	columns: Array<string>;
 };

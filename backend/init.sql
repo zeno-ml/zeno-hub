@@ -22,13 +22,16 @@ CREATE TABLE organizations (
 
 CREATE TABLE metrics (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name text NOT NULL
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    name text NOT NULL,
+    type text NOT NULL,
+    columns text[] NOT NULL
 );
 
 CREATE TABLE folders (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name text NOT NULL,
-    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE,
+    name text NOT NULL
 );
 
 CREATE TABLE charts (
@@ -66,12 +69,6 @@ CREATE TABLE user_organization (
     user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     organization_id integer NOT NULL REFERENCES organizations(id) ON DELETE CASCADE ON UPDATE CASCADE,
     admin boolean NOT NULL DEFAULT false
-);
-
-CREATE TABLE project_metrics (
-    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE,
-    metric_id integer NOT NULL REFERENCES metrics(id)
 );
 
 CREATE TABLE organization_project (

@@ -4,10 +4,17 @@ from zeno_backend.classes.slice import Slice
 
 
 class Metric(CamelModel):
-    """Specification of metric data in Zeno."""
+    """Metric to calculate for a Zeno project.
 
-    id: int
+    Attributes:
+        name (str): The name of the metric.
+        type (str): The type of metric to calculate.
+        columns (list[str]): The columns to calculate the metric on.
+    """
+
     name: str
+    type: str
+    columns: list[str]
 
 
 class MetricKey(CamelModel):
