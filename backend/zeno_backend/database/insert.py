@@ -1,5 +1,6 @@
 """Functions to insert new data into Zeno's database."""
 import json
+import secrets
 import uuid
 
 import pandas as pd
@@ -14,10 +15,33 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
-from zeno_backend.database.util import resolve_metadata_type
+from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 
 
-def project(project_config: Project, user: User):
+def api_key(user: User) -> str | None:
+    """Generate an API key for the user and save the hash.
+
+    Args:
+        user (User): the user for which to fetch the API key.
+
+    Returns:
+        str | None: the API key of the user.
+    """
+    # Generate a new API key for the user.
+    api_key = "zen_" + secrets.token_urlsafe(32)
+    hashed_api_key = hash_api_key(api_key)
+
+    # Set the API key hash in the database.
+    db = Database()
+    db.connect_execute(
+        "UPDATE users SET api_key_hash = %s WHERE id = %s;",
+        [hashed_api_key, user.id],
+    )
+
+    return api_key
+
+
+def project(project_config: Project, owner_id: int):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -27,7 +51,7 @@ def project(project_config: Project, user: User):
     Args:
         project_config (Project): the configuration with which to
             initialize the new project.
-        user (User): the user who is setting up the project and becomes its admin.
+        owner_id (int): the id of the user who owns the project.
 
     Raises:
         Exception: something went wrong in the process of creating the new project in
@@ -41,7 +65,7 @@ def project(project_config: Project, user: User):
             [
                 project_config.uuid,
                 project_config.name,
-                user.id,
+                owner_id,
                 project_config.view,
                 project_config.data_url,
                 project_config.calculate_histogram_metrics,
@@ -52,7 +76,7 @@ def project(project_config: Project, user: User):
         db.execute(
             "INSERT INTO user_project (user_id, project_uuid, editor) "
             "VALUES (%s,%s,%s)",
-            [user.id, project_config.uuid, True],
+            [owner_id, project_config.uuid, True],
         )
         # Create table to hold project data.
         db.execute(

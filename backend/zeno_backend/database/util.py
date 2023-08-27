@@ -1,4 +1,6 @@
 """Utility functions for database operations."""
+import hashlib
+
 import pandas as pd
 
 from zeno_backend.classes.base import MetadataType
@@ -24,3 +26,19 @@ def resolve_metadata_type(data_frame: pd.DataFrame, column: str) -> MetadataType
     elif pd.api.types.is_string_dtype(dtype):
         return MetadataType.NOMINAL
     return MetadataType.OTHER
+
+
+def hash_api_key(api_key: str) -> str:
+    """Hash an API key.
+
+    Args:
+        api_key (str): API key to hash.
+
+    Returns:
+        str: hashed API key.
+    """
+    hasher = hashlib.sha256()
+
+    hasher.update(api_key.encode("utf-8"))
+
+    return hasher.hexdigest()

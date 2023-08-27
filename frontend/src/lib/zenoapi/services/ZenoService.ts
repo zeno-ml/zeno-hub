@@ -543,6 +543,18 @@ export class ZenoService {
 	}
 
 	/**
+	 * Create Api Key
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static createApiKey(): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/api-key/'
+		});
+	}
+
+	/**
 	 * Get Project Orgs
 	 * @param project
 	 * @returns Organization Successful Response

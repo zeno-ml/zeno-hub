@@ -1,36 +1,33 @@
 """Functions to upload data to Zeno's backend."""
 import io
 import os
-from pathlib import Path
 
 import pandas as pd
 import requests
-from dotenv import load_dotenv
-from pycognito import Cognito
 
 
 class ZenoProject:
     """Provides data upload functionality for a Zeno project.
 
     Attributes:
-        user (Cognito): The user to authenticate uploads with.
+        api_key (str): The API key to authenticate uploads with.
         project_uuid (str): The ID of the project to add data to.
         endpoint (str): The base URL of the Zeno backend.
     """
 
-    user: Cognito
+    api_key: str
     project_uuid: str
     endpoint: str
 
-    def __init__(self, user: Cognito, project_uuid: str, endpoint: str) -> None:
+    def __init__(self, api_key: str, project_uuid: str, endpoint: str) -> None:
         """Initialize the Project object for API upload calls.
 
         Args:
-            user (Cognito): the user to authenticate uploads with.
+            api_key (str): the API key to authenticate uploads with.
             project_uuid (str): the ID of the project to add data to.
             endpoint (str): the base URL of the Zeno backend.
         """
-        self.user = user
+        self.api_key = api_key
         self.project_uuid = project_uuid
         self.endpoint = endpoint
 
@@ -65,7 +62,7 @@ class ZenoProject:
                 "data_column": data_column if data_column is not None else "",
             },
             files={"file": (b)},
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+            headers={"Authorization": "Bearer " + self.api_key},
         )
         if response.status_code == 200:
             print("Successfully uploaded data")
@@ -97,7 +94,7 @@ class ZenoProject:
                 "id_column": id_column,
             },
             files={"file": (b)},
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+            headers={"Authorization": "Bearer " + self.api_key},
         )
         if response.status_code == 200:
             print("Successfully uploaded system")
@@ -109,39 +106,22 @@ class ZenoClient:
     """Client class for data upload functionality to Zeno.
 
     Attributes:
-        user (Cognito): The user to authenticate uploads with.
-        username (str): The username of the user to authenticate with.
+        api_key (str): The API key to authenticate uploads with.
         endpoint (str): The base URL of the Zeno backend.
     """
 
-    user: Cognito | None
-    username: str
+    api_key: str
     endpoint: str
 
-    def __init__(
-        self, *, username, password, endpoint=os.environ["PUBLIC_BACKEND_ENDPOINT"]
-    ) -> None:
+    def __init__(self, api_key, endpoint=os.environ["PUBLIC_BACKEND_ENDPOINT"]) -> None:
         """Initialize the ZenoClient object for API upload calls.
 
         Args:
-            username (str): the username of the user to authenticate with.
-            password (str): the password of the user to authenticate with.
+            api_key (str): the API key to authenticate uploads with.
             endpoint (str, optional): the base URL of the Zeno backend.
                 Defaults to os.environ["PUBLIC_BACKEND_ENDPOINT"].
         """
-        env_path = Path("../../frontend/.env")
-        if env_path.exists():
-            load_dotenv(env_path)
-
-        user = Cognito(
-            os.environ["ZENO_USER_POOL_ID"],
-            os.environ["ZENO_USER_POOL_CLIENT_ID"],
-            username=username,
-        )
-        user.authenticate(password=password)
-
-        self.user = user
-        self.username = username
+        self.api_key = api_key
         self.endpoint = endpoint
 
     def create_project(
@@ -179,42 +159,32 @@ class ZenoClient:
             ValidationError: If the config does not match the ProjectConfig schema.
             HTTPError: If the project could not be created.
         """
-        if self.user is None:
-            raise Exception(
-                "ERROR: User not authenticated. Please try creating the client again."
-            )
-        else:
-            self.user.check_token()
-
         response = requests.post(
             f"{self.endpoint}/api/new-project/",
             json={
                 "uuid": "",
                 "name": name,
                 "view": view,
-                "owner_name": self.username,
+                "owner_name": "",
                 "data_url": data_url,
                 "calculate_histogram_metrics": calculate_histogram_metrics,
                 "samplesPerPage": samples_per_page,
                 "public": public,
                 "editor": True,
             },
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+            headers={"Authorization": "Bearer " + self.api_key},
         )
         if response.status_code == 200:
-            print("Successfully created project", self.username + "/" + name)
-            return ZenoProject(self.user, response.text[1:-1], self.endpoint)
+            print("Successfully created project ", response.text[1:-1])
+            return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
             raise Exception(response.json()["detail"])
 
     def get_project(self, project_name: str) -> ZenoProject:
         """Get a project object by its name. Names are split into owner/project_name.
 
-        If no slash is present, user is assumed to be the owner.
-
         Args:
             project_name (str): The owner/project_name of the project to get.
-
 
         Returns:
             Project | None: The project object or None if the project could not be
@@ -222,32 +192,22 @@ class ZenoClient:
 
 
         Raises:
-            Exception: If the user is not authenticated.
             HTTPError: If the project could not be found.
         """
-        if self.user is None:
-            print(
-                "ERROR: User not authenticated. Please try creating the client again."
-            )
-            raise Exception(
-                "User not authenticated. Please try creating the client again."
-            )
-
         # Get owner and project name from project_name.
         # If no owner, assume current user.
         split_project_name = project_name.split("/")
         if len(split_project_name) == 1:
-            user = self.username
-            project_name = project_name
+            raise Exception("Project name must be in the format owner/project_name")
         else:
             user = split_project_name[0]
             project_name = split_project_name[1]
 
         response = requests.get(
             f"{self.endpoint}/api/project-uuid/{user}/{project_name}",
-            headers={"Authorization": "Bearer " + str(self.user.access_token)},
+            headers={"Authorization": "Bearer " + self.api_key},
         )
         if response.status_code == 200:
-            return ZenoProject(self.user, response.text[1:-1], self.endpoint)
+            return ZenoProject(self.api_key, response.text[1:-1], self.endpoint)
         else:
             raise Exception(response.json()["detail"])
