@@ -17,6 +17,7 @@ from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.util import hash_api_key
 
 
 def models(project: str) -> list[str]:
@@ -224,11 +225,49 @@ def project_public(project_uuid: str) -> bool:
     return False
 
 
-def project_exists(owner_name: str, project_name: str) -> bool:
+def api_key_exists(api_key: str) -> bool:
+    """Check whether an API key exists.
+
+    Args:
+        api_key (str): The API key to check for.
+
+    Returns:
+        bool: Whether the API key exists.
+    """
+    db = Database()
+    api_key_hash = hash_api_key(api_key)
+    exists = db.connect_execute_return(
+        "SELECT EXISTS(SELECT 1 FROM users WHERE api_key_hash = %s);", [api_key_hash]
+    )
+    if exists is not None:
+        return bool(exists[0])
+    else:
+        raise Exception("Error while checking whether API key exists.")
+
+
+def user_id_by_api_key(api_key: str) -> int | None:
+    """Get the user ID given an API key.
+
+    Args:
+        api_key (str): The API key to get the user ID for.
+
+
+    Returns:
+        int | None: The user ID of the user with the given API key.
+    """
+    db = Database()
+    api_key_hash = hash_api_key(api_key)
+    user_id = db.connect_execute_return(
+        "SELECT id FROM users WHERE api_key_hash = %s;", [api_key_hash]
+    )
+    return int(user_id[0]) if user_id is not None else None
+
+
+def project_exists(owner_id: int, project_name: str) -> bool:
     """Check whether a project exists.
 
     Args:
-        owner_name (str): The name of the owner of the project.
+        owner_id (int): The ID of the owner of the project.
         project_name (str): The name of the project.
 
 
@@ -239,23 +278,16 @@ def project_exists(owner_name: str, project_name: str) -> bool:
     Raises:
         Exception: Something went wrong while checking whether the project exists.
     """
-    with Database() as db:
-        owner_id = db.execute_return(
-            "SELECT id FROM users WHERE name = %s;", [owner_name]
-        )
-        if owner_id is None:
-            raise Exception("Owner does not exist.")
-        else:
-            owner_id = owner_id[0]
-            exists = db.execute_return(
-                "SELECT EXISTS(SELECT 1 FROM projects "
-                "WHERE name = %s AND owner_id = %s);",
-                [project_name, owner_id],
-            )
-            if exists is not None:
-                return bool(exists[0])
-            else:
-                raise Exception("Error while checking whether project exists.")
+    db = Database()
+    exists = db.connect_execute_return(
+        "SELECT EXISTS(SELECT 1 FROM projects "
+        "WHERE name = %s AND owner_id = %s);",
+        [project_name, owner_id],
+    )
+    if exists is not None:
+        return bool(exists[0])
+    else:
+        raise Exception("Error while checking whether project exists.")
 
 
 def project(owner_name: str, project_name: str, user: User | None) -> Project | None:

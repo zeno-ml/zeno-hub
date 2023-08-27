@@ -41,7 +41,7 @@ def api_key(user: User) -> str | None:
     return api_key
 
 
-def project(project_config: Project, user: User):
+def project(project_config: Project, owner_id: int):
     """Setting up a new project in Zeno.
 
     Creates a new entry in the projects table, creates a new table for the project's
@@ -49,9 +49,9 @@ def project(project_config: Project, user: User):
     all tags of the project.
 
     Args:
-        project_config (Project): the configuration with which to
+        project_config (Project): The configuration with which to
             initialize the new project.
-        user (User): the user who is setting up the project and becomes its admin.
+        owner_id (int): The id of the user who owns the project.
 
     Raises:
         Exception: something went wrong in the process of creating the new project in
@@ -65,7 +65,7 @@ def project(project_config: Project, user: User):
             [
                 project_config.uuid,
                 project_config.name,
-                user.id,
+                owner_id,
                 project_config.view,
                 project_config.data_url,
                 project_config.calculate_histogram_metrics,
@@ -76,7 +76,7 @@ def project(project_config: Project, user: User):
         db.execute(
             "INSERT INTO user_project (user_id, project_uuid, editor) "
             "VALUES (%s,%s,%s)",
-            [user.id, project_config.uuid, True],
+            [owner_id, project_config.uuid, True],
         )
         # Create table to hold project data.
         db.execute(
