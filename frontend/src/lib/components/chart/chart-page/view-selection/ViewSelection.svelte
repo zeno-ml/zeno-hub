@@ -17,7 +17,7 @@
 </script>
 
 <div class="mb-5">
-	<h4 class="border-b-2 border-grey-light mb-2">Chart Type</h4>
+	<h4 class="border-b-2 border-grey-light mb-2 pb-1">Chart Type</h4>
 	<div class="flex flex-wrap justify-between">
 		<ChartElement {chart} {updateChart} type={ChartType.BAR} />
 		<ChartElement {chart} {updateChart} type={ChartType.LINE} />

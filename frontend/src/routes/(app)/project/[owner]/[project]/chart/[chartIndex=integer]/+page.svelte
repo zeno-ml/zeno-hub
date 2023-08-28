@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
@@ -12,7 +13,7 @@
 
 	export let data;
 
-	let isChartEdit = false;
+	let isChartEdit = $page.url.searchParams.get('edit') ? true : false;
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
 
