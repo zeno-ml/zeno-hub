@@ -1,6 +1,5 @@
 """Type representations for metric data."""
 from zeno_backend.classes.base import CamelModel, ZenoColumn
-from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import FilterPredicateGroup
 
 
@@ -24,7 +23,7 @@ class HistogramRequest(CamelModel):
     column_requests: list[HistogramColumnRequest]
     filter_predicates: FilterPredicateGroup | None = None
     model: str | None = None
-    metric: Metric | None = None
+    metric: str | None = None
     data_ids: list[str] | None = None
 
 

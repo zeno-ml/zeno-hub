@@ -10,7 +10,7 @@ import type { SlicesOrModels } from './SlicesOrModels';
  */
 export type XCParameters = {
 	slices: Array<number>;
-	metric: number;
+	metric: string;
 	models: Array<string>;
 	colorChannel: SlicesOrModels;
 	xChannel: SlicesOrModels;

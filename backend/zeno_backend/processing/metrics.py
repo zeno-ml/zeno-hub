@@ -287,6 +287,38 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
         )
 
 
+def mean(project_uuid: str, metric: Metric) -> GroupMetric:
+    """Calculate the mean of a metric for a given project.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        metric (Metric): the metric for which to calculate the mean.
+
+    Raises:
+        Exception: something in the database processing failed.
+
+    Returns:
+        GroupMetric: mean of the metric for the given project.
+    """
+    with Database() as db:
+        # Get column name from project column map
+        column_id = db.execute_return(
+            "SELECT column_id FROM {}_column_map WHERE name = %s".format(
+                sql.Identifier(project_uuid),
+            )
+        )
+        res = db.execute_return(
+            sql.SQL("SELECT COUNT(*) AS n, AVG({}) FROM {}").format(
+                sql.Literal(column_id), sql.Identifier(project_uuid)
+            )
+        )
+        return (
+            GroupMetric(metric=float(res[1]), size=res[0])
+            if res is not None
+            else GroupMetric(metric=None, size=0)
+        )
+
+
 def metric_map(
     metric: Metric | None,
     project: str,
@@ -310,6 +342,8 @@ def metric_map(
 
     if metric.name == "accuracy":
         return accuracy(project, model, sql_filter)
+    if metric.name == "mean":
+        return mean(project, metric)
     elif metric.name == "recall":
         return recall(project, model, sql_filter)
     elif metric.name == "f1":

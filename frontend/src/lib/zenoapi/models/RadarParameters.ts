@@ -10,7 +10,7 @@ import type { SlicesOrModels } from './SlicesOrModels';
  * Parameter specification for a radar chart.
  */
 export type RadarParameters = {
-	metrics: Array<number>;
+	metrics: Array<string>;
 	slices: Array<number>;
 	models: Array<string>;
 	axisChannel: SlicesMetricsOrModels;

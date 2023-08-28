@@ -15,7 +15,7 @@
 	let value = 0;
 
 	$metrics.forEach((m) => {
-		options.push({ value: m.id, label: m.name });
+		options.push({ value: m, label: m });
 	});
 	value = numberValue;
 

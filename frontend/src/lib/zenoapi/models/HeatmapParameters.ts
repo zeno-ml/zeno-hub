@@ -9,7 +9,7 @@ import type { SlicesOrModels } from './SlicesOrModels';
  * Parameter specirication for a heatmap chart.
  */
 export type HeatmapParameters = {
-	metric: number;
+	metric: string;
 	xValues: Array<number | string>;
 	yValues: Array<number | string>;
 	model: string;

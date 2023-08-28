@@ -22,7 +22,7 @@ from zeno_backend.classes.base import (
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
-from zeno_backend.classes.metric import Metric, MetricRequest
+from zeno_backend.classes.metric import MetricRequest
 from zeno_backend.classes.project import Project, ProjectStats
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
@@ -142,13 +142,13 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/metrics/{project}",
-        response_model=list[Metric],
+        response_model=list[str],
         tags=["zeno"],
     )
     def get_metrics(project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return select.metrics(project)
+        return select.metric_names(project)
 
     @api_app.get(
         "/folders/{project}",
@@ -330,7 +330,8 @@ def get_server() -> FastAPI:
         if not util.access_valid(project, request):
             return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
-        for metric_key in req.metric_keys:
+        metrics = select.metrics_by_name([m.metric for m in req.metric_keys], project)
+        for i, metric_key in enumerate(req.metric_keys):
             filter_sql = table_filter(
                 project,
                 metric_key.model,
@@ -338,7 +339,7 @@ def get_server() -> FastAPI:
                 req.data_ids,
             )
             return_metrics.append(
-                metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+                metric_map(metrics[i], project, metric_key.model, filter_sql)
             )
         return return_metrics
 

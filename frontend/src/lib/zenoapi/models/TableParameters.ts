@@ -10,7 +10,7 @@ import type { SlicesOrModels } from './SlicesOrModels';
  * Parameter specification for a tabular visualization.
  */
 export type TableParameters = {
-	metrics: Array<number>;
+	metrics: Array<string>;
 	slices: Array<number>;
 	models: Array<string>;
 	yChannel: SlicesOrModels;

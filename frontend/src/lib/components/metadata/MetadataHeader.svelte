@@ -22,16 +22,6 @@
 	) {
 		$model = $models[1];
 	}
-	$: if (
-		$metric === undefined ||
-		(-1 ===
-			$metrics.findIndex(
-				(currentMetric) => currentMetric.id === ($metric === undefined ? -1 : $metric.id)
-			) &&
-			$metrics.length > 0)
-	) {
-		$metric = $metrics[0];
-	}
 </script>
 
 <div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1 w-96">
@@ -58,7 +48,7 @@
 				bind:value={$metric}
 			>
 				{#each $metrics as met}
-					<option value={met}>{met.name}</option>
+					<option value={met}>{met}</option>
 				{/each}
 			</select>
 		</div>

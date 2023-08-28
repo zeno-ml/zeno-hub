@@ -9,7 +9,7 @@ import type { SlicesOrModels } from './SlicesOrModels';
  * Parameter specification for a beeswarm chart.
  */
 export type BeeswarmParameters = {
-	metrics: Array<number>;
+	metrics: Array<string>;
 	slices: Array<number>;
 	models: Array<string>;
 	yChannel: SlicesOrModels;

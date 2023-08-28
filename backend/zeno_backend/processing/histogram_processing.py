@@ -8,7 +8,7 @@ from zeno_backend.classes.metadata import (
     HistogramBucket,
     HistogramRequest,
 )
-from zeno_backend.database.select import column
+from zeno_backend.database.select import column, metrics_by_name
 from zeno_backend.processing.filtering import bucket_filter, filter_to_sql, table_filter
 from zeno_backend.processing.metrics import metric_map
 
@@ -128,6 +128,8 @@ def histogram_metrics(project: str, req: HistogramRequest) -> list[list[float | 
     if req.metric is None:
         return []
 
+    metric_obj = metrics_by_name([req.metric], project)[0]
+
     filter_sql = table_filter(project, req.model, req.filter_predicates, req.data_ids)
     ret: list[list[float | None]] = []
     for r in req.column_requests:
@@ -144,7 +146,7 @@ def histogram_metrics(project: str, req: HistogramRequest) -> list[list[float | 
                         final_filter = filter_bucket
                     else:
                         final_filter = final_filter + sql.SQL(" AND ") + filter_bucket
-                metric = metric_map(req.metric, project, req.model, final_filter)
+                metric = metric_map(metric_obj, project, req.model, final_filter)
                 if metric.metric is None:
                     loc_ret.append(None)
                 else:

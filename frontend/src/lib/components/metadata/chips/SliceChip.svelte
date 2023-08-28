@@ -8,7 +8,7 @@
 	$: slice = $slices.find((slice) => slice.id === sliceIdx);
 </script>
 
-<div class="px-1 py-2.5 bg-primary-light mx-1 my rounded w-fit">
+<div class="px-2.5 py-1 bg-primary-light mx-1 my rounded w-fit">
 	{slice !== undefined ? slice.sliceName : ''}
 	<TrailingIcon
 		class="remove material-icons"

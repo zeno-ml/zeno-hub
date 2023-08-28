@@ -25,7 +25,7 @@ class MetricKey(CamelModel):
 
     slice: Slice
     model: str
-    metric: Metric
+    metric: str
 
 
 class MetricRequest(CamelModel):
