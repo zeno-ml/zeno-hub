@@ -31,10 +31,9 @@
 	};
 </script>
 
-<div
+<button
 	class="flex flex-col items-center border-2 border-grey-lighter rounded-lg hover:bg-primary-ligther mt-2 cursor-pointer p-2 mr-2 max-w-[500px]"
-	on:click={() => goto(`${$page.url}/${chart.id}`)}
-	on:keypress={() => goto(`${$page.url}/${chart.id}`)}
+	on:click={() => goto(`${$page.url}/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
 		<div class="m-4 min-w-[24px]">
@@ -102,4 +101,4 @@
 			{/if}
 		</div>
 	</div>
-</div>
+</button>
