@@ -2933,10 +2933,10 @@ regl-line@~1.0.0:
     gl-matrix "^3.3.0"
     regl "^2.1.0"
 
-regl-scatterplot@^1.6.10:
-  version "1.7.1"
-  resolved "https://registry.npmjs.org/regl-scatterplot/-/regl-scatterplot-1.7.1.tgz"
-  integrity sha512-fi9Ybz3gh7KQw68lCKhrT1csqVY0ZG5wQhdGFrcdLNOH6BngSGkdYl8mT+q5RB/yVBQBZ3Wif6NHe12YADaWBg==
+regl-scatterplot@^1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/regl-scatterplot/-/regl-scatterplot-1.8.3.tgz#9c1660ec0794fac0c670c07d1d9fb4e118d06e99"
+  integrity sha512-t5KMs0gN8T+4nVHLjXG/Cn9Y5zRSogaI1gEWkdMrp3TyoZ+NcDG8yi9+R5sNrnmfjU1n0ilauqHWGkgWxqAtdQ==
   dependencies:
     "@flekschas/utils" "^0.31.0"
     dom-2d-camera "~2.2.5"
