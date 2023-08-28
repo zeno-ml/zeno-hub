@@ -287,12 +287,16 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
         )
 
 
-def mean(project_uuid: str, metric: Metric) -> GroupMetric:
+def mean(
+    project_uuid: str, metric: Metric, model: str, filter: sql.Composed | None
+) -> GroupMetric:
     """Calculate the mean of a metric for a given project.
 
     Args:
         project_uuid (str): the project the user is currently working with.
         metric (Metric): the metric for which to calculate the mean.
+        model (str): the model for which to calculate the metric.
+        filter (sql.Composed | None): the filter to apply to the data before metric.
 
     Raises:
         Exception: something in the database processing failed.
@@ -303,17 +307,31 @@ def mean(project_uuid: str, metric: Metric) -> GroupMetric:
     with Database() as db:
         # Get column name from project column map
         column_id = db.execute_return(
-            "SELECT column_id FROM {}_column_map WHERE name = %s".format(
-                sql.Identifier(project_uuid),
+            sql.SQL(
+                "SELECT column_id FROM {} WHERE name = {} AND"
+                " (model IS NULL OR model = {})"
+            ).format(
+                sql.Identifier(f"{project_uuid}_column_map"),
+                sql.Literal(metric.columns[0]),
+                sql.Literal(model),
             )
         )
+
+        if column_id is None:
+            return GroupMetric(metric=None, size=0)
+        column_id = column_id[0]
+
         res = db.execute_return(
-            sql.SQL("SELECT COUNT(*) AS n, AVG({}) FROM {}").format(
-                sql.Literal(column_id), sql.Identifier(project_uuid)
+            sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {}").format(
+                sql.Identifier(str(column_id)), sql.Identifier(project_uuid)
             )
+            + (sql.SQL(" WHERE ") + filter)
+            if filter is not None
+            else ""
         )
+
         return (
-            GroupMetric(metric=float(res[1]), size=res[0])
+            GroupMetric(metric=float(res[1]) if res[1] else None, size=res[0])
             if res is not None
             else GroupMetric(metric=None, size=0)
         )
@@ -340,15 +358,15 @@ def metric_map(
     if metric is None or model is None:
         return count(project, sql_filter)
 
-    if metric.name == "accuracy":
+    if metric.type == "mean":
+        return mean(project, metric, model, sql_filter)
+    if metric.type == "accuracy":
         return accuracy(project, model, sql_filter)
-    if metric.name == "mean":
-        return mean(project, metric)
-    elif metric.name == "recall":
+    elif metric.type == "recall":
         return recall(project, model, sql_filter)
-    elif metric.name == "f1":
+    elif metric.type == "f1":
         return f1(project, model, sql_filter)
-    elif metric.name == "precision":
+    elif metric.type == "precision":
         return precision(project, model, sql_filter)
     else:
         return count(project, sql_filter)
