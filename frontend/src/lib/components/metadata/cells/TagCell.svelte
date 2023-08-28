@@ -15,7 +15,7 @@
 	$: result = getMetricsForTags(<TagMetricKey>{
 		tag: tag,
 		model: $model,
-		metric: $metric
+		metric: $metric?.id || -1
 	});
 	$: selected = $selections.tags.includes(tag.id);
 

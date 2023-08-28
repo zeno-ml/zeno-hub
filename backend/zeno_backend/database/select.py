@@ -464,7 +464,7 @@ def metrics(project_uuid: str) -> list[Metric]:
     )
 
 
-def metrics_by_id(metric_ids: list[int], project_uuid: str) -> list[Metric]:
+def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric | None]:
     """Get a list of metrics by their ids.
 
     Args:
@@ -482,22 +482,22 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> list[Metric]:
         True,
     )
     if metric_results is None:
-        return []
-    # Filter out those not in list
-    metric_results = list(
-        filter(lambda metric: metric[0] in metric_ids, metric_results)
-    )
-    return list(
-        map(
-            lambda metric: Metric(
-                id=metric[0],
-                name=metric[1],
-                type=metric[2],
-                columns=metric[3],
-            ),
-            metric_results,
-        )
-    )
+        return {}
+
+    returned_ids = list(map(lambda metric: metric[0], metric_results))
+    metric_objects = {}
+    for i, requested_metric in enumerate(metric_ids):
+        if requested_metric not in returned_ids:
+            metric_objects[requested_metric] = None
+        else:
+            metric_objects[requested_metric] = Metric(
+                id=requested_metric,
+                name=metric_results[i][1],
+                type=metric_results[i][2],
+                columns=metric_results[i][3],
+            )
+
+    return metric_objects
 
 
 def folders(project: str) -> list[Folder]:
@@ -678,7 +678,11 @@ def columns(project: str) -> list[ZenoColumn]:
 
 
 def table_data_paginated(
-    project: str, filter_sql: sql.Composed | None, offset: int, limit: int
+    project: str,
+    filter_sql: sql.Composed | None,
+    offset: int,
+    limit: int,
+    sort_by: tuple[ZenoColumn | None, bool],
 ) -> SQLTable:
     """Get a slice of the data saved in the project table.
 
@@ -688,6 +692,9 @@ def table_data_paginated(
         the data.
         offset (int): where in the remaining data to start extracting the slice.
         limit (int): maximum slice length to be extracted.
+        sort_by (tuple[ZenoColumn | None, bool]): column to sort by and whether to
+            sort in descending order. If the column is None, the data is sorted by
+            data_id.
 
     Raises:
         Exception: something failed while reading the data from the database.
@@ -702,8 +709,12 @@ def table_data_paginated(
             if db.cur is not None:
                 db.cur.execute(
                     sql.SQL(
-                        "SELECT * FROM {} ORDER BY data_id LIMIT %s OFFSET %s;"
-                    ).format(sql.Identifier(f"{project}")),
+                        "SELECT * FROM {} ORDER BY {} {} LIMIT %s OFFSET %s;"
+                    ).format(
+                        sql.Identifier(f"{project}"),
+                        sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
+                        sql.SQL("DESC" if sort_by[1] else "ASC"),
+                    ),
                     [
                         limit,
                         offset,
@@ -717,8 +728,11 @@ def table_data_paginated(
                 db.cur.execute(
                     sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
                     + filter_sql
-                    + sql.SQL("ORDER BY data_id LIMIT {} OFFSET {};").format(
-                        sql.Literal(limit), sql.Literal(offset)
+                    + sql.SQL("ORDER BY {} {} LIMIT {} OFFSET {};").format(
+                        sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
+                        sql.SQL("DESC" if sort_by[1] else "ASC"),
+                        sql.Literal(limit),
+                        sql.Literal(offset),
                     )
                 )
                 if db.cur.description is not None:

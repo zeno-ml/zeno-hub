@@ -7,7 +7,7 @@
 	import Button, { Label } from '@smui/button';
 	import { SmuiElement } from '@smui/common';
 
-	export let isChartEdit: boolean;
+	export let isChartEdit: boolean | undefined;
 	export let chart: Chart;
 
 	let ishover = false;

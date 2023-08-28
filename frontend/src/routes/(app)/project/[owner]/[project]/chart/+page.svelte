@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
 	import { chartDefaults } from '$lib/components/chart/chartUtil';
 	import { project } from '$lib/stores';
@@ -16,7 +17,7 @@
 
 <div class="flex flex-col m-5 w-full">
 	<div class="flex justify-between align-center">
-		<h3>Charts</h3>
+		<h3 class="text-xl mb-3">Charts</h3>
 	</div>
 	<div class="flex flex-wrap overflow-y-auto">
 		{#each $charts as chart}
@@ -24,15 +25,20 @@
 		{/each}
 		{#if $project && $project.editor}
 			<button
-				class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg m-2 px-2.5 w-48 h-24 hover:bg-primary-light"
+				class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg mt-2 w-48 hover:bg-primary-light h-[76px]"
 				on:click={() => {
 					ZenoService.addChart(
 						$project ? $project.uuid : '',
 						chartDefaults('New Chart', 0, ChartType.BAR)
 					).then(() => {
-						ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-							charts.set(fetchedCharts)
-						);
+						ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) => {
+							charts.set(fetchedCharts);
+							goto(
+								`/project/${$project ? $project.ownerName : ''}/${
+									$project ? $project.name : ''
+								}/chart/${fetchedCharts[fetchedCharts.length - 1].id}?edit=true`
+							);
+						});
 					});
 				}}
 			>

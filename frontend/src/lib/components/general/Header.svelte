@@ -4,7 +4,7 @@
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
 	import { authToken, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
-	import { ZenoService, type User } from '$lib/zenoapi';
+	import type { User } from '$lib/zenoapi';
 	import {
 		mdiAccount,
 		mdiChartBoxOutline,
@@ -43,18 +43,12 @@
 						icon={mdiCompare}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
 					/>
-					{#if $project}
-						{#await ZenoService.getProjectStats($project.uuid) then stats}
-							{#if $project.editor || stats.numCharts > 0}
-								<HeaderIcon
-									pageName={'chart'}
-									tooltipContent={'Create charts from your slices and metrics.'}
-									icon={mdiChartBoxOutline}
-									on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
-								/>
-							{/if}
-						{/await}
-					{/if}
+					<HeaderIcon
+						pageName={'chart'}
+						tooltipContent={'Create charts from your slices and metrics.'}
+						icon={mdiChartBoxOutline}
+						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
+					/>
 					{#if $project && $project.ownerName === user?.name}
 						<HeaderIcon
 							pageName={'editProject'}

@@ -26,7 +26,7 @@
 {/if}
 <div class="flex flex-col mt-7">
 	<div class="flex items-center">
-		<h2 class="mr-2.5">Organizations ({organizations.length})</h2>
+		<h2 class="mr-2.5 text-lg">Organizations ({organizations.length})</h2>
 		<IconButton
 			on:click={() => {
 				ZenoService.addOrganization({

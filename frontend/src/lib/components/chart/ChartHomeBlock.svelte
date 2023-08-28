@@ -3,7 +3,7 @@
 		mdiBee,
 		mdiChartBar,
 		mdiChartLine,
-		mdiDotsVertical,
+		mdiDotsHorizontal,
 		mdiRadar,
 		mdiTable,
 		mdiViewGrid
@@ -32,25 +32,26 @@
 </script>
 
 <button
-	class="flex flex-col items-center border-2 border-grey-lighter rounded-lg m-2 hover:bg-primary-light w-48 h-24"
-	on:click={() => goto(`${$page.url}/${chart.id}`)}
+	class="flex flex-col items-center border-2 border-grey-lighter rounded-lg hover:bg-primary-ligther mt-2 cursor-pointer p-2 mr-2 max-w-[500px]"
+	on:click={() => goto(`${$page.url}/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
-		<div class="w-5 h-5 m-4">
+		<div class="m-4 min-w-[24px]">
 			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
 		</div>
-		<p class="color-black">{chart.name}</p>
+		<h3 class="text-lg">{chart.name}</h3>
 		<div>
 			<IconButton
+				class="ml-2"
 				on:click={(e) => {
 					e.stopPropagation();
 					showOptions = !showOptions;
 				}}
 			>
 				<Icon tag="svg" viewBox="0 0 24 24">
-					<path fill="black" d={mdiDotsVertical} />
+					<path fill="black" d={mdiDotsHorizontal} />
 				</Icon>
 			</IconButton>
 			{#if showOptions}
