@@ -13,5 +13,5 @@ class TableRequest(CamelModel):
     offset: int
     limit: int
     filter_predicates: FilterPredicateGroup | None = None
-    sort: tuple[ZenoColumn | str | None, bool]
+    sort: tuple[ZenoColumn | None, bool]
     data_ids: list[str] | None = None

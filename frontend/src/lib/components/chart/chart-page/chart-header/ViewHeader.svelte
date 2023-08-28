@@ -6,8 +6,8 @@
 	import { mdiArrowCollapseLeft } from '@mdi/js';
 	import Button, { Label } from '@smui/button';
 	import { Svg } from '@smui/common';
-	export let isChartEdit: boolean;
 
+	export let isChartEdit: boolean | undefined;
 	export let chart: Chart;
 
 	let ishover = false;

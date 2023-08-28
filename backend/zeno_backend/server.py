@@ -215,8 +215,10 @@ def get_server() -> FastAPI:
         if metric_key.metric is None:
             return metric_map(None, project, metric_key.model, filter_sql)
 
-        metric = select.metrics_by_id([metric_key.metric], project)[0]
-        return metric_map(metric, project, metric_key.model, filter_sql)
+        metric = select.metrics_by_id([metric_key.metric], project)
+        return metric_map(
+            metric.get(metric_key.metric), project, metric_key.model, filter_sql
+        )
 
     @api_app.post(
         "/slice-finder/{project}",
@@ -239,7 +241,7 @@ def get_server() -> FastAPI:
             project_uuid, None, req.filter_predicates, req.data_ids
         )
         sql_table = select.table_data_paginated(
-            project_uuid, filter_sql, req.offset, req.limit
+            project_uuid, filter_sql, req.offset, req.limit, req.sort
         )
         filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
 
@@ -336,7 +338,7 @@ def get_server() -> FastAPI:
             return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
         metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project)
-        for i, metric_key in enumerate(req.metric_keys):
+        for metric_key in req.metric_keys:
             filter_sql = table_filter(
                 project,
                 metric_key.model,
@@ -344,7 +346,12 @@ def get_server() -> FastAPI:
                 req.data_ids,
             )
             return_metrics.append(
-                metric_map(metrics[i], project, metric_key.model, filter_sql)
+                metric_map(
+                    metrics.get(metric_key.metric),
+                    project,
+                    metric_key.model,
+                    filter_sql,
+                )
             )
         return return_metrics
 

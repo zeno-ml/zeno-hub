@@ -14,10 +14,10 @@
 	);
 </script>
 
-<div class="flex flex-col m-2">
+<div class="flex flex-col m-2 ml-4">
 	{#if data.user}
 		{#if ownProjects.length > 0}
-			<h1 class="text-lg">Your projects</h1>
+			<h1 class="text-xl mt-3 mb-4 ml-1">Your projects</h1>
 			<div class="mb-4 flex flex-wrap items-start">
 				{#each ownProjects as project}
 					<Project {project} deletable />

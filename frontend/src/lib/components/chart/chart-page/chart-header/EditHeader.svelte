@@ -33,8 +33,9 @@
 		<Textfield
 			style="width: -webkit-fill-available"
 			variant="outlined"
-			bind:value={chart.name}
 			label="Chart Name"
+			on:blur={updateChart}
+			bind:value={chart.name}
 		/>
 	</div>
 </div>
