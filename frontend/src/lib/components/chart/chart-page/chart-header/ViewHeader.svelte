@@ -5,7 +5,7 @@
 	import type { Chart } from '$lib/zenoapi';
 	import { mdiArrowCollapseLeft } from '@mdi/js';
 	import Button, { Label } from '@smui/button';
-	import { Svg } from '@smui/common';
+	import { SmuiElement } from '@smui/common';
 
 	export let isChartEdit: boolean | undefined;
 	export let chart: Chart;
@@ -32,9 +32,13 @@
 			ishover = false;
 		}}
 	>
-		<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
+		<SmuiElement
+			tag="svg"
+			style="width: 24px; height: 24px; padding-right: 10px"
+			viewBox="-2 -2 26 26"
+		>
 			<path class="fill-{ishover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
-		</Svg>
+		</SmuiElement>
 		<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 	</div>
 	<div class="flex items-center">
