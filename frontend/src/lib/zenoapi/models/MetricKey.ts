@@ -13,5 +13,5 @@ import type { Slice } from './Slice';
 export type MetricKey = {
 	slice: Slice;
 	model: string;
-	metric: string;
+	metric: number;
 };

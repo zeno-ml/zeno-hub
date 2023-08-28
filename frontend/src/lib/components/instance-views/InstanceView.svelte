@@ -14,6 +14,7 @@
 		Join,
 		type FilterPredicateGroup,
 		type GroupMetric,
+		type Metric,
 		type MetricKey,
 		type Slice
 	} from '$lib/zenoapi';
@@ -42,7 +43,7 @@
 
 	function getMetricKeys(
 		model: string,
-		metric: string | undefined,
+		metric: Metric | undefined,
 		predicates?: FilterPredicateGroup
 	): MetricKey[] {
 		return [
@@ -57,12 +58,12 @@
 					}
 				},
 				model: model,
-				metric: metric ?? 'count'
+				metric: metric ? metric.id : -1
 			}
 		];
 	}
 
-	function getCompareResults(model: string, metric: string, predicates?: FilterPredicateGroup) {
+	function getCompareResults(model: string, metric: Metric, predicates?: FilterPredicateGroup) {
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];

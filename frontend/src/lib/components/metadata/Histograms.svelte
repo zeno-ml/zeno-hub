@@ -69,7 +69,7 @@
 		tagIds: string[] | undefined,
 		selectionIds: string[] | undefined,
 		model: string | undefined,
-		metric: string | undefined,
+		metric: Metric | undefined,
 		selectionPredicates: FilterPredicateGroup | undefined
 	) {
 		const dataIds =

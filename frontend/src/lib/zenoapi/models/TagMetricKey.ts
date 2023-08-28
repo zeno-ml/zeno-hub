@@ -13,10 +13,10 @@ import type { Tag } from './Tag';
  * Attributes:
  * tag (Tag): The tag to calculate metrics for.
  * model (str | None): The model to calculate metrics for.
- * metric (str | None): The metric to calculate.
+ * metric (int | None): The metric to calculate.
  */
 export type TagMetricKey = {
 	tag: Tag;
 	model?: string | null;
-	metric?: string | null;
+	metric?: number | null;
 };

@@ -10,6 +10,7 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
+import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
@@ -208,10 +209,10 @@ export class ZenoService {
 	/**
 	 * Get Metrics
 	 * @param project
-	 * @returns string Successful Response
+	 * @returns Metric Successful Response
 	 * @throws ApiError
 	 */
-	public static getMetrics(project: string): CancelablePromise<Array<string>> {
+	public static getMetrics(project: string): CancelablePromise<Array<Metric>> {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/metrics/{project}',

@@ -69,7 +69,7 @@
 				{#if currentResult}
 					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
 						<span class="text-grey-dark mr-3">
-							{$metric ? $metric + ':' : ''}
+							{$metric ? $metric.name + ':' : ''}
 						</span>
 						<span class="text-primary mr-3">
 							{currentResult[0].metric.toFixed(2)}

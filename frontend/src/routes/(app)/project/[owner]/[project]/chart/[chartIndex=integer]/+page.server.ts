@@ -10,6 +10,7 @@ export async function load({ params }) {
 	if (!charts || chart === undefined) {
 		throw error(404, 'Could not load charts');
 	}
+
 	const chartData = await ZenoService.getChartData(uuid, chart);
 	if (!chartData) {
 		throw error(404, 'Could not load chart data');

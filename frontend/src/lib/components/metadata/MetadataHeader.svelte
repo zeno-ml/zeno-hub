@@ -48,7 +48,7 @@
 				bind:value={$metric}
 			>
 				{#each $metrics as met}
-					<option value={met}>{met}</option>
+					<option value={met}>{met.name}</option>
 				{/each}
 			</select>
 		</div>

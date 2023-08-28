@@ -22,7 +22,7 @@ from zeno_backend.classes.base import (
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
-from zeno_backend.classes.metric import MetricRequest
+from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import Project, ProjectStats
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
@@ -142,13 +142,13 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/metrics/{project}",
-        response_model=list[str],
+        response_model=list[Metric],
         tags=["zeno"],
     )
     def get_metrics(project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return select.metric_names(project)
+        return select.metrics(project)
 
     @api_app.get(
         "/folders/{project}",
@@ -215,7 +215,7 @@ def get_server() -> FastAPI:
         if metric_key.metric is None:
             return metric_map(None, project, metric_key.model, filter_sql)
 
-        metric = select.metrics_by_name([metric_key.metric], project)[0]
+        metric = select.metrics_by_id([metric_key.metric], project)[0]
         return metric_map(metric, project, metric_key.model, filter_sql)
 
     @api_app.post(
@@ -335,7 +335,7 @@ def get_server() -> FastAPI:
         if not util.access_valid(project, request):
             return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
-        metrics = select.metrics_by_name([m.metric for m in req.metric_keys], project)
+        metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project)
         for i, metric_key in enumerate(req.metric_keys):
             filter_sql = table_filter(
                 project,
@@ -435,7 +435,9 @@ def get_server() -> FastAPI:
             ) from exc
         if fetched_user is None:
             try:
-                insert.user(User(id=-1, name=name, admin=None))
+                user = User(id=-1, name=name, admin=None)
+                insert.user(user)
+                insert.api_key(user)
                 return select.user(name)
             except Exception as exc:
                 raise HTTPException(

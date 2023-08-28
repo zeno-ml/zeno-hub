@@ -36,8 +36,8 @@ def xyc_data(chart: Chart, project: str) -> str:
         return json.dumps({"table": elements})
     all_metrics = metrics(project)
     selected_metric = next(
-        (x for x in all_metrics if x == chart.parameters.metric),
-        Metric(name="count", type="count", columns=[]),
+        (x for x in all_metrics if x.id == chart.parameters.metric),
+        Metric(id=-1, name="count", type="count", columns=[]),
     )
     selected_slices = slices(project, chart.parameters.slices)
     selected_models = chart.parameters.models
@@ -75,7 +75,7 @@ def table_data(chart: Chart, project: str) -> str:
     if not isinstance(params, TableParameters):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric in params.metrics, metrics(project))
+        filter(lambda metric: metric.id in params.metrics, metrics(project))
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
@@ -93,7 +93,7 @@ def table_data(chart: Chart, project: str) -> str:
                         if params.x_channel == SlicesMetricsOrModels.SLICES
                         else model
                         if params.x_channel == SlicesMetricsOrModels.MODELS
-                        else current_metric,
+                        else current_metric.id,
                         "fixed_value": metric.metric,
                         "y_value": current_slice.id
                         if params.y_channel == SlicesOrModels.SLICES
@@ -119,7 +119,7 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, BeeswarmParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric in params.metrics, metrics(project))
+        filter(lambda metric: metric.id in params.metrics, metrics(project))
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
@@ -162,7 +162,7 @@ def radar_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, RadarParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric in params.metrics, metrics(project))
+        filter(lambda metric: metric.id in params.metrics, metrics(project))
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
@@ -206,8 +206,8 @@ def heatmap_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, HeatmapParameters)):
         return json.dumps({"table": elements})
     selected_metric = next(
-        (x for x in metrics(project) if x == params.metric),
-        Metric(name="count", type="count", columns=[]),
+        (x for x in metrics(project) if x.id == params.metric),
+        Metric(id=-1, name="count", type="count", columns=[]),
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES

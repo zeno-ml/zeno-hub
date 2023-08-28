@@ -4,6 +4,7 @@ import {
 	type FilterPredicate,
 	type FilterPredicateGroup,
 	type Folder,
+	type Metric,
 	type Project,
 	type Slice,
 	type Tag,
@@ -19,8 +20,8 @@ export const columns: Writable<ZenoColumn[]> = writable([]);
 export const models: Writable<string[]> = writable([]);
 export const model: Writable<string | undefined> = writable(undefined);
 export const comparisonModel: Writable<string | undefined> = writable(undefined);
-export const metrics: Writable<string[]> = writable([]);
-export const metric: Writable<string | undefined> = writable(undefined);
+export const metrics: Writable<Metric[]> = writable([]);
+export const metric: Writable<Metric | undefined> = writable(undefined);
 export const rowsPerPage: Writable<number> = writable(5);
 export const folders: Writable<Folder[]> = writable([]);
 export const tags: Writable<Tag[]> = writable([]);

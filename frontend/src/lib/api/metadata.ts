@@ -11,6 +11,7 @@ import {
 	ZenoColumnType,
 	ZenoService,
 	type FilterPredicateGroup,
+	type Metric,
 	type ZenoColumn
 } from '$lib/zenoapi';
 import { get } from 'svelte/store';
@@ -125,12 +126,12 @@ let histogramMetricRequest: CancelablePromise<Array<Array<number | null>>>;
 export async function getHistogramMetrics(
 	histograms: Map<string, HistogramEntry[]>,
 	model: string | undefined,
-	metric: string,
+	metric: Metric,
 	dataIds: string[] | undefined,
 	filterPredicates?: FilterPredicateGroup
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const config = get(project);
-	if (metric === '' || !config || !config.calculateHistogramMetrics) {
+	if (!config || !config.calculateHistogramMetrics) {
 		return undefined;
 	}
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({

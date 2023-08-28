@@ -14,7 +14,7 @@
 		: '';
 </script>
 
-{#await getMetricsForSlices( [{ slice: slice, model: sliceModel, metric: $metric ?? 'count' }] ) then res}
+{#await getMetricsForSlices( [{ slice: slice, model: sliceModel, metric: $metric ? $metric.id : -1 }] ) then res}
 	{#if res !== null}
 		<div
 			class={compare

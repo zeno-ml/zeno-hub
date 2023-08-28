@@ -16,6 +16,7 @@ class ZenoMetric(BaseModel):
         columns (list[str]): The columns to calculate the metric on.
     """
 
+    id: int = -1
     name: str
     type: str
     columns: list[str]

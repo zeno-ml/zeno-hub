@@ -35,7 +35,7 @@ class XCParameters(CamelModel):
     """Parameter specification for the x and color channels of a chart."""
 
     slices: list[int]
-    metric: str
+    metric: int
     models: list[str]
     color_channel: SlicesOrModels
     x_channel: SlicesOrModels
@@ -44,7 +44,7 @@ class XCParameters(CamelModel):
 class TableParameters(CamelModel):
     """Parameter specification for a tabular visualization."""
 
-    metrics: list[str]
+    metrics: list[int]
     slices: list[int]
     models: list[str]
     y_channel: SlicesOrModels
@@ -55,7 +55,7 @@ class TableParameters(CamelModel):
 class BeeswarmParameters(CamelModel):
     """Parameter specification for a beeswarm chart."""
 
-    metrics: list[str]
+    metrics: list[int]
     slices: list[int]
     models: list[str]
     y_channel: SlicesOrModels
@@ -66,7 +66,7 @@ class BeeswarmParameters(CamelModel):
 class RadarParameters(CamelModel):
     """Parameter specification for a radar chart."""
 
-    metrics: list[str]
+    metrics: list[int]
     slices: list[int]
     models: list[str]
     axis_channel: SlicesMetricsOrModels
@@ -77,7 +77,7 @@ class RadarParameters(CamelModel):
 class HeatmapParameters(CamelModel):
     """Parameter specirication for a heatmap chart."""
 
-    metric: str
+    metric: int
     x_values: list[int | str]
     y_values: list[int | str]
     model: str

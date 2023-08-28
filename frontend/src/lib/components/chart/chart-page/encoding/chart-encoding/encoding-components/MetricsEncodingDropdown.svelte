@@ -15,13 +15,13 @@
 	let value = 0;
 
 	$metrics.forEach((m) => {
-		options.push({ value: m, label: m });
+		options.push({ value: m.id, label: m.name });
 	});
 	value = numberValue;
 
 	function valueSelected(e: CustomEvent) {
 		if (e.detail.value !== numberValue) {
-			dispatch('selected', e.detail);
+			dispatch('selected', e.detail.value);
 		}
 	}
 </script>

@@ -231,7 +231,7 @@
 					<div>{$model}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
-							{$metric ? $metric + ':' : ''}
+							{$metric ? $metric.name + ':' : ''}
 						</span>
 						<span class="font-normal mr-3.5 text-primary">
 							{metricA}
@@ -242,7 +242,7 @@
 					<div>{$comparisonModel}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
-							{$metric ? $metric + ':' : ''}
+							{$metric ? $metric.name + ':' : ''}
 						</span>
 						<span class="font-normal text-sm mr-3.5 text-primary">
 							{metricB}

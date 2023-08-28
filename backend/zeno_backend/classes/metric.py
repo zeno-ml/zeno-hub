@@ -7,11 +7,13 @@ class Metric(CamelModel):
     """Specification for a metric in a Zeno project.
 
     Attributes:
+        id (int): the id of the metric to be used.
         name (str): The name of the metric.
         type (str): The type of metric to calculate.
         columns (list[str]): The columns to calculate the metric on.
     """
 
+    id: int
     name: str
     type: str
     columns: list[str]
@@ -25,7 +27,7 @@ class MetricKey(CamelModel):
 
     slice: Slice
     model: str
-    metric: str
+    metric: int
 
 
 class MetricRequest(CamelModel):

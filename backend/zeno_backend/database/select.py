@@ -443,7 +443,7 @@ def metrics(project_uuid: str) -> list[Metric]:
     """
     db = Database()
     metric_results = db.connect_execute_return(
-        "SELECT name, type, columns FROM metrics WHERE project_uuid = %s;",
+        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
         [project_uuid],
         True,
     )
@@ -451,9 +451,10 @@ def metrics(project_uuid: str) -> list[Metric]:
         list(
             map(
                 lambda metric: Metric(
-                    name=metric[0],
-                    type=metric[1],
-                    columns=metric[2],
+                    id=metric[0],
+                    name=metric[1],
+                    type=metric[2],
+                    columns=metric[3],
                 ),
                 metric_results,
             )
@@ -463,27 +464,11 @@ def metrics(project_uuid: str) -> list[Metric]:
     )
 
 
-def metric_names(project_uuid: str) -> list[str]:
-    """Get a list of all metrics that are used in the project.
+def metrics_by_id(metric_ids: list[int], project_uuid: str) -> list[Metric]:
+    """Get a list of metrics by their ids.
 
     Args:
-        project_uuid (str): the project the user is currently working with.
-
-    Returns:
-        list[Metric]: list of metrics used with the project.
-    """
-    db = Database()
-    metric_results = db.connect_execute_return(
-        "SELECT name FROM metrics WHERE project_uuid = %s;", [project_uuid], True
-    )
-    return [str(m[0]) for m in metric_results] if metric_results is not None else []
-
-
-def metrics_by_name(metric_names: list[str], project_uuid: str) -> list[Metric]:
-    """Get a list of metrics by their names.
-
-    Args:
-        metric_names (list[str]): list of metric names to be fetched.
+        metric_ids (list[int]): list of metric ids to be fetched.
         project_uuid (str): the project the user is currently working with.
 
     Returns:
@@ -492,7 +477,7 @@ def metrics_by_name(metric_names: list[str], project_uuid: str) -> list[Metric]:
     db = Database()
     # Get all metrics for the project and filter out the ones that are not in the list
     metric_results = db.connect_execute_return(
-        "SELECT name, type, columns FROM metrics WHERE project_uuid = %s;",
+        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
         [project_uuid],
         True,
     )
@@ -500,14 +485,15 @@ def metrics_by_name(metric_names: list[str], project_uuid: str) -> list[Metric]:
         return []
     # Filter out those not in list
     metric_results = list(
-        filter(lambda metric: metric[0] in metric_names, metric_results)
+        filter(lambda metric: metric[0] in metric_ids, metric_results)
     )
     return list(
         map(
             lambda metric: Metric(
-                name=metric[0],
-                type=metric[1],
-                columns=metric[2],
+                id=metric[0],
+                name=metric[1],
+                type=metric[2],
+                columns=metric[3],
             ),
             metric_results,
         )
