@@ -18,8 +18,8 @@
 </script>
 
 <div class="flex flex-col w-full m-5">
-	<h1 class="text-lg mb-5">Account management</h1>
+	<h1 class="text-xl mb-3">Account management</h1>
 	<Account name={cognitoUser.name} email={cognitoUser.email} />
-	<hr class="mt-10 text-grey-lighter" />
+	<hr class="mt-5 text-grey-lighter" />
 	<OrganizationsTable {organizations} {user} />
 </div>

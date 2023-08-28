@@ -75,7 +75,7 @@
 	</div>
 	<div class="flex items-center" use:clickOutside={() => (showOptions = false)}>
 		{#if showOptions}
-			<div class="top-0 right-0 absolute mt-9">
+			<div class="top-0 right-0 absolute mt-9 z-10">
 				<Paper style="padding: 3px 0px;" elevation={7}>
 					<Content>
 						<div

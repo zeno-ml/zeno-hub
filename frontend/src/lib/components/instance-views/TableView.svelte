@@ -132,14 +132,14 @@
 			>
 				<tr>
 					{#if $editTag !== undefined}
-						<th class="mr-5">Included</th>
+						<th class="mr-5 p-2">Included</th>
 					{/if}
 					{#if $project !== undefined && viewMap[$project.view] !== undefined}
-						<th class="mr-5">instance</th>
+						<th class="mr-5 p-2">instance</th>
 					{/if}
 					{#each columnHeader as header}
 						{#if header.name !== 'data_id'}
-							<th class="mr-5" on:click={() => updateSort(header)}>
+							<th class="mr-5 p-2" on:click={() => updateSort(header)}>
 								<div class="flex">
 									{header.name}
 									<Icon
@@ -162,12 +162,12 @@
 				{#each table as tableContent (tableContent['data_id'])}
 					<tr>
 						{#if $editTag !== undefined}
-							<td class="pr-3.5">
+							<td class="p-2">
 								<Checkbox bind:group={currentTagIds} value={String(tableContent['data_id'])} />
 							</td>
 						{/if}
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
-							<td class="pr-3.5">
+							<td class="p-2">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -180,9 +180,9 @@
 						{/if}
 						{#each columnHeader as header}
 							{#if header.dataType === MetadataType.CONTINUOUS}
-								<td class="pr-3.5">{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
+								<td class="p-2">{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
 							{:else}
-								<td class="pr-3.5">{tableContent[header.id]}</td>
+								<td class="p-2">{tableContent[header.id]}</td>
 							{/if}
 						{/each}
 					</tr>
