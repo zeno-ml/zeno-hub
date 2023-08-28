@@ -4,7 +4,7 @@ from zeno_backend.classes.slice import Slice
 
 
 class Metric(CamelModel):
-    """Metric to calculate for a Zeno project.
+    """Specification for a metric in a Zeno project.
 
     Attributes:
         name (str): The name of the metric.

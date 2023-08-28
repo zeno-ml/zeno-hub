@@ -24,7 +24,7 @@
 	}
 </script>
 
-<div class="px-1 py-2.5 bg-greenish-light mx-1 my rounded-lg w-fit">
+<div class="px-2.5 py-1 bg-greenish-light mx-1 my rounded-lg w-fit">
 	{tagId}
 	<TrailingIcon class="remove material-icons" on:click={cancelClicked}>cancel</TrailingIcon>
 </div>

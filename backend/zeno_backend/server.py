@@ -211,7 +211,12 @@ def get_server() -> FastAPI:
         filter_sql = table_filter(
             project, metric_key.model, None, metric_key.tag.data_ids
         )
-        return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+
+        if metric_key.metric is None:
+            return metric_map(None, project, metric_key.model, filter_sql)
+
+        metric = select.metrics_by_name([metric_key.metric], project)[0]
+        return metric_map(metric, project, metric_key.model, filter_sql)
 
     @api_app.post(
         "/slice-finder/{project}",
