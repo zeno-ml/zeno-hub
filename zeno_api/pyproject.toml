@@ -13,6 +13,7 @@ pycognito = "^2023.5.0"
 boto3 = "^1.28.33"
 python = "^3.11"
 python-dotenv = "^1.0.0"
+pydantic = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
