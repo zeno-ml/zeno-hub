@@ -13,6 +13,7 @@
 	import {
 		Join,
 		type FilterPredicateGroup,
+		type GroupMetric,
 		type Metric,
 		type MetricKey,
 		type Slice
@@ -27,6 +28,7 @@
 	export let compare: boolean;
 
 	let selected = 'list';
+	let currentResult: GroupMetric[] | undefined = undefined;
 	let viewOptions: Record<string, unknown> | undefined = undefined;
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
@@ -56,10 +58,7 @@
 					}
 				},
 				model: model,
-				metric: metric ?? {
-					id: -1,
-					name: 'count'
-				}
+				metric: metric ? metric.id : -1
 			}
 		];
 	}
@@ -73,32 +72,37 @@
 
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
+	$: if ($model) {
+		getMetricsForSlicesAndTags(
+			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
+			[...new Set([...secureTagIds, ...secureSelectionIds])],
+			false
+		).then((res) => (currentResult = res));
+	}
 </script>
 
-{#await getMetricsForSlicesAndTags($model ? getMetricKeys($model, $metric, $selectionPredicates) : [], [...new Set( [...secureTagIds, ...secureSelectionIds] )], false) then currentResult}
-	<div class="flex justify-between align-center">
-		<SelectionBar bind:selected {currentResult}>
-			{#if $project !== undefined && optionsMap[$project.view] !== undefined}
-				<svelte:component this={optionsMap[$project.view]} bind:viewOptions />
-			{/if}
-		</SelectionBar>
-	</div>
-	{#if compare && $metric && $model}
-		{#if $comparisonModel !== undefined}
-			{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
-				{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}
-					<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
-				{/await}
+<div class="flex justify-between align-center">
+	<SelectionBar bind:selected {currentResult}>
+		{#if $project !== undefined && optionsMap[$project.view] !== undefined}
+			<svelte:component this={optionsMap[$project.view]} bind:viewOptions />
+		{/if}
+	</SelectionBar>
+</div>
+{#if compare && $metric && $model}
+	{#if $comparisonModel !== undefined}
+		{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
+			{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}
+				<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
 			{/await}
-		{/if}
-	{:else if $editTag !== undefined}
-		<TableView {currentResult} {viewOptions} />
-	{:else}
-		{#if selected === 'list'}
-			<ListView {currentResult} {viewOptions} />
-		{/if}
-		{#if selected === 'table'}
-			<TableView {currentResult} {viewOptions} />
-		{/if}
+		{/await}
 	{/if}
-{/await}
+{:else if $editTag !== undefined}
+	<TableView {currentResult} {viewOptions} />
+{:else}
+	{#if selected === 'list'}
+		<ListView {currentResult} {viewOptions} />
+	{/if}
+	{#if selected === 'table'}
+		<TableView {currentResult} {viewOptions} />
+	{/if}
+{/if}

@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { Metric } from './Metric';
 import type { Slice } from './Slice';
 
 /**
@@ -14,5 +13,5 @@ import type { Slice } from './Slice';
 export type MetricKey = {
 	slice: Slice;
 	model: string;
-	metric: Metric;
+	metric: number;
 };

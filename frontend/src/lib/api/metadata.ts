@@ -131,7 +131,7 @@ export async function getHistogramMetrics(
 	filterPredicates?: FilterPredicateGroup
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const config = get(project);
-	if (metric.name === '' || !config || !config.calculateHistogramMetrics) {
+	if (!config || !config.calculateHistogramMetrics) {
 		return undefined;
 	}
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({

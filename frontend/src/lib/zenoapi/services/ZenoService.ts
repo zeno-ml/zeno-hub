@@ -31,6 +31,97 @@ import { request as __request } from '../core/request';
 
 export class ZenoService {
 	/**
+	 * Create Project
+	 * Create a new project.
+	 *
+	 * Args:
+	 * project (Project): Project object.
+	 * api_key (str, optional): API key.
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static createProject(requestBody: Project): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/project',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Upload Dataset
+	 * Upload a dataset to a Zeno project.
+	 *
+	 * Args:
+	 * project (str): the UUID of the project to add data to.
+	 * id_column (str): the name of the column containing the instance IDs.
+	 * label_column (str | None, optional): the name of the column containing the
+	 * instance labels. Defaults to None.
+	 * data_column (str | None, optional): the name of the column containing the
+	 * raw data. Only works for small text data. Defaults to None.
+	 * file (UploadFile): the dataset to upload.
+	 * @param project
+	 * @param formData
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static uploadDataset(
+		project: string,
+		formData: Body_upload_dataset
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/dataset/{project}',
+			path: {
+				project: project
+			},
+			formData: formData,
+			mediaType: 'multipart/form-data',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Upload System
+	 * Upload a system to a Zeno project.
+	 *
+	 * Args:
+	 * project (str): the UUID of the project to add data to.
+	 * system_name (str): the name of the system to upload.
+	 * output_column (str): the name of the column containing the system output.
+	 * id_column (str): the name of the column containing the instance IDs.
+	 * file (UploadFile): the dataset to upload.
+	 * @param project
+	 * @param formData
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static uploadSystem(
+		project: string,
+		formData: Body_upload_system
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/system/{project}',
+			path: {
+				project: project
+			},
+			formData: formData,
+			mediaType: 'multipart/form-data',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Users
 	 * @returns User Successful Response
 	 * @throws ApiError
@@ -281,20 +372,20 @@ export class ZenoService {
 
 	/**
 	 * Get Filtered Table
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
 	public static getFilteredTable(
-		project: string,
+		projectUuid: string,
 		requestBody: TableRequest
 	): CancelablePromise<string> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/filtered-table/{project}',
+			url: '/filtered-table/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -611,74 +702,6 @@ export class ZenoService {
 			query: {
 				name: name
 			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Create Project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static createProject(requestBody: Project): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/project',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Upload Dataset
-	 * @param project
-	 * @param formData
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static uploadDataset(
-		project: string,
-		formData: Body_upload_dataset
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/dataset/{project}',
-			path: {
-				project: project
-			},
-			formData: formData,
-			mediaType: 'multipart/form-data',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Upload System
-	 * @param project
-	 * @param formData
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static uploadSystem(
-		project: string,
-		formData: Body_upload_system
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/system/{project}',
-			path: {
-				project: project
-			},
-			formData: formData,
-			mediaType: 'multipart/form-data',
 			errors: {
 				422: `Validation Error`
 			}

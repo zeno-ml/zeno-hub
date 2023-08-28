@@ -211,7 +211,12 @@ def get_server() -> FastAPI:
         filter_sql = table_filter(
             project, metric_key.model, None, metric_key.tag.data_ids
         )
-        return metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+
+        if metric_key.metric is None:
+            return metric_map(None, project, metric_key.model, filter_sql)
+
+        metric = select.metrics_by_id([metric_key.metric], project)[0]
+        return metric_map(metric, project, metric_key.model, filter_sql)
 
     @api_app.post(
         "/slice-finder/{project}",
@@ -330,7 +335,8 @@ def get_server() -> FastAPI:
         if not util.access_valid(project, request):
             return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
-        for metric_key in req.metric_keys:
+        metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project)
+        for i, metric_key in enumerate(req.metric_keys):
             filter_sql = table_filter(
                 project,
                 metric_key.model,
@@ -338,7 +344,7 @@ def get_server() -> FastAPI:
                 req.data_ids,
             )
             return_metrics.append(
-                metric_map(metric_key.metric, project, metric_key.model, filter_sql)
+                metric_map(metrics[i], project, metric_key.model, filter_sql)
             )
         return return_metrics
 
@@ -429,7 +435,9 @@ def get_server() -> FastAPI:
             ) from exc
         if fetched_user is None:
             try:
-                insert.user(User(id=-1, name=name, admin=None))
+                user = User(id=-1, name=name, admin=None)
+                insert.user(user)
+                insert.api_key(user)
                 return select.user(name)
             except Exception as exc:
                 raise HTTPException(

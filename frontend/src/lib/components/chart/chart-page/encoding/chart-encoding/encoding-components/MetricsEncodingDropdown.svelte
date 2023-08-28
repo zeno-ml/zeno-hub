@@ -21,7 +21,7 @@
 
 	function valueSelected(e: CustomEvent) {
 		if (e.detail.value !== numberValue) {
-			dispatch('selected', e.detail);
+			dispatch('selected', e.detail.value);
 		}
 	}
 </script>

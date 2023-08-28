@@ -33,7 +33,7 @@
 </script>
 
 <div style:width="100%">
-	<div class="pt-2.5 flex justify-between w-full border-b border-grey-lighter">
+	<div class="pt-2.5 flex justify-between w-full border-b border-grey-lighter h-[60px]">
 		<ChipsWrapper />
 		<div class="status flex items-center">
 			{#if runningAnalysis}

@@ -18,7 +18,7 @@
 
 <div class="flex flex-col p-3">
 	<div
-		class="flex items-center cursor-pointer mb-2"
+		class="flex items-center cursor-pointer mb-4"
 		on:keydown={() => ({})}
 		on:click={() => {
 			goto($page.url.href.substring(0, $page.url.href.lastIndexOf('/')));
@@ -38,12 +38,12 @@
 		<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 	</div>
 	<div class="flex items-center">
-		<h2 class="mr-5 text-grey-dark">
+		<h2 class="mr-5 text-grey-dark text-xl">
 			{chart.name}
 		</h2>
 		{#if $project?.editor}
 			<Button
-				style="width: 24px; height: 24px;background-color:var(--G5)"
+				variant="outlined"
 				on:mouseleave={blur}
 				on:focusout={blur}
 				on:click={() => (isChartEdit = !isChartEdit)}

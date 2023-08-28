@@ -14,7 +14,7 @@
 		: '';
 </script>
 
-{#await getMetricsForSlices( [{ slice: slice, model: sliceModel, metric: $metric ?? { id: -1, name: 'count' } }] ) then res}
+{#await getMetricsForSlices( [{ slice: slice, model: sliceModel, metric: $metric ? $metric.id : -1 }] ) then res}
 	{#if res !== null}
 		<div
 			class={compare
@@ -22,10 +22,10 @@
 				: 'flex items-center'}
 			on:keydown={() => ({})}
 		>
-			<span class="w-12 mr-1 text-right">
+			<span class="mr-2 text-right">
 				{res[0].metric !== undefined && res[0].metric !== null ? res[0].metric.toFixed(2) : ''}
 			</span>
-			<span class="w-12 mr-1 text-right italic text-grey-dark">
+			<span class="mr-1 text-right italic text-grey-dark">
 				({res[0].size.toLocaleString()})
 			</span>
 		</div>

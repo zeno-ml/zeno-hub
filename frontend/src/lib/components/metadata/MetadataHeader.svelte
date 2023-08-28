@@ -7,6 +7,9 @@
 		if ($model === undefined && $models.length > 0) {
 			model.set($models[0]);
 		}
+		if ($metric === undefined && $metrics.length > 0) {
+			metric.set($metrics[0]);
+		}
 	});
 
 	$: exludeModels = $models.filter((m) => m !== $model);
@@ -18,16 +21,6 @@
 		(!$models.includes($comparisonModel) && $models.length > 1)
 	) {
 		$model = $models[1];
-	}
-	$: if (
-		$metric === undefined ||
-		(-1 ===
-			$metrics.findIndex(
-				(currentMetric) => currentMetric.id === ($metric === undefined ? -1 : $metric.id)
-			) &&
-			$metrics.length > 0)
-	) {
-		$metric = $metrics[0];
 	}
 </script>
 

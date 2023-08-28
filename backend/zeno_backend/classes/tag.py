@@ -1,7 +1,6 @@
 """Type representations for tags."""
 
 from zeno_backend.classes.base import CamelModel
-from zeno_backend.classes.metric import Metric
 
 
 class Tag(CamelModel):
@@ -28,9 +27,9 @@ class TagMetricKey(CamelModel):
     Attributes:
         tag (Tag): The tag to calculate metrics for.
         model (str | None): The model to calculate metrics for.
-        metric (Metric | None): The metric to calculate.
+        metric (int | None): The metric to calculate.
     """
 
     tag: Tag
     model: str | None = None
-    metric: Metric | None = None
+    metric: int | None = None

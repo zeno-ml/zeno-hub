@@ -15,10 +15,10 @@
 </script>
 
 <div class="flex flex-col mb-5">
-	<div class="flex items-center justify-between">
+	<div class="flex items-center justify-between mb-5">
 		<HomeButton />
 		<Button
-			style="width: 24px; height: 24px;margin-bottom:3px;background-color:var(--G5)"
+			variant="outlined"
 			on:mouseleave={blur}
 			on:focusout={blur}
 			on:click={() => {

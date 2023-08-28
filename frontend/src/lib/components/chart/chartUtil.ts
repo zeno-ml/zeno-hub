@@ -31,7 +31,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 					slices: get(slices)
 						.map((slice) => slice.id)
 						.slice(0, 2),
-					metric: 1,
+					metric: -1,
 					models: get(models),
 					xChannel: SlicesOrModels.SLICES,
 					colorChannel: SlicesOrModels.MODELS
@@ -47,7 +47,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 					slices: get(slices)
 						.map((slice) => slice.id)
 						.slice(0, 2),
-					metrics: [1],
+					metrics: [-1],
 					xChannel: SlicesMetricsOrModels.MODELS,
 					yChannel: SlicesOrModels.SLICES,
 					fixedChannel: SlicesMetricsOrModels.METRICS
@@ -63,7 +63,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 					slices: get(slices)
 						.map((slice) => slice.id)
 						.slice(0, 2),
-					metrics: get(metrics).map((metric) => metric.id),
+					metrics: get(metrics).map((m) => m.id),
 					yChannel: SlicesOrModels.MODELS,
 					colorChannel: SlicesOrModels.SLICES,
 					fixedDimension: 'y'
@@ -79,7 +79,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 					slices: get(slices)
 						.map((slice) => slice.id)
 						.slice(0, 2),
-					metrics: get(metrics).map((metric) => metric.id),
+					metrics: get(metrics).map((m) => m.id),
 					axisChannel: SlicesMetricsOrModels.METRICS,
 					fixedChannel: SlicesMetricsOrModels.MODELS,
 					layerChannel: SlicesOrModels.SLICES
@@ -95,7 +95,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 						.map((slice) => slice.id)
 						.slice(0, 2),
 					yValues: get(models),
-					metric: 1,
+					metric: -1,
 					model: get(models)[0],
 					xChannel: SlicesOrModels.SLICES,
 					yChannel: SlicesOrModels.MODELS

@@ -37,7 +37,7 @@ def xyc_data(chart: Chart, project: str) -> str:
     all_metrics = metrics(project)
     selected_metric = next(
         (x for x in all_metrics if x.id == chart.parameters.metric),
-        Metric(id=0, name="count"),
+        Metric(id=-1, name="count", type="count", columns=[]),
     )
     selected_slices = slices(project, chart.parameters.slices)
     selected_models = chart.parameters.models
@@ -207,7 +207,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
         return json.dumps({"table": elements})
     selected_metric = next(
         (x for x in metrics(project) if x.id == params.metric),
-        Metric(id=0, name="count"),
+        Metric(id=-1, name="count", type="count", columns=[]),
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES

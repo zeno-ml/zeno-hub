@@ -1,6 +1,7 @@
 """Types for Zeno projects."""
 
 from zeno_backend.classes.base import CamelModel
+from zeno_backend.classes.metric import Metric
 
 
 class Project(CamelModel):
@@ -9,6 +10,7 @@ class Project(CamelModel):
     Attributes:
         uuid (str): The UUID of the task.
         name (str): The name of the task.
+        metrics (list[Metric]): The metrics to calculate for the task.
         owner_name (str): The name of the user who owns the task.
         view (str): The name of the view to use for the task.
         data_url (Optional[str]): The base URL from which to read data instances.
@@ -21,6 +23,7 @@ class Project(CamelModel):
 
     uuid: str
     name: str
+    metrics: list[Metric] = []
     owner_name: str
     view: str
     data_url: str | None

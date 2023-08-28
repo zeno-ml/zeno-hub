@@ -100,6 +100,14 @@ def project(project_config: Project, owner_id: int):
             ["data_id", "data_id", ZenoColumnType.DATA, MetadataType.NOMINAL],
         )
 
+        # Add metrics to the metrics table.
+        for metric in project_config.metrics:
+            db.execute(
+                "INSERT INTO metrics (project_uuid, name, type, columns) VALUES "
+                "(%s, %s, %s, %s);",
+                [project_config.uuid, metric.name, metric.type, metric.columns],
+            )
+
         # Create table to hold information about tags and associated datapoints.
         db.execute(
             sql.SQL(

@@ -432,29 +432,71 @@ def project_stats(project: str) -> ProjectStats | None:
         )
 
 
-def metrics(project: str) -> list[Metric]:
-    """Get a list of all metrics that are used in the project.
+def metrics(project_uuid: str) -> list[Metric]:
+    """Get all metrics for a specified project.
 
     Args:
-        project (str): the project the user is currently working with.
+        project_uuid (str): the project the user is currently working with.
 
     Returns:
         list[Metric]: list of metrics used with the project.
     """
     db = Database()
     metric_results = db.connect_execute_return(
-        "SELECT metrics.id, metrics.name FROM metrics INNER JOIN project_metrics ON "
-        "metrics.id = project_metrics.metric_id "
-        "WHERE project_metrics.project_uuid = %s;",
-        [
-            project,
-        ],
-        return_all=True,
+        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+        [project_uuid],
+        True,
     )
     return (
-        list(map(lambda metric: Metric(id=metric[0], name=metric[1]), metric_results))
+        list(
+            map(
+                lambda metric: Metric(
+                    id=metric[0],
+                    name=metric[1],
+                    type=metric[2],
+                    columns=metric[3],
+                ),
+                metric_results,
+            )
+        )
         if metric_results is not None
         else []
+    )
+
+
+def metrics_by_id(metric_ids: list[int], project_uuid: str) -> list[Metric]:
+    """Get a list of metrics by their ids.
+
+    Args:
+        metric_ids (list[int]): list of metric ids to be fetched.
+        project_uuid (str): the project the user is currently working with.
+
+    Returns:
+        list[Metric]: list of metrics as requested by the user.
+    """
+    db = Database()
+    # Get all metrics for the project and filter out the ones that are not in the list
+    metric_results = db.connect_execute_return(
+        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+        [project_uuid],
+        True,
+    )
+    if metric_results is None:
+        return []
+    # Filter out those not in list
+    metric_results = list(
+        filter(lambda metric: metric[0] in metric_ids, metric_results)
+    )
+    return list(
+        map(
+            lambda metric: Metric(
+                id=metric[0],
+                name=metric[1],
+                type=metric[2],
+                columns=metric[3],
+            ),
+            metric_results,
+        )
     )
 
 

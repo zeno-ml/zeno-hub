@@ -1,5 +1,5 @@
 <div class="ml-5">
-	<div class="mt-7">
+	<div>
 		<slot />
 	</div>
 </div>

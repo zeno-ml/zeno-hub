@@ -4,8 +4,8 @@
 
 {#if $metrics.length !== 0 && $metricRange[0] !== Infinity}
 	<div class="flex items-center mr-1 text-grey-dark">
-		<span style:margin-right="15px">
-			{$metric?.name}:
+		<span class="mr-[15px]">
+			{$metric ? $metric.name + ':' : ''}
 		</span>
 		<span
 			contenteditable="true"
