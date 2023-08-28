@@ -1,9 +1,14 @@
 <!-- License: CC Attribution. Made by salesforce: https://lightningdesignsystem.com/ -->
 <script lang="ts">
-	import { Svg } from '@smui/common';
+	import { SmuiElement } from '@smui/common';
 </script>
 
-<Svg style="width: 140px; height: 80px" viewBox="3 0 45 45" class="fill-grey-darker">
+<SmuiElement
+	tag="svg"
+	style="width: 140px; height: 80px"
+	viewBox="3 0 45 45"
+	class="fill-grey-darker"
+>
 	<path
 		d="M46.5,2h-41C4.7,2,4,2.7,4,3.5v5C4,9.3,4.7,10,5.5,10h41c0.8,0,1.5-0.7,1.5-1.5v-5C48,2.7,47.3,2,46.5,2z"
 	/>
@@ -52,4 +57,4 @@
 		d="M46.5,34h-9c-0.8,0-1.5,0.7-1.5,1.5v3c0,0.8,0.7,1.5,1.5,1.5h9c0.8,0,1.5-0.7,1.5-1.5v-3
                             C48,34.7,47.3,34,46.5,34z"
 	/>
-</Svg>
+</SmuiElement>

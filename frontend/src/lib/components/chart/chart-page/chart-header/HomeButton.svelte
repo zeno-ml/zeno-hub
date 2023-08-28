@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { mdiArrowCollapseLeft } from '@mdi/js';
-	import { Svg } from '@smui/common';
+	import { SmuiElement } from '@smui/common';
 	import { noop } from 'svelte/internal';
 
 	export let updateChart: () => void = noop;
@@ -22,8 +22,12 @@
 		isHover = false;
 	}}
 >
-	<Svg style="width: 24px; height: 24px; padding-right: 10px" viewBox="-2 -2 26 26">
+	<SmuiElement
+		tag="svg"
+		style="width: 24px; height: 24px; padding-right: 10px"
+		viewBox="-2 -2 26 26"
+	>
 		<path class="fill-{isHover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
-	</Svg>
+	</SmuiElement>
 	<h4 class="text-grey-dark hover:text-black">Back to Chart Home</h4>
 </a>

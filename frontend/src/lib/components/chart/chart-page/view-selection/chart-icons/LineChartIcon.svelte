@@ -1,9 +1,14 @@
 <!-- Reference: https://icons8.com, https://visualpharm.com/free-icons/line%20chart-595b40b65ba036ed117d2f17  -->
 <script lang="ts">
-	import { Svg } from '@smui/common';
+	import { SmuiElement } from '@smui/common';
 </script>
 
-<Svg style="width: 140px; height: 80px" viewBox="8 2 23 23" class="fill-grey-darker">
+<SmuiElement
+	tag="svg"
+	style="width: 140px; height: 80px"
+	viewBox="8 2 23 23"
+	class="fill-grey-darker"
+>
 	<polyline
 		style="fill:none;stroke:var(--G3);stroke-miterlimit:10;"
 		points="3,19 12,11 20,15 27,7 37,10 "
@@ -48,4 +53,4 @@
 		s0.895,2,2,2s2-0.895,2-2S4.105,17,3,17L3,17z"
 		/>
 	</g>
-</Svg>
+</SmuiElement>
