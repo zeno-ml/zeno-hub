@@ -1,9 +1,9 @@
-import { env } from '$env/dynamic/public';
+import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, params, url }) {
-	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
+	OpenAPI.BASE = getEndpoint() + '/api';
 
 	const projectPublic = ZenoService.isProjectPublic(params.project);
 

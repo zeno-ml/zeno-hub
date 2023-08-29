@@ -1,10 +1,10 @@
-import { env } from '$env/dynamic/public';
+import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService, type Project } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, url }) {
 	const userCookie = cookies.get('loggedIn');
-	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
+	OpenAPI.BASE = getEndpoint() + '/api';
 	let projects: Project[] = [];
 	if (userCookie) {
 		const cognitoUser = JSON.parse(userCookie);

@@ -144,7 +144,7 @@ def dataset(
         db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
         db.execute(
             sql.SQL("DROP TABLE {} CASCADE;").format(
-                sql.Identifier(project + "_column_map")
+                sql.Identifier(f"{project}_column_map")
             )
         )
         db.commit()
@@ -280,8 +280,10 @@ def system(
     with Database() as db:
         for col in columns:
             db.execute(
-                sql.SQL("ALTER TABLE {} ADD {}" + str(col.data_type) + ";").format(
-                    sql.Identifier(project), sql.Identifier(col.id)
+                sql.SQL("ALTER TABLE {} ADD {}{};").format(
+                    sql.Identifier(project),
+                    sql.Identifier(col.id),
+                    sql.Literal(col.data_type),
                 )
             )
             db.execute(

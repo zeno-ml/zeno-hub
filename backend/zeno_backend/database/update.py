@@ -94,9 +94,8 @@ def tag(tag: Tag, project: str):
             [
                 tag.id,
             ],
-            return_all=True,
         )
-        if data_ids_result is None:
+        if len(data_ids_result) == 0:
             return
 
         existing_data = set(map(lambda d: d[0], data_ids_result))
@@ -153,7 +152,6 @@ def organization(organization: Organization):
         organization_users = db.execute_return(
             "SELECT user_id, admin FROM user_organization WHERE organization_id = %s",
             [organization.id],
-            return_all=True,
         )
         if organization_users is None:
             return
