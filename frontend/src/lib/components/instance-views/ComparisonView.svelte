@@ -225,9 +225,9 @@
 	{#if table}
 		<table class="mt-2">
 			<thead
-				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background"
+				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
 			>
-				<th class="pr-10 cursor-pointer">
+				<th>
 					<div>{$model}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
@@ -238,7 +238,7 @@
 						</span>
 					</div>
 				</th>
-				<th class="pr-10 cursor-pointer">
+				<th>
 					<div>{$comparisonModel}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
@@ -263,7 +263,7 @@
 				</th>
 			</thead>
 			<tbody>
-				{#each table as tableContent (tableContent['dataId'])}
+				{#each table as tableContent}
 					<tr>
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="pr-2.5">

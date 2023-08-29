@@ -24,7 +24,7 @@
 	}
 </script>
 
-<div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1 w-96">
+<div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1">
 	{#if $model !== undefined && $models.length > 0}
 		<div class="mr-2.5 flex flex-col w-1/2">
 			<span class="my-1 text-grey-dark w-fit">

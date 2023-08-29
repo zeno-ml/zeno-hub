@@ -5,7 +5,7 @@
 	import Tags from './Tags.svelte';
 </script>
 
-<div class="h-full p-5 overflow-y-auto shrink-0 bg-yellowish-light">
+<div class="h-full p-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]">
 	<MetadataHeader />
 	<Slices />
 	<Tags />
