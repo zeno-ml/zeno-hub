@@ -79,6 +79,7 @@
 					options={['==', '!=']}
 				/>
 			{:else}
+				<!-- renderer function avoids HTML sanitation issues-->
 				<Svelecte
 					on:change={operationChange}
 					value={inverseOperationMap[predicate.operation]}
@@ -86,6 +87,7 @@
 					placeholder={'Operation'}
 					searchable={false}
 					options={['==', '!=', '>', '<', '>=', '<=', 'LIKE']}
+					renderer={(d) => d.label}
 				/>
 			{/if}
 		{/if}
