@@ -153,7 +153,7 @@ def public_projects() -> list[Project]:
                 "SELECT name FROM users WHERE id = %s;", [res[2]]
             )
             if owner_name is not None:
-                owner_name = owner_name[0]
+                owner_name = owner_name[0][0]
                 projects.append(
                     Project(
                         uuid=res[0],
