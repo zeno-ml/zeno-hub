@@ -11,7 +11,7 @@
 	} from '$lib/stores';
 	import { onMount } from 'svelte';
 
-	let comparisonColumnOptions = $columns.filter((c) => c.model === null || c.model === $model);
+	let comparisonColumnOptions = $columns.filter((c) => c.model === $model);
 	comparisonColumn.set(comparisonColumnOptions[0]);
 
 	onMount(() => {

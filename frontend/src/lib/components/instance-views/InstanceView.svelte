@@ -35,6 +35,7 @@
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
 	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
+
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
 	$: if ($model) {

@@ -52,7 +52,7 @@
 
 <div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
 	{#if isChartEdit && $project?.editor}
-		<div class="h-full pt-5 pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]">
+		<div class="h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]">
 			<EditHeader bind:isChartEdit bind:chart {updateChart} />
 			<ViewSelection bind:chart bind:chartData />
 			<Encoding bind:chart />
@@ -61,8 +61,8 @@
 		<ViewHeader bind:isChartEdit {chart} />
 	{/if}
 	{#if chartData}
-		<div class={`overflow-auto flex flex-col pt-3 pl-2 h-full ${isChartEdit ? 'w-full' : ''}`}>
-			<ChartContainer>
+		<div class={`overflow-auto flex flex-col pl-2 h-full ${isChartEdit ? 'w-full' : ''}`}>
+			<ChartContainer chartName={chart.name}>
 				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
 			</ChartContainer>
 		</div>

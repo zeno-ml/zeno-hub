@@ -216,16 +216,13 @@
 						</span>
 					</div>
 				</th>
-				<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-width-[200px]">
+				<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-w-[150px]">
 					<ComparisonViewTableHeader {sortModel} header={$model} />
 				</th>
-				<th
-					on:click={() => updateSort($comparisonModel)}
-					class="cursor-pointer p-3 min-width-[200px]"
-				>
+				<th on:click={() => updateSort($comparisonModel)} class="cursor-pointer p-3 min-w-[150px]">
 					<ComparisonViewTableHeader {sortModel} header={$comparisonModel} />
 				</th>
-				<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-width-[200px]">
+				<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-w-[150px]">
 					<ComparisonViewTableHeader {sortModel} header={''} />
 				</th>
 			</thead>
@@ -233,7 +230,7 @@
 				{#each table as tableContent}
 					<tr>
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
-							<td class="pr-2.5">
+							<td class="p-3">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -243,7 +240,7 @@
 									/>
 								</div>
 							</td>
-							<td class="pr-2.5">
+							<td class="p-3">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -255,9 +252,9 @@
 							</td>
 						{/if}
 						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td class="pr-2.5">{modelValueAndDiff($model, false, tableContent)}</td>
-							<td class="pr-2.5">{modelValueAndDiff($comparisonModel, false, tableContent)}</td>
-							<td class="pr-2.5">{modelValueAndDiff($model, true, tableContent)}</td>
+							<td class="p-3">{modelValueAndDiff($model, false, tableContent)}</td>
+							<td class="p-3">{modelValueAndDiff($comparisonModel, false, tableContent)}</td>
+							<td class="p-3">{modelValueAndDiff($model, true, tableContent)}</td>
 						{/if}
 					</tr>
 				{/each}
