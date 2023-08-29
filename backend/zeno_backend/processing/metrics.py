@@ -317,24 +317,33 @@ def mean(
             )
         )
 
-        if column_id is None:
+        if len(column_id) == 0:
             return GroupMetric(metric=None, size=0)
-        column_id = column_id[0]
+        column_id = column_id[0][0]
 
-        res = db.execute_return(
-            sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {}").format(
-                sql.Identifier(str(column_id)), sql.Identifier(project_uuid)
+        if filter is None:
+            db.execute(
+                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {}").format(
+                    sql.Identifier(column_id), sql.Identifier(project_uuid)
+                )
             )
-            + (sql.SQL(" WHERE ") + filter)
-            if filter is not None
-            else ""
-        )
+        else:
+            db.execute(
+                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {} WHERE ").format(
+                    sql.Identifier(column_id), sql.Identifier(project_uuid)
+                )
+                + filter
+            )
 
-        return (
-            GroupMetric(metric=float(res[1]) if res[1] else None, size=res[0])
-            if res is not None
-            else GroupMetric(metric=None, size=0)
-        )
+        if not db.cur or db.cur.rowcount == 0:
+            return GroupMetric(metric=None, size=0)
+        else:
+            res = db.cur.fetchone()
+
+        if res:
+            return GroupMetric(metric=float(res[1]) if res[1] else None, size=res[0])
+        else:
+            return GroupMetric(metric=None, size=0)
 
 
 def metric_map(

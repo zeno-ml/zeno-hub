@@ -3,6 +3,7 @@ import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$l
 import { authToken, slicesForComparison } from '../stores';
 import { project } from './../stores';
 
+import { browser } from '$app/environment';
 import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
@@ -94,7 +95,10 @@ export function getEndpoint() {
 		return '/localzeno';
 	}
 	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://zeno-backend:8000') {
-		return '/dockerzeno';
+		if (browser) {
+			return '/dockerzeno';
+		}
+		return 'http://zeno-backend:8000';
 	}
 	return env.PUBLIC_BACKEND_ENDPOINT;
 }

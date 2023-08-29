@@ -1,7 +1,6 @@
 """Functions to select data from the database."""
 import json
 import re
-from operator import itemgetter
 
 from psycopg import sql
 
@@ -34,9 +33,8 @@ def models(project: str) -> list[str]:
         sql.SQL("SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;").format(
             sql.Identifier(f"{project}_column_map")
         ),
-        return_all=True,
     )
-    return list(map(itemgetter(0), model_results)) if model_results is not None else []
+    return [m[0] for m in model_results]
 
 
 def projects(user: User) -> list[Project]:
@@ -53,27 +51,22 @@ def projects(user: User) -> list[Project]:
             "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
             "samples_per_page, public FROM projects WHERE owner_id = %s;",
             [user.id],
-            return_all=True,
         )
-        own_projects = (
-            list(
-                map(
-                    lambda project: Project(
-                        uuid=project[0],
-                        name=project[1],
-                        owner_name=user.name,
-                        view=project[2],
-                        data_url=project[3],
-                        calculate_histogram_metrics=bool(project[4]),
-                        samples_per_page=project[5],
-                        editor=True,
-                        public=project[6],
-                    ),
-                    own_projects_result,
-                )
+        own_projects = list(
+            map(
+                lambda project: Project(
+                    uuid=project[0],
+                    name=project[1],
+                    owner_name=user.name,
+                    view=project[2],
+                    data_url=project[3],
+                    calculate_histogram_metrics=bool(project[4]),
+                    samples_per_page=project[5],
+                    editor=True,
+                    public=project[6],
+                ),
+                own_projects_result,
             )
-            if own_projects_result is not None
-            else []
         )
 
         user_projects_result = db.execute_return(
@@ -82,29 +75,27 @@ def projects(user: User) -> list[Project]:
             "FROM projects AS p JOIN user_project AS up ON p.uuid = up.project_uuid "
             "WHERE up.user_id = %s;",
             [user.id],
-            return_all=True,
         )
         user_projects = []
-        if user_projects_result is not None:
-            for res in user_projects_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s", [res[2]]
-                )
-                if owner_name is not None and owner_name[0] != user.name:
-                    owner_name = owner_name[0]
-                    user_projects.append(
-                        Project(
-                            uuid=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            view=res[3],
-                            data_url=res[4],
-                            calculate_histogram_metrics=bool(res[5]),
-                            samples_per_page=res[6],
-                            editor=res[7],
-                            public=res[8],
-                        )
+        for res in user_projects_result:
+            owner_name = db.execute_return(
+                "SELECT name FROM users WHERE id = %s", [res[2]]
+            )
+            if len(owner_name) != 0 and owner_name[0][0] != user.name:
+                owner_name = owner_name[0][0]
+                user_projects.append(
+                    Project(
+                        uuid=res[0],
+                        name=res[1],
+                        owner_name=str(owner_name),
+                        view=res[3],
+                        data_url=res[4],
+                        calculate_histogram_metrics=bool(res[5]),
+                        samples_per_page=res[6],
+                        editor=res[7],
+                        public=res[8],
                     )
+                )
 
         project_org_result = db.execute_return(
             "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
@@ -114,29 +105,27 @@ def projects(user: User) -> list[Project]:
             " ON uo.organization_id = op.organization_id "
             "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
             [user.id],
-            return_all=True,
         )
         org_projects = []
-        if project_org_result is not None:
-            for res in project_org_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s", [res[2]]
-                )
-                if owner_name is not None:
-                    owner_name = owner_name[0]
-                    org_projects.append(
-                        Project(
-                            uuid=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            view=res[3],
-                            calculate_histogram_metrics=bool(res[4]),
-                            data_url=res[5],
-                            samples_per_page=res[6],
-                            editor=res[7],
-                            public=res[8],
-                        )
+        for res in project_org_result:
+            owner_name = db.execute_return(
+                "SELECT name FROM users WHERE id = %s", [res[2]]
+            )
+            if len(owner_name) != 0 and owner_name[0][0] != user.name:
+                owner_name = owner_name[0][0]
+                org_projects.append(
+                    Project(
+                        uuid=res[0],
+                        name=res[1],
+                        owner_name=str(owner_name),
+                        view=res[3],
+                        calculate_histogram_metrics=bool(res[4]),
+                        data_url=res[5],
+                        samples_per_page=res[6],
+                        editor=res[7],
+                        public=res[8],
                     )
+                )
         org_projects = list(
             filter(
                 lambda project: not any(p.uuid == project.uuid for p in user_projects)
@@ -157,29 +146,27 @@ def public_projects() -> list[Project]:
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
             "samples_per_page FROM projects WHERE public IS TRUE;",
-            return_all=True,
         )
         projects = []
-        if project_result is not None:
-            for res in project_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s;", [res[2]]
-                )
-                if owner_name is not None:
-                    owner_name = owner_name[0]
-                    projects.append(
-                        Project(
-                            uuid=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            view=res[3],
-                            data_url=res[4],
-                            calculate_histogram_metrics=bool(res[5]),
-                            samples_per_page=res[6],
-                            editor=False,
-                            public=True,
-                        )
+        for res in project_result:
+            owner_name = db.execute_return(
+                "SELECT name FROM users WHERE id = %s;", [res[2]]
+            )
+            if owner_name is not None:
+                owner_name = owner_name[0]
+                projects.append(
+                    Project(
+                        uuid=res[0],
+                        name=res[1],
+                        owner_name=str(owner_name),
+                        view=res[3],
+                        data_url=res[4],
+                        calculate_histogram_metrics=bool(res[5]),
+                        samples_per_page=res[6],
+                        editor=False,
+                        public=True,
                     )
+                )
         return projects
 
 
@@ -197,14 +184,12 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
-        if owner_id is None:
-            return None
 
         project_uuid = db.execute_return(
             "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
-            [project_name, owner_id[0]],
+            [project_name, owner_id[0][0]],
         )
-        return str(project_uuid[0]) if project_uuid is not None else None
+        return str(project_uuid[0][0])
 
 
 def project_public(project_uuid: str) -> bool:
@@ -220,9 +205,7 @@ def project_public(project_uuid: str) -> bool:
     public = db.connect_execute_return(
         "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
     )
-    if public is not None:
-        return bool(public[0])
-    return False
+    return bool(public[0][0]) if len(public) > 0 else False
 
 
 def api_key_exists(api_key: str) -> bool:
@@ -239,8 +222,8 @@ def api_key_exists(api_key: str) -> bool:
     exists = db.connect_execute_return(
         "SELECT EXISTS(SELECT 1 FROM users WHERE api_key_hash = %s);", [api_key_hash]
     )
-    if exists is not None:
-        return bool(exists[0])
+    if len(exists) > 0:
+        return bool(exists[0][0])
     else:
         raise Exception("Error while checking whether API key exists.")
 
@@ -260,7 +243,7 @@ def user_id_by_api_key(api_key: str) -> int | None:
     user_id = db.connect_execute_return(
         "SELECT id FROM users WHERE api_key_hash = %s;", [api_key_hash]
     )
-    return int(user_id[0]) if user_id is not None else None
+    return int(user_id[0][0]) if len(user_id) > 0 else None
 
 
 def project_exists(owner_id: int, project_name: str) -> bool:
@@ -283,8 +266,8 @@ def project_exists(owner_id: int, project_name: str) -> bool:
         "SELECT EXISTS(SELECT 1 FROM projects " "WHERE name = %s AND owner_id = %s);",
         [project_name, owner_id],
     )
-    if exists is not None:
-        return bool(exists[0])
+    if len(exists) > 0:
+        return bool(exists[0][0])
     else:
         raise Exception("Error while checking whether project exists.")
 
@@ -304,18 +287,19 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
-        if owner_id is None:
+        if len(owner_id) == 0:
             raise Exception("Owner does not exist.")
         else:
-            owner_id = owner_id[0]
+            owner_id = owner_id[0][0]
 
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
             "samples_per_page, public FROM projects WHERE name = %s AND owner_id = %s;",
             [project_name, owner_id],
         )
-        if project_result is None:
+        if len(project_result) == 0:
             raise Exception("Project does not exist.")
+        project_result = project_result[0]
         project_uuid = project_result[0][0]
 
         if user is None:
@@ -336,8 +320,8 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
                 "WHERE p.project_uuid = %s AND o.user_id = %s",
                 [project_uuid, user.id],
             )
-            editor = (bool(org_editor[0]) if org_editor is not None else False) or (
-                bool(user_editor) if user_editor is not None else False
+            editor = (bool(org_editor[0][0]) if len(org_editor) > 0 else False) or (
+                bool(user_editor[0][0]) if len(user_editor) > 0 else False
             )
 
         return (
@@ -375,16 +359,17 @@ def project_from_uuid(project_uuid: str) -> Project | None:
             "FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
-        if project_result is None:
+        if len(project_result) == 0:
             raise Exception("Project does not exist.")
+        project_result = project_result[0]
         owner_result = db.execute_return(
             "SELECT name from users WHERE id = %s;", [project_result[2]]
         )
-        if owner_result is not None:
+        if len(owner_result) > 0:
             return Project(
                 uuid=str(project_result[0]),
                 name=str(project_result[1]),
-                owner_name=str(owner_result[0]),
+                owner_name=str(owner_result[0][0]),
                 view=str(project_result[3]),
                 data_url=str(project_result[4]),
                 editor=False,
@@ -419,15 +404,13 @@ def project_stats(project: str) -> ProjectStats | None:
         )
         return (
             ProjectStats(
-                num_instances=num_instances[0]
-                if isinstance(num_instances[0], int)
+                num_instances=num_instances[0][0]
+                if isinstance(num_instances[0][0], int)
                 else 0,
-                num_charts=num_charts[0] if isinstance(num_charts[0], int) else 0,
-                num_models=num_models[0] if isinstance(num_models[0], int) else 0,
+                num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
+                num_models=num_models[0][0] if isinstance(num_models[0][0], int) else 0,
             )
-            if num_charts is not None
-            and num_instances is not None
-            and num_models is not None
+            if len(num_charts) > 0 and len(num_instances) > 0 and len(num_models) > 0
             else None
         )
 
@@ -445,22 +428,17 @@ def metrics(project_uuid: str) -> list[Metric]:
     metric_results = db.connect_execute_return(
         "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
         [project_uuid],
-        True,
     )
-    return (
-        list(
-            map(
-                lambda metric: Metric(
-                    id=metric[0],
-                    name=metric[1],
-                    type=metric[2],
-                    columns=metric[3],
-                ),
-                metric_results,
-            )
+    return list(
+        map(
+            lambda metric: Metric(
+                id=metric[0],
+                name=metric[1],
+                type=metric[2],
+                columns=metric[3],
+            ),
+            metric_results,
         )
-        if metric_results is not None
-        else []
     )
 
 
@@ -479,7 +457,6 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
     metric_results = db.connect_execute_return(
         "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
         [project_uuid],
-        True,
     )
     if metric_results is None:
         return {}
@@ -515,17 +492,12 @@ def folders(project: str) -> list[Folder]:
         [
             project,
         ],
-        return_all=True,
     )
-    return (
-        list(
-            map(
-                lambda folder: Folder(id=folder[0], name=folder[1]),
-                folder_results,
-            )
+    return list(
+        map(
+            lambda folder: Folder(id=folder[0], name=folder[1]),
+            folder_results,
         )
-        if folder_results is not None
-        else []
     )
 
 
@@ -547,10 +519,10 @@ def folder(id: int) -> Folder | None:
     )
     return (
         Folder(
-            id=folder_result[0] if isinstance(folder_result[0], int) else 0,
-            name=str(folder_result[1]),
+            id=folder_result[0][0] if isinstance(folder_result[0][0], int) else 0,
+            name=str(folder_result[0][1]),
         )
-        if folder_result is not None
+        if len(folder_result) > 0
         else None
     )
 
@@ -575,7 +547,6 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
             [
                 project,
             ],
-            return_all=True,
         )
     else:
         slice_results = db.connect_execute_return(
@@ -585,25 +556,20 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
                 project,
                 ids,
             ],
-            return_all=True,
         )
-    return (
-        list(
-            map(
-                lambda slice: Slice(
-                    id=slice[0],
-                    slice_name=slice[1],
-                    folder_id=slice[2],
-                    filter_predicates=FilterPredicateGroup(
-                        predicates=json.loads(slice[3])["predicates"],
-                        join=Join.OMITTED,
-                    ),
+    return list(
+        map(
+            lambda slice: Slice(
+                id=slice[0],
+                slice_name=slice[1],
+                folder_id=slice[2],
+                filter_predicates=FilterPredicateGroup(
+                    predicates=json.loads(slice[3])["predicates"],
+                    join=Join.OMITTED,
                 ),
-                slice_results,
-            )
+            ),
+            slice_results,
         )
-        if slice_results is not None
-        else []
     )
 
 
@@ -622,22 +588,17 @@ def charts(project: str) -> list[Chart]:
         [
             project,
         ],
-        return_all=True,
     )
-    return (
-        list(
-            map(
-                lambda chart: Chart(
-                    id=chart[0],
-                    name=chart[1],
-                    type=chart[2],
-                    parameters=json.loads(chart[3]),
-                ),
-                chart_results,
-            )
+    return list(
+        map(
+            lambda chart: Chart(
+                id=chart[0],
+                name=chart[1],
+                type=chart[2],
+                parameters=json.loads(chart[3]),
+            ),
+            chart_results,
         )
-        if chart_results is not None
-        else []
     )
 
 
@@ -655,25 +616,18 @@ def columns(project: str) -> list[ZenoColumn]:
         sql.SQL("SELECT column_id, name, type, model, data_type FROM {};").format(
             sql.Identifier(f"{project}_column_map")
         ),
-        return_all=True,
     )
-    return (
-        (
-            list(
-                map(
-                    lambda column: ZenoColumn(
-                        id=column[0],
-                        name=column[1],
-                        column_type=column[2],
-                        model=column[3],
-                        data_type=column[4],
-                    ),
-                    column_results,
-                )
-            )
+    return list(
+        map(
+            lambda column: ZenoColumn(
+                id=column[0],
+                name=column[1],
+                column_type=column[2],
+                model=column[3],
+                data_type=column[4],
+            ),
+            column_results,
         )
-        if column_results is not None
-        else []
     )
 
 
@@ -804,7 +758,7 @@ def column_id_from_name_and_model(project: str, column_name: str, model: str) ->
         ).format(sql.Identifier(f"{project}_column_map")),
         [column_name, model],
     )
-    return str(column_result[0]) if column_result is not None else ""
+    return str(column_result[0][0]) if len(column_result) > 0 else ""
 
 
 def column(
@@ -828,7 +782,6 @@ def column(
             sql.SQL("SELECT {} FROM {}").format(
                 sql.Identifier(column.id), sql.Identifier(project)
             ),
-            return_all=True,
         )
     else:
         column_result = db.connect_execute_return(
@@ -836,13 +789,8 @@ def column(
                 sql.Identifier(column.id), sql.Identifier(project)
             )
             + filter_sql,
-            return_all=True,
         )
-    return (
-        list(map(lambda column: column[0], column_result))
-        if column_result is not None
-        else []
-    )
+    return list(map(lambda column: column[0], column_result))
 
 
 def tags(project: str) -> list[Tag]:
@@ -863,7 +811,6 @@ def tags(project: str) -> list[Tag]:
             [
                 project,
             ],
-            return_all=True,
         )
         if tags_result is None:
             return []
@@ -876,7 +823,6 @@ def tags(project: str) -> list[Tag]:
                 [
                     tag_result[0],
                 ],
-                return_all=True,
             )
             tags.append(
                 Tag(
@@ -884,8 +830,8 @@ def tags(project: str) -> list[Tag]:
                     tag_name=tag_result[1],
                     folder_id=tag_result[2],
                     data_ids=[]
-                    if data_results is None
-                    else list(map(lambda d: d[0], data_results)),
+                    if len(data_results) == 0
+                    else list(map(lambda d: d[0], data_results[0])),
                 )
             )
         return tags
@@ -904,8 +850,9 @@ def user(name: str) -> User | None:
     user = db.connect_execute_return(
         "SELECT id, name FROM users WHERE name = %s", [name]
     )
-    if user is None:
+    if len(user) is None:
         return None
+    user = user[0]
     return User(
         id=user[0] if isinstance(user[0], int) else -1,
         name=str(user[1]),
@@ -920,16 +867,12 @@ def users() -> list[User]:
         list[User]: all registered users.
     """
     db = Database()
-    users = db.connect_execute_return("SELECT id, name FROM users;", return_all=True)
-    return (
-        list(
-            map(
-                lambda user: User(id=user[0], name=user[1], admin=None),
-                users,
-            )
+    users = db.connect_execute_return("SELECT id, name FROM users;")
+    return list(
+        map(
+            lambda user: User(id=user[0], name=user[1], admin=None),
+            users,
         )
-        if users is not None
-        else []
     )
 
 
@@ -940,20 +883,14 @@ def organization_names() -> list[Organization]:
         list[Organization]: all organizations in the database.
     """
     db = Database()
-    organizations = db.connect_execute_return(
-        "SELECT id, name FROM organizations;", return_all=True
-    )
-    return (
-        list(
-            map(
-                lambda organization: Organization(
-                    id=organization[0], name=organization[1], admin=False, members=[]
-                ),
-                organizations,
-            )
+    organizations = db.connect_execute_return("SELECT id, name FROM organizations;")
+    return list(
+        map(
+            lambda organization: Organization(
+                id=organization[0], name=organization[1], admin=False, members=[]
+            ),
+            organizations,
         )
-        if organizations is not None
-        else []
     )
 
 
@@ -973,9 +910,8 @@ def organizations(user: User) -> list[Organization]:
             "JOIN user_organization AS uo ON o.id = uo.organization_id "
             "WHERE uo.user_id = %s;",
             [user.id],
-            return_all=True,
         )
-        if organizations_result is None:
+        if len(organizations_result) == 0:
             return organizations
         for org in organizations_result:
             members = db.execute_return(
@@ -983,16 +919,13 @@ def organizations(user: User) -> list[Organization]:
                 "JOIN user_organization as uo ON u.id = uo.user_id "
                 "WHERE uo.organization_id = %s;",
                 [org[0]],
-                return_all=True,
             )
             organizations.append(
                 Organization(
                     id=org[0],
                     name=org[1],
                     admin=org[2],
-                    members=[]
-                    if members is None
-                    else list(
+                    members=list(
                         map(
                             lambda member: User(
                                 id=member[0],
@@ -1021,17 +954,12 @@ def project_users(project: str) -> list[User]:
         "SELECT u.id, u.name, up.editor FROM users as u "
         "JOIN user_project AS up ON u.id = up.user_id WHERE up.project_uuid = %s",
         [project],
-        return_all=True,
     )
-    return (
-        list(
-            map(
-                lambda user: User(id=user[0], name=user[1], admin=user[2]),
-                project_users,
-            )
+    return list(
+        map(
+            lambda user: User(id=user[0], name=user[1], admin=user[2]),
+            project_users,
         )
-        if project_users is not None
-        else []
     )
 
 
@@ -1050,19 +978,12 @@ def project_orgs(project: str) -> list[Organization]:
         "JOIN organization_project AS op ON o.id = op.organization_id "
         "WHERE op.project_uuid = %s",
         [project],
-        return_all=True,
     )
-    return (
-        list(
-            map(
-                lambda org: Organization(
-                    id=org[0], name=org[1], members=[], admin=org[2]
-                ),
-                project_organizations,
-            )
+    return list(
+        map(
+            lambda org: Organization(id=org[0], name=org[1], members=[], admin=org[2]),
+            project_organizations,
         )
-        if project_organizations is not None
-        else []
     )
 
 
@@ -1095,7 +1016,6 @@ def filered_short_string_column_values(
                 [
                     req.filter_string,
                 ],
-                return_all=True,
             )
         else:
             returned_strings = db.connect_execute_return(
@@ -1107,10 +1027,9 @@ def filered_short_string_column_values(
                 [
                     req.filter_string,
                 ],
-                return_all=True,
             )
 
-        if returned_strings is None:
+        if len(returned_strings) == 0:
             return short_ret
         for result in returned_strings[0:5]:
             idx = result[0].find(req.filter_string)
@@ -1132,10 +1051,9 @@ def filered_short_string_column_values(
             [
                 req.filter_string,
             ],
-            return_all=True,
         )
 
-        if returned_strings is None:
+        if len(returned_strings) == 0:
             return short_ret
         for result in returned_strings:
             idx = re.search(req.filter_string, result[0])

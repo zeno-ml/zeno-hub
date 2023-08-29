@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
@@ -13,7 +13,7 @@ export async function load({ cookies, url }) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
+	OpenAPI.BASE = getEndpoint() + '/api';
 	OpenAPI.HEADERS = {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};
