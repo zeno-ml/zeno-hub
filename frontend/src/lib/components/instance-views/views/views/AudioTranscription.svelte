@@ -5,20 +5,22 @@
 	$: audioURL = entry['data_id'] as string;
 </script>
 
-<div id="flex flex-wrap">
-	<div class="p-2.5 border border-grey-lighter">
-		<div style:display="flex">
-			<audio controls src={audioURL}>
-				<source src={audioURL} type={'audio/' + audioURL.split('.').at(-1)} />
-			</audio>
-		</div>
-		<span class="text-xs">label: </span><span class="value">
+<div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded">
+	<div>
+		<audio controls src={audioURL}>
+			<source src={audioURL} type={'audio/' + audioURL.split('.').at(-1)} />
+		</audio>
+	</div>
+	<p class="mt-3 text-grey">
+		<span class="font-semibold">label: </span>
+		<span class="value">
 			{entry['label']}
 		</span>
-		{#if modelColumn && entry[modelColumn] !== undefined}
-			<br />
-			<span class="text-xs">output: </span>
-			<span class="text-xs">{entry[modelColumn]} </span>
-		{/if}
-	</div>
+	</p>
+	{#if modelColumn && entry[modelColumn] !== undefined}
+		<p class="mt-2 text-grey">
+			<span class="font-semibold">output: </span>
+			<span>{entry[modelColumn]} </span>
+		</p>
+	{/if}
 </div>

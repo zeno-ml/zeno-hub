@@ -5,6 +5,7 @@
 	import {
 		columns,
 		compareSort,
+		comparisonColumn,
 		comparisonModel,
 		metric,
 		model,
@@ -16,19 +17,11 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
-	import { columnSort } from '$lib/util/util';
-	import {
-		Join,
-		MetadataType,
-		ZenoColumnType,
-		type GroupMetric,
-		type ZenoColumn
-	} from '$lib/zenoapi';
+	import { Join, MetadataType, ZenoColumnType, type GroupMetric } from '$lib/zenoapi';
 	import { Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
-	import Svelecte from 'svelecte';
 	import ComparisonViewTableHeader from './ComparisonViewTableHeader.svelte';
 	import { viewMap } from './views/viewMap';
 
@@ -41,16 +34,6 @@
 
 	// decide which model column to show sort icon
 	let sortModel = '';
-
-	let options = $columns
-		.filter(
-			(c) =>
-				c.model === undefined ||
-				c.model === $model ||
-				(sortModel === undefined && c.model === $model)
-		)
-		.sort(columnSort);
-	let selectColumn = options[0];
 
 	let currentPage = 0;
 	let lastPage = 0;
@@ -102,6 +85,11 @@
 		updateTable();
 	}
 
+	comparisonColumn.subscribe((_) => {
+		table = undefined;
+		compareSort.set([undefined, true]);
+	});
+
 	model.subscribe((model) => {
 		// make sure Model A and Model B are exclusive
 		if ($comparisonModel && $comparisonModel === model) {
@@ -117,7 +105,7 @@
 	});
 
 	// trigger this function when clicking column header to sort
-	function updateSort(selectColumn: ZenoColumn, model: string | undefined) {
+	function updateSort(model: string | undefined) {
 		if (model === undefined) return;
 		// when clicking different model columns, reset compareSort
 		if (sortModel !== model) {
@@ -126,7 +114,7 @@
 		}
 
 		// assign new model to the selected column
-		let newHeader = setColumnModel(selectColumn, model);
+		let newHeader = setColumnModel(model);
 
 		let compareSortString = JSON.stringify($compareSort[0]);
 		let newHeaderString = JSON.stringify(newHeader);
@@ -141,13 +129,13 @@
 	}
 
 	// set model for feature/output column
-	function setColumnModel(col: ZenoColumn, model: string) {
-		let col_copy = Object.assign({}, col);
+	function setColumnModel(model: string) {
+		let col_copy = Object.assign({}, $comparisonColumn);
 		col_copy.model =
-			(col.columnType === ZenoColumnType.FEATURE &&
-				col.model !== undefined &&
-				col.model !== null) ||
-			col.columnType === ZenoColumnType.OUTPUT
+			(col_copy.columnType === ZenoColumnType.FEATURE &&
+				col_copy.model !== undefined &&
+				col_copy.model !== null) ||
+			col_copy.columnType === ZenoColumnType.OUTPUT
 				? model
 				: '';
 		return col_copy;
@@ -172,7 +160,7 @@
 			getFilteredTable(
 				$columns,
 				[$model, $comparisonModel],
-				selectColumn,
+				$comparisonColumn,
 				start,
 				end - start,
 				$compareSort,
@@ -192,43 +180,22 @@
 		diff: boolean,
 		tableContent: Record<string, string | number | boolean>
 	) {
-		let newHeader = setColumnModel(selectColumn, model);
+		let newHeader = setColumnModel(model);
 		let key = diff ? 'diff' : newHeader.id;
 		return tableContent[key] && newHeader.dataType === MetadataType.CONTINUOUS
 			? parseFloat(`${tableContent[key]}`).toFixed(2)
 			: tableContent[key];
 	}
-
-	function columnSelected(e: CustomEvent) {
-		if (e.detail !== selectColumn) {
-			selectColumn = e.detail;
-			// reset tables data to prevent rerender the existing(non-updated) data
-			table = undefined;
-			compareSort.set([undefined, true]);
-		}
-	}
 </script>
 
-<div style="display: flex; align-items:center;">
-	<h4 style="margin-right: 10px">Comparison Feature:</h4>
-	<Svelecte
-		style="padding-top: 5px;padding-bottom: 5px; z-index:6"
-		value={selectColumn}
-		placeholder={'Column'}
-		valueAsObject
-		valueField={'name'}
-		{options}
-		on:change={columnSelected}
-	/>
-</div>
 <div class="w-full overflow-auto" bind:this={instanceContainer}>
 	{#if table}
 		<table class="mt-2">
 			<thead
 				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
 			>
-				<th>
-					<div>{$model}</div>
+				<th class="p-3">
+					<div>A: {$model}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
 							{$metric ? $metric.name + ':' : ''}
@@ -238,8 +205,8 @@
 						</span>
 					</div>
 				</th>
-				<th>
-					<div>{$comparisonModel}</div>
+				<th class="p-3">
+					<div>B: {$comparisonModel}</div>
 					<div>
 						<span class="font-normal text-sm mr-3.5 text-grey-dark">
 							{$metric ? $metric.name + ':' : ''}
@@ -249,17 +216,17 @@
 						</span>
 					</div>
 				</th>
-				<th on:click={() => updateSort(selectColumn, $model)} class="pr-10 cursor-pointer">
-					<ComparisonViewTableHeader {selectColumn} {sortModel} header={$model} />
+				<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-width-[200px]">
+					<ComparisonViewTableHeader {sortModel} header={$model} />
 				</th>
 				<th
-					on:click={() => updateSort(selectColumn, $comparisonModel)}
-					class="pr-10 cursor-pointer"
+					on:click={() => updateSort($comparisonModel)}
+					class="cursor-pointer p-3 min-width-[200px]"
 				>
-					<ComparisonViewTableHeader {selectColumn} {sortModel} header={$comparisonModel} />
+					<ComparisonViewTableHeader {sortModel} header={$comparisonModel} />
 				</th>
-				<th on:click={() => updateSort(selectColumn, '')} class="pr-10 cursor-pointer">
-					<ComparisonViewTableHeader {selectColumn} {sortModel} header={''} />
+				<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-width-[200px]">
+					<ComparisonViewTableHeader {sortModel} header={''} />
 				</th>
 			</thead>
 			<tbody>
