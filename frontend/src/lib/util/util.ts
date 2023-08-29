@@ -91,9 +91,6 @@ export function updateModelDependentSlices(name: string, mod: string, slis: Slic
 }
 
 export function getEndpoint() {
-	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://localhost:8000') {
-		return '/localzeno';
-	}
 	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://zeno-backend:8000') {
 		if (browser) {
 			return '/dockerzeno';
