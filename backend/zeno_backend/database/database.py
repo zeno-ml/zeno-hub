@@ -92,15 +92,13 @@ class Database:
         self,
         query: LiteralString | sql.Composed,
         params: list[Any] | None = None,
-        return_all: bool = False,
-    ):
+    ) -> list[tuple[Any, ...]]:
         """Execute a query on the database and then return one or multiple results.
 
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
-            return_all (bool, optional): whether to return all results instead of just
             the first. Defaults to False.
 
         Raises:
@@ -109,10 +107,11 @@ class Database:
         Returns:
             Any: the data as fetched by the query.
         """
+        if self.cur is None:
+            raise Exception("No connection to the database")
         try:
-            if self.cur is not None:
-                self.cur.execute(query, params)
-                return self.cur.fetchall() if return_all else self.cur.fetchone()
+            self.cur.execute(query, params)
+            return self.cur.fetchall()
         except (Exception, psycopg.DatabaseError) as error:
             raise Exception(error) from error
 
@@ -120,15 +119,13 @@ class Database:
         self,
         query: LiteralString | sql.Composed,
         params: list[Any] | None = None,
-        return_all: bool = False,
-    ):
+    ) -> list[tuple[Any, ...]]:
         """Connect, execute a query, return one or multiple results, and disconnect.
 
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
             Defaults to None.
-            return_all (bool, optional): whether to return all results instead of just
             the first. Defaults to False.
 
         Raises:
@@ -139,7 +136,7 @@ class Database:
         """
         try:
             self.connect()
-            result = self.execute_return(query, params, return_all)
+            result = self.execute_return(query, params)
             self.commit()
             return result
         except (Exception, psycopg.DatabaseError) as error:

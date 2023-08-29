@@ -1,8 +1,8 @@
 import { dev } from '$app/environment';
 import { env as private_env } from '$env/dynamic/private';
-import { env as public_env } from '$env/dynamic/public';
 import { extractUserFromSession, refreshAccessToken } from '$lib/auth/cognito.js';
 import type { AuthUser } from '$lib/auth/types.js';
+import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
@@ -34,7 +34,7 @@ export const load = async ({ cookies, url }) => {
 			throw redirect(303, `/login?redirectTo=${url.pathname}`);
 		}
 
-		OpenAPI.BASE = public_env.PUBLIC_BACKEND_ENDPOINT + '/api';
+		OpenAPI.BASE = getEndpoint() + '/api';
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
