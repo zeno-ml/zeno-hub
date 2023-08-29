@@ -148,7 +148,7 @@ class ZenoClient:
         data_url: str = "",
         calculate_histogram_metrics: bool = True,
         samples_per_page: int = 10,
-        public: bool = False,
+        public: bool = True,
     ) -> ZenoProject:
         """Creates an empty project in Zeno's backend.
 
