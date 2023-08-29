@@ -247,7 +247,7 @@
 							<td class="p-3">{modelValueAndDiff($comparisonModel, tableContent)}</td>
 							<td class="p-3"
 								>{Number(tableContent['diff'])
-									? tableContent['diff'].toFixed(2)
+									? Number(tableContent['diff']).toFixed(2)
 									: tableContent['diff']}</td
 							>
 						{/if}
