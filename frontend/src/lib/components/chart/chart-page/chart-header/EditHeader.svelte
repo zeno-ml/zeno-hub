@@ -2,16 +2,22 @@
 	import type { Chart } from '$lib/zenoapi';
 	import Button, { Label } from '@smui/button';
 	import Textfield from '@smui/textfield';
-	import { noop } from 'svelte/internal';
 	import HomeButton from './HomeButton.svelte';
 
 	export let isChartEdit: boolean;
 	export let chart: Chart;
-	export let updateChart: () => void = noop;
+
+	let title = chart.name;
+
+	$: updateChartTitle(title);
 
 	let blur = function (ev: CustomEvent) {
 		ev.target && (ev.target as HTMLElement).blur();
 	};
+
+	function updateChartTitle(title: string) {
+		chart = { ...chart, name: title };
+	}
 </script>
 
 <div class="flex flex-col mb-5 mt-5">
@@ -22,10 +28,7 @@
 			variant="outlined"
 			on:mouseleave={blur}
 			on:focusout={blur}
-			on:click={() => {
-				isChartEdit = !isChartEdit;
-				updateChart();
-			}}
+			on:click={() => (isChartEdit = !isChartEdit)}
 		>
 			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
 		</Button>
@@ -35,8 +38,7 @@
 			style="width: -webkit-fill-available"
 			variant="outlined"
 			label="Chart Name"
-			on:blur={updateChart}
-			bind:value={chart.name}
+			bind:value={title}
 		/>
 	</div>
 </div>

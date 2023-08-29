@@ -50,7 +50,7 @@
 			</IconButton>
 		{/if}
 	</div>
-	<div class="{index === -1 ? '' : 'mb-2.5 ml-2.5'} rounded mt-1">
+	<div class="{index === -1 ? '' : 'mb-2.5 ml-2.5 border border-primary-mid p-2'} rounded mt-1">
 		<ul use:autoAnimate class="list-none mr-2.5">
 			{#each predicateGroup.predicates as p, i}
 				{#if !('predicates' in p)}
@@ -70,7 +70,7 @@
 				{/if}
 			{/each}
 		</ul>
-		<div class="mb-2.5">
+		<div class="mb-2.5 mt-4">
 			<Button
 				color="secondary"
 				on:click={() => {

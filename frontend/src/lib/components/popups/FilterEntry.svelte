@@ -69,10 +69,10 @@
 	</div>
 	<div class="mr-2.5">
 		{#if predicate.column}
-			{#if predicate.column.dataType === MetadataType.BOOLEAN}
+			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL}
 				<Svelecte
-					value={predicate.operation}
 					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
@@ -80,8 +80,8 @@
 				/>
 			{:else}
 				<Svelecte
-					value={inverseOperationMap[predicate.operation]}
 					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}

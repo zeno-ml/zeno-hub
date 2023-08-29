@@ -130,14 +130,14 @@
 			<thead class="text-left sticky top-0 bg-background cursor-pointer z-10">
 				<tr class="border-b border-grey-lighter bg-background">
 					{#if $editTag !== undefined}
-						<th class="p-3">Included</th>
+						<th class="p-3 font-semibold font-grey">Included</th>
 					{/if}
 					{#if $project !== undefined && viewMap[$project.view] !== undefined}
-						<th class="p-3">instance</th>
+						<th class="p-3 font-semibold font-grey">instance</th>
 					{/if}
 					{#each columnHeader as header}
 						{#if header.name !== 'data_id'}
-							<th class="p-3" on:click={() => updateSort(header)}>
+							<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
 								<div class="flex">
 									{header.name}
 									<Icon

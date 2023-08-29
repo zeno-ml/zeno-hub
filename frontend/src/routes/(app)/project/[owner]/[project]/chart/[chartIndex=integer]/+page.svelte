@@ -19,6 +19,7 @@
 
 	$: updateEditUrl(isChartEdit);
 	$: reloadData(chart);
+	$: updateChart(chart);
 
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
@@ -34,7 +35,7 @@
 		}
 	}
 
-	function updateChart() {
+	function updateChart(chart: Chart) {
 		if ($project) {
 			ZenoService.updateChart($project.uuid, chart).then(() => {
 				if ($project)
@@ -53,12 +54,12 @@
 <div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
 	{#if isChartEdit && $project?.editor}
 		<div class="h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]">
-			<EditHeader bind:isChartEdit bind:chart {updateChart} />
+			<EditHeader bind:isChartEdit bind:chart />
 			<ViewSelection bind:chart bind:chartData />
 			<Encoding bind:chart />
 		</div>
 	{:else}
-		<ViewHeader bind:isChartEdit {chart} />
+		<ViewHeader bind:isChartEdit />
 	{/if}
 	{#if chartData}
 		<div class={`overflow-auto flex flex-col pl-2 h-full ${isChartEdit ? 'w-full' : ''}`}>

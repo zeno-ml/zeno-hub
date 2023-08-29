@@ -9,10 +9,10 @@
 		model,
 		models
 	} from '$lib/stores';
+	import type { ZenoColumn } from '$lib/zenoapi';
 	import { onMount } from 'svelte';
 
-	let comparisonColumnOptions = $columns.filter((c) => c.model === $model);
-	comparisonColumn.set(comparisonColumnOptions[0]);
+	let comparisonColumnOptions: ZenoColumn[] = [];
 
 	onMount(() => {
 		if ($model === undefined && $models.length > 0) {
@@ -21,6 +21,8 @@
 		if ($metric === undefined && $metrics.length > 0) {
 			metric.set($metrics[0]);
 		}
+		comparisonColumnOptions = $columns.filter((c) => c.model === $model);
+		comparisonColumn.set(comparisonColumnOptions[0]);
 	});
 
 	$: exludeModels = $models.filter((m) => m !== $model);

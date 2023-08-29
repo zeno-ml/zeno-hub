@@ -32,9 +32,8 @@
 	let table: Record<string, string | number | boolean>[] | undefined;
 	let instanceContainer: HTMLDivElement;
 
-	// decide which model column to show sort icon
+	// Which model column to show sort for.
 	let sortModel = '';
-
 	let currentPage = 0;
 	let lastPage = 0;
 	let metricA = 0;
@@ -61,14 +60,16 @@
 	$: if (modelBResult !== undefined) {
 		lastPage = Math.max(Math.ceil(modelBResult[0].size / $rowsPerPage) - 1, 0);
 		if (modelBResult[0].metric !== undefined && modelBResult[0].metric !== null)
-			metricA = Math.round(modelBResult[0].metric * 100) / 100;
+			metricB = Math.round(modelBResult[0].metric * 100) / 100;
 	}
+
 	$: modelAColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
 	);
 	$: modelBColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $comparisonModel
 	);
+
 	// when state changes update current table view
 	$: {
 		currentPage;
@@ -81,7 +82,8 @@
 		$selectionPredicates;
 		$tagIds;
 		$selections.tags;
-		start, end;
+		start;
+		end;
 		updateTable();
 	}
 
@@ -113,32 +115,20 @@
 			sortModel = model;
 		}
 
-		// assign new model to the selected column
-		let newHeader = setColumnModel(model);
+		let compareColumnObj = $columns.filter(
+			(col) => col.name == $comparisonColumn?.name && col.model == $comparisonModel
+		)[0];
 
 		let compareSortString = JSON.stringify($compareSort[0]);
-		let newHeaderString = JSON.stringify(newHeader);
+		let newHeaderString = JSON.stringify(compareColumnObj);
 
 		if (compareSortString !== newHeaderString) {
-			compareSort.set([newHeader, true]);
+			compareSort.set([compareColumnObj, true]);
 		} else if (compareSortString === newHeaderString && $compareSort[1]) {
-			compareSort.set([newHeader, false]);
+			compareSort.set([compareColumnObj, false]);
 		} else {
 			compareSort.set([undefined, true]);
 		}
-	}
-
-	// set model for feature/output column
-	function setColumnModel(model: string) {
-		let col_copy = Object.assign({}, $comparisonColumn);
-		col_copy.model =
-			(col_copy.columnType === ZenoColumnType.FEATURE &&
-				col_copy.model !== undefined &&
-				col_copy.model !== null) ||
-			col_copy.columnType === ZenoColumnType.OUTPUT
-				? model
-				: '';
-		return col_copy;
 	}
 
 	function updateTable() {
@@ -177,14 +167,15 @@
 
 	function modelValueAndDiff(
 		model: string,
-		diff: boolean,
 		tableContent: Record<string, string | number | boolean>
 	) {
-		let newHeader = setColumnModel(model);
-		let key = diff ? 'diff' : newHeader.id;
-		return tableContent[key] && newHeader.dataType === MetadataType.CONTINUOUS
-			? parseFloat(`${tableContent[key]}`).toFixed(2)
-			: tableContent[key];
+		const compareColumnObj = $columns.filter(
+			(col) => col.name == $comparisonColumn?.name && col.model == model
+		)[0];
+		const id = compareColumnObj.id;
+		return compareColumnObj.dataType === MetadataType.CONTINUOUS
+			? parseFloat(`${tableContent[id]}`).toFixed(2)
+			: tableContent[id];
 	}
 </script>
 
@@ -230,7 +221,7 @@
 				{#each table as tableContent}
 					<tr>
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
-							<td class="p-3">
+							<td class="p-3 align-baseline">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -240,7 +231,7 @@
 									/>
 								</div>
 							</td>
-							<td class="p-3">
+							<td class="p-3 align-baseline">
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -252,9 +243,13 @@
 							</td>
 						{/if}
 						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td class="p-3">{modelValueAndDiff($model, false, tableContent)}</td>
-							<td class="p-3">{modelValueAndDiff($comparisonModel, false, tableContent)}</td>
-							<td class="p-3">{modelValueAndDiff($model, true, tableContent)}</td>
+							<td class="p-3">{modelValueAndDiff($model, tableContent)}</td>
+							<td class="p-3">{modelValueAndDiff($comparisonModel, tableContent)}</td>
+							<td class="p-3"
+								>{Number(tableContent['diff'])
+									? tableContent['diff'].toFixed(2)
+									: tableContent['diff']}</td
+							>
 						{/if}
 					</tr>
 				{/each}
