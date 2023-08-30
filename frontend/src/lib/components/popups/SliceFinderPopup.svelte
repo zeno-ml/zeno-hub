@@ -60,7 +60,7 @@
 			return $page.url.href.includes('compare')
 				? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.FEATURE) &&
 						d.model === $model
-				: (d.dataType = MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
+				: (d.dataType === MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
 						completeColumns.includes(d);
 		})
 		.sort(columnSort);
