@@ -54,7 +54,7 @@
 		</div>
 	{/if}
 	{#if !$page.url.href.includes('compare') && $metric !== undefined}
-		<div class="flex flex-col w-[50%]">
+		<div class="flex flex-col w-1/2">
 			<span class="my-1 text-grey-dark">Metric</span>
 			<select
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"

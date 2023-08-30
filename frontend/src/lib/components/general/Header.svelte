@@ -25,7 +25,7 @@
 {#if projectEdit && $project && user !== null}
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
-<nav>
+<nav class="z-20">
 	<header class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center">
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
@@ -51,26 +51,28 @@
 						icon={mdiChartBoxOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
 					/>
-					{#if $project && $project.ownerName === user?.name}
-						<HeaderIcon
-							pageName={'editProject'}
-							tooltipContent={"Edit your project's configuration."}
-							icon={mdiCog}
-							on:click={() => (projectEdit = true)}
-						/>
-					{/if}
 				</div>
 			{/if}
 		</div>
 		<div>
-			<HeaderIcon
-				pageName={'$collapseHeader'}
-				tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
-				icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
-				on:click={() => collapseHeader.set(!$collapseHeader)}
-			/>
+			{#if $page.url.href.includes('project')}
+				<HeaderIcon
+					pageName={'$collapseHeader'}
+					tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
+					icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
+					on:click={() => collapseHeader.set(!$collapseHeader)}
+				/>
+			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mb-3">
+			{#if $page.url.href.includes('project') && $project && $project.ownerName === user?.name}
+				<HeaderIcon
+					pageName={'editProject'}
+					tooltipContent={"Edit your project's configuration."}
+					icon={mdiCog}
+					on:click={() => (projectEdit = true)}
+				/>
+			{/if}
 			<HeaderIcon
 				pageName={'account'}
 				tooltipContent={'Manage your account.'}
