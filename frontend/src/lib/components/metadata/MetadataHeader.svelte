@@ -1,7 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { comparisonModel, metric, metrics, model, models } from '$lib/stores';
+	import {
+		columns,
+		comparisonColumn,
+		comparisonModel,
+		metric,
+		metrics,
+		model,
+		models
+	} from '$lib/stores';
+	import type { ZenoColumn } from '$lib/zenoapi';
 	import { onMount } from 'svelte';
+
+	let comparisonColumnOptions: ZenoColumn[] = [];
 
 	onMount(() => {
 		if ($model === undefined && $models.length > 0) {
@@ -10,6 +21,8 @@
 		if ($metric === undefined && $metrics.length > 0) {
 			metric.set($metrics[0]);
 		}
+		comparisonColumnOptions = $columns.filter((c) => c.model === $model);
+		comparisonColumn.set(comparisonColumnOptions[0]);
 	});
 
 	$: exludeModels = $models.filter((m) => m !== $model);
@@ -76,6 +89,20 @@
 		>
 			{#each $metrics as met}
 				<option value={met}>{met.name}</option>
+			{/each}
+		</select>
+	</div>
+{/if}
+
+{#if $page.url.href.includes('compare')}
+	<div class="mt-3 mb-3">
+		<h4 class="mb-1">Comparison Feature</h4>
+		<select
+			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+			bind:value={$comparisonColumn}
+		>
+			{#each comparisonColumnOptions as col}
+				<option value={col}>{col.name}</option>
 			{/each}
 		</select>
 	</div>

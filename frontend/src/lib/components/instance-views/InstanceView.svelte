@@ -30,9 +30,26 @@
 	let selected = 'list';
 	let currentResult: GroupMetric[] | undefined = undefined;
 	let viewOptions: Record<string, unknown> | undefined = undefined;
+	let modelAResult: GroupMetric[] | undefined = undefined;
+	let modelBResult: GroupMetric[] | undefined = undefined;
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
 	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
+
+	// change selected to table if a tag is edited
+	$: selected = $editTag !== undefined ? 'table' : selected;
+	$: if ($model) {
+		getMetricsForSlicesAndTags(
+			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
+			[...new Set([...secureTagIds, ...secureSelectionIds])],
+			false
+		).then((res) => (currentResult = res));
+	}
+
+	$: getCompareResults($model, $metric, $selectionPredicates).then((r) => (modelAResult = r));
+	$: getCompareResults($comparisonModel, $metric, $selectionPredicates).then(
+		(r) => (modelBResult = r)
+	);
 
 	onMount(() => {
 		if ($project === undefined || $project.view === '') {
@@ -63,21 +80,18 @@
 		];
 	}
 
-	function getCompareResults(model: string, metric: Metric, predicates?: FilterPredicateGroup) {
+	function getCompareResults(
+		model: string | undefined,
+		metric: Metric | undefined,
+		predicates?: FilterPredicateGroup
+	) {
+		if (model === undefined || metric === undefined) {
+			return Promise.resolve(undefined);
+		}
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds, true);
-	}
-
-	// change selected to table if a tag is edited
-	$: selected = $editTag !== undefined ? 'table' : selected;
-	$: if ($model) {
-		getMetricsForSlicesAndTags(
-			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
-			[...new Set([...secureTagIds, ...secureSelectionIds])],
-			false
-		).then((res) => (currentResult = res));
 	}
 </script>
 
@@ -90,11 +104,7 @@
 </div>
 {#if compare && $metric && $model}
 	{#if $comparisonModel !== undefined}
-		{#await getCompareResults($model, $metric, $selectionPredicates) then modelAResult}
-			{#await getCompareResults($comparisonModel, $metric, $selectionPredicates) then modelBResult}
-				<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
-			{/await}
-		{/await}
+		<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
 	{/if}
 {:else if $editTag !== undefined}
 	<TableView {currentResult} {viewOptions} />

@@ -7,7 +7,7 @@
 </script>
 
 <div
-	class="h-full p-5 overflow-y-auto shrink-0 bg-yellowish-light w-[400px]"
+	class="h-full p-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]"
 	style:display={$collapseHeader ? 'none' : 'block'}
 >
 	<MetadataHeader />

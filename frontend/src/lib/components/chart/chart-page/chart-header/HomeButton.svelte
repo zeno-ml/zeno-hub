@@ -10,7 +10,7 @@
 </script>
 
 <a
-	class="flex items-center cursor-pointer mb-2"
+	class="flex items-center cursor-pointer"
 	href={$page.url.href.substring(0, $page.url.href.lastIndexOf('/'))}
 	on:click={updateChart}
 	on:focus={() => ({})}

@@ -25,7 +25,7 @@
 		{/each}
 		{#if $project && $project.editor}
 			<button
-				class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg mt-2 w-48 hover:bg-primary-light h-[76px]"
+				class="flex flex-col justify-around items-center border border-grey-lighter rounded-lg w-48 hover:bg-primary-light mb-2"
 				on:click={() => {
 					ZenoService.addChart(
 						$project ? $project.uuid : '',

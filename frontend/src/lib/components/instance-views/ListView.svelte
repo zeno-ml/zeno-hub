@@ -105,7 +105,7 @@
 			class="overflow-y-auto flex flex-wrap border-b border-grey-lighter content-start w-full h-full"
 		>
 			{#each table as inst (inst['data_id'])}
-				<div class="mr-2 mt-1">
+				<div class="mr-2 mt-2">
 					<svelte:component
 						this={viewMap[$project.view]}
 						options={viewOptions}
