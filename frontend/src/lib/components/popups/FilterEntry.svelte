@@ -51,7 +51,7 @@
 			<p class="ml-1">where</p>
 		</div>
 	{/if}
-	<div class="mr-2.5 min-w-[200px]">
+	<div class="mr-2.5 w-52">
 		<Svelecte
 			bind:value={predicate.column}
 			placeholder="Column"

@@ -16,8 +16,7 @@
 	on:keydown={() => undefined}
 >
 	<Paper
-		class="pt-3 overflow-scroll min-h-[300px]"
-		style="height: 90%; display: flex; flex-direction: column;"
+		class="pt-3 overflow-scroll min-h-[300px] flex flex-col h-5/6"
 		elevation={7}
 		on:mousedown={(e) => e.stopPropagation()}
 	>
