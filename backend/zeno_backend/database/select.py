@@ -617,6 +617,7 @@ def columns(project: str) -> list[ZenoColumn]:
             sql.Identifier(f"{project}_column_map")
         ),
     )
+
     return list(
         map(
             lambda column: ZenoColumn(
