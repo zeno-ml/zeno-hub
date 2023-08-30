@@ -13,14 +13,12 @@
 	</div>
 	<p class="mt-3 text-grey">
 		<span class="font-semibold">label: </span>
-		<span class="value">
-			{entry['label']}
-		</span>
+		{entry['label']}
 	</p>
 	{#if modelColumn && entry[modelColumn] !== undefined}
 		<p class="mt-2 text-grey">
 			<span class="font-semibold">output: </span>
-			<span>{entry[modelColumn]} </span>
+			{entry[modelColumn]}
 		</p>
 	{/if}
 </div>
