@@ -42,23 +42,6 @@ jobs:
         with:
           path: "backend/zeno_backend/"
 
-  format-api:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "zeno_api/zeno_api/"
-
-  lint-api:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: jpetrucciani/ruff-check@main
-        with:
-          path: "zeno_api/zeno_api/"
-
   typecheck-python:
     runs-on: ubuntu-latest
     steps:
