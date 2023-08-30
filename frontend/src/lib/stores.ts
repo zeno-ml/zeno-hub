@@ -20,6 +20,7 @@ export const columns: Writable<ZenoColumn[]> = writable([]);
 export const models: Writable<string[]> = writable([]);
 export const model: Writable<string | undefined> = writable(undefined);
 export const comparisonModel: Writable<string | undefined> = writable(undefined);
+export const comparisonColumn: Writable<ZenoColumn | undefined> = writable(undefined);
 export const metrics: Writable<Metric[]> = writable([]);
 export const metric: Writable<Metric | undefined> = writable(undefined);
 export const rowsPerPage: Writable<number> = writable(5);

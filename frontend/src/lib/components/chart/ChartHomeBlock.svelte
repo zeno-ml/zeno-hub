@@ -32,7 +32,7 @@
 </script>
 
 <button
-	class="flex flex-col items-center border-2 border-grey-lighter rounded-lg hover:bg-primary-ligther mt-2 cursor-pointer p-2 mr-2 max-w-[500px]"
+	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
 	on:click={() => goto(`${$page.url}/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">

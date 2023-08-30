@@ -1,12 +1,8 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { editTag, metric, project } from '$lib/stores';
 	import type { GroupMetric } from '$lib/zenoapi';
-	import { mdiRefresh } from '@mdi/js';
-	import Button, { Group, Icon } from '@smui/button';
-	import CircularProgress from '@smui/circular-progress';
-	import { tooltip } from '@svelte-plugins/tooltips';
+	import Button, { Group } from '@smui/button';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
 	export let currentResult: GroupMetric[] | undefined;
@@ -14,52 +10,17 @@
 
 	let CHOICES: string[];
 
-	let runningAnalysis = true;
-
 	$: CHOICES =
 		$editTag === undefined
 			? $project !== undefined && $project.view !== ''
 				? ['list', 'table']
 				: ['table']
 			: ['table'];
-
-	$: {
-		if ($project === undefined) {
-			runningAnalysis = true;
-		} else {
-			runningAnalysis = false;
-		}
-	}
 </script>
 
-<div style:width="100%">
+<div class="w-full">
 	<div class="pt-2.5 flex justify-between w-full border-b border-grey-lighter h-[60px]">
 		<ChipsWrapper />
-		<div class="status flex items-center">
-			{#if runningAnalysis}
-				<CircularProgress
-					class="status-circle"
-					style="height: 32px; width: 32px; margin-right:20px"
-					indeterminate
-				/>
-			{:else}
-				<div
-					on:keydown={() => ({})}
-					on:click={() => invalidateAll()}
-					use:tooltip={{
-						content: 'Refresh data & functions',
-						position: 'left',
-						theme: 'zeno-tooltip'
-					}}
-				>
-					<div class="cursor-pointer w-6 h-6 fill-grey">
-						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
-							<path d={mdiRefresh} />
-						</Icon>
-					</div>
-				</div>
-			{/if}
-		</div>
 	</div>
 	{#if !$page.url.href.includes('compare')}
 		<div

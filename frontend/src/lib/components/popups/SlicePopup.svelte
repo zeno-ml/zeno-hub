@@ -145,7 +145,7 @@
 
 <Popup on:close>
 	<Content>
-		<Textfield bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
+		<Textfield class="mb-2 ml-3" bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
 		<div class="flex items-center flex-row-reverse">
 			<Button

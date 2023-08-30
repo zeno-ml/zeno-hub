@@ -28,9 +28,13 @@
 	function predicateChange(e: CustomEvent) {
 		predicate.value = e.detail.label;
 	}
+
+	function renderOptions(option: { label: string }) {
+		return option.label;
+	}
 </script>
 
-<div class="flex mb-1 mt-1">
+<div class="flex mb-1 mt-1 items-center">
 	{#if index !== 0}
 		<div class="mr-2.5">
 			<Svelecte
@@ -44,19 +48,21 @@
 		</div>
 	{:else}
 		<div style="width: 90px">
-			<p class="ml-1 mt-1">where</p>
+			<p class="ml-1">where</p>
 		</div>
 	{/if}
-	<div class="mr-2.5">
+	<div class="mr-2.5 w-52">
 		<Svelecte
 			bind:value={predicate.column}
-			placeholder={'Column'}
+			placeholder="Column"
 			valueAsObject
-			valueField={'name'}
+			valueField="name"
 			options={$columns.filter(
 				(d) =>
-					d.columnType !== ZenoColumnType.EMBEDDING &&
-					(d.model === $model || d.columnType === ZenoColumnType.FEATURE)
+					(d.columnType === ZenoColumnType.FEATURE ||
+						d.columnType === ZenoColumnType.OUTPUT ||
+						ZenoColumnType.LABEL) &&
+					(d.model === $model || d.model === null)
 			)}
 			on:change={() => {
 				if (predicate.column.dataType === MetadataType.OTHER) {
@@ -69,23 +75,25 @@
 	</div>
 	<div class="mr-2.5">
 		{#if predicate.column}
-			{#if predicate.column.dataType === MetadataType.BOOLEAN}
+			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL}
 				<Svelecte
-					value={predicate.operation}
 					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=']}
+					options={['==', '!=', 'LIKE']}
 				/>
 			{:else}
+				<!-- renderer function avoids HTML sanitation issues-->
 				<Svelecte
-					value={inverseOperationMap[predicate.operation]}
 					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
 					options={['==', '!=', '>', '<', '>=', '<=', 'LIKE']}
+					renderer={renderOptions}
 				/>
 			{/if}
 		{/if}
@@ -106,7 +114,7 @@
 				<input
 					type="text"
 					bind:value={predicate.value}
-					class="h-8 border border-grey-lighter rounded"
+					class="h-[38px] pl-2 border border-grey-lighter rounded"
 				/>
 			{/if}
 		{:else}
