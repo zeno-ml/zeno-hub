@@ -279,7 +279,7 @@ def get_server() -> FastAPI:
 
     @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
     def get_project(owner_name: str, project_name: str, request: Request):
-        uuid = get_project_uuid(owner_name, project_name)
+        uuid = select.project_uuid(owner_name, project_name)
         if uuid is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if not util.access_valid(uuid, request):
@@ -291,10 +291,9 @@ def get_server() -> FastAPI:
     @api_app.get(
         "/project-uuid/{owner_name}/{project_name}",
         response_model=str,
-        dependencies=[Depends(auth)],
         tags=["zeno"],
     )
-    def get_project_uuid(owner_name: str, project_name: str):
+    def get_project_uuid(owner_name: str, project_name: str, request: Request):
         uuid = select.project_uuid(owner_name, project_name)
         if uuid is None:
             raise HTTPException(
@@ -307,6 +306,8 @@ def get_server() -> FastAPI:
                     + " does not exist."
                 ),
             )
+        if not util.access_valid(uuid, request):
+            return Response(status_code=401)
         return uuid
 
     @api_app.get(
