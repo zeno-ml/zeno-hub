@@ -20,6 +20,8 @@
 	export let user: User | null;
 
 	let projectEdit = false;
+
+	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
 {#if projectEdit && $project && user !== null}
@@ -55,7 +57,7 @@
 			{/if}
 		</div>
 		<div>
-			{#if $page.url.href.includes('project')}
+			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
 				<HeaderIcon
 					pageName={'$collapseHeader'}
 					tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
@@ -65,7 +67,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mb-3">
-			{#if $page.url.href.includes('project') && $project && $project.ownerName === user?.name}
+			{#if currentTab?.includes('project') && $project && $project.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}
 					tooltipContent={"Edit your project's configuration."}
