@@ -2,11 +2,13 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { authToken, project } from '$lib/stores';
+	import { authToken, collapseHeader, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
 		mdiAccount,
+		mdiArrowCollapseLeft,
+		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
 		mdiCog,
 		mdiCompare,
@@ -60,8 +62,15 @@
 				</div>
 			{/if}
 		</div>
-
-		<div class="m-auto flex flex-col items-center justify-center mb-3">
+		<div>
+			<HeaderIcon
+				pageName={'$collapseHeader'}
+				tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
+				icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
+				on:click={() => collapseHeader.set(!$collapseHeader)}
+			/>
+		</div>
+		<div class="flex flex-col items-center justify-center mb-3">
 			<HeaderIcon
 				pageName={'account'}
 				tooltipContent={'Manage your account.'}

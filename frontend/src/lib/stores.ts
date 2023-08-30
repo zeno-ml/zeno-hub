@@ -26,6 +26,7 @@ export const rowsPerPage: Writable<number> = writable(5);
 export const folders: Writable<Folder[]> = writable([]);
 export const tags: Writable<Tag[]> = writable([]);
 export const charts: Writable<Chart[]> = writable([]);
+export const collapseHeader: Writable<boolean> = writable(false);
 
 // [column, ascending]
 export const sort: Writable<[ZenoColumn | undefined, boolean]> = writable([undefined, true]);
