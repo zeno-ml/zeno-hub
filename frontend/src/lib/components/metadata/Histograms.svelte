@@ -185,7 +185,7 @@
 				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content:
-						'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data.',
+						'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data',
 					position: 'right',
 					theme: 'zeno-tooltip'
 				}}
