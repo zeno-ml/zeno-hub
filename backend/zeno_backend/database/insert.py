@@ -279,12 +279,20 @@ def system(
 
     with Database() as db:
         for col in columns:
+            data_type = db.execute_return(
+                sql.SQL(
+                    "SELECT data_type FROM information_schema.columns WHERE "
+                    "table_schema = 'public' AND table_name = 'tmp' AND "
+                    "column_name = {};"
+                ).format(sql.Literal(col.id))
+            )
+
             db.execute(
-                sql.SQL("ALTER TABLE {} ADD {}{};").format(
+                sql.SQL("ALTER TABLE {} ADD {} ").format(
                     sql.Identifier(project),
                     sql.Identifier(col.id),
-                    sql.Literal(col.data_type),
                 )
+                + sql.SQL(data_type[0][0] + ";"),
             )
             db.execute(
                 sql.SQL(
