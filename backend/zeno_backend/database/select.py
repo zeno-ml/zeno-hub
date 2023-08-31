@@ -1004,10 +1004,13 @@ def filered_short_string_column_values(
     db = Database()
     short_ret: list[str] = []
     if not req.is_regex:
-        if not req.whole_word_match:
+        if req.whole_word_match:
+            req.filter_string = f"% {req.filter_string} %"
+        else:
             req.filter_string = f"%{req.filter_string}%"
+
         if not req.case_match:
-            req.filter_string = req.filter_string.lower()
+            req.filter_string = req.filter_string.upper()
             returned_strings = db.connect_execute_return(
                 sql.SQL("SELECT {} from {} WHERE UPPER({}) LIKE %s;").format(
                     sql.Identifier(req.column.id),
@@ -1044,7 +1047,7 @@ def filered_short_string_column_values(
 
     else:
         returned_strings = db.connect_execute_return(
-            sql.SQL("SELECT {} from {} WHERE {} LIKE %s").format(
+            sql.SQL("SELECT {} from {} WHERE {} SIMILAR TO %s").format(
                 sql.Identifier(req.column.id),
                 sql.Identifier(project),
                 sql.Identifier(req.column.id),

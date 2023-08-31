@@ -8,8 +8,8 @@
 
 <button
 	{id}
-	class={`flex items-center p-1 h-6 cursor-pointer hover:bg-yellowish ${
-		highlighted ? 'bg-primary-mid' : ''
+	class={`flex items-center pt-1 pb-1 pl-2 pr-2 h-7 cursor-pointer  ${
+		highlighted ? 'bg-primary-mid' : 'hover:bg-yellowish'
 	}`}
 	on:click
 	use:tooltip={{
