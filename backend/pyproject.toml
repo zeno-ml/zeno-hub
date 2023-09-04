@@ -30,7 +30,7 @@ sqlalchemy = "^2.0.20"
 black = "^23.3.0"
 pre-commit = "^3.3.3"
 pyright = "^1.1.323"
-pytest = "^7.3.2"
+pytest = "^7.4.1"
 ruff = "^0.0.287"
 
 [build-system]
