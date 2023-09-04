@@ -873,7 +873,7 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/checkbox@7.0.0-beta.14", "@smui/checkbox@^7.0.0-beta.8":
+"@smui/checkbox@7.0.0-beta.14", "@smui/checkbox@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.npmjs.org/@smui/checkbox/-/checkbox-7.0.0-beta.14.tgz"
   integrity sha512-tQV/9VJC7cxktR5/pXsK34+FPGmc0tWDHfEQBMK35Pbm1jdp99mbj/5ZaaM/43NYj94ynOo7imRmNkWyXSCJng==
@@ -912,19 +912,19 @@
     "@material/dom" "^14.0.0"
     svelte2tsx "^0.6.15"
 
-"@smui/data-table@7.0.0-beta.8":
-  version "7.0.0-beta.8"
-  resolved "https://registry.npmjs.org/@smui/data-table/-/data-table-7.0.0-beta.8.tgz"
-  integrity sha512-sBmgQccJ4qasqbYIJD6fldu486lGPW38uLDgukjXDOuB9185f2pdgUhltCbP+sz+svHZDg/QXn0qEA4nks1Tbw==
+"@smui/data-table@7.0.0-beta.14":
+  version "7.0.0-beta.14"
+  resolved "https://registry.yarnpkg.com/@smui/data-table/-/data-table-7.0.0-beta.14.tgz#274c0118975ef75d41b343b4359bf4d4da6d824c"
+  integrity sha512-E5O/fyopx/PBDmrouu5J4W/yblsYnBF9Lqapk2zCR24rGNJOiVVf7AiN0Yl2F7wjiNhTqUg8X3Mietqe76OdhA==
   dependencies:
     "@material/data-table" "^14.0.0"
     "@material/dom" "^14.0.0"
-    "@smui/checkbox" "^7.0.0-beta.8"
-    "@smui/common" "^7.0.0-beta.8"
-    "@smui/icon-button" "^7.0.0-beta.8"
-    "@smui/ripple" "^7.0.0-beta.8"
-    "@smui/select" "^7.0.0-beta.8"
-    svelte2tsx "^0.6.10"
+    "@smui/checkbox" "^7.0.0-beta.14"
+    "@smui/common" "^7.0.0-beta.14"
+    "@smui/icon-button" "^7.0.0-beta.14"
+    "@smui/ripple" "^7.0.0-beta.14"
+    "@smui/select" "^7.0.0-beta.14"
+    svelte2tsx "^0.6.15"
 
 "@smui/dialog@^7.0.0-beta.14":
   version "7.0.0-beta.14"
@@ -1077,7 +1077,7 @@
     "@smui/ripple" "^7.0.0-beta.14"
     svelte2tsx "^0.6.15"
 
-"@smui/select@7.0.0-beta.14", "@smui/select@^7.0.0-beta.8":
+"@smui/select@7.0.0-beta.14", "@smui/select@^7.0.0-beta.14":
   version "7.0.0-beta.14"
   resolved "https://registry.yarnpkg.com/@smui/select/-/select-7.0.0-beta.14.tgz#801e4a14bb4d530fc8108bf337e9fa59dce7b7a6"
   integrity sha512-pv3xdnbHLYE72qFfTy3Kx/sTsezyHheEdcXNeQ6DKZ9v/2RcJzlQSA/Q/Qj559ZWH1m6XOK9kXk1HjtsaQk6bg==
