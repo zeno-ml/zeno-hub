@@ -13,6 +13,7 @@
 		mdiCog,
 		mdiCompare,
 		mdiCompassOutline,
+		mdiLogin,
 		mdiLogout
 	} from '@mdi/js';
 	import HeaderIcon from './HeaderIcon.svelte';
@@ -75,20 +76,24 @@
 					on:click={() => (projectEdit = true)}
 				/>
 			{/if}
-			<HeaderIcon
-				pageName={'account'}
-				tooltipContent={'Manage your account'}
-				icon={mdiAccount}
-				on:click={() => goto(`/account`)}
-			/>
-			<form method="POST" action="/logout">
+			{#if $authToken}
 				<HeaderIcon
-					pageName={'logout'}
-					tooltipContent={'Logout'}
-					icon={mdiLogout}
-					on:click={() => authToken.set(undefined)}
+					pageName={'account'}
+					tooltipContent={'Manage your account'}
+					icon={mdiAccount}
+					on:click={() => goto(`/account`)}
 				/>
-			</form>
+				<form method="POST" action="/logout">
+					<HeaderIcon pageName={'logout'} tooltipContent={'Logout'} icon={mdiLogout} />
+				</form>
+			{:else}
+				<HeaderIcon
+					pageName={'login'}
+					tooltipContent={'Login'}
+					icon={mdiLogin}
+					on:click={() => goto(`/login`)}
+				/>
+			{/if}
 		</div>
 	</header>
 </nav>
