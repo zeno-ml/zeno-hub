@@ -17,7 +17,11 @@
 	<!-- y cell -->
 	<Cell>
 		{#if parameters.yChannel === SlicesOrModels.SLICES}
-			<SliceDetailsContainer sli={$slices.find((sli) => sli.id === row)} />
+			{#if row === -1}
+				<p>All instances</p>
+			{:else}
+				<SliceDetailsContainer sli={$slices.find((sli) => sli.id === row)} />
+			{/if}
 		{:else}
 			{row}
 		{/if}

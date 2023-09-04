@@ -12,6 +12,7 @@
 	let options: { value: number; label: string }[] = [];
 	let value: number[] = [];
 
+	options.push({ value: -1, label: 'All instances' });
 	// initial options & values
 	$slices.forEach((s) => {
 		options.push({ value: s.id, label: s.sliceName });
