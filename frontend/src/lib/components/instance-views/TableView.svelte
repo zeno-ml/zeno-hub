@@ -32,6 +32,7 @@
 	let currentTagIds: string[] = [];
 	let currentPage = 0;
 	let lastPage = 0;
+	let instanceHidden = false;
 	let sampleOptions = [
 		...new Set(
 			$project !== undefined && $project.samplesPerPage !== undefined
@@ -133,7 +134,15 @@
 						<th class="p-3 font-semibold font-grey">Included</th>
 					{/if}
 					{#if $project !== undefined && viewMap[$project.view] !== undefined}
-						<th class="p-3 font-semibold font-grey">instance</th>
+						<th
+							class="p-3 font-semibold font-grey whitespace-nowrap"
+							on:click={() => (instanceHidden = !instanceHidden)}
+						>
+							instance
+							{#if instanceHidden}
+								<span class="ml-2 text-grey-darker">hidden</span>
+							{/if}
+						</th>
 					{/if}
 					{#each columnHeader as header}
 						{#if header.name !== 'data_id'}
@@ -166,21 +175,29 @@
 						{/if}
 						{#if $project !== undefined && viewMap[$project.view] !== undefined}
 							<td class="p-3">
-								<div class="instance">
-									<svelte:component
-										this={viewMap[$project.view]}
-										options={viewOptions}
-										entry={tableContent}
-										modelColumn={modelColumn?.id}
-									/>
-								</div>
+								{#if instanceHidden}
+									<p class="text-center">...</p>
+								{:else}
+									<div class="instance">
+										<svelte:component
+											this={viewMap[$project.view]}
+											options={viewOptions}
+											entry={tableContent}
+											modelColumn={modelColumn?.id}
+										/>
+									</div>
+								{/if}
 							</td>
 						{/if}
 						{#each columnHeader as header}
 							{#if header.dataType === MetadataType.CONTINUOUS}
-								<td class="p-3">{parseFloat(`${tableContent[header.id]}`).toFixed(2)}</td>
+								<td class="p-3 border border-grey-lighter align-top">
+									{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
+								</td>
 							{:else}
-								<td class="p-3">{tableContent[header.id]}</td>
+								<td class="p-3 border border-grey-lighter align-top">
+									{tableContent[header.id]}
+								</td>
 							{/if}
 						{/each}
 					</tr>

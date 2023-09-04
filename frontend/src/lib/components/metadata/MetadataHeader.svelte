@@ -53,11 +53,13 @@
 			</select>
 		</div>
 	{/if}
-	{#if !$page.url.href.includes('compare') && $metric !== undefined}
+	{#if !$page.url.href.includes('compare') && $metrics.length > 0 && $metric !== undefined}
 		<div class="flex flex-col w-1/2">
 			<span class="my-1 text-grey-dark">Metric</span>
 			<select
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+				name="metric-select"
+				required
 				bind:value={$metric}
 			>
 				{#each $metrics as met}
@@ -80,7 +82,7 @@
 		</div>
 	{/if}
 </div>
-{#if $page.url.href.includes('compare') && $metric !== undefined}
+{#if $page.url.href.includes('compare') && $metric !== undefined && $metrics.length > 0}
 	<div class="flex flex-col w-full">
 		<span class="my-1 text-grey-dark">Metric</span>
 		<select

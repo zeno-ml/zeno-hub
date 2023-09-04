@@ -15,11 +15,7 @@
 	on:mousedown={() => dispatch('close')}
 	on:keydown={() => undefined}
 >
-	<Paper
-		class="pt-3 overflow-scroll min-h-[300px] flex flex-col h-5/6"
-		elevation={7}
-		on:mousedown={(e) => e.stopPropagation()}
-	>
+	<Paper class="pt-3 flex flex-col" elevation={7} on:mousedown={(e) => e.stopPropagation()}>
 		<slot />
 	</Paper>
 </div>

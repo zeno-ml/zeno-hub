@@ -75,7 +75,7 @@
 	</div>
 	<div class="mr-2.5">
 		{#if predicate.column}
-			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL}
+			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL || predicate.column.dataType === MetadataType.OTHER}
 				<Svelecte
 					on:change={operationChange}
 					value={inverseOperationMap[predicate.operation]}
@@ -110,7 +110,7 @@
 					searchable={false}
 					options={['true', 'false']}
 				/>
-			{:else if predicate.column.dataType !== MetadataType.OTHER}
+			{:else}
 				<input
 					type="text"
 					bind:value={predicate.value}

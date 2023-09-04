@@ -37,19 +37,19 @@
 				<div class="flex flex-col mt-3">
 					<HeaderIcon
 						pageName={'explore'}
-						tooltipContent={'Explore your data and model outputs.'}
+						tooltipContent={'Explore your data and model outputs'}
 						icon={mdiCompassOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
 					/>
 					<HeaderIcon
 						pageName={'compare'}
-						tooltipContent={'Qualitatively compare model outputs.'}
+						tooltipContent={'Qualitatively compare model outputs'}
 						icon={mdiCompare}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
 					/>
 					<HeaderIcon
 						pageName={'chart'}
-						tooltipContent={'Create charts from your slices and metrics.'}
+						tooltipContent={'Create charts from your slices and metrics'}
 						icon={mdiChartBoxOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
 					/>
@@ -60,7 +60,7 @@
 			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
 				<HeaderIcon
 					pageName={'$collapseHeader'}
-					tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
+					tooltipContent={$collapseHeader ? 'Expand sidebar' : 'Collapse sidebar'}
 					icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
 					on:click={() => collapseHeader.set(!$collapseHeader)}
 				/>
@@ -70,21 +70,21 @@
 			{#if currentTab?.includes('project') && $project && $project.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}
-					tooltipContent={"Edit your project's configuration."}
+					tooltipContent={"Edit your project's configuration"}
 					icon={mdiCog}
 					on:click={() => (projectEdit = true)}
 				/>
 			{/if}
 			<HeaderIcon
 				pageName={'account'}
-				tooltipContent={'Manage your account.'}
+				tooltipContent={'Manage your account'}
 				icon={mdiAccount}
 				on:click={() => goto(`/account`)}
 			/>
 			<form method="POST" action="/logout">
 				<HeaderIcon
 					pageName={'logout'}
-					tooltipContent={'Logout.'}
+					tooltipContent={'Logout'}
 					icon={mdiLogout}
 					on:click={() => authToken.set(undefined)}
 				/>

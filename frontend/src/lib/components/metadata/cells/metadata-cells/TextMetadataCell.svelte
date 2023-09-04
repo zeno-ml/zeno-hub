@@ -130,13 +130,14 @@
 			</div>
 		</AutoComplete>
 	{/key}
-	<div class="ml-2.5 flex items-center">
+	<div class="ml-2.5 flex items-center border rounded-md border-grey-light">
 		<SearchOption
 			id={'caseMatch'}
 			highlighted={caseMatch}
 			on:click={optionClick}
 			tooltipContent={'Match Case'}>Aa</SearchOption
 		>
+		<div class="w-px h-6 bg-grey-light" />
 		<SearchOption
 			id={'wholeWordMatch'}
 			highlighted={wholeWordMatch}
@@ -145,6 +146,7 @@
 		>
 			<svelte:component this={MatchWholeWordIcon} />
 		</SearchOption>
+		<div class="w-px h-6 bg-grey-light" />
 		<SearchOption
 			id={'typeSelection'}
 			highlighted={isRegex}

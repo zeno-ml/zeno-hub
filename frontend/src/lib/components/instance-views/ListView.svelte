@@ -118,7 +118,7 @@
 	{/if}
 	<Pagination slot="paginate" class="pagination">
 		<svelte:fragment slot="rowsPerPage">
-			<Label>Rows Per Page</Label>
+			<Label>Instances Per Page</Label>
 			<Select variant="outlined" bind:value={$rowsPerPage} noLabel>
 				{#each sampleOptions as option}
 					<Option value={option}>{option}</Option>

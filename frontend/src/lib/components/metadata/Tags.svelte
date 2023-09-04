@@ -40,7 +40,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-darker"
 			use:tooltip={{
-				content: 'Tags are named sets of data instances.',
+				content: 'Tags are named sets of data instances',
 				position: 'right',
 				theme: 'zeno-tooltip'
 			}}
@@ -55,7 +55,7 @@
 			<div>
 				<div
 					use:tooltip={{
-						content: 'Create a new tag.',
+						content: 'Create a new tag',
 						position: 'left',
 						theme: 'zeno-tooltip'
 					}}

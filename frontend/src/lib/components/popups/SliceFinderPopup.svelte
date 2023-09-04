@@ -141,8 +141,8 @@
 				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content: $page.url.href.includes('compare')
-						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two models.'
-						: 'Run the SliceLine algorithm to find slices of data with high or low metrics.',
+						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two models'
+						: 'Run the SliceLine algorithm to find slices of data with high or low metrics',
 					position: 'right',
 					theme: 'zeno-tooltip',
 					maxWidth: '350'
@@ -229,7 +229,7 @@
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content:
-							'Weight parameter for the average slice metric. Increase it to find more slices.',
+							'Weight parameter for the average slice metric. Increase it to find more slices',
 						theme: 'zeno-tooltip',
 						maxWidth: '195',
 						position: 'left'
