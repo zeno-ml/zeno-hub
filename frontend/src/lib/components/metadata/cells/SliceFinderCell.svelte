@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import { comparisonModel, model, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { updateModelDependentSlices } from '$lib/util/util';
@@ -29,15 +30,14 @@
 	function addSlice() {
 		slice.sliceName = newSliceName;
 		if ($project !== undefined) {
-			ZenoService.addSlice($project.uuid, slice).then(() => {
-				ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) => {
-					slices.set(fetchedSlices);
-					$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
-					$comparisonModel !== undefined &&
-						updateModelDependentSlices('model B', $comparisonModel, $slices);
-					showSliceName = false;
-					created = true;
-				});
+			ZenoService.addSlice($project.uuid, slice).then((res) => {
+				invalidateAll();
+				slices.update((s) => [...s, { ...slice, id: res }]);
+				$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
+				$comparisonModel !== undefined &&
+					updateModelDependentSlices('model B', $comparisonModel, $slices);
+				showSliceName = false;
+				created = true;
 			});
 		}
 	}
@@ -45,12 +45,9 @@
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($project) {
-				ZenoService.getSlices($project.uuid).then((fetchedSlices) => {
-					slices.set(fetchedSlices);
-					created = false;
-				});
-			}
+			invalidateAll();
+			slices.update((s) => s.filter((sli) => sli.sliceName !== slice.sliceName));
+			created = false;
 		});
 	}
 

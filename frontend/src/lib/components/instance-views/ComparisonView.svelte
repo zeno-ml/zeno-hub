@@ -87,7 +87,7 @@
 		updateTable();
 	}
 
-	comparisonColumn.subscribe((_) => {
+	comparisonColumn.subscribe(() => {
 		table = undefined;
 		compareSort.set([undefined, true]);
 	});

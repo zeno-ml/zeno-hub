@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { folders, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -33,11 +34,14 @@
 						...slice,
 						folderId: folder.id
 					}).then(() => {
-						if ($project) {
-							ZenoService.getSlices($project.uuid).then((fetchedSlices) =>
-								slices.set(fetchedSlices)
-							);
-						}
+						invalidateAll();
+						slices.update((s) => {
+							const index = s.findIndex((s) => s.id === slice.id);
+							if (index !== -1) {
+								s[index] = { ...slice, folderId: folder.id };
+							}
+							return s;
+						});
 					});
 				}
 			});
@@ -97,14 +101,22 @@
 								e.stopPropagation();
 								showOptions = false;
 								ZenoService.deleteFolder(folder).then(() => {
-									if ($project) {
-										ZenoService.getSlices($project.uuid).then((fetchedSlices) =>
-											slices.set(fetchedSlices)
-										);
-										ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
-											folders.set(fetchedFolders)
-										);
-									}
+									invalidateAll();
+									slices.update((s) => {
+										s.forEach((slice) => {
+											if (slice.folderId === folder.id) {
+												slice.folderId = undefined;
+											}
+										});
+										return s;
+									});
+									folders.update((f) => {
+										const index = f.findIndex((f) => f.id === folder.id);
+										if (index !== -1) {
+											f.splice(index, 1);
+										}
+										return f;
+									});
 								});
 							}}
 						>

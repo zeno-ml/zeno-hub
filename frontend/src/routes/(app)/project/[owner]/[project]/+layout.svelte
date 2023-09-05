@@ -2,7 +2,9 @@
 	import {
 		columns,
 		folders,
+		metric,
 		metrics,
+		model,
 		models,
 		project,
 		rowsPerPage,
@@ -14,23 +16,27 @@
 
 	export let data;
 
-	$: setupProject(data);
+	project.set(data.project);
+	rowsPerPage.set(data.project.samplesPerPage ?? 10);
+	slices.set(data.slices);
+	columns.set(data.columns);
+	models.set(data.models);
+	if (data.models.length > 0) {
+		model.set(data.models[0]);
+	}
+	metrics.set(data.metrics);
+	if (data.metrics.length > 0) {
+		metric.set(data.metrics[0]);
+	}
+	folders.set(data.folders);
+	tags.set(data.tags);
 
-	function setupProject(setup_data: any) {
-		project.set(setup_data.project);
-		rowsPerPage.set(setup_data.project.samplesPerPage ?? 5);
-		slices.set(setup_data.slices);
-		columns.set(setup_data.columns);
-		models.set(setup_data.models);
-		metrics.set(setup_data.metrics);
-		folders.set(setup_data.folders);
-		tags.set(setup_data.tags);
-		zenoAPI.BASE = `${getEndpoint()}/api`;
-		if (setup_data.cognitoUser) {
-			zenoAPI.HEADERS = {
-				Authorization: 'Bearer ' + setup_data.cognitoUser.accessToken
-			};
-		}
+	zenoAPI.BASE = `${getEndpoint()}/api`;
+
+	if (data.cognitoUser) {
+		zenoAPI.HEADERS = {
+			Authorization: 'Bearer ' + data.cognitoUser.accessToken
+		};
 	}
 </script>
 

@@ -832,7 +832,7 @@ def tags(project: str) -> list[Tag]:
                     folder_id=tag_result[2],
                     data_ids=[]
                     if len(data_results) == 0
-                    else list(map(lambda d: d[0], data_results[0])),
+                    else [d[0] for d in data_results],
                 )
             )
         return tags

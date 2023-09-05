@@ -316,31 +316,40 @@ def system(
         db.commit()
 
 
-def folder(project: str, name: str):
+def folder(project: str, name: str) -> int | None:
     """Adding a folder to an existing project.
 
     Args:
         project (str): the project the user is currently working with.
         name (str): name of the folder to be added.
+
+
+    Returns:
+        int | None: the id of the newly created folder.
     """
     db = Database()
-    db.connect_execute(
-        "INSERT INTO folders (name, project_uuid) VALUES (%s,%s);",
+    id = db.connect_execute_return(
+        "INSERT INTO folders (name, project_uuid) VALUES (%s,%s) RETURNING id;",
         [name, project],
     )
+    if id is not None and len(id) > 0:
+        return id[0][0]
 
 
-def slice(project: str, req: Slice):
+def slice(project: str, req: Slice) -> int | None:
     """Add a slice to an existing project.
 
     Args:
         project (str): the project the user is currently working with.
         req (Slice): the slice to be added to the project.
+
+    Returns:
+        int | None: the id of the newly created slice.
     """
     db = Database()
-    db.connect_execute(
+    ids = db.connect_execute_return(
         "INSERT INTO slices (name, folder_id, filter, project_uuid) "
-        "VALUES (%s,%s,%s,%s);",
+        "VALUES (%s,%s,%s,%s) RETURNING id;",
         [
             req.slice_name,
             req.folder_id,
@@ -348,19 +357,27 @@ def slice(project: str, req: Slice):
             project,
         ],
     )
+    if ids is not None:
+        return ids[0][0]
+    else:
+        return None
 
 
-def chart(project: str, chart: Chart):
+def chart(project: str, chart: Chart) -> int | None:
     """Add a chart to an existing project.
 
     Args:
         project (str): the project the user is currently working with.
         chart (Chart): the chart to be added to the project.
+    
+
+    Returns:
+        int | None: the id of the newly created chart.
     """
     db = Database()
-    db.connect_execute(
+    id = db.connect_execute_return(
         "INSERT INTO charts (name, type, parameters, project_uuid) "
-        "VALUES (%s,%s,%s,%s);",
+        "VALUES (%s,%s,%s,%s) RETURNING id;",
         [
             chart.name,
             chart.type,
@@ -368,14 +385,19 @@ def chart(project: str, chart: Chart):
             project,
         ],
     )
+    if id is not None and len(id) > 0:
+        return id[0][0]
 
 
-def tag(project: str, tag: Tag):
+def tag(project: str, tag: Tag) -> int | None:
     """Add a tag to an existing project.
 
     Args:
         project (str): the project the user is currently working with.
         tag (Tag): the tag to be added to the project.
+
+    Returns:
+        int | None: the id of the newly created tag.
     """
     with Database() as db:
         id = db.execute_return(
@@ -383,16 +405,17 @@ def tag(project: str, tag: Tag):
             "RETURNING id;",
             [tag.tag_name, tag.folder_id, project],
         )
-        if id is None:
+        if id is None or len(id) == 0:
             return
         for datapoint in tag.data_ids:
             db.execute(
                 sql.SQL("INSERT INTO {} (tag_id, data_id) VALUES (%s,%s);").format(
                     sql.Identifier(f"{project}_tags_datapoints")
                 ),
-                [id[0], datapoint],
+                [id[0][0], datapoint],
             )
         db.commit()
+        return id[0][0]
 
 
 def user(user: User):
