@@ -369,7 +369,7 @@ def chart(project: str, chart: Chart) -> int | None:
     Args:
         project (str): the project the user is currently working with.
         chart (Chart): the chart to be added to the project.
-    
+
 
     Returns:
         int | None: the id of the newly created chart.
