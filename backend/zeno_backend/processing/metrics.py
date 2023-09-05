@@ -256,12 +256,15 @@ def f1(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
         )
 
 
-def count(project: str, filter: sql.Composed | None) -> GroupMetric:
+def count(
+    project: str, filter: sql.Composed | None, size_as_metric: bool = False
+) -> GroupMetric:
     """Count the number of datapoints matching a specified filter.
 
     Args:
         project (str): the project the user is currently working with.
         filter (sql.Composed | None): the filter to be applied before counting.
+        size_as_metric (bool): whether to return the count as the metric.
 
     Raises:
         Exception: something in the database processing failed.
@@ -278,9 +281,16 @@ def count(project: str, filter: sql.Composed | None) -> GroupMetric:
             )
             + filter,
         )
+
+        if size_as_metric:
+            met = num_total[0][0] if isinstance(num_total[0][0], int) else 0
+        else:
+            met = None
+
         return (
             GroupMetric(
-                metric=None, size=num_total[0] if isinstance(num_total[0], int) else 0
+                metric=met,
+                size=num_total[0][0] if isinstance(num_total[0][0], int) else 0,
             )
             if num_total is not None
             else GroupMetric(metric=None, size=0)
@@ -377,5 +387,7 @@ def metric_map(
         return f1(project, model, sql_filter)
     elif metric.type == "precision":
         return precision(project, model, sql_filter)
+    elif metric.type == "count":
+        return count(project, sql_filter, True)
     else:
         return count(project, sql_filter)

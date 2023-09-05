@@ -13,6 +13,7 @@
 	let value: number[] = [];
 
 	// initial options & values
+	options.push({ value: -1, label: 'slice size' });
 	$metrics.forEach((m) => {
 		options.push({ value: m.id, label: m.name });
 	});

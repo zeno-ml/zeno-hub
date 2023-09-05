@@ -57,6 +57,7 @@ def xyc_data(chart: Chart, project: str) -> str:
                     "size": metric.size,
                 }
             )
+
     return json.dumps({"table": elements})
 
 
@@ -75,7 +76,10 @@ def table_data(chart: Chart, project: str) -> str:
     if not isinstance(params, TableParameters):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
@@ -119,7 +123,10 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, BeeswarmParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
@@ -162,7 +169,10 @@ def radar_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, RadarParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
     selected_models = params.models
