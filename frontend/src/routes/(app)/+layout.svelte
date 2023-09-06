@@ -6,6 +6,7 @@
 	import { OpenAPI } from '$lib/zenoapi/index.js';
 
 	export let data;
+
 	if (data.cognitoUser !== null) {
 		authToken.set(data.cognitoUser.accessToken);
 	}

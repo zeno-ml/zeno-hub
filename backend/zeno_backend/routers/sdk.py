@@ -3,6 +3,7 @@ import io
 import uuid
 
 import pandas as pd
+from amplitude import Amplitude, BaseEvent
 from fastapi import (
     APIRouter,
     Depends,
@@ -17,6 +18,8 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.project import Project
 from zeno_backend.database import insert, select
+
+client = Amplitude("9e6755badfe6f970b509d3325a6a6678")
 
 
 class APIKeyBearer(HTTPBearer):
@@ -92,6 +95,13 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
             detail=("ERROR: Project already exists."),
         )
 
+    client.track(
+        BaseEvent(
+            event_type="project_created",
+            user_id=str(user_id + 10000),
+            event_properties={"project": project.name},
+        )
+    )
     project.uuid = str(uuid.uuid4())
     insert.project(project, user_id)
     return project.uuid
@@ -167,3 +177,11 @@ def upload_system(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=("ERROR: Unable to create system table: " + str(e)),
         ) from e
+
+    client.track(
+        BaseEvent(
+            event_type="system_uploaded",
+            user_id="10000",
+            event_properties={"project": project},
+        )
+    )
