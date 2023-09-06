@@ -1,56 +1,9 @@
-"""Methods to calculate metrics for model outputs."""
+"""Compute the F1 score."""
 from psycopg import sql
 
 from zeno_backend.classes.base import GroupMetric
-from zeno_backend.classes.metric import Metric
 from zeno_backend.database.database import Database
 from zeno_backend.database.select import column_id_from_name_and_model
-
-
-def accuracy(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
-    """Accuracy of the selected model on the selected data.
-
-    Args:
-        project (str): the project the user is currently working with.
-        model (str): the model for which to calulate the accuracy.
-        filter (sql.Composed | None): how to filter the data before calculation.
-
-    Raises:
-        Exception: something in the database processing failed.
-
-    Returns:
-        GroupMetric: accuracy metric calculated as specified.
-    """
-    output_column_id = column_id_from_name_and_model(project, "output", model)
-    with Database() as db:
-        correct_query = sql.SQL("SELECT COUNT(*) FROM {} WHERE {} = label").format(
-            sql.Identifier(project), sql.Identifier(output_column_id)
-        )
-        num_correct = db.execute_return(
-            correct_query
-            if filter is None
-            else correct_query + sql.SQL(" AND ") + filter,
-        )
-        total_query = sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
-        num_total = db.execute_return(
-            total_query
-            if filter is None
-            else total_query + sql.SQL(" WHERE ") + filter,
-        )
-        return (
-            (
-                GroupMetric(
-                    metric=100 * num_correct[0] / num_total[0], size=num_total[0]
-                )
-                if num_total[0] != 0
-                else GroupMetric(metric=0, size=0)
-            )
-            if num_correct is not None
-            and isinstance(num_correct[0], int)
-            and num_total is not None
-            and isinstance(num_total[0], int)
-            else GroupMetric(metric=None, size=0)
-        )
 
 
 def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
@@ -76,8 +29,7 @@ def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric
         num_tp = db.execute_return(
             tp_query + group_query
             if filter is None
-            else tp_query + sql.SQL(" AND ") + filter + group_query,
-            return_all=True,
+            else tp_query + sql.SQL(" AND ") + filter + group_query
         )
         fn_query = sql.SQL("SELECT COUNT(*), label FROM {} WHERE {} != label").format(
             sql.Identifier(project), sql.Identifier(output_column_id)
@@ -85,8 +37,7 @@ def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric
         num_fn = db.execute_return(
             fn_query + group_query
             if filter is None
-            else fn_query + sql.SQL(" AND ") + filter + group_query,
-            return_all=True,
+            else fn_query + sql.SQL(" AND ") + filter + group_query
         )
         total_query = sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
         num_total = db.execute_return(
@@ -100,8 +51,7 @@ def recall(project: str, model: str, filter: sql.Composed | None) -> GroupMetric
         label_result = db.execute_return(
             labels_query
             if filter is None
-            else labels_query + sql.SQL(" WHERE ") + filter,
-            return_all=True,
+            else labels_query + sql.SQL(" WHERE ") + filter
         )
         if (
             num_tp is None
@@ -161,8 +111,7 @@ def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMet
         num_tp = db.execute_return(
             tp_query + group_query
             if filter is None
-            else tp_query + sql.SQL(" AND ") + filter + group_query,
-            return_all=True,
+            else tp_query + sql.SQL(" AND ") + filter + group_query
         )
         fp_query = sql.SQL("SELECT COUNT(*), {} FROM {} WHERE {} != label").format(
             sql.Identifier(output_column_id),
@@ -173,8 +122,7 @@ def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMet
         num_fp = db.execute_return(
             fp_query + group_query
             if filter is None
-            else fp_query + sql.SQL(" AND ") + filter + group_query,
-            return_all=True,
+            else fp_query + sql.SQL(" AND ") + filter + group_query
         )
         total_query = sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
         num_total = db.execute_return(
@@ -188,8 +136,7 @@ def precision(project: str, model: str, filter: sql.Composed | None) -> GroupMet
         label_result = db.execute_return(
             labels_query
             if filter is None
-            else labels_query + sql.SQL(" WHERE ") + filter,
-            return_all=True,
+            else labels_query + sql.SQL(" WHERE ") + filter
         )
         if (
             num_tp is None
@@ -254,140 +201,3 @@ def f1(project: str, model: str, filter: sql.Composed | None) -> GroupMetric:
             metric=2 * (prec.metric * rec.metric) / (prec.metric + rec.metric),
             size=prec.size,
         )
-
-
-def count(
-    project: str, filter: sql.Composed | None, size_as_metric: bool = False
-) -> GroupMetric:
-    """Count the number of datapoints matching a specified filter.
-
-    Args:
-        project (str): the project the user is currently working with.
-        filter (sql.Composed | None): the filter to be applied before counting.
-        size_as_metric (bool): whether to return the count as the metric.
-
-    Raises:
-        Exception: something in the database processing failed.
-
-    Returns:
-        GroupMetric: count of datapoints matching the specified filter.
-    """
-    with Database() as db:
-        num_total = db.execute_return(
-            sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(project))
-            if filter is None
-            else sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
-                sql.Identifier(project)
-            )
-            + filter,
-        )
-
-        if size_as_metric:
-            met = num_total[0][0] if isinstance(num_total[0][0], int) else 0
-        else:
-            met = None
-
-        return (
-            GroupMetric(
-                metric=met,
-                size=num_total[0][0] if isinstance(num_total[0][0], int) else 0,
-            )
-            if num_total is not None
-            else GroupMetric(metric=None, size=0)
-        )
-
-
-def mean(
-    project_uuid: str, metric: Metric, model: str, filter: sql.Composed | None
-) -> GroupMetric:
-    """Calculate the mean of a metric for a given project.
-
-    Args:
-        project_uuid (str): the project the user is currently working with.
-        metric (Metric): the metric for which to calculate the mean.
-        model (str): the model for which to calculate the metric.
-        filter (sql.Composed | None): the filter to apply to the data before metric.
-
-    Raises:
-        Exception: something in the database processing failed.
-
-    Returns:
-        GroupMetric: mean of the metric for the given project.
-    """
-    with Database() as db:
-        # Get column name from project column map
-        column_id = db.execute_return(
-            sql.SQL(
-                "SELECT column_id FROM {} WHERE name = {} AND"
-                " (model IS NULL OR model = {})"
-            ).format(
-                sql.Identifier(f"{project_uuid}_column_map"),
-                sql.Literal(metric.columns[0]),
-                sql.Literal(model),
-            )
-        )
-
-        if len(column_id) == 0:
-            return GroupMetric(metric=None, size=0)
-        column_id = column_id[0][0]
-
-        if filter is None:
-            db.execute(
-                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {}").format(
-                    sql.Identifier(column_id), sql.Identifier(project_uuid)
-                )
-            )
-        else:
-            db.execute(
-                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {} WHERE ").format(
-                    sql.Identifier(column_id), sql.Identifier(project_uuid)
-                )
-                + filter
-            )
-
-        if not db.cur or db.cur.rowcount == 0:
-            return GroupMetric(metric=None, size=0)
-        else:
-            res = db.cur.fetchone()
-
-        if res:
-            return GroupMetric(metric=float(res[1]) if res[1] else None, size=res[0])
-        else:
-            return GroupMetric(metric=None, size=0)
-
-
-def metric_map(
-    metric: Metric | None,
-    project: str,
-    model: str | None,
-    sql_filter: sql.Composed | None,
-) -> GroupMetric:
-    """Call a metric function based on the selected metric.
-
-    Args:
-        metric (Metric): the metric for which to call a metric function.
-        project (str): the project the user is currently working with.
-        model (str): the model for which to calculate the metric.
-        sql_filter (str | None): the filter to apply to the data before metric
-        calculation.
-
-    Returns:
-        GroupMetric: the metric result calculated on the data as specified.
-    """
-    if metric is None or model is None:
-        return count(project, sql_filter)
-
-    if metric.type == "mean":
-        return mean(project, metric, model, sql_filter)
-    if metric.type == "accuracy":
-        return accuracy(project, model, sql_filter)
-    elif metric.type == "recall":
-        return recall(project, model, sql_filter)
-    elif metric.type == "f1":
-        return f1(project, model, sql_filter)
-    elif metric.type == "precision":
-        return precision(project, model, sql_filter)
-    elif metric.type == "count":
-        return count(project, sql_filter, True)
-    else:
-        return count(project, sql_filter)
