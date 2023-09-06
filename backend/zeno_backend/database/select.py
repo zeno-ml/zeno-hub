@@ -453,28 +453,23 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
         list[Metric]: list of metrics as requested by the user.
     """
     db = Database()
-    # Get all metrics for the project and filter out the ones that are not in the list
     metric_results = db.connect_execute_return(
-        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
-        [project_uuid],
+        "SELECT id, name, type, columns FROM metrics"
+        " WHERE project_uuid = %s AND id = ANY(%s);",
+        [project_uuid, [metric_ids]],
     )
     if metric_results is None:
         return {}
 
-    returned_ids = list(map(lambda metric: metric[0], metric_results))
-    metric_objects = {}
-    for i, requested_metric in enumerate(metric_ids):
-        if requested_metric not in returned_ids:
-            metric_objects[requested_metric] = None
-        else:
-            metric_objects[requested_metric] = Metric(
-                id=requested_metric,
-                name=metric_results[i][1],
-                type=metric_results[i][2],
-                columns=metric_results[i][3],
-            )
-
-    return metric_objects
+    ret = {}
+    for m in metric_results:
+        ret[m[0]] = Metric(
+            id=m[0],
+            name=m[1],
+            type=m[2],
+            columns=m[3],
+        )
+    return ret
 
 
 def folders(project: str) -> list[Folder]:

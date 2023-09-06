@@ -37,7 +37,7 @@ from zeno_backend.processing.histogram_processing import (
     histogram_counts,
     histogram_metrics,
 )
-from zeno_backend.processing.metrics import metric_map
+from zeno_backend.processing.metrics.map import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
 from zeno_backend.processing.util import generate_diff_cols
 
