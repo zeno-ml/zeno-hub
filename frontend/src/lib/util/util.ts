@@ -1,11 +1,23 @@
+import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
 import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
-import { authToken, slicesForComparison } from '../stores';
-import { project } from './../stores';
-
-import { browser } from '$app/environment';
 import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
+import {
+	authToken,
+	columns,
+	compareSort,
+	comparisonColumn,
+	comparisonModel,
+	metric,
+	metricRange,
+	metrics,
+	model,
+	models,
+	project,
+	selections,
+	slicesForComparison
+} from '../stores';
 
 export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
@@ -178,4 +190,73 @@ function isValidHttpUrl(string: string) {
 		return false;
 	}
 	return url.protocol === 'http:' || url.protocol === 'https:';
+}
+
+export function decodeURLParameters() {
+	if (!browser) return;
+
+	const urlParams = new URLSearchParams(window.location.search);
+	let decoded: Record<string, any>;
+	if (urlParams.has('params')) {
+		const decodedString = atob(urlParams.get('params') ?? '');
+		decoded = JSON.parse(decodedString);
+	} else {
+		decoded = {};
+	}
+
+	if (decoded.metric) {
+		const foundMetric = get(metrics).find((m) => m.id === decoded.metric);
+		if (foundMetric) {
+			metric.set(foundMetric);
+		} else {
+			metric.set(get(metrics)[0]);
+		}
+	} else {
+		metric.set(get(metrics)[0]);
+	}
+
+	if (decoded.model) {
+		if (get(models).find((m) => m === decoded.model)) {
+			model.set(decoded.model);
+		} else {
+			model.set(get(models)[0]);
+		}
+	} else {
+		model.set(get(models)[0]);
+	}
+
+	if (decoded.comparisonModel) {
+		if (get(models).find((m) => m === decoded.comparisonModel)) {
+			comparisonModel.set(decoded.comparisonModel);
+		}
+	}
+	if (decoded.comparisonColumn) {
+		const foundColumn = get(columns).find((c) => c.id === decoded.comparisonColumn);
+		if (foundColumn) {
+			comparisonColumn.set(foundColumn);
+		}
+	}
+	if (decoded.compareSort) {
+		compareSort.set(decoded.compareSort);
+	}
+	if (decoded.metricRange) {
+		metricRange.set(decoded.metricRange);
+	}
+	if (decoded.selections) {
+		selections.set(decoded.selections);
+	}
+}
+
+export function setURLParameters() {
+	if (!browser) return;
+	const params = {
+		model: get(model),
+		metric: get(metric)?.id,
+		comparisonModel: get(comparisonModel),
+		comparisonColumn: get(comparisonColumn)?.id,
+		compareSort: get(compareSort),
+		metricRange: get(metricRange),
+		selections: get(selections)
+	};
+	window.history.replaceState(history.state, '', `?params=${btoa(JSON.stringify(params))}`);
 }

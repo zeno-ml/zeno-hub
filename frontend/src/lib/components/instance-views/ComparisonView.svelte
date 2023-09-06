@@ -268,7 +268,7 @@
 		</Select>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
-		{start + 1}-
+		{start + 1} -
 		{Math.min(end, modelAResult ? modelAResult[0].size : end)} of
 		{modelAResult ? modelAResult[0].size : ''}
 	</svelte:fragment>

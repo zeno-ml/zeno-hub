@@ -9,26 +9,13 @@
 		model,
 		models
 	} from '$lib/stores';
-	import type { ZenoColumn } from '$lib/zenoapi';
-	import { onMount } from 'svelte';
 
-	let comparisonColumnOptions: ZenoColumn[] = [];
-
-	onMount(() => {
-		comparisonColumnOptions = $columns.filter((c) => c.model === $model);
+	let comparisonColumnOptions = $columns.filter((c) => c.model === $model);
+	if (!$comparisonColumn) {
 		comparisonColumn.set(comparisonColumnOptions[0]);
-	});
+	}
 
-	$: exludeModels = $models.filter((m) => m !== $model);
-	$: if ($model === undefined || (!$models.includes($model) && $models.length > 0)) {
-		$model = $models[0];
-	}
-	$: if (
-		$comparisonModel === undefined ||
-		(!$models.includes($comparisonModel) && $models.length > 1)
-	) {
-		$model = $models[1];
-	}
+	$: excludeModels = $models.filter((m) => m !== $model);
 </script>
 
 <div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1">
@@ -69,7 +56,7 @@
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$comparisonModel}
 			>
-				{#each exludeModels as mod}
+				{#each excludeModels as mod}
 					<option value={mod}>{mod}</option>
 				{/each}
 			</select>
@@ -90,14 +77,14 @@
 	</div>
 {/if}
 
-{#if $page.url.href.includes('compare')}
+{#if $page.url.href.includes('compare') && comparisonColumnOptions.length > 0}
 	<div class="mt-3 mb-3">
 		<h4 class="mb-1">Comparison Feature</h4>
 		<select
 			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 			bind:value={$comparisonColumn}
 		>
-			{#each comparisonColumnOptions as col}
+			{#each comparisonColumnOptions as col (col.id)}
 				<option value={col}>{col.name}</option>
 			{/each}
 		</select>

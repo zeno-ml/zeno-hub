@@ -25,23 +25,20 @@
 	import CircularProgress from '@smui/circular-progress';
 	import { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
-	import { onMount } from 'svelte';
 	import MetadataCell from './cells/MetadataCell.svelte';
 	import MetricRange from './MetricRange.svelte';
 
 	let metadataHistograms: Map<string, HistogramEntry[]> = new Map();
 
-	// Get histogram buckets, counts, and metrics when columns update.
-	onMount(() => {
-		loadHistogramData($tagIds, $selectionIds, $model, $metric);
-		$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
-	});
+	loadHistogramData($tagIds, $selectionIds, $model).then(() =>
+		loadCountsAndMetrics($tagIds, $selectionIds, $model, $metric, $selectionPredicates)
+	);
+	$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
 
-	function loadHistogramData(
+	async function loadHistogramData(
 		tagIds: string[] | undefined,
 		selectionIds: string[] | undefined,
-		model: string | undefined,
-		metric: Metric | undefined
+		model: string | undefined
 	) {
 		const dataIds =
 			tagIds !== undefined && selectionIds !== undefined
@@ -49,20 +46,12 @@
 				: tagIds !== undefined
 				? tagIds
 				: selectionIds;
-		getHistograms($columns, model).then((res) => {
-			getHistogramCounts(res, undefined, dataIds).then((res) => {
-				if (res === undefined) {
-					return;
-				}
-				metadataHistograms = res;
-				metric !== undefined &&
-					getHistogramMetrics(res, model, metric, dataIds, undefined).then((res) => {
-						if (res !== undefined) {
-							metadataHistograms = res;
-						}
-					});
-			});
-		});
+		let histograms = await getHistograms($columns, model);
+		let counts = await getHistogramCounts(histograms, undefined, dataIds);
+		if (counts === undefined) {
+			return;
+		}
+		metadataHistograms = counts;
 	}
 
 	function loadCountsAndMetrics(
@@ -147,7 +136,7 @@
 			return;
 		}
 		selections.set({ metadata: {}, slices: [], tags: [] });
-		loadHistogramData(undefined, undefined, model, $metric);
+		loadHistogramData(undefined, undefined, model);
 	});
 
 	// when the selection Ids change, update the histograms

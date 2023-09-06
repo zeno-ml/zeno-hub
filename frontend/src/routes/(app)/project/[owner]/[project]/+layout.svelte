@@ -2,9 +2,7 @@
 	import {
 		columns,
 		folders,
-		metric,
 		metrics,
-		model,
 		models,
 		project,
 		rowsPerPage,
@@ -21,13 +19,7 @@
 	slices.set(data.slices);
 	columns.set(data.columns);
 	models.set(data.models);
-	if (data.models.length > 0) {
-		model.set(data.models[0]);
-	}
 	metrics.set(data.metrics);
-	if (data.metrics.length > 0) {
-		metric.set(data.metrics[0]);
-	}
 	folders.set(data.folders);
 	tags.set(data.tags);
 
