@@ -25,6 +25,6 @@
 </script>
 
 <div class="px-2.5 py-1 bg-greenish-light mx-1 my rounded-lg w-fit">
-	{tagId}
+	{$tags.find((tag) => tag.id === tagId)?.tagName}
 	<TrailingIcon class="remove material-icons" on:click={cancelClicked}>cancel</TrailingIcon>
 </div>

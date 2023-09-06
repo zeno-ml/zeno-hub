@@ -2,7 +2,7 @@
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
 
-	$: audioURL = entry['data_id'] as string;
+	$: audioURL = entry['data'] as string;
 </script>
 
 <div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded">

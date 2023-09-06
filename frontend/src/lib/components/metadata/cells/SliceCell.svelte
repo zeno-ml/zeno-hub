@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import { doesModelDependOnPredicates } from '$lib/api/slice';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -41,9 +42,8 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($project) {
-				ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
-			}
+			slices.update((s) => s.filter((s) => s.id !== slice.id));
+			invalidateAll();
 		});
 	}
 
@@ -69,11 +69,16 @@
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
 					if (slice && $project) {
-						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() => {
-							ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) =>
-								slices.set(fetchedSlices)
-							);
-						});
+						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
+							slices.update((s) => {
+								invalidateAll();
+								const index = s.findIndex((s) => s.id === slice.id);
+								if (index !== -1) {
+									s[index].folderId = undefined;
+								}
+								return s;
+							})
+						);
 					}
 				});
 			}
@@ -85,7 +90,7 @@
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <button
-	class="overflow-auto border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	class="border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
 	{selected ? ' bg-primary-light' : ''} 
 	{compare ? ' py-1' : ''}"
 	on:click={(e) => setSelected(e)}

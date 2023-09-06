@@ -9,7 +9,7 @@
 		mdiViewGrid
 	} from '@mdi/js';
 
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { charts, project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -69,10 +69,17 @@
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
 										parameters: chart.parameters
-									}).then(() => {
-										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-											charts.set(fetchedCharts)
-										);
+									}).then((res) => {
+										invalidateAll();
+										charts.update((c) => {
+											c.push({
+												id: res,
+												name: 'Copy of ' + chart.name,
+												type: chart.type,
+												parameters: chart.parameters
+											});
+											return c;
+										});
 									});
 								}}
 							>
@@ -86,9 +93,8 @@
 									e.stopPropagation();
 									showOptions = false;
 									ZenoService.deleteChart(chart).then(() => {
-										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-											charts.set(fetchedCharts)
-										);
+										invalidateAll();
+										charts.update((c) => c.filter((c) => c.id != chart.id));
 									});
 								}}
 							>

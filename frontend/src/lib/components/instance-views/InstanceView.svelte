@@ -54,7 +54,6 @@
 	onMount(() => {
 		if ($project === undefined || $project.view === '') {
 			selected = 'table';
-			return;
 		}
 	});
 

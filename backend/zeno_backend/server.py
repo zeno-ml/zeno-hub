@@ -248,7 +248,7 @@ def get_server() -> FastAPI:
         # Prepend the DATA_URL to the data column if it exists
         project = select.project_from_uuid(project_uuid)
         if project and project.data_url:
-            filt_df["data_id"] = project.data_url + filt_df["data_id"]
+            filt_df["data"] = project.data_url + filt_df["data"]
 
         if req.diff_column_1 and req.diff_column_2:
             filt_df = generate_diff_cols(
@@ -455,21 +455,65 @@ def get_server() -> FastAPI:
         else:
             return fetched_user
 
-    @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/folder/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_folder(project: str, name: str):
-        insert.folder(project, name)
+        id = insert.folder(project, name)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert folder",
+            )
+        return id
 
-    @api_app.post("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/slice/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_slice(project: str, req: Slice):
-        insert.slice(project, req)
+        id = insert.slice(project, req)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert slice",
+            )
+        return id
 
-    @api_app.post("/chart/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/chart/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_chart(project: str, chart: Chart):
-        insert.chart(project, chart)
+        id = insert.chart(project, chart)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert chart",
+            )
+        return id
 
-    @api_app.post("/tag/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/tag/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_tag(tag: Tag, project: str):
-        insert.tag(project, tag)
+        id = insert.tag(project, tag)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert tag",
+            )
+        return id
 
     @api_app.post("/add-organization", tags=["zeno"], dependencies=[Depends(auth)])
     def add_organization(user: User, organization: Organization):
