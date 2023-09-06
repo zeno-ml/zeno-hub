@@ -90,9 +90,10 @@
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <button
-	class="border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	class="border border-grey-lighter rounded mt-1 flex items-center w-full px-2.5 justify-between text-grey overflow-visible relative
 	{selected ? ' bg-primary-light' : ''} 
-	{compare ? ' py-1' : ''}"
+	{compare ? ' py-1 h-11' : 'h-9'}
+	{compareButton ? ' cursor-default' : ''}"
 	on:click={(e) => setSelected(e)}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}

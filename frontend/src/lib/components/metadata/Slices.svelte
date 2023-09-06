@@ -14,9 +14,9 @@
 <SliceHeader />
 <div class="mb-2">
 	<button
-		class="flex items-center border border-grey-lighter rounded px-2.5 justify-between cursor-pointer text-grey w-full h-9
+		class="flex items-center border border-grey-lighter rounded px-2.5 justify-between cursor-pointer text-grey w-full
 			{$selectionPredicates === undefined ? 'bg-primary-light' : ''}
-			{$page.url.href.includes('compare') ? 'py-1' : ''}"
+			{$page.url.href.includes('compare') ? 'py-1 h-11' : 'h-9'}"
 		on:click={() => {
 			selections.update((m) => {
 				Object.keys(m.metadata).forEach((key) => {
