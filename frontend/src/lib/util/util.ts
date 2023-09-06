@@ -235,6 +235,8 @@ export function decodeURLParameters() {
 		if (foundColumn) {
 			comparisonColumn.set(foundColumn);
 		}
+	} else {
+		comparisonColumn.set(get(columns).filter((c) => c.model === get(models)[0])[0]);
 	}
 	if (decoded.compareSort) {
 		compareSort.set(decoded.compareSort);
