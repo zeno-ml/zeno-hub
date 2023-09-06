@@ -46,7 +46,7 @@
 	function removeSlice() {
 		ZenoService.deleteSlice(slice).then(() => {
 			invalidateAll();
-			slices.update((s) => s.filter((sli) => sli.sliceName !== slice.sliceName));
+			slices.update((s) => s.filter((sli) => sli.id !== slice.id));
 			created = false;
 		});
 	}

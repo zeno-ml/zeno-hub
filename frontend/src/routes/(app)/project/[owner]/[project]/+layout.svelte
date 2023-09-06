@@ -2,7 +2,9 @@
 	import {
 		columns,
 		folders,
+		metric,
 		metrics,
+		model,
 		models,
 		project,
 		rowsPerPage,

@@ -477,13 +477,13 @@ def get_server() -> FastAPI:
         dependencies=[Depends(auth)],
     )
     def add_slice(project: str, req: Slice):
-        res = insert.slice(project, req)
-        if res is None:
+        id = insert.slice(project, req)
+        if id is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to insert slice",
             )
-        return res
+        return id
 
     @api_app.post(
         "/chart/{project}",
