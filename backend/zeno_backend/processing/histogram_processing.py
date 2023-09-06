@@ -8,9 +8,9 @@ from zeno_backend.classes.metadata import (
     HistogramBucket,
     HistogramRequest,
 )
-from zeno_backend.database.select import column
+from zeno_backend.database.select import column, project_from_uuid
 from zeno_backend.processing.filtering import bucket_filter, filter_to_sql, table_filter
-from zeno_backend.processing.metrics import metric_map
+from zeno_backend.processing.metrics.map import metric_map
 
 
 def histogram_buckets(
@@ -105,7 +105,9 @@ def histogram_counts(project: str, req: HistogramRequest) -> list[list[int]]:
         elif col.data_type == MetadataType.CONTINUOUS:
             bucs = [b.bucket for b in r.buckets]
             ret.append(
-                data_frame.groupby([pd.cut(data_frame["col"], bucs)])  # type: ignore
+                data_frame.groupby(
+                    [pd.cut(data_frame["col"], bucs)], observed=False  # type: ignore
+                )
                 .size()
                 .astype(int)
                 .tolist()
@@ -125,7 +127,12 @@ def histogram_metrics(project: str, req: HistogramRequest) -> list[list[float | 
     Returns:
         List[List[Union[float, None]]]: metrics for the requested histogram buckets.
     """
-    if req.metric is None:
+    project_obj = project_from_uuid(project)
+    if (
+        req.metric is None
+        or project_obj is not None
+        and project_obj.calculate_histogram_metrics is False
+    ):
         return []
 
     filter_sql = table_filter(project, req.model, req.filter_predicates, req.data_ids)

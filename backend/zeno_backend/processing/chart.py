@@ -18,7 +18,7 @@ from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import Slice
 from zeno_backend.database.select import metrics, slices
 from zeno_backend.processing.filtering import table_filter
-from zeno_backend.processing.metrics import metric_map
+from zeno_backend.processing.metrics.map import metric_map
 
 
 def xyc_data(chart: Chart, project: str) -> str:
