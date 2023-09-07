@@ -1,17 +1,19 @@
 <script lang="ts">
 	import {
 		columns,
+		compareSort,
+		comparisonModel,
 		folders,
-		metric,
+		metricRange,
 		metrics,
-		model,
 		models,
 		project,
 		rowsPerPage,
+		selections,
 		slices,
 		tags
 	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
+	import { decodeURLParameters, getEndpoint, setURLParameters } from '$lib/util/util';
 	import { OpenAPI as zenoAPI } from '$lib/zenoapi';
 
 	export let data;
@@ -24,6 +26,15 @@
 	metrics.set(data.metrics);
 	folders.set(data.folders);
 	tags.set(data.tags);
+
+	decodeURLParameters();
+
+	// Don't update on model, metric, or comparison column change since
+	// these are triggered by other subscriptions.
+	comparisonModel.subscribe(() => setURLParameters());
+	compareSort.subscribe(() => setURLParameters());
+	metricRange.subscribe(() => setURLParameters());
+	selections.subscribe(() => setURLParameters());
 
 	zenoAPI.BASE = `${getEndpoint()}/api`;
 

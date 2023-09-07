@@ -1,7 +1,5 @@
 import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
-import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
-import { browser } from '$app/environment';
 import { Operation, ZenoColumnType, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 import {
@@ -16,8 +14,7 @@ import {
 	model,
 	models,
 	project,
-	selections,
-	slicesForComparison
+	selections
 } from '../stores';
 
 export function getProjectRouteFromURL(url: URL) {
@@ -229,6 +226,7 @@ export function decodeURLParameters() {
 
 export function setURLParameters() {
 	if (!browser) return;
+	console.log('params set');
 	const params = {
 		model: get(model),
 		metric: get(metric)?.id,
