@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
 	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
-	import { chartDefaults } from '$lib/components/chart/chartUtil';
-	import { project } from '$lib/stores';
-	import { charts } from '$lib/stores.js';
+	import { charts, project } from '$lib/stores';
+	import { chartDefaults } from '$lib/util/charts';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/icon-button';

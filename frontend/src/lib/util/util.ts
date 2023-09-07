@@ -1,10 +1,9 @@
 import { env } from '$env/dynamic/public';
-import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
-import { authToken, slicesForComparison } from '../stores';
+import { authToken } from '../stores';
 import { project } from './../stores';
 
 import { browser } from '$app/environment';
-import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
+import { Operation, ZenoColumnType, type ZenoColumn } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
 export function getProjectRouteFromURL(url: URL) {
@@ -65,29 +64,6 @@ export function getMetricRange(res: (number | null)[][]): [number, number] {
 		return [Infinity, -Infinity];
 	}
 	return range;
-}
-
-// update model dependent slices in compare tab
-export function updateModelDependentSlices(name: string, mod: string, slis: Slice[]) {
-	slis.forEach((sli) => {
-		const preds = sli.filterPredicates.predicates;
-		if (doesModelDependOnPredicates(preds)) {
-			const slices = [...get(slicesForComparison)];
-			const index = slices.findIndex((current) => current.id === sli.id);
-			if (index !== -1) {
-				slicesForComparison.set([
-					...slices.slice(0, index),
-					<Slice>{
-						id: sli.id,
-						sliceName: sli.sliceName + ' (' + name + ')',
-						folderId: sli.folderId,
-						filterPredicates: setModelForFilterPredicateGroup(sli.filterPredicates, mod)
-					},
-					...slices.slice(index + 1)
-				]);
-			}
-		}
-	});
 }
 
 export function getEndpoint() {

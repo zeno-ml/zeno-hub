@@ -12,12 +12,12 @@ import {
 } from '$lib/zenoapi';
 import type { ComponentType } from 'svelte';
 import { get } from 'svelte/store';
-import BarChart from './chart-types/bar-chart/BarChart.svelte';
-import BeeswarmChart from './chart-types/beeswarm-chart/BeeswarmChart.svelte';
-import HeatMap from './chart-types/heatmap-chart/HeatMap.svelte';
-import LineChart from './chart-types/line-chart/LineChart.svelte';
-import RadarChart from './chart-types/radar-chart/RadarChart.svelte';
-import Table from './chart-types/table/Table.svelte';
+import BarChart from '../components/chart/chart-types/bar-chart/BarChart.svelte';
+import BeeswarmChart from '../components/chart/chart-types/beeswarm-chart/BeeswarmChart.svelte';
+import HeatMap from '../components/chart/chart-types/heatmap-chart/HeatMap.svelte';
+import LineChart from '../components/chart/chart-types/line-chart/LineChart.svelte';
+import RadarChart from '../components/chart/chart-types/radar-chart/RadarChart.svelte';
+import Table from '../components/chart/chart-types/table/Table.svelte';
 
 export function chartDefaults(name: string, id: number, type: ChartType): Chart {
 	switch (type) {

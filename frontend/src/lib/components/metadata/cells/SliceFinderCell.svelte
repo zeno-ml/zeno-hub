@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { comparisonModel, model, project, slices } from '$lib/stores';
+	import { project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { updateModelDependentSlices } from '$lib/util/util';
 	import { ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiCheckCircle, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
@@ -33,9 +32,6 @@
 			ZenoService.addSlice($project.uuid, slice).then((res) => {
 				invalidateAll();
 				slices.update((s) => [...s, { ...slice, id: res }]);
-				$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
-				$comparisonModel !== undefined &&
-					updateModelDependentSlices('model B', $comparisonModel, $slices);
 				showSliceName = false;
 				created = true;
 			});
