@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import uvicorn
+from amplitude import Amplitude, BaseEvent
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -42,6 +43,8 @@ from zeno_backend.processing.slice_finder import slice_finder
 from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
+
+amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 def get_server() -> FastAPI:
@@ -284,6 +287,13 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if not util.access_valid(uuid, request):
             return Response(status_code=401)
+        amplitude_client.track(
+            BaseEvent(
+                event_type="Project Viewed",
+                user_id="ProjectViewedUser",
+                event_properties={"project_uuid": uuid},
+            )
+        )
         return select.project(
             owner_name, project_name, util.get_user_from_token(request)
         )
@@ -327,6 +337,12 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_public_projects():
+        amplitude_client.track(
+            BaseEvent(
+                event_type="Home Viewed",
+                user_id="HomeViewedUser",
+            )
+        )
         return select.public_projects()
 
     @api_app.post(
@@ -444,7 +460,13 @@ def get_server() -> FastAPI:
         if fetched_user is None:
             try:
                 user = User(id=-1, name=name, admin=None)
-                insert.user(user)
+                user_id = insert.user(user)
+                amplitude_client.track(
+                    BaseEvent(
+                        event_type="User Registered",
+                        user_id="00000" + str(user_id) if user_id else "",
+                    )
+                )
                 insert.api_key(user)
                 return select.user(name)
             except Exception as exc:
@@ -453,6 +475,12 @@ def get_server() -> FastAPI:
                     detail=str(exc),
                 ) from exc
         else:
+            amplitude_client.track(
+                BaseEvent(
+                    event_type="User Logged In",
+                    user_id="00000" + str(fetched_user.id),
+                )
+            )
             return fetched_user
 
     @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])

@@ -1,5 +1,6 @@
 """FastAPI server endpoints for the Zeno SDK."""
 import io
+import os
 import uuid
 
 import pandas as pd
@@ -19,7 +20,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from zeno_backend.classes.project import Project
 from zeno_backend.database import insert, select
 
-client = Amplitude("9e6755badfe6f970b509d3325a6a6678")
+amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 class APIKeyBearer(HTTPBearer):
@@ -95,14 +96,14 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
             detail=("ERROR: Project already exists."),
         )
 
-    client.track(
+    project.uuid = str(uuid.uuid4())
+    amplitude_client.track(
         BaseEvent(
-            event_type="project_created",
-            user_id=str(user_id + 10000),
-            event_properties={"project": project.name},
+            event_type="Project Created",
+            user_id="00000" + str(user_id),
+            event_properties={"project_uuid": project.uuid},
         )
     )
-    project.uuid = str(uuid.uuid4())
     insert.project(project, user_id)
     return project.uuid
 
@@ -114,6 +115,7 @@ def upload_dataset(
     label_column: str = Form(None),
     data_column: str = Form(None),
     file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
 ):
     """Upload a dataset to a Zeno project.
 
@@ -125,7 +127,15 @@ def upload_dataset(
         data_column (str | None, optional): the name of the column containing the
             raw data. Only works for small text data. Defaults to None.
         file (UploadFile): the dataset to upload.
+        api_key (str, optional): API key.
     """
+    user_id = select.user_id_by_api_key(api_key)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("ERROR: Invalid API key."),
+        )
+
     try:
         bytes = file.file.read()
         dataset_df = pd.read_feather(io.BytesIO(bytes))
@@ -151,6 +161,7 @@ def upload_system(
     output_column: str = Form(...),
     id_column: str = Form(...),
     file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
 ):
     """Upload a system to a Zeno project.
 
@@ -160,7 +171,15 @@ def upload_system(
         output_column (str): the name of the column containing the system output.
         id_column (str): the name of the column containing the instance IDs.
         file (UploadFile): the dataset to upload.
+        api_key (str, optional): API key.
     """
+    user_id = select.user_id_by_api_key(api_key)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("ERROR: Invalid API key."),
+        )
+
     try:
         bytes = file.file.read()
         system_df = pd.read_feather(io.BytesIO(bytes))
@@ -178,10 +197,10 @@ def upload_system(
             detail=("ERROR: Unable to create system table: " + str(e)),
         ) from e
 
-    client.track(
+    amplitude_client.track(
         BaseEvent(
-            event_type="system_uploaded",
-            user_id="10000",
-            event_properties={"project": project},
+            event_type="System Uploaded",
+            user_id="00000" + str(user_id),
+            event_properties={"project_uuid": project},
         )
     )
