@@ -8,7 +8,6 @@
 	} from '$lib/api/metadata';
 	import {
 		columns,
-		comparisonModel,
 		metric,
 		metricRange,
 		model,
@@ -16,10 +15,8 @@
 		selectionIds,
 		selectionPredicates,
 		selections,
-		slices,
 		tagIds
 	} from '$lib/stores';
-	import { updateModelDependentSlices } from '$lib/util/util';
 	import { Join, ZenoColumnType, type FilterPredicateGroup, type Metric } from '$lib/zenoapi';
 	import { mdiInformationOutline } from '@mdi/js';
 	import CircularProgress from '@smui/circular-progress';
@@ -33,7 +30,6 @@
 	loadHistogramData($tagIds, $selectionIds, $model).then(() =>
 		loadCountsAndMetrics($tagIds, $selectionIds, $model, $metric, $selectionPredicates)
 	);
-	$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
 
 	async function loadHistogramData(
 		tagIds: string[] | undefined,
@@ -104,10 +100,6 @@
 		});
 	}
 
-	comparisonModel.subscribe((mod) => {
-		mod && updateModelDependentSlices('model B', mod, $slices);
-	});
-
 	// Calculate histogram metrics when metric changes
 	metric.subscribe((metric) => {
 		if (metadataHistograms.size === 0) {
@@ -162,6 +154,9 @@
 		}
 		loadCountsAndMetrics($tagIds, $selectionIds, $model, $metric, sels);
 	});
+
+	// Get histogram buckets, counts, and metrics when columns update.
+	loadHistogramData($tagIds, $selectionIds, $model, $metric);
 </script>
 
 {#if !$page.url.href.includes('compare')}

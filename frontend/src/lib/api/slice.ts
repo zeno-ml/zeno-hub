@@ -1,68 +1,9 @@
 import { project } from '$lib/stores';
-import { isPredicateGroup } from '$lib/util/typeCheck';
-import {
-	ZenoColumnType,
-	ZenoService,
-	type FilterPredicate,
-	type FilterPredicateGroup,
-	type GroupMetric,
-	type MetricKey
-} from '$lib/zenoapi';
+import { ZenoService, type FilterPredicate, type GroupMetric, type MetricKey } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
 export function instanceOfFilterPredicate(object: object): object is FilterPredicate {
 	return 'column' in object;
-}
-
-export function setModelForFilterPredicateGroup(
-	pred: FilterPredicateGroup | FilterPredicate,
-	model: string
-): FilterPredicate | FilterPredicateGroup {
-	if (instanceOfFilterPredicate(pred)) {
-		if (
-			(pred.column.columnType === ZenoColumnType.FEATURE &&
-				pred.column.model !== undefined &&
-				pred.column.model !== null) ||
-			pred.column.columnType === ZenoColumnType.OUTPUT
-		) {
-			pred = {
-				...pred,
-				column: {
-					...pred.column,
-					model: model
-				}
-			};
-		}
-	} else {
-		return {
-			...pred,
-			predicates: pred.predicates.map((p) => setModelForFilterPredicateGroup(p, model))
-		};
-	}
-	return pred;
-}
-
-function setModelForMetricKeys(metricKeys: MetricKey[]) {
-	return metricKeys.map((key) => {
-		if (key.slice.filterPredicates && key.slice.filterPredicates.predicates.length > 0) {
-			return {
-				...key,
-				slice: {
-					...key.slice,
-					filterPredicates: {
-						...key.slice.filterPredicates,
-						predicates: key.slice.filterPredicates.predicates.map((pred) => {
-							return {
-								...pred,
-								...setModelForFilterPredicateGroup(pred, key.model)
-							};
-						})
-					}
-				}
-			};
-		}
-		return { ...key };
-	});
 }
 
 const metricKeyCache = new Map();
@@ -71,8 +12,6 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		return null;
 	}
 
-	// Update model in predicates if slices are dependent on feature or output columns.
-	metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	// Check if we have already fetched this metric key
 	const keysToRequest: MetricKey[] = [];
 	const requestIndices: number[] = [];
@@ -105,15 +44,10 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 
 export async function getMetricsForSlicesAndTags(
 	metricKeys: MetricKey[],
-	dataIds?: string[],
-	compare?: boolean
+	dataIds?: string[]
 ): Promise<GroupMetric[] | undefined> {
 	if (metricKeys.length === 0) {
 		return undefined;
-	}
-	// Update model in predicates if slices are dependent on feature columns.
-	if (!compare) {
-		metricKeys = <MetricKey[]>setModelForMetricKeys(metricKeys);
 	}
 	if (metricKeys.length > 0) {
 		const config = get(project);
@@ -125,22 +59,4 @@ export async function getMetricsForSlicesAndTags(
 			dataIds
 		});
 	}
-}
-
-// check if predicates contain model dependent columns (feature or output)
-export function doesModelDependOnPredicates(
-	predicates: Array<FilterPredicateGroup | FilterPredicate>
-) {
-	const isModelDependent: boolean[] = [];
-	predicates.forEach((p) => {
-		isModelDependent.push(
-			isPredicateGroup(p)
-				? doesModelDependOnPredicates(p.predicates)
-				: (p.column.columnType === ZenoColumnType.FEATURE &&
-						p.column.model !== undefined &&
-						p.column.model !== null) ||
-						p.column.columnType === ZenoColumnType.OUTPUT
-		);
-	});
-	return isModelDependent.includes(true);
 }

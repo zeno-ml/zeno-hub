@@ -47,9 +47,7 @@ export async function getHistograms(
 	const res = await ZenoService.getHistogramBuckets(config.uuid, requestedHistograms);
 	requestingHistogramCounts.set(false);
 	const histograms = new Map<string, HistogramEntry[]>(
-		[
-			...new Map<string, HistogramEntry[]>(requestedHistograms.map((col, i) => [col.id, res[i]]))
-		].filter((el) => el[1].length < 30)
+		requestedHistograms.map((col, i) => [col.id, res[i]])
 	);
 	return histograms;
 }

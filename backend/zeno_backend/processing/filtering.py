@@ -46,7 +46,7 @@ def filter_to_sql(
                     val = f.value
             column_id = (
                 f.column.id
-                if model is None
+                if f.column.model is None or model is None
                 else column_id_from_name_and_model(project, f.column.name, model)
             )
             filt = (
