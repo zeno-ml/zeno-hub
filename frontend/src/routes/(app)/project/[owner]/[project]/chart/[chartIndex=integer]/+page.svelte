@@ -7,8 +7,8 @@
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
-	import { chartMap } from '$lib/components/chart/chartUtil.js';
-	import { charts, project } from '$lib/stores.js';
+	import { charts, project } from '$lib/stores';
+	import { chartMap } from '$lib/util/charts';
 	import { ZenoService, type Chart } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 

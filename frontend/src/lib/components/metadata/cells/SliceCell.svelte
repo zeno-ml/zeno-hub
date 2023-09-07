@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
-	import { doesModelDependOnPredicates } from '$lib/api/slice';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
@@ -12,7 +11,6 @@
 	import SliceDetails from '../../general/SliceDetails.svelte';
 	import SlicePopup from '../../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
-	import { selectSliceCell } from './sliceCellUtil';
 
 	export let slice: Slice;
 	export let compare: boolean;
@@ -22,10 +20,6 @@
 	let hovering = false;
 	let showOptions = false;
 	let editing = false;
-
-	let compareButton = slice
-		? doesModelDependOnPredicates(slice.filterPredicates.predicates)
-		: false;
 
 	$: selected = $selections.slices.includes(slice.id);
 	$: transferData =
@@ -45,13 +39,6 @@
 			slices.update((s) => s.filter((s) => s.id !== slice.id));
 			invalidateAll();
 		});
-	}
-
-	function setSelected(e: MouseEvent) {
-		if (compare && compareButton) {
-			return;
-		}
-		selectSliceCell(e, slice);
 	}
 
 	function dragStart(e: DragEvent) {
@@ -84,16 +71,57 @@
 			}
 		}
 	}
+
+	function selectSliceCell(e: MouseEvent, slice: Slice) {
+		if (
+			$selections.slices.length === 1 &&
+			$selections.slices.some((currentSlice) => currentSlice === slice.id)
+		) {
+			selections.update((s) => ({
+				slices: [],
+				metadata: s.metadata,
+				tags: s.tags
+			}));
+			return;
+		}
+		if (e.shiftKey) {
+			if ($selections.slices.some((currentSlice) => currentSlice === slice.id)) {
+				selections.update((sel) => {
+					sel.slices.splice(
+						sel.slices.findIndex((currentSlice) => currentSlice === slice.id),
+						1
+					);
+					return {
+						slices: [...sel.slices],
+						metadata: sel.metadata,
+						tags: sel.tags
+					};
+				});
+			} else {
+				selections.update((sel) => ({
+					slices: [...sel.slices, slice.id],
+					metadata: sel.metadata,
+					tags: sel.tags
+				}));
+			}
+		} else {
+			selections.update((sel) => ({
+				slices: [slice.id],
+				metadata: sel.metadata,
+				tags: sel.tags
+			}));
+		}
+	}
 </script>
 
 {#if editing}
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <button
-	class="border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	class="border border-grey-lighter rounded mt-1 flex items-center w-full px-2.5 justify-between text-grey overflow-visible relative
 	{selected ? ' bg-primary-light' : ''} 
-	{compare ? ' py-1' : ''}"
-	on:click={(e) => setSelected(e)}
+	{compare ? ' py-1 h-11' : 'h-9'}"
+	on:click={(e) => selectSliceCell(e, slice)}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}

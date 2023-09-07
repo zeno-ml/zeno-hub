@@ -238,7 +238,7 @@ def get_server() -> FastAPI:
         if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
         filter_sql = table_filter(
-            project_uuid, None, req.filter_predicates, req.data_ids
+            project_uuid, req.model, req.filter_predicates, req.data_ids
         )
         sql_table = select.table_data_paginated(
             project_uuid, filter_sql, req.offset, req.limit, req.sort

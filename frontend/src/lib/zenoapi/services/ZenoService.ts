@@ -712,10 +712,10 @@ export class ZenoService {
 	 * Add Folder
 	 * @param project
 	 * @param name
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addFolder(project: string, name: string): CancelablePromise<any> {
+	public static addFolder(project: string, name: string): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/folder/{project}',
@@ -735,10 +735,10 @@ export class ZenoService {
 	 * Add Slice
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addSlice(project: string, requestBody: Slice): CancelablePromise<any> {
+	public static addSlice(project: string, requestBody: Slice): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/slice/{project}',
@@ -757,10 +757,10 @@ export class ZenoService {
 	 * Add Chart
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addChart(project: string, requestBody: Chart): CancelablePromise<any> {
+	public static addChart(project: string, requestBody: Chart): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/chart/{project}',
@@ -779,10 +779,10 @@ export class ZenoService {
 	 * Add Tag
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addTag(project: string, requestBody: Tag): CancelablePromise<any> {
+	public static addTag(project: string, requestBody: Tag): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/tag/{project}',
