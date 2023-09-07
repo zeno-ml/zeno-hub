@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
@@ -9,7 +8,6 @@
 		comparisonModel,
 		metric,
 		model,
-		models,
 		project,
 		rowsPerPage,
 		selectionIds,
@@ -89,14 +87,6 @@
 
 	comparisonColumn.subscribe(() => {
 		table = undefined;
-		compareSort.set([undefined, true]);
-	});
-
-	model.subscribe((model) => {
-		// make sure Model A and Model B are exclusive
-		if ($comparisonModel && $comparisonModel === model) {
-			$comparisonModel = $models.filter((m) => m !== model)[0];
-		}
 	});
 
 	// reset page on selection change
@@ -132,7 +122,7 @@
 	}
 
 	function updateTable() {
-		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start) return;
 		if ($model !== undefined && $comparisonModel !== undefined) {
 			let predicates = $selectionPredicates;
 			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
@@ -37,7 +37,7 @@
 		});
 		ZenoService.deleteSlice(slice).then(() => {
 			slices.update((s) => s.filter((s) => s.id !== slice.id));
-			invalidateAll();
+			invalidate('app:state');
 		});
 	}
 
@@ -58,7 +58,7 @@
 					if (slice && $project) {
 						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
 							slices.update((s) => {
-								invalidateAll();
+								invalidate('app:state');
 								const index = s.findIndex((s) => s.id === slice.id);
 								if (index !== -1) {
 									s[index].folderId = undefined;

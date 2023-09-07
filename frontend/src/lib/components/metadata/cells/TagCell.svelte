@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { getMetricsForTags } from '$lib/api/tag';
 	import { editTag, metric, model, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -28,7 +28,7 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteTag(tag).then(() => {
-			invalidateAll();
+			invalidate('app:state');
 			tags.update((t) => t.filter((t) => t.id !== tag.id));
 		});
 		tagIds.set([]);

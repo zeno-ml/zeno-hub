@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { folders, project } from '$lib/stores';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import Button from '@smui/button';
@@ -27,7 +27,7 @@
 				...folderToEdit,
 				name: folderName
 			}).then(() => {
-				invalidateAll();
+				invalidate('app:state');
 				folders.update((f) => {
 					const index = f.findIndex((f) => f.id === folderToEdit?.id);
 					if (index !== -1 && folderToEdit) {
@@ -44,7 +44,7 @@
 	function createFolder() {
 		if ($project) {
 			ZenoService.addFolder($project.uuid, folderName).then((res) => {
-				invalidateAll();
+				invalidate('app:state');
 				folders.update((f) => [
 					...f,
 					{
