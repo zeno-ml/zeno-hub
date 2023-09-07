@@ -24,9 +24,7 @@ def resolve_metadata_type(data_frame: pd.DataFrame, column: str) -> MetadataType
     elif pd.api.types.is_datetime64_any_dtype(dtype):
         return MetadataType.DATETIME
     elif pd.api.types.is_string_dtype(dtype):
-        if data_frame[column].nunique() < 20:
-            return MetadataType.NOMINAL
-        return MetadataType.OTHER
+        return MetadataType.NOMINAL
     return MetadataType.OTHER
 
 
