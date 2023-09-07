@@ -104,3 +104,6 @@ export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 		};
 	}
 );
+
+// Store the current state of feature flags
+export const featureFlags: Writable<Record<string, boolean>> = writable({});

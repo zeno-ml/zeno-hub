@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidateAll } from '$app/navigation';
+	import { featureFlags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Project } from '$lib/zenoapi';
 	import {
@@ -80,13 +81,15 @@
 			{/if}
 		</div>
 	</div>
-	<div class="flex items-center w-full px-2 mb-2">
-		{#await ZenoService.getProjectStats(project.uuid)}
-			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
-		{:then stats}
-			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
-			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
-			<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
-		{/await}
-	</div>
+	{#if $featureFlags['PROJECT_STATS']}
+		<div class="flex items-center w-full px-2 mb-2">
+			{#await ZenoService.getProjectStats(project.uuid)}
+				<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
+			{:then stats}
+				<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
+				<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
+				<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
+			{/await}
+		</div>
+	{/if}
 </button>
