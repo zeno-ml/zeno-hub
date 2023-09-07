@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
+	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
 		columns,
@@ -87,7 +87,7 @@
 		updateTable();
 	}
 
-	comparisonColumn.subscribe((_) => {
+	comparisonColumn.subscribe(() => {
 		table = undefined;
 		compareSort.set([undefined, true]);
 	});
@@ -134,10 +134,7 @@
 	function updateTable() {
 		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
 		if ($model !== undefined && $comparisonModel !== undefined) {
-			let predicates =
-				$selectionPredicates === undefined
-					? undefined
-					: setModelForFilterPredicateGroup($selectionPredicates, $model);
+			let predicates = $selectionPredicates;
 			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 				predicates = {
 					join: Join._,

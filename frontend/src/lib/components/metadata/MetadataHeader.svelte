@@ -15,12 +15,6 @@
 	let comparisonColumnOptions: ZenoColumn[] = [];
 
 	onMount(() => {
-		if ($model === undefined && $models.length > 0) {
-			model.set($models[0]);
-		}
-		if ($metric === undefined && $metrics.length > 0) {
-			metric.set($metrics[0]);
-		}
 		comparisonColumnOptions = $columns.filter((c) => c.model === $model);
 		comparisonColumn.set(comparisonColumnOptions[0]);
 	});

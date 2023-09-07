@@ -41,6 +41,14 @@
 			tags: mets.tags
 		}));
 	}
+
+	function getChartType(dataType: MetadataType, histogram: HistogramEntry[]) {
+		if (dataType === MetadataType.NOMINAL && histogram.length >= 20) {
+			return columnMap[MetadataType.OTHER];
+		} else {
+			return columnMap[dataType];
+		}
+	}
 </script>
 
 {#if histogram}
@@ -53,7 +61,7 @@
 			</div>
 		</div>
 		<svelte:component
-			this={columnMap[col.dataType]}
+			this={getChartType(col.dataType, histogram)}
 			filterPredicates={predicates}
 			{updatePredicates}
 			{col}
