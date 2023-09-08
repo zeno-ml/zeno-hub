@@ -75,7 +75,7 @@
 	</div>
 	<div class="mr-2.5">
 		{#if predicate.column}
-			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL || predicate.column.dataType === MetadataType.OTHER}
+			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
 					on:change={operationChange}
 					value={inverseOperationMap[predicate.operation]}
@@ -84,7 +84,7 @@
 					searchable={false}
 					options={['==', '!=', 'LIKE']}
 				/>
-			{:else}
+			{:else if predicate.column.dataType === MetadataType.CONTINUOUS}
 				<!-- renderer function avoids HTML sanitation issues-->
 				<Svelecte
 					on:change={operationChange}
@@ -92,8 +92,17 @@
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', '>', '<', '>=', '<=', 'LIKE']}
+					options={['==', '!=', '>', '<', '>=', '<=']}
 					renderer={renderOptions}
+				/>
+			{:else}
+				<Svelecte
+					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
+					valueField="label"
+					placeholder={'Operation'}
+					searchable={false}
+					options={['==', '!=', 'LIKE', 'ILIKE', 'REGEX']}
 				/>
 			{/if}
 		{/if}
