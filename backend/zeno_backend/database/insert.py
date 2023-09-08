@@ -418,17 +418,19 @@ def tag(project: str, tag: Tag) -> int | None:
         return id[0][0]
 
 
-def user(user: User):
+def user(user: User) -> int | None:
     """Add a new user to the database.
 
     Args:
         user (User): the user to be added.
     """
     db = Database()
-    db.connect_execute(
-        'INSERT INTO users ("name") values(%s)',
+    id = db.connect_execute_return(
+        'INSERT INTO users ("name") values(%s) RETURNING id;',
         [user.name],
     )
+    if id is not None:
+        return id[0][0]
 
 
 def organization(user: User, organization: Organization):

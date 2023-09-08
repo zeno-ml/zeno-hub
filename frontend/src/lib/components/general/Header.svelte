@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { authToken, collapseHeader, project } from '$lib/stores';
+	import { authToken, collapseHeader, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -42,12 +42,14 @@
 						icon={mdiCompassOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
 					/>
-					<HeaderIcon
-						pageName={'compare'}
-						tooltipContent={'Qualitatively compare model outputs'}
-						icon={mdiCompare}
-						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
-					/>
+					{#if $models.length > 1}
+						<HeaderIcon
+							pageName={'compare'}
+							tooltipContent={'Qualitatively compare model outputs'}
+							icon={mdiCompare}
+							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
+						/>
+					{/if}
 					<HeaderIcon
 						pageName={'chart'}
 						tooltipContent={'Create charts from your slices and metrics'}

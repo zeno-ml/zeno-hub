@@ -1,11 +1,36 @@
-import { env } from '$env/dynamic/public';
-import { doesModelDependOnPredicates, setModelForFilterPredicateGroup } from '$lib/api/slice';
-import { authToken, slicesForComparison } from '../stores';
-import { project } from './../stores';
-
 import { browser } from '$app/environment';
-import { Operation, ZenoColumnType, type Slice, type ZenoColumn } from '$lib/zenoapi';
+import { env } from '$env/dynamic/public';
+import {
+	Operation,
+	ZenoColumnType,
+	type FilterPredicateGroup,
+	type Metric,
+	type ZenoColumn
+} from '$lib/zenoapi';
 import { get } from 'svelte/store';
+import {
+	authToken,
+	compareSort,
+	comparisonColumn,
+	comparisonModel,
+	metric,
+	metricRange,
+	model,
+	project,
+	selections
+} from '../stores';
+
+export type URLParams = {
+	model: string | undefined;
+	metric: Metric | undefined;
+	comparisonModel: string | undefined;
+	comparisonColumn: ZenoColumn | undefined;
+	compareSort: [ZenoColumn | undefined, boolean] | undefined;
+	metricRange: [number, number] | undefined;
+	selections:
+		| { metadata: Record<string, FilterPredicateGroup>; slices: number[]; tags: number[] }
+		| undefined;
+};
 
 export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
@@ -65,29 +90,6 @@ export function getMetricRange(res: (number | null)[][]): [number, number] {
 		return [Infinity, -Infinity];
 	}
 	return range;
-}
-
-// update model dependent slices in compare tab
-export function updateModelDependentSlices(name: string, mod: string, slis: Slice[]) {
-	slis.forEach((sli) => {
-		const preds = sli.filterPredicates.predicates;
-		if (doesModelDependOnPredicates(preds)) {
-			const slices = [...get(slicesForComparison)];
-			const index = slices.findIndex((current) => current.id === sli.id);
-			if (index !== -1) {
-				slicesForComparison.set([
-					...slices.slice(0, index),
-					<Slice>{
-						id: sli.id,
-						sliceName: sli.sliceName + ' (' + name + ')',
-						folderId: sli.folderId,
-						filterPredicates: setModelForFilterPredicateGroup(sli.filterPredicates, mod)
-					},
-					...slices.slice(index + 1)
-				]);
-			}
-		}
-	});
 }
 
 export function getEndpoint() {
@@ -178,4 +180,18 @@ function isValidHttpUrl(string: string) {
 		return false;
 	}
 	return url.protocol === 'http:' || url.protocol === 'https:';
+}
+
+export function setURLParameters() {
+	if (!browser) return;
+	const params = {
+		model: get(model),
+		metric: get(metric),
+		comparisonModel: get(comparisonModel),
+		comparisonColumn: get(comparisonColumn),
+		compareSort: get(compareSort),
+		metricRange: get(metricRange),
+		selections: get(selections)
+	} as URLParams;
+	window.history.replaceState(history.state, '', `?params=${btoa(JSON.stringify(params))}`);
 }

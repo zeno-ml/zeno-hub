@@ -42,6 +42,7 @@ export async function getFilteredTable(
 	}
 	const res = await ZenoService.getFilteredTable(config.uuid, {
 		columns: requestedColumns,
+		model: filterModels[0],
 		diffColumn1,
 		diffColumn2,
 		filterPredicates,

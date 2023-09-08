@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { folders, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -34,7 +34,7 @@
 						...slice,
 						folderId: folder.id
 					}).then(() => {
-						invalidateAll();
+						invalidate('app:state');
 						slices.update((s) => {
 							const index = s.findIndex((s) => s.id === slice.id);
 							if (index !== -1) {
@@ -101,7 +101,7 @@
 								e.stopPropagation();
 								showOptions = false;
 								ZenoService.deleteFolder(folder).then(() => {
-									invalidateAll();
+									invalidate('app:state');
 									slices.update((s) => {
 										s.forEach((slice) => {
 											if (slice.folderId === folder.id) {

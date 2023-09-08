@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { project } from '$lib/stores';
+	import { chartDefaults } from '$lib/util/charts';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
-	import { chartDefaults } from '../../chartUtil';
 	import ChartElement from './ChartElement.svelte';
 
 	export let chart: Chart;

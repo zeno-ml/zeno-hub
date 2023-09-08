@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
+	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
 		columns,
@@ -72,11 +71,8 @@
 	});
 
 	function updateTable() {
-		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
-		let predicates =
-			$selectionPredicates === undefined || $model === undefined
-				? undefined
-				: setModelForFilterPredicateGroup($selectionPredicates, $model);
+		if (isNaN(start) || isNaN(end) || end <= start) return;
+		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 			predicates = {
 				join: Join._,

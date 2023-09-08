@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
-	import { comparisonModel, model, project, slices } from '$lib/stores';
+	import { invalidate } from '$app/navigation';
+	import { project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { updateModelDependentSlices } from '$lib/util/util';
 	import { ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiCheckCircle, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
@@ -31,11 +30,8 @@
 		slice.sliceName = newSliceName;
 		if ($project !== undefined) {
 			ZenoService.addSlice($project.uuid, slice).then((res) => {
-				invalidateAll();
+				invalidate('app:state');
 				slices.update((s) => [...s, { ...slice, id: res }]);
-				$model !== undefined && updateModelDependentSlices('model A', $model, $slices);
-				$comparisonModel !== undefined &&
-					updateModelDependentSlices('model B', $comparisonModel, $slices);
 				showSliceName = false;
 				created = true;
 			});
@@ -45,7 +41,7 @@
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
 		ZenoService.deleteSlice(slice).then(() => {
-			invalidateAll();
+			invalidate('app:state');
 			slices.update((s) => s.filter((sli) => sli.id !== slice.id));
 			created = false;
 		});

@@ -39,11 +39,9 @@
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
 	$: if ($model) {
-		getMetricsForSlicesAndTags(
-			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
-			[...new Set([...secureTagIds, ...secureSelectionIds])],
-			false
-		).then((res) => (currentResult = res));
+		getMetricsForSlicesAndTags($model ? getMetricKeys($model, $metric, $selectionPredicates) : [], [
+			...new Set([...secureTagIds, ...secureSelectionIds])
+		]).then((res) => (currentResult = res));
 	}
 
 	$: getCompareResults($model, $metric, $selectionPredicates).then((r) => (modelAResult = r));
@@ -90,7 +88,7 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds, true);
+		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds);
 	}
 </script>
 

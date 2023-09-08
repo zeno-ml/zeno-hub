@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
-	import { chartMap } from '$lib/components/chart/chartUtil.js';
-	import { charts, project } from '$lib/stores.js';
+	import { charts, project } from '$lib/stores';
+	import { chartMap } from '$lib/util/charts';
 	import { ZenoService, type Chart } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
@@ -39,7 +39,7 @@
 	function updateChart(chart: Chart) {
 		if ($project) {
 			ZenoService.updateChart($project.uuid, chart).then(() => {
-				invalidateAll();
+				invalidate('app:state');
 				charts.update((c) => {
 					let index = c.findIndex((c) => c.id === chart.id);
 					if (index !== -1) {
@@ -52,7 +52,7 @@
 	}
 
 	async function reloadData(chart: Chart) {
-		if ($project && browser) {
+		if ($project) {
 			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}

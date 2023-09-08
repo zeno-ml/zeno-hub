@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
+	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
 		columns,
@@ -9,7 +8,6 @@
 		comparisonModel,
 		metric,
 		model,
-		models,
 		project,
 		rowsPerPage,
 		selectionIds,
@@ -89,14 +87,6 @@
 
 	comparisonColumn.subscribe(() => {
 		table = undefined;
-		compareSort.set([undefined, true]);
-	});
-
-	model.subscribe((model) => {
-		// make sure Model A and Model B are exclusive
-		if ($comparisonModel && $comparisonModel === model) {
-			$comparisonModel = $models.filter((m) => m !== model)[0];
-		}
 	});
 
 	// reset page on selection change
@@ -132,12 +122,9 @@
 	}
 
 	function updateTable() {
-		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start) return;
 		if ($model !== undefined && $comparisonModel !== undefined) {
-			let predicates =
-				$selectionPredicates === undefined
-					? undefined
-					: setModelForFilterPredicateGroup($selectionPredicates, $model);
+			let predicates = $selectionPredicates;
 			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 				predicates = {
 					join: Join._,
@@ -268,7 +255,7 @@
 		</Select>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
-		{start + 1}-
+		{start + 1} -
 		{Math.min(end, modelAResult ? modelAResult[0].size : end)} of
 		{modelAResult ? modelAResult[0].size : ''}
 	</svelte:fragment>

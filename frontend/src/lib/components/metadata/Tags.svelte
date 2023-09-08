@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
 	import { ZenoService, type Tag } from '$lib/zenoapi';
@@ -18,7 +18,7 @@
 			...$editTag,
 			dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
 		}).then(() => {
-			invalidateAll();
+			invalidate('app:state');
 			tags.update((t) => {
 				const index = t.findIndex((tag) => tag.id === $editTag?.id);
 				if (index !== -1 && $editTag !== undefined) {

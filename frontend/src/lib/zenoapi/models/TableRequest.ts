@@ -11,6 +11,7 @@ import type { ZenoColumn } from './ZenoColumn';
  */
 export type TableRequest = {
 	columns: Array<ZenoColumn>;
+	model?: string | null;
 	diffColumn1?: ZenoColumn | null;
 	diffColumn2?: ZenoColumn | null;
 	offset: number;
