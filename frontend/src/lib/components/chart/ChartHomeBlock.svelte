@@ -9,7 +9,7 @@
 		mdiViewGrid
 	} from '@mdi/js';
 
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { charts, project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -70,7 +70,7 @@
 										type: chart.type,
 										parameters: chart.parameters
 									}).then((res) => {
-										invalidateAll();
+										invalidate('app:state');
 										charts.update((c) => {
 											c.push({
 												id: res,
@@ -93,7 +93,7 @@
 									e.stopPropagation();
 									showOptions = false;
 									ZenoService.deleteChart(chart).then(() => {
-										invalidateAll();
+										invalidate('app:state');
 										charts.update((c) => c.filter((c) => c.id != chart.id));
 									});
 								}}

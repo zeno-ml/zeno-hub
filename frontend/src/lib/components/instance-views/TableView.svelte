@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
@@ -88,7 +87,7 @@
 	});
 
 	function updateTable() {
-		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start) return;
 		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 			predicates = {

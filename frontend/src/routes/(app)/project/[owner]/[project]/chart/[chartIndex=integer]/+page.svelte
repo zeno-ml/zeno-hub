@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
@@ -39,7 +39,7 @@
 	function updateChart(chart: Chart) {
 		if ($project) {
 			ZenoService.updateChart($project.uuid, chart).then(() => {
-				invalidateAll();
+				invalidate('app:state');
 				charts.update((c) => {
 					let index = c.findIndex((c) => c.id === chart.id);
 					if (index !== -1) {
@@ -52,7 +52,7 @@
 	}
 
 	async function reloadData(chart: Chart) {
-		if ($project && browser) {
+		if ($project) {
 			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}

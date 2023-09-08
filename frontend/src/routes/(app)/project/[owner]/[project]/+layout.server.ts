@@ -1,7 +1,8 @@
-import { getEndpoint } from '$lib/util/util';
+import { getEndpoint, type URLParams } from '$lib/util/util';
 import {
 	OpenAPI,
 	ZenoService,
+	type FilterPredicateGroup,
 	type Folder,
 	type Metric,
 	type Slice,
@@ -10,7 +11,9 @@ import {
 } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, params, url }) {
+export async function load({ cookies, params, url, depends }) {
+	depends('app:state');
+
 	OpenAPI.BASE = getEndpoint() + '/api';
 
 	const projectPublic = ZenoService.isProjectPublic(params.project);
@@ -44,16 +47,95 @@ export async function load({ cookies, params, url }) {
 		ZenoService.getTags(project.uuid)
 	];
 
-	const results = await Promise.all(requests);
+	const res = await Promise.all(requests);
+	const slices = res[0] as Slice[];
+	const columns = res[1] as ZenoColumn[];
+	const models = res[2] as string[];
+	const metrics = res[3] as Metric[];
+	const folders = res[4] as Folder[];
+	const tags = res[5] as Tag[];
+
+	// Get state from URL parameters.
+	let urlParams: URLParams | undefined;
+	let pars = '';
+	if (url.searchParams.has('params')) {
+		pars = url.searchParams.get('params') ?? '';
+		const decodedString = atob(pars);
+		if (decodedString) {
+			urlParams = JSON.parse(decodedString) as URLParams;
+		}
+	}
+
+	let model: string | undefined = models.length > 0 ? models[0] : undefined;
+	let metric: Metric | undefined = metrics.length > 0 ? metrics[0] : undefined;
+	let comparisonModel: string | undefined = models.length > 1 ? models[1] : undefined;
+	let comparisonColumn: ZenoColumn | undefined = columns.find((c) => c.model === model);
+	let compareSort: [ZenoColumn | undefined, boolean] = [undefined, false];
+	let metricRange: [number, number] = [Infinity, -Infinity];
+	let selections: {
+		metadata: Record<string, FilterPredicateGroup>;
+		slices: number[];
+		tags: number[];
+	} = {
+		metadata: {},
+		slices: [],
+		tags: []
+	};
+
+	if (urlParams !== undefined) {
+		if (urlParams.metric !== undefined) {
+			urlParams.metric;
+			const foundMetric = metrics.find((m) => m.id === urlParams?.metric?.id);
+			if (foundMetric) {
+				metric = foundMetric;
+			}
+		}
+
+		if (urlParams.model) {
+			if (models.find((m) => m === urlParams?.model)) {
+				model = urlParams.model;
+			}
+		}
+
+		if (urlParams.comparisonModel) {
+			if (models.find((m) => m === urlParams?.comparisonModel)) {
+				comparisonModel = urlParams.comparisonModel;
+			}
+		}
+
+		if (urlParams.comparisonColumn) {
+			const foundColumn = columns.find((c) => c.id === urlParams?.comparisonColumn?.id);
+			if (foundColumn) {
+				comparisonColumn = foundColumn;
+			}
+		}
+
+		if (urlParams.compareSort) {
+			compareSort = urlParams.compareSort;
+		}
+		if (urlParams.metricRange) {
+			metricRange = urlParams.metricRange;
+		}
+		if (urlParams.selections) {
+			selections = urlParams.selections;
+		}
+	}
 
 	return {
 		project: project,
-		slices: results[0] as Slice[],
-		columns: results[1] as ZenoColumn[],
-		models: results[2] as string[],
-		metrics: results[3] as Metric[],
-		folders: results[4] as Folder[],
-		tags: results[5] as Tag[],
+		slices: slices,
+		columns: columns,
+		models: models,
+		metrics: metrics,
+		folders: folders,
+		tags: tags,
+		model: model,
+		metric: metric,
+		comparisonModel: comparisonModel,
+		comparisonColumn: comparisonColumn,
+		compareSort: compareSort,
+		metricRange: metricRange,
+		selections: selections,
 		cognitoUser: cognitoUser
 	};
 }

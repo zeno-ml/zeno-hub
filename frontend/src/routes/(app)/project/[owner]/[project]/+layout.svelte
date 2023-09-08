@@ -1,18 +1,22 @@
 <script lang="ts">
 	import {
 		columns,
+		compareSort,
+		comparisonColumn,
+		comparisonModel,
 		folders,
 		metric,
+		metricRange,
 		metrics,
 		model,
 		models,
 		project,
 		rowsPerPage,
+		selections,
 		slices,
 		tags
-	} from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
-	import { OpenAPI as zenoAPI } from '$lib/zenoapi';
+	} from '$lib/stores.js';
+	import { setURLParameters } from '$lib/util/util.js';
 
 	export let data;
 
@@ -21,25 +25,32 @@
 	slices.set(data.slices);
 	columns.set(data.columns);
 	models.set(data.models);
-	if (data.models.length > 0) {
-		model.set(data.models[0]);
-	}
 	metrics.set(data.metrics);
-	if (data.metrics.length > 0) {
-		metric.set(data.metrics[0]);
-	}
 	folders.set(data.folders);
 	tags.set(data.tags);
+	model.set(data.model);
+	metric.set(data.metric);
+	comparisonModel.set(data.comparisonModel);
+	comparisonColumn.set(data.comparisonColumn);
+	compareSort.set(data.compareSort);
+	metricRange.set(data.metricRange);
+	selections.set(data.selections);
 
-	zenoAPI.BASE = `${getEndpoint()}/api`;
-
-	if (data.cognitoUser) {
-		zenoAPI.HEADERS = {
-			Authorization: 'Bearer ' + data.cognitoUser.accessToken
-		};
-	}
+	model.subscribe((mod) => {
+		// URL parameters set by selection subscription.
+		selections.set({ metadata: {}, slices: [], tags: [] });
+		if ($comparisonModel && $comparisonModel === mod) {
+			comparisonModel.set($models.filter((m) => m !== mod)[0]);
+		}
+	});
+	// URL parameters set by metricRange subscription.
+	metric.subscribe(() => metricRange.set([Infinity, -Infinity]));
+	// URL parameters set by compareSort subscription.
+	comparisonColumn.subscribe(() => compareSort.set([undefined, true]));
+	comparisonModel.subscribe(() => setURLParameters());
+	compareSort.subscribe(() => setURLParameters());
+	metricRange.subscribe(() => setURLParameters());
+	selections.subscribe(() => setURLParameters());
 </script>
 
-<div class="w-full h-full flex">
-	<slot />
-</div>
+<slot />

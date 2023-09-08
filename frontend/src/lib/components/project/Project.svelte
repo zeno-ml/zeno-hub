@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Project } from '$lib/zenoapi';
 	import {
@@ -68,7 +68,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteProject(project.uuid).then(() => invalidateAll());
+									ZenoService.deleteProject(project.uuid).then(() => invalidate('app:state'));
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;

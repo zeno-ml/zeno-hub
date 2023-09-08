@@ -1,10 +1,36 @@
-import { env } from '$env/dynamic/public';
-import { authToken } from '../stores';
-import { project } from './../stores';
-
 import { browser } from '$app/environment';
-import { Operation, ZenoColumnType, type ZenoColumn } from '$lib/zenoapi';
+import { env } from '$env/dynamic/public';
+import {
+	Operation,
+	ZenoColumnType,
+	type FilterPredicateGroup,
+	type Metric,
+	type ZenoColumn
+} from '$lib/zenoapi';
 import { get } from 'svelte/store';
+import {
+	authToken,
+	compareSort,
+	comparisonColumn,
+	comparisonModel,
+	metric,
+	metricRange,
+	model,
+	project,
+	selections
+} from '../stores';
+
+export type URLParams = {
+	model: string | undefined;
+	metric: Metric | undefined;
+	comparisonModel: string | undefined;
+	comparisonColumn: ZenoColumn | undefined;
+	compareSort: [ZenoColumn | undefined, boolean] | undefined;
+	metricRange: [number, number] | undefined;
+	selections:
+		| { metadata: Record<string, FilterPredicateGroup>; slices: number[]; tags: number[] }
+		| undefined;
+};
 
 export function getProjectRouteFromURL(url: URL) {
 	let projectURL = url.origin;
@@ -154,4 +180,18 @@ function isValidHttpUrl(string: string) {
 		return false;
 	}
 	return url.protocol === 'http:' || url.protocol === 'https:';
+}
+
+export function setURLParameters() {
+	if (!browser) return;
+	const params = {
+		model: get(model),
+		metric: get(metric),
+		comparisonModel: get(comparisonModel),
+		comparisonColumn: get(comparisonColumn),
+		compareSort: get(compareSort),
+		metricRange: get(metricRange),
+		selections: get(selections)
+	} as URLParams;
+	window.history.replaceState(history.state, '', `?params=${btoa(JSON.stringify(params))}`);
 }

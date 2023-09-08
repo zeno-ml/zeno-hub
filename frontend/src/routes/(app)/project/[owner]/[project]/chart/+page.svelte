@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
 	import { charts, project } from '$lib/stores';
 	import { chartDefaults } from '$lib/util/charts';
@@ -30,7 +30,7 @@
 						$project ? $project.uuid : '',
 						chartDefaults('New Chart', 0, ChartType.BAR)
 					).then((res) => {
-						invalidateAll();
+						invalidate('app:state');
 						charts.update((c) => [...c, chartDefaults('New Chart', res, ChartType.BAR)]);
 
 						goto(

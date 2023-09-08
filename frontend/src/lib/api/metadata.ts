@@ -24,6 +24,26 @@ export interface HistogramEntry {
 	metric?: number;
 }
 
+export async function loadHistogramData(
+	project_uuid: string,
+	tagIds: string[] | undefined,
+	selectionIds: string[] | undefined,
+	model: string | undefined,
+	columns: ZenoColumn[]
+) {
+	const dataIds =
+		tagIds !== undefined && selectionIds !== undefined
+			? [...new Set([...tagIds, ...selectionIds])]
+			: tagIds !== undefined
+			? tagIds
+			: selectionIds;
+	const histograms = await getHistograms(project_uuid, columns, model);
+	const counts = await getHistogramCounts(project_uuid, columns, histograms, undefined, dataIds);
+	if (counts === undefined) {
+		return;
+	}
+	return counts;
+}
 /**
  * Fetch metadata columns buckets for histograms.
  *
@@ -33,6 +53,7 @@ export interface HistogramEntry {
  * @returns Histogram buckets for each column.
  */
 export async function getHistograms(
+	project_uuid: string,
 	completeColumns: ZenoColumn[],
 	model: string | undefined
 ): Promise<Map<string, HistogramEntry[]>> {
@@ -40,11 +61,7 @@ export async function getHistograms(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
 	);
 	requestingHistogramCounts.set(true);
-	const config = get(project);
-	if (!config) {
-		return Promise.reject('No project selected.');
-	}
-	const res = await ZenoService.getHistogramBuckets(config.uuid, requestedHistograms);
+	const res = await ZenoService.getHistogramBuckets(project_uuid, requestedHistograms);
 	requestingHistogramCounts.set(false);
 	const histograms = new Map<string, HistogramEntry[]>(
 		requestedHistograms.map((col, i) => [col.id, res[i]])
@@ -63,24 +80,22 @@ let histogramCountRequest: CancelablePromise<Array<Array<number>>>;
  * @returns Histogram counts for each column.
  */
 export async function getHistogramCounts(
+	project_uuid: string,
+	columns: ZenoColumn[],
 	histograms: Map<string, HistogramEntry[]>,
 	filterPredicates?: FilterPredicateGroup,
 	dataIds?: string[]
 ): Promise<Map<string, HistogramEntry[]> | undefined> {
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
-		column: get(columns).find((col) => col.id === k) ?? get(columns)[0],
+		column: columns.find((col) => col.id === k) ?? columns[0],
 		buckets: v
 	}));
 	if (histogramCountRequest) {
 		histogramCountRequest.cancel();
 	}
 	try {
-		const config = get(project);
-		if (!config) {
-			return Promise.reject('No project selected.');
-		}
 		requestingHistogramCounts.set(true);
-		histogramCountRequest = ZenoService.calculateHistogramCounts(config.uuid, {
+		histogramCountRequest = ZenoService.calculateHistogramCounts(project_uuid, {
 			columnRequests,
 			filterPredicates,
 			dataIds

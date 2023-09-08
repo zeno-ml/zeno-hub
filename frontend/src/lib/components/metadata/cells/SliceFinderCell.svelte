@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Slice } from '$lib/zenoapi';
@@ -30,7 +30,7 @@
 		slice.sliceName = newSliceName;
 		if ($project !== undefined) {
 			ZenoService.addSlice($project.uuid, slice).then((res) => {
-				invalidateAll();
+				invalidate('app:state');
 				slices.update((s) => [...s, { ...slice, id: res }]);
 				showSliceName = false;
 				created = true;
@@ -41,7 +41,7 @@
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
 		ZenoService.deleteSlice(slice).then(() => {
-			invalidateAll();
+			invalidate('app:state');
 			slices.update((s) => s.filter((sli) => sli.id !== slice.id));
 			created = false;
 		});

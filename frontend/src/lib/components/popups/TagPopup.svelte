@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
 	import { project, selectionIds, tags } from '$lib/stores';
 	import { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
@@ -33,7 +33,7 @@
 				tagName,
 				dataIds: []
 			}).then((res) => {
-				invalidateAll();
+				invalidate('app:state');
 				tags.update((t) => [
 					...t,
 					{
