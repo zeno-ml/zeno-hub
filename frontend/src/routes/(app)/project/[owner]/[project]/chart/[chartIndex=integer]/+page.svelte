@@ -38,16 +38,22 @@
 
 	function updateChart(chart: Chart) {
 		if ($project) {
-			ZenoService.updateChart($project.uuid, chart).then(() => {
-				invalidate('app:state');
-				charts.update((c) => {
-					let index = c.findIndex((c) => c.id === chart.id);
-					if (index !== -1) {
-						c[index] = chart;
+			try {
+				ZenoService.updateChart($project.uuid, chart).then(() => {
+					if (browser) {
+						invalidate('app:chart');
 					}
-					return c;
+					charts.update((c) => {
+						let index = c.findIndex((c) => c.id === chart.id);
+						if (index !== -1) {
+							c[index] = chart;
+						}
+						return c;
+					});
 				});
-			});
+			} catch (e) {
+				return;
+			}
 		}
 	}
 
