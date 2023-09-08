@@ -16,6 +16,8 @@ class Operation(str, Enum):
     LTE = "LTE"
     GTE = "GTE"
     LIKE = "LIKE"
+    ILIKE = "ILIKE"
+    REGEX = "REGEX"
 
     def literal(self) -> LiteralString:
         """Obtain a string representation to be used in a SQL filter.
@@ -35,6 +37,10 @@ class Operation(str, Enum):
             return ">="
         if self == Operation.LTE:
             return "<="
+        if self == Operation.ILIKE:
+            return "ILIKE"
+        if self == Operation.REGEX:
+            return "~"
         return "LIKE"
 
 

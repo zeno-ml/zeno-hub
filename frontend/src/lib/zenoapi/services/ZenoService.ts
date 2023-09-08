@@ -65,6 +65,7 @@ export class ZenoService {
 	 * data_column (str | None, optional): the name of the column containing the
 	 * raw data. Only works for small text data. Defaults to None.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
@@ -98,6 +99,7 @@ export class ZenoService {
 	 * output_column (str): the name of the column containing the system output.
 	 * id_column (str): the name of the column containing the instance IDs.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response

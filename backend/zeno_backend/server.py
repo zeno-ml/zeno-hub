@@ -58,7 +58,7 @@ def get_server() -> FastAPI:
     -------
         FastAPI: FastAPI endpoint
     """
-    app = FastAPI(title="Frontend API")
+    app = FastAPI(title="Frontend API", separate_input_output_schemas=False)
 
     # load env vars for cognito if available
     env_path = Path("../frontend/.env")
@@ -83,7 +83,9 @@ def get_server() -> FastAPI:
         )
 
     api_app = FastAPI(
-        title="Backend API", generate_unique_id_function=lambda route: route.name
+        title="Backend API",
+        generate_unique_id_function=lambda route: route.name,
+        separate_input_output_schemas=False,
     )
     api_app.include_router(sdk.router)
     app.mount("/api", api_app)
@@ -443,7 +445,7 @@ def get_server() -> FastAPI:
     ):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return select.filered_short_string_column_values(project, req)
+        return select.filtered_short_string_column_values(project, req)
 
     ####################################################################### Insert
     @api_app.post(
