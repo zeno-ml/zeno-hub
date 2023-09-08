@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Project from '$lib/components/project/Project.svelte';
+	import { featureFlags } from '$lib/stores.js';
 
 	export let data;
 
@@ -23,6 +24,12 @@
 					<Project {project} deletable />
 				{/each}
 			</div>
+		{:else if $featureFlags['WELCOME_TEXT']}
+			<p class="text-lg mt-3 mb-4 ml-1">
+				Welcome to Zeno! You don't have any projects yet. Create one with the <a
+					href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a
+				>
+			</p>
 		{/if}
 		{#if sharedProjects.length > 0}
 			<h1 class="text-lg">Shared projects</h1>
@@ -40,5 +47,11 @@
 				<Project {project} />
 			{/each}
 		</div>
+	{/if}
+	{#if !data.user && $featureFlags['WELCOME_TEXT']}
+		<p class="text-lg mt-3 mb-4 ml-1">
+			Welcome to Zeno! You can only see public projects. <a href="/login">Login</a> or
+			<a href="/signup">create an account</a> to see your own projects.
+		</p>
 	{/if}
 </div>
