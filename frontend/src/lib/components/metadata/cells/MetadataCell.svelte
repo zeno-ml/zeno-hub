@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { HistogramBucket } from '$lib/api/metadata';
 	import { selections } from '$lib/stores';
 	import {
 		Join,
 		MetadataType,
 		type FilterPredicate,
 		type FilterPredicateGroup,
+		type HistogramBucket,
 		type ZenoColumn
 	} from '$lib/zenoapi';
 	import BinaryMetadataCell from './metadata-cells/BinaryMetadataCell.svelte';
