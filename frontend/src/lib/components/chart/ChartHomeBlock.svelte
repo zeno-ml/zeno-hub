@@ -70,7 +70,7 @@
 										type: chart.type,
 										parameters: chart.parameters
 									}).then((res) => {
-										invalidate('app:state');
+										invalidate('app:chart');
 										charts.update((c) => {
 											c.push({
 												id: res,
@@ -93,8 +93,8 @@
 									e.stopPropagation();
 									showOptions = false;
 									ZenoService.deleteChart(chart).then(() => {
-										invalidate('app:state');
-										charts.update((c) => c.filter((c) => c.id != chart.id));
+										charts.update((c) => c.filter((c) => c.id !== chart.id));
+										invalidate('app:chart');
 									});
 								}}
 							>

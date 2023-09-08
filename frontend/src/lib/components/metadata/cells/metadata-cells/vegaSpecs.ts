@@ -1,7 +1,7 @@
 import type { VegaLiteSpec } from 'svelte-vega';
 
 export function nominalVegaSpec(metricRange: [number, number]) {
-	const countSpec = {
+	const sizeSpec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		data: {
 			name: 'table'
@@ -33,12 +33,12 @@ export function nominalVegaSpec(metricRange: [number, number]) {
 						}
 					},
 					y: {
-						field: 'count',
+						field: 'size',
 						type: 'quantitative',
 						axis: { title: '', tickCount: 2, labelColor: 'rgba(0, 0, 0, 0.6)' }
 					},
 					tooltip: [
-						{ field: 'count', type: 'quantitative', title: 'Count' },
+						{ field: 'size', type: 'quantitative', title: 'Count' },
 						{
 							field: 'metric',
 							type: 'quantitative',
@@ -60,12 +60,12 @@ export function nominalVegaSpec(metricRange: [number, number]) {
 						field: 'bucket'
 					},
 					y: {
-						field: 'filteredCount',
+						field: 'filteredSize',
 						type: 'quantitative'
 					},
 					tooltip: [
 						{
-							field: 'filteredCount',
+							field: 'filteredSize',
 							type: 'quantitative',
 							title: 'Filtered Count'
 						},
@@ -91,8 +91,8 @@ export function nominalVegaSpec(metricRange: [number, number]) {
 		]
 	} as VegaLiteSpec;
 
-	if ('layer' in countSpec) {
-		const topLayerBars = countSpec['layer'][1];
+	if ('layer' in sizeSpec) {
+		const topLayerBars = sizeSpec['layer'][1];
 		if (topLayerBars['encoding'] !== undefined) {
 			if (metricRange[0] !== Infinity) {
 				topLayerBars.encoding.color = {
@@ -113,7 +113,7 @@ export function nominalVegaSpec(metricRange: [number, number]) {
 		}
 	}
 
-	return countSpec;
+	return sizeSpec;
 }
 
 export function continuousVegaSpec(metricRange: [number, number]) {
@@ -149,12 +149,12 @@ export function continuousVegaSpec(metricRange: [number, number]) {
 					},
 					x2: { field: 'bucketEnd' },
 					y: {
-						field: 'count',
+						field: 'size',
 						type: 'quantitative'
 					},
 					color: { value: '#ddd' },
 					tooltip: [
-						{ field: 'count', type: 'quantitative', title: 'Count' },
+						{ field: 'size', type: 'quantitative', title: 'Count' },
 						{
 							field: 'metric',
 							type: 'quantitative',
@@ -182,9 +182,9 @@ export function continuousVegaSpec(metricRange: [number, number]) {
 					},
 					x2: { field: 'bucketEnd' },
 					y: {
-						field: 'filteredCount',
+						field: 'filteredSize',
 						type: 'quantitative',
-						title: 'count',
+						title: 'size',
 						axis: {
 							title: '',
 							tickCount: 2,
@@ -193,7 +193,7 @@ export function continuousVegaSpec(metricRange: [number, number]) {
 					},
 					tooltip: [
 						{
-							field: 'filteredCount',
+							field: 'filteredSize',
 							type: 'quantitative',
 							title: 'Filtered Count'
 						},

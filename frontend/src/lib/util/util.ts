@@ -4,6 +4,7 @@ import {
 	Operation,
 	ZenoColumnType,
 	type FilterPredicateGroup,
+	type HistogramBucket,
 	type Metric,
 	type ZenoColumn
 } from '$lib/zenoapi';
@@ -74,15 +75,15 @@ export function columnSort(col1: ZenoColumn, col2: ZenoColumn) {
 }
 
 /** Calculate the metric range for coloring histograms */
-export function getMetricRange(res: (number | null)[][]): [number, number] {
+export function getMetricRange(res: HistogramBucket[][]): [number, number] {
 	const range: [number, number] = [Infinity, -Infinity];
 	let allNull = true;
 	res.forEach((arr) =>
 		arr.forEach((n) => {
-			if (n !== null) {
+			if (n.metric !== undefined && n.metric !== null) {
 				allNull = false;
-				range[0] = Math.min(range[0], n);
-				range[1] = Math.max(range[1], n);
+				range[0] = Math.min(range[0], n.metric);
+				range[1] = Math.max(range[1], n.metric);
 			}
 		})
 	);

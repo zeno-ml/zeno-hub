@@ -1,137 +1,79 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import {
-		getHistogramCounts,
-		getHistogramMetrics,
-		loadHistogramData,
-		type HistogramEntry
-	} from '$lib/api/metadata';
+	import { calculateHistograms, getHistograms } from '$lib/api/metadata';
 	import MetadataCell from '$lib/components/metadata/cells/MetadataCell.svelte';
-	import {
-		columns,
-		metric,
-		model,
-		project,
-		selectionIds,
-		selectionPredicates,
-		tagIds
-	} from '$lib/stores';
-	import { Join, ZenoColumnType, type FilterPredicateGroup, type Metric } from '$lib/zenoapi';
+	import { columns, metric, model, project, selectionIds, selectionPredicates } from '$lib/stores';
+	import { ZenoColumnType, type HistogramBucket } from '$lib/zenoapi';
 
-	let metadataHistograms: Map<string, HistogramEntry[]> = new Map();
+	let metadataHistograms: Map<string, HistogramBucket[]> = new Map();
 
-	if ($project) {
-		loadHistogramData($project?.uuid, undefined, undefined, $model, $columns).then((res) => {
-			if (res !== undefined) {
-				metadataHistograms = res;
-			}
-		});
-	}
-
-	function loadCountsAndMetrics(
-		tagIds: string[] | undefined,
-		selectionIds: string[] | undefined,
-		model: string | undefined,
-		metric: Metric | undefined,
-		selectionPredicates: FilterPredicateGroup | undefined
-	) {
-		if ($project === undefined) return;
-		const dataIds =
-			tagIds !== undefined && selectionIds !== undefined
-				? [...new Set([...tagIds, ...selectionIds])]
-				: tagIds !== undefined
-				? tagIds
-				: selectionIds;
-		getHistogramCounts(
-			$project.uuid,
+	getHistograms($project?.uuid, $columns, $model).then((res) => {
+		calculateHistograms(
+			$project?.uuid,
 			$columns,
-			metadataHistograms,
-			selectionPredicates === undefined
-				? undefined
-				: {
-						predicates: [selectionPredicates],
-						join: Join.AND
-				  },
-			dataIds
+			res,
+			undefined,
+			$selectionIds,
+			$model,
+			$metric
 		).then((res) => {
-			if (res === undefined || model === undefined || metric === undefined) {
-				return;
-			}
-			metadataHistograms = res;
-			getHistogramMetrics(
-				res,
-				model,
-				metric,
-				dataIds,
-				selectionPredicates === undefined
-					? undefined
-					: {
-							predicates: [selectionPredicates],
-							join: Join._
-					  }
-			).then((res) => {
-				if (res === undefined) {
-					return;
-				}
-				metadataHistograms = res;
-			});
-		});
-	}
-
-	// Calculate histogram metrics when metric changes
-	metric.subscribe((metric) => {
-		if (metadataHistograms.size === 0 || $model === undefined || metric === undefined) {
-			return;
-		}
-
-		const dataIds =
-			$tagIds !== undefined && $selectionIds !== undefined
-				? [...new Set([...$tagIds, ...$selectionIds])]
-				: $tagIds !== undefined
-				? $tagIds
-				: $selectionIds;
-
-		getHistogramMetrics(metadataHistograms, $model, metric, dataIds, undefined).then((res) => {
-			if (res === undefined) {
-				return;
-			}
 			metadataHistograms = res;
 		});
 	});
 
-	// Calculate histogram counts when model changes for feature columns
-	model.subscribe((model) => {
-		if ($project) {
-			loadHistogramData($project.uuid, undefined, undefined, model, $columns).then((res) => {
-				if (res !== undefined) {
-					metadataHistograms = res;
-				}
-			});
-		}
+	metric.subscribe((m) => {
+		calculateHistograms(
+			$project?.uuid,
+			$columns,
+			metadataHistograms,
+			$selectionPredicates,
+			$selectionIds,
+			$model,
+			m
+		).then((r) => (metadataHistograms = r));
+	});
+
+	model.subscribe((m) => {
+		getHistograms($project?.uuid, $columns, $model).then((res) => {
+			calculateHistograms(
+				$project?.uuid,
+				$columns,
+				res,
+				$selectionPredicates,
+				$selectionIds,
+				m,
+				$metric
+			).then((r) => (metadataHistograms = r));
+		});
 	});
 
 	// when the selection Ids change, update the histograms
-	selectionIds.subscribe((selectionIds) => {
-		if (metadataHistograms.size === 0) {
-			return;
-		}
-		loadCountsAndMetrics($tagIds, selectionIds, $model, $metric, $selectionPredicates);
-	});
-
-	// when the tag Ids change, update the histograms
-	tagIds.subscribe((tIds) => {
-		if (metadataHistograms.size === 0) {
-			return;
-		}
-		loadCountsAndMetrics(tIds, $selectionIds, $model, $metric, $selectionPredicates);
-	});
+	selectionIds.subscribe((selectionIds) =>
+		calculateHistograms(
+			$project?.uuid,
+			$columns,
+			metadataHistograms,
+			$selectionPredicates,
+			selectionIds,
+			$model,
+			$metric
+		).then((r) => (metadataHistograms = r))
+	);
 
 	// Update counts and metrics when selection changes.
 	selectionPredicates.subscribe((sels) => {
 		if (metadataHistograms.size === 0) {
 			return;
 		}
-		loadCountsAndMetrics($tagIds, $selectionIds, $model, $metric, sels);
+		calculateHistograms(
+			$project?.uuid,
+			$columns,
+			metadataHistograms,
+			sels,
+			$selectionIds,
+			$model,
+			$metric
+		).then((r) => (metadataHistograms = r));
 	});
 </script>
 

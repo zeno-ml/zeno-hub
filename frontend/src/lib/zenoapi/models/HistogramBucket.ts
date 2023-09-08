@@ -9,4 +9,7 @@
 export type HistogramBucket = {
 	bucket: number | boolean | string;
 	bucketEnd?: number | boolean | string | null;
+	size?: number | null;
+	filteredSize?: number | null;
+	metric?: number | null;
 };

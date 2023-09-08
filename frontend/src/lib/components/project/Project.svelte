@@ -69,7 +69,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteProject(project.uuid).then(() => invalidate('app:state'));
+									ZenoService.deleteProject(project.uuid).then(() => invalidate('app:projects'));
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;

@@ -70,7 +70,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mb-3">
-			{#if currentTab?.includes('project') && $project && $project.ownerName === user?.name}
+			{#if (currentTab?.includes('explore') || currentTab?.includes('compare')) && $project?.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}
 					tooltipContent={"Edit your project's configuration"}

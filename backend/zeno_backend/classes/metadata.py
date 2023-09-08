@@ -9,6 +9,9 @@ class HistogramBucket(CamelModel):
 
     bucket: float | bool | int | str
     bucket_end: float | bool | int | str | None = None
+    size: int | None = None
+    filtered_size: int | None = None
+    metric: float | None = None
 
 
 class HistogramColumnRequest(CamelModel):

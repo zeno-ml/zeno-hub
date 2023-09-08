@@ -65,6 +65,7 @@ export class ZenoService {
 	 * data_column (str | None, optional): the name of the column containing the
 	 * raw data. Only works for small text data. Defaults to None.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
@@ -98,6 +99,7 @@ export class ZenoService {
 	 * output_column (str): the name of the column containing the system output.
 	 * id_column (str): the name of the column containing the instance IDs.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
@@ -565,44 +567,19 @@ export class ZenoService {
 	}
 
 	/**
-	 * Calculate Histogram Counts
+	 * Calculate Histograms
 	 * @param project
 	 * @param requestBody
-	 * @returns number Successful Response
+	 * @returns HistogramBucket Successful Response
 	 * @throws ApiError
 	 */
-	public static calculateHistogramCounts(
+	public static calculateHistograms(
 		project: string,
 		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
+	): CancelablePromise<Array<Array<HistogramBucket>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/histogram-counts/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Calculate Histogram Metrics
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static calculateHistogramMetrics(
-		project: string,
-		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number | null>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histogram-metrics/{project}',
 			path: {
 				project: project
 			},

@@ -4,46 +4,19 @@
  * can run then asynchronously and provide interactive updates while waiting
  * for more expensive computations like calculating metrics.
  */
-import { columns, metricRange, project, requestingHistogramCounts } from '$lib/stores';
+import { metricRange, requestingHistogramCounts } from '$lib/stores';
 import { getMetricRange } from '$lib/util/util';
 import {
 	CancelablePromise,
 	ZenoColumnType,
 	ZenoService,
 	type FilterPredicateGroup,
+	type HistogramBucket,
 	type Metric,
 	type ZenoColumn
 } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
-export interface HistogramEntry {
-	bucket: number | string | boolean;
-	bucketEnd?: number | string | boolean | null;
-	count?: number;
-	filteredCount?: number;
-	metric?: number;
-}
-
-export async function loadHistogramData(
-	project_uuid: string,
-	tagIds: string[] | undefined,
-	selectionIds: string[] | undefined,
-	model: string | undefined,
-	columns: ZenoColumn[]
-) {
-	const dataIds =
-		tagIds !== undefined && selectionIds !== undefined
-			? [...new Set([...tagIds, ...selectionIds])]
-			: tagIds !== undefined
-			? tagIds
-			: selectionIds;
-	const histograms = await getHistograms(project_uuid, columns, model);
-	const counts = await getHistogramCounts(project_uuid, columns, histograms, undefined, dataIds);
-	if (counts === undefined) {
-		return;
-	}
-	return counts;
-}
 /**
  * Fetch metadata columns buckets for histograms.
  *
@@ -53,25 +26,27 @@ export async function loadHistogramData(
  * @returns Histogram buckets for each column.
  */
 export async function getHistograms(
-	project_uuid: string,
+	project_uuid: string | undefined,
 	completeColumns: ZenoColumn[],
 	model: string | undefined
-): Promise<Map<string, HistogramEntry[]>> {
+): Promise<Map<string, HistogramBucket[]>> {
+	if (!project_uuid) {
+		return new Map();
+	}
 	const requestedHistograms = completeColumns.filter(
 		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
 	);
+
 	requestingHistogramCounts.set(true);
 	const res = await ZenoService.getHistogramBuckets(project_uuid, requestedHistograms);
 	requestingHistogramCounts.set(false);
-	const histograms = new Map<string, HistogramEntry[]>(
-		requestedHistograms.map((col, i) => [col.id, res[i]])
-	);
-	return histograms;
+
+	return new Map<string, HistogramBucket[]>(requestedHistograms.map((col, i) => [col.id, res[i]]));
 }
 
 // Since a user might change the selection before we get counts,
 // make this fetch request cancellable.
-let histogramCountRequest: CancelablePromise<Array<Array<number>>>;
+let histogramRequest: CancelablePromise<Array<Array<HistogramBucket>>>;
 /**
  * Fetch histogram counts for the buckets of metadata columns.
  *
@@ -79,29 +54,40 @@ let histogramCountRequest: CancelablePromise<Array<Array<number>>>;
  * @param filterPredicates Filter predicates to filter DataFrame by.
  * @returns Histogram counts for each column.
  */
-export async function getHistogramCounts(
-	project_uuid: string,
+export async function calculateHistograms(
+	project_uuid: string | undefined,
 	columns: ZenoColumn[],
-	histograms: Map<string, HistogramEntry[]>,
+	histograms: Map<string, HistogramBucket[]>,
 	filterPredicates?: FilterPredicateGroup,
-	dataIds?: string[]
-): Promise<Map<string, HistogramEntry[]> | undefined> {
+	dataIds?: string[],
+	model?: string | null,
+	metric?: Metric | null
+): Promise<Map<string, HistogramBucket[]>> {
+	if (!project_uuid) {
+		return new Map();
+	}
 	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
 		column: columns.find((col) => col.id === k) ?? columns[0],
 		buckets: v
 	}));
-	if (histogramCountRequest) {
-		histogramCountRequest.cancel();
+	if (histogramRequest) {
+		histogramRequest.cancel();
 	}
 	try {
 		requestingHistogramCounts.set(true);
-		histogramCountRequest = ZenoService.calculateHistogramCounts(project_uuid, {
+		histogramRequest = ZenoService.calculateHistograms(project_uuid, {
 			columnRequests,
 			filterPredicates,
+			model,
+			metric,
 			dataIds
 		});
-		const out = await histogramCountRequest;
+		const out = await histogramRequest;
 		requestingHistogramCounts.set(false);
+
+		if (get(metricRange)[0] === Infinity) {
+			metricRange.set(getMetricRange(out));
+		}
 
 		[...histograms.keys()].forEach((k, i) => {
 			const hist = histograms.get(k);
@@ -110,9 +96,10 @@ export async function getHistogramCounts(
 					k,
 					hist.map((h, j) => {
 						if (filterPredicates === undefined) {
-							h.count = out[i][j];
+							h.size = out[i][j].size;
 						}
-						h.filteredCount = out[i][j];
+						h.metric = out[i][j].metric;
+						h.filteredSize = out[i][j].size;
 						return h;
 					})
 				);
@@ -120,79 +107,7 @@ export async function getHistogramCounts(
 		});
 		return histograms;
 	} catch (e) {
-		return undefined;
-	}
-}
-
-// Since a user might change the selection before we get metrics,
-// make this fetch request cancellable.
-let histogramMetricRequest: CancelablePromise<Array<Array<number | null>>>;
-/**
- * Fetch histogram metrics for the buckets of metadata columns.
- *
- * @param histograms Histogram buckets for each column.
- * @param filterPredicates Filter predicates to filter DataFrame by.
- * @param model Model to fetch metrics for.
- * @param metric Metric to calculate per bucket.
- * @returns Histogram metrics for each column.
- */
-export async function getHistogramMetrics(
-	histograms: Map<string, HistogramEntry[]>,
-	model: string | undefined,
-	metric: Metric,
-	dataIds: string[] | undefined,
-	filterPredicates?: FilterPredicateGroup
-): Promise<Map<string, HistogramEntry[]> | undefined> {
-	const config = get(project);
-	if (!config || !config.calculateHistogramMetrics) {
-		return undefined;
-	}
-	const columnRequests = [...histograms.entries()].map(([k, v]) => ({
-		column: get(columns).find((col) => col.id === k) ?? get(columns)[0],
-		buckets: v
-	}));
-	if (histogramMetricRequest) {
-		histogramMetricRequest.cancel();
-	}
-	try {
-		const config = get(project);
-		if (!config) {
-			return Promise.reject('No project selected.');
-		}
-		histogramMetricRequest = ZenoService.calculateHistogramMetrics(config.uuid, {
-			columnRequests,
-			filterPredicates,
-			model: model ?? null,
-			metric,
-			dataIds
-		});
-
-		requestingHistogramCounts.set(true);
-		const res = await histogramMetricRequest;
 		requestingHistogramCounts.set(false);
-
-		if (res === undefined) {
-			return undefined;
-		}
-
-		if (get(metricRange)[0] === Infinity) {
-			metricRange.set(getMetricRange(res));
-		}
-
-		[...histograms.keys()].forEach((k, i) => {
-			const hist = histograms.get(k);
-			if (hist !== undefined) {
-				histograms.set(
-					k,
-					hist.map((h, j) => {
-						h.metric = res[i][j] || 0;
-						return h;
-					})
-				);
-			}
-		});
 		return histograms;
-	} catch (e) {
-		return undefined;
 	}
 }

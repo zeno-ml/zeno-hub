@@ -36,7 +36,6 @@ from zeno_backend.processing.histogram_processing import (
     HistogramRequest,
     histogram_buckets,
     histogram_counts,
-    histogram_metrics,
 )
 from zeno_backend.processing.metrics.map import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
@@ -83,7 +82,9 @@ def get_server() -> FastAPI:
         )
 
     api_app = FastAPI(
-        title="Backend API", generate_unique_id_function=lambda route: route.name
+        title="Backend API",
+        generate_unique_id_function=lambda route: route.name,
+        separate_input_output_schemas=False,
     )
     api_app.include_router(sdk.router)
     app.mount("/api", api_app)
@@ -377,34 +378,24 @@ def get_server() -> FastAPI:
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    def get_histogram_buckets(req: list[ZenoColumn], project: str, request: Request):
+    async def get_histogram_buckets(
+        req: list[ZenoColumn], project: str, request: Request
+    ):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return histogram_buckets(project, req)
+        return await histogram_buckets(project, req)
 
     @api_app.post(
         "/histogram-counts/{project}",
-        response_model=list[list[int]],
+        response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    def calculate_histogram_counts(
+    async def calculate_histograms(
         req: HistogramRequest, project: str, request: Request
     ):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return histogram_counts(project, req)
-
-    @api_app.post(
-        "/histogram-metrics/{project}",
-        response_model=list[list[float | None]],
-        tags=["zeno"],
-    )
-    def calculate_histogram_metrics(
-        req: HistogramRequest, project: str, request: Request
-    ):
-        if not util.access_valid(project, request):
-            return Response(status_code=401)
-        return histogram_metrics(project, req)
+        return await histogram_counts(project, req)
 
     @api_app.get(
         "/project-users/{project}",

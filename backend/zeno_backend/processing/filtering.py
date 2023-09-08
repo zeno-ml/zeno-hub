@@ -34,16 +34,13 @@ def filter_to_sql(
                     + sql.SQL(")")
                 )
         else:
-            try:
-                val = str(float(f.value))
-            except ValueError:
-                if str(f.value).lower() in [
-                    "true",
-                    "false",
-                ]:
-                    val = "True" if str(f.value).lower() == "true" else "False"
-                else:
-                    val = f.value
+            if str(f.value).lower() in [
+                "true",
+                "false",
+            ]:
+                val = "True" if str(f.value).lower() == "true" else "False"
+            else:
+                val = f.value
             column_id = (
                 f.column.id
                 if f.column.model is None or model is None
