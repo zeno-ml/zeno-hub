@@ -3,7 +3,7 @@
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
-from zeno_backend.classes.filter import FilterPredicateGroup
+from zeno_backend.classes.filter import FilterPredicateGroup, Operation
 from zeno_backend.classes.metadata import HistogramBucket
 from zeno_backend.database.select import column_id_from_name_and_model
 
@@ -40,7 +40,9 @@ def filter_to_sql(
             ]:
                 val = "True" if str(f.value).lower() == "true" else "False"
             else:
-                val = f.value
+                val = str(f.value)
+                if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
+                    val = "%" + val + "%"
             column_id = (
                 f.column.id
                 if f.column.model is None or model is None
