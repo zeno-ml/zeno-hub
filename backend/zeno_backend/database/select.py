@@ -1,12 +1,11 @@
 """Functions to select data from the database."""
 import json
-import re
 
 from psycopg import sql
 
 from zeno_backend.classes.base import ZenoColumn
 from zeno_backend.classes.chart import Chart
-from zeno_backend.classes.filter import FilterPredicateGroup, Join
+from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
@@ -983,7 +982,7 @@ def project_orgs(project: str) -> list[Organization]:
     )
 
 
-def filered_short_string_column_values(
+def filtered_short_string_column_values(
     project: str, req: StringFilterRequest
 ) -> list[str]:
     """Select distinct string values of a column and return their short representation.
@@ -997,68 +996,33 @@ def filered_short_string_column_values(
         list[str]: the filtered string column data.
     """
     db = Database()
+
+    if req.operation == Operation.LIKE or req.operation == Operation.ILIKE:
+        req.filter_string = "%" + req.filter_string + "%"
+
+    returned_strings = db.connect_execute_return(
+        sql.SQL("SELECT {} from {} WHERE {} {} %s;").format(
+            sql.Identifier(req.column.id),
+            sql.Identifier(project),
+            sql.Identifier(req.column.id),
+            sql.SQL(req.operation.literal()),
+        ),
+        [
+            req.filter_string,
+        ],
+    )
+
     short_ret: list[str] = []
-    if not req.is_regex:
-        if req.whole_word_match:
-            req.filter_string = f"% {req.filter_string} %"
-        else:
-            req.filter_string = f"%{req.filter_string}%"
-
-        if not req.case_match:
-            req.filter_string = req.filter_string.upper()
-            returned_strings = db.connect_execute_return(
-                sql.SQL("SELECT {} from {} WHERE UPPER({}) LIKE %s;").format(
-                    sql.Identifier(req.column.id),
-                    sql.Identifier(project),
-                    sql.Identifier(req.column.id),
-                ),
-                [
-                    req.filter_string,
-                ],
-            )
-        else:
-            returned_strings = db.connect_execute_return(
-                sql.SQL("SELECT {} from {} WHERE {} LIKE %s").format(
-                    sql.Identifier(req.column.id),
-                    sql.Identifier(project),
-                    sql.Identifier(req.column.id),
-                ),
-                [
-                    req.filter_string,
-                ],
-            )
-
-        if len(returned_strings) == 0:
-            return short_ret
-        for result in returned_strings[0:5]:
-            idx = result[0].find(req.filter_string)
-            loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
-            if len(result[0]) > 40 + len(req.filter_string):
-                if idx - 20 > 0:
-                    loc_str = "..." + loc_str
-                if idx + 20 < len(result[0]):
-                    loc_str = loc_str + "..."
-            short_ret.append(loc_str)
-
-    else:
-        returned_strings = db.connect_execute_return(
-            sql.SQL("SELECT {} from {} WHERE {} SIMILAR TO %s").format(
-                sql.Identifier(req.column.id),
-                sql.Identifier(project),
-                sql.Identifier(req.column.id),
-            ),
-            [
-                req.filter_string,
-            ],
-        )
-
-        if len(returned_strings) == 0:
-            return short_ret
-        for result in returned_strings:
-            idx = re.search(req.filter_string, result[0])
-            if idx is not None:
-                idx = idx.start()
-                loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
-                short_ret.append(loc_str)
+    if len(returned_strings) == 0:
+        return short_ret
+    for result in returned_strings[0:5]:
+        idx = result[0].find(req.filter_string)
+        loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
+        if len(result[0]) > 40 + len(req.filter_string):
+            if idx - 20 > 0:
+                loc_str = "..." + loc_str
+            if idx + 20 < len(result[0]):
+                loc_str = loc_str + "..."
+        short_ret.append(loc_str)
 
     return short_ret
