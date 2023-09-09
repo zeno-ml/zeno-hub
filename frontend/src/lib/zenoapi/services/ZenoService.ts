@@ -567,44 +567,19 @@ export class ZenoService {
 	}
 
 	/**
-	 * Calculate Histogram Counts
+	 * Calculate Histograms
 	 * @param project
 	 * @param requestBody
-	 * @returns number Successful Response
+	 * @returns HistogramBucket Successful Response
 	 * @throws ApiError
 	 */
-	public static calculateHistogramCounts(
+	public static calculateHistograms(
 		project: string,
 		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
+	): CancelablePromise<Array<Array<HistogramBucket>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/histogram-counts/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Calculate Histogram Metrics
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static calculateHistogramMetrics(
-		project: string,
-		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number | null>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histogram-metrics/{project}',
 			path: {
 				project: project
 			},

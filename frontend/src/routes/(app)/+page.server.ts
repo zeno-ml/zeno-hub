@@ -1,7 +1,8 @@
 import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService, type Project } from '$lib/zenoapi';
 
-export async function load({ cookies }) {
+export async function load({ cookies, depends }) {
+	depends('app:projects');
 	OpenAPI.BASE = `${getEndpoint()}/api`;
 
 	let projects: Project[] = [];

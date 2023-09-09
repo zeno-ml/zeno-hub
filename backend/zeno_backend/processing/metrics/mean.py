@@ -1,7 +1,7 @@
 """Mean metric calculation."""
 from psycopg import sql
 
-from zeno_backend.classes.base import GroupMetric
+from zeno_backend.classes.base import GroupMetric, MetadataType
 from zeno_backend.classes.metric import Metric
 from zeno_backend.database.database import Database
 
@@ -25,9 +25,9 @@ def mean(
     """
     with Database() as db:
         # Get column name from project column map
-        column_id = db.execute_return(
+        column_output = db.execute_return(
             sql.SQL(
-                "SELECT column_id FROM {} WHERE name = {} AND"
+                "SELECT column_id, data_type FROM {} WHERE name = {} AND"
                 " (model IS NULL OR model = {})"
             ).format(
                 sql.Identifier(f"{project_uuid}_column_map"),
@@ -36,20 +36,24 @@ def mean(
             )
         )
 
-        if len(column_id) == 0:
+        if len(column_output) == 0:
             return GroupMetric(metric=None, size=0)
-        column_id = column_id[0][0]
+        column_id = column_output[0][0]
+        if column_output[0][1] == MetadataType.BOOLEAN:
+            column_id = sql.Identifier(column_id) + sql.SQL("::int")
+        else:
+            column_id = sql.Identifier(column_id)
 
         if filter is None:
             db.execute(
-                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {}").format(
-                    sql.Identifier(column_id), sql.Identifier(project_uuid)
+                sql.SQL("SELECT COUNT(*) AS n, AVG({}) FROM {}").format(
+                    column_id, sql.Identifier(project_uuid)
                 )
             )
         else:
             db.execute(
-                sql.SQL("SELECT COUNT(*) AS n, AVG({}::float) FROM {} WHERE ").format(
-                    sql.Identifier(column_id), sql.Identifier(project_uuid)
+                sql.SQL("SELECT COUNT(*) AS n, AVG({}) FROM {} WHERE ").format(
+                    column_id, sql.Identifier(project_uuid)
                 )
                 + filter
             )

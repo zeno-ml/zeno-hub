@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { HistogramEntry } from '$lib/api/metadata';
 	import { selections } from '$lib/stores';
 	import {
 		Join,
 		MetadataType,
 		type FilterPredicate,
 		type FilterPredicateGroup,
+		type HistogramBucket,
 		type ZenoColumn
 	} from '$lib/zenoapi';
 	import BinaryMetadataCell from './metadata-cells/BinaryMetadataCell.svelte';
@@ -14,7 +14,7 @@
 	import TextMetadataCell from './metadata-cells/TextMetadataCell.svelte';
 
 	export let col: ZenoColumn;
-	export let histogram: HistogramEntry[];
+	export let histogram: HistogramBucket[];
 
 	const columnMap = {
 		[MetadataType.NOMINAL]: NominalMetadataCell,
@@ -42,8 +42,8 @@
 		}));
 	}
 
-	function getChartType(dataType: MetadataType, histogram: HistogramEntry[]) {
-		if (dataType === MetadataType.NOMINAL && histogram.length >= 20) {
+	function getChartType(dataType: MetadataType, histogram: HistogramBucket[]) {
+		if (dataType === MetadataType.NOMINAL && histogram.length == 0) {
 			return columnMap[MetadataType.OTHER];
 		} else {
 			return columnMap[dataType];
@@ -52,7 +52,7 @@
 </script>
 
 {#if histogram}
-	<div class="border-b border-grey-lighter p-2.5 flex flex-col">
+	<div class="border-b border-grey-lighter pb-2 pt-2 flex flex-col">
 		<div class="flex justify-between items-center ml-1 mb-2.5 text-grey-darker">
 			<div class="label top-text">
 				<span>

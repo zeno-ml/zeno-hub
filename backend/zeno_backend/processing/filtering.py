@@ -34,18 +34,15 @@ def filter_to_sql(
                     + sql.SQL(")")
                 )
         else:
-            try:
-                val = str(float(f.value))
-            except ValueError:
-                if str(f.value).lower() in [
-                    "true",
-                    "false",
-                ]:
-                    val = "True" if str(f.value).lower() == "true" else "False"
-                else:
-                    val = str(f.value)
-                    if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
-                        val = "%" + val + "%"
+            if str(f.value).lower() in [
+                "true",
+                "false",
+            ]:
+                val = "True" if str(f.value).lower() == "true" else "False"
+            else:
+                val = str(f.value)
+                if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
+                    val = "%" + val + "%"
             column_id = (
                 f.column.id
                 if f.column.model is None or model is None

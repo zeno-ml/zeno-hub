@@ -1,13 +1,18 @@
 <script lang="ts">
-	import type { HistogramEntry } from '$lib/api/metadata';
 	import { metricRange } from '$lib/stores';
-	import { Join, Operation, type FilterPredicate, type ZenoColumn } from '$lib/zenoapi';
+	import {
+		Join,
+		Operation,
+		type FilterPredicate,
+		type HistogramBucket,
+		type ZenoColumn
+	} from '$lib/zenoapi';
 	import type { View } from 'svelte-vega';
 	import { VegaLite } from 'svelte-vega';
 	import { nominalVegaSpec } from './vegaSpecs';
 
 	export let col: ZenoColumn;
-	export let histogram: HistogramEntry[];
+	export let histogram: HistogramBucket[];
 	export let filterPredicates: FilterPredicate[];
 	export let updatePredicates: (predicates: FilterPredicate[]) => void;
 

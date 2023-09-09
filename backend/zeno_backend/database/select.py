@@ -677,7 +677,7 @@ def table_data_paginated(
                 db.cur.execute(
                     sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
                     + filter_sql
-                    + sql.SQL("ORDER BY {} {} LIMIT {} OFFSET {};").format(
+                    + sql.SQL(" ORDER BY {} {} LIMIT {} OFFSET {};").format(
                         sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
                         sql.SQL("DESC" if sort_by[1] else "ASC"),
                         sql.Literal(limit),
