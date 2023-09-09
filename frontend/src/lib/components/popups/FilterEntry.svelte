@@ -73,7 +73,7 @@
 			}}
 		/>
 	</div>
-	<div class="mr-2.5">
+	<div class="mr-2.5 w-20">
 		{#if predicate.column}
 			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
@@ -82,7 +82,7 @@
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', 'LIKE']}
+					options={[inverseOperationMap[Operation.EQUAL], inverseOperationMap[Operation.DIFFERENT]]}
 				/>
 			{:else if predicate.column.dataType === MetadataType.CONTINUOUS}
 				<!-- renderer function avoids HTML sanitation issues-->
@@ -92,7 +92,14 @@
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', '>', '<', '>=', '<=']}
+					options={[
+						inverseOperationMap[Operation.EQUAL],
+						inverseOperationMap[Operation.DIFFERENT],
+						inverseOperationMap[Operation.GT],
+						inverseOperationMap[Operation.LT],
+						inverseOperationMap[Operation.GTE],
+						inverseOperationMap[Operation.LTE]
+					]}
 					renderer={renderOptions}
 				/>
 			{:else}
@@ -102,7 +109,13 @@
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', 'LIKE', 'ILIKE', 'REGEX']}
+					options={[
+						inverseOperationMap[Operation.EQUAL],
+						inverseOperationMap[Operation.DIFFERENT],
+						inverseOperationMap[Operation.LIKE],
+						inverseOperationMap[Operation.ILIKE],
+						inverseOperationMap[Operation.REGEX]
+					]}
 				/>
 			{/if}
 		{/if}
