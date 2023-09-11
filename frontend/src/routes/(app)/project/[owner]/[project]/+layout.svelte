@@ -20,23 +20,21 @@
 
 	export let data;
 
-	if ($project === undefined) {
-		project.set(data.project);
-		rowsPerPage.set(data.project.samplesPerPage ?? 10);
-		slices.set(data.slices);
-		columns.set(data.columns);
-		models.set(data.models);
-		metrics.set(data.metrics);
-		folders.set(data.folders);
-		tags.set(data.tags);
-		model.set(data.model);
-		metric.set(data.metric);
-		comparisonModel.set(data.comparisonModel);
-		comparisonColumn.set(data.comparisonColumn);
-		compareSort.set(data.compareSort);
-		metricRange.set(data.metricRange);
-		selections.set(data.selections);
-	}
+	project.set(data.project);
+	rowsPerPage.set(data.project.samplesPerPage ?? 10);
+	slices.set(data.slices);
+	columns.set(data.columns);
+	models.set(data.models);
+	metrics.set(data.metrics);
+	folders.set(data.folders);
+	tags.set(data.tags);
+	model.set(data.model);
+	metric.set(data.metric);
+	comparisonModel.set(data.comparisonModel);
+	comparisonColumn.set(data.comparisonColumn);
+	compareSort.set(data.compareSort);
+	metricRange.set(data.metricRange);
+	selections.set(data.selections);
 
 	model.subscribe((mod) => {
 		// URL parameters set by selection subscription.

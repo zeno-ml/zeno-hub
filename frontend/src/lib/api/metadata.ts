@@ -107,7 +107,6 @@ export async function calculateHistograms(
 		});
 		return histograms;
 	} catch (e) {
-		requestingHistogramCounts.set(false);
 		return histograms;
 	}
 }
