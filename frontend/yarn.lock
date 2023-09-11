@@ -846,22 +846,7 @@
   dependencies:
     tslib "^2.5.0"
 
-"@smui/button@7.0.0-beta.14":
-  version "7.0.0-beta.14"
-  resolved "https://registry.npmjs.org/@smui/button/-/button-7.0.0-beta.14.tgz"
-  integrity sha512-xkYjj7E8kILhToDGcHoFB3Hdh7bgIjoRJP3X65wnZBJTCBcM1949e7b0lJBWvVMEMJ3F2aKFVrWpEdfllqZmkg==
-  dependencies:
-    "@material/button" "^14.0.0"
-    "@material/elevation" "^14.0.0"
-    "@material/feature-targeting" "^14.0.0"
-    "@material/ripple" "^14.0.0"
-    "@material/shape" "^14.0.0"
-    "@material/theme" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.14"
-    "@smui/ripple" "^7.0.0-beta.14"
-    svelte2tsx "^0.6.15"
-
-"@smui/button@^7.0.0-beta.15":
+"@smui/button@7.0.0-beta.15", "@smui/button@^7.0.0-beta.15":
   version "7.0.0-beta.15"
   resolved "https://registry.yarnpkg.com/@smui/button/-/button-7.0.0-beta.15.tgz#7581a930198e9689f77e2ea98f01e4ccf0cc809b"
   integrity sha512-yfs/HkIjLDJROzUw+lvK26AV3S/XtAGkuRXEPUQuIzlfv8LAp9kIv2S3EPpxPj9xXAS/kiKu8HnFsyknl02dSw==
