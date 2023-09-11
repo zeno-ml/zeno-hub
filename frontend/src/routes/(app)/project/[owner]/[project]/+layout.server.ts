@@ -14,8 +14,6 @@ export async function load({ cookies, params, url, depends }) {
 
 	OpenAPI.BASE = getEndpoint() + '/api';
 
-	const projectPublic = ZenoService.isProjectPublic(params.project);
-
 	let cognitoUser = null;
 	const userCookie = cookies.get('loggedIn');
 	if (userCookie) {
@@ -27,8 +25,6 @@ export async function load({ cookies, params, url, depends }) {
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
-	} else if (!projectPublic) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
 	let project_result: ProjectState;
