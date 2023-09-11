@@ -9,9 +9,9 @@ export async function load({ params, depends }) {
 	let chartResult: ChartResponse;
 	try {
 		chartResult = await ZenoService.getChart(
+			parseInt(params.chartIndex),
 			params.owner,
-			params.project,
-			parseInt(params.chartIndex)
+			params.project
 		);
 	} catch (e) {
 		throw error(404, 'Could not load chart');

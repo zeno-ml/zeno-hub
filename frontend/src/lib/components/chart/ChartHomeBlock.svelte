@@ -10,7 +10,6 @@
 	} from '@mdi/js';
 
 	import { goto, invalidate } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
@@ -33,7 +32,7 @@
 
 <button
 	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
-	on:click={() => goto(`${$page.url.href.split('?')[0]}/${chart.id}?edit=false`)}
+	on:click={() => goto(`chart/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
 		<div class="m-4 min-w-[24px]">

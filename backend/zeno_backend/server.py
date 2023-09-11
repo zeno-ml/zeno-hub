@@ -266,7 +266,7 @@ def get_server() -> FastAPI:
         return filt_df.to_json(orient="records")
 
     @api_app.get(
-        "/chart/{owner}/{project}/{chart_uuid}",
+        "/chart/{owner}/{project}/{chart_id}",
         response_model=ChartResponse,
         tags=["zeno"],
     )

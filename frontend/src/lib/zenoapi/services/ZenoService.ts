@@ -403,24 +403,26 @@ export class ZenoService {
 
 	/**
 	 * Get Chart
+	 * @param chartId
 	 * @param ownerName
 	 * @param projectName
-	 * @param chartId
 	 * @returns ChartResponse Successful Response
 	 * @throws ApiError
 	 */
 	public static getChart(
+		chartId: number,
 		ownerName: string,
-		projectName: string,
-		chartId: number
+		projectName: string
 	): CancelablePromise<ChartResponse> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/chart/{owner}/{project}/{chart_uuid}',
+			url: '/chart/{owner}/{project}/{chart_id}',
+			path: {
+				chart_id: chartId
+			},
 			query: {
 				owner_name: ownerName,
-				project_name: projectName,
-				chart_id: chartId
+				project_name: projectName
 			},
 			errors: {
 				422: `Validation Error`

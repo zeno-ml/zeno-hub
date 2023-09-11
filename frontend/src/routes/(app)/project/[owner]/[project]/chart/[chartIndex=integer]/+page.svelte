@@ -37,7 +37,7 @@
 	}
 
 	function updateChart(chart: Chart) {
-		if ($project && $project.editor) {
+		if ($project && $project.editor && browser) {
 			ZenoService.updateChart($project.uuid, chart).then(() => {
 				invalidate('app:chart');
 			});
