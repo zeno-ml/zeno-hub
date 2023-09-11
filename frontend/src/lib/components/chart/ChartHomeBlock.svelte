@@ -11,7 +11,7 @@
 
 	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { charts, project } from '$lib/stores';
+	import { project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
@@ -33,7 +33,7 @@
 
 <button
 	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
-	on:click={() => goto(`${$page.url}/${chart.id}?edit=false`)}
+	on:click={() => goto(`${$page.url.href.split('?')[0]}/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
 		<div class="m-4 min-w-[24px]">
@@ -55,7 +55,16 @@
 				</Icon>
 			</IconButton>
 			{#if showOptions}
-				<div class="z-10 absolute ml-5" use:clickOutside={() => (showOptions = !showOptions)}>
+				<div
+					class="z-10 absolute ml-5"
+					use:clickOutside={() => (showOptions = !showOptions)}
+					on:click={(e) => e.stopPropagation()}
+					on:keydown={(e) => {
+						if (e.key === 'Escape') {
+							showOptions = false;
+						}
+					}}
+				>
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
 							<div
@@ -69,17 +78,8 @@
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
 										parameters: chart.parameters
-									}).then((res) => {
-										invalidate('app:chart');
-										charts.update((c) => {
-											c.push({
-												id: res,
-												name: 'Copy of ' + chart.name,
-												type: chart.type,
-												parameters: chart.parameters
-											});
-											return c;
-										});
+									}).then(() => {
+										invalidate('app:charts');
 									});
 								}}
 							>
@@ -92,10 +92,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteChart(chart).then(() => {
-										charts.update((c) => c.filter((c) => c.id !== chart.id));
-										invalidate('app:chart');
-									});
+									ZenoService.deleteChart(chart).then(() => invalidate('app:charts'));
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;

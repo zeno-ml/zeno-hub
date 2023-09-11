@@ -9,7 +9,7 @@ from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
-from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.tag import Tag
@@ -380,6 +380,131 @@ def project_from_uuid(project_uuid: str) -> Project | None:
             )
 
 
+def project_state(project_uuid: str, project: Project) -> ProjectState | None:
+    """Get the state variables of a project.
+
+    Args:
+        project_uuid (str): the uuid of the project to be fetched.
+        project (Project): the project object with project metadata.
+
+    Returns:
+        ProjectState | None: state variables of the requested project.
+    """
+    with Database() as db:
+        metric_results = db.execute_return(
+            "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+            [project_uuid],
+        )
+        metrics = list(
+            map(
+                lambda metric: Metric(
+                    id=metric[0],
+                    name=metric[1],
+                    type=metric[2],
+                    columns=metric[3],
+                ),
+                metric_results,
+            )
+        )
+
+        slice_results = db.execute_return(
+            "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid = %s;",
+            [
+                project_uuid,
+            ],
+        )
+        slices = list(
+            map(
+                lambda slice: Slice(
+                    id=slice[0],
+                    slice_name=slice[1],
+                    folder_id=slice[2],
+                    filter_predicates=FilterPredicateGroup(
+                        predicates=json.loads(slice[3])["predicates"],
+                        join=Join.OMITTED,
+                    ),
+                ),
+                slice_results,
+            )
+        )
+
+        folder_results = db.execute_return(
+            "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
+            [
+                project_uuid,
+            ],
+        )
+        folders = list(
+            map(
+                lambda folder: Folder(id=folder[0], name=folder[1]),
+                folder_results,
+            )
+        )
+
+        tags_result = db.execute_return(
+            "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
+            [
+                project_uuid,
+            ],
+        )
+        tags: list[Tag] = []
+        for tag_result in tags_result:
+            data_results = db.execute_return(
+                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                    sql.Identifier(f"{project_uuid}_tags_datapoints")
+                ),
+                [
+                    tag_result[0],
+                ],
+            )
+            tags.append(
+                Tag(
+                    id=tag_result[0],
+                    tag_name=tag_result[1],
+                    folder_id=tag_result[2],
+                    data_ids=[]
+                    if len(data_results) == 0
+                    else [d[0] for d in data_results],
+                )
+            )
+
+        column_results = db.execute_return(
+            sql.SQL("SELECT column_id, name, type, model, data_type FROM {};").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+        )
+
+        columns = list(
+            map(
+                lambda column: ZenoColumn(
+                    id=column[0],
+                    name=column[1],
+                    column_type=column[2],
+                    model=column[3],
+                    data_type=column[4],
+                ),
+                column_results,
+            )
+        )
+
+        model_results = db.execute_return(
+            sql.SQL("SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+        )
+        models = [m[0] for m in model_results]
+
+        return ProjectState(
+            project=project,
+            metrics=metrics,
+            folders=folders,
+            columns=columns,
+            slices=slices,
+            tags=tags,
+            models=models,
+        )
+
+
 def project_stats(project: str) -> ProjectStats | None:
     """Get statistics for a specified project.
 
@@ -564,6 +689,36 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
             ),
             slice_results,
         )
+    )
+
+
+def chart(project_uuid: str, chart_id: int):
+    """Get a project chart by its ID.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        chart_id (int): the ID of the chart to be fetched.
+
+
+    Returns:
+        Chart | None: the requested chart.
+    """
+    db = Database()
+    chart_result = db.connect_execute_return(
+        "SELECT id, name, type, parameters FROM "
+        "charts WHERE id = %s AND project_uuid = %s;",
+        [
+            chart_id,
+            project_uuid,
+        ],
+    )
+    if len(chart_result) == 0:
+        return None
+    return Chart(
+        id=chart_result[0][0],
+        name=chart_result[0][1],
+        type=chart_result[0][2],
+        parameters=json.loads(chart_result[0][3]),
     )
 
 

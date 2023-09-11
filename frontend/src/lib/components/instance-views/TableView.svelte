@@ -14,7 +14,7 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import type { GroupMetric, ZenoColumn } from '$lib/zenoapi';
+	import type { ZenoColumn } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
 	import Checkbox from '@smui/checkbox';
@@ -23,10 +23,11 @@
 	import Select, { Option } from '@smui/select';
 	import { viewMap } from './views/viewMap';
 
-	export let currentResult: GroupMetric[] | undefined;
+	export let numberOfInstances = 0;
 	export let viewOptions: Record<string, unknown> | undefined;
 
-	let table: Record<string, string | number | boolean>[];
+	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+
 	let columnHeader: ZenoColumn[] = [];
 	let currentTagIds: string[] = [];
 	let currentPage = 0;
@@ -51,9 +52,7 @@
 	);
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;
-	$: if (currentResult !== undefined) {
-		lastPage = Math.max(Math.ceil(currentResult[0].size / $rowsPerPage) - 1, 0);
-	}
+	$: lastPage = Math.max(Math.ceil(numberOfInstances / $rowsPerPage) - 1, 0);
 	$: if (currentPage > lastPage) {
 		currentPage = lastPage;
 	}
@@ -98,7 +97,7 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		getFilteredTable(
+		tablePromise = getFilteredTable(
 			$columns,
 			$model ? [$model] : [],
 			undefined,
@@ -107,7 +106,7 @@
 			$sort,
 			dataIds,
 			predicates
-		).then((res) => (table = res));
+		);
 	}
 
 	function updateSort(column: ZenoColumn) {
@@ -121,47 +120,47 @@
 	}
 </script>
 
-{#if table}
-	<div class="overflow-auto">
-		<table>
-			<thead class="text-left sticky top-0 bg-background cursor-pointer z-10">
-				<tr class="border-b border-grey-lighter bg-background">
-					{#if $editTag !== undefined}
-						<th class="p-3 font-semibold font-grey">Included</th>
-					{/if}
-					{#if $project !== undefined && viewMap[$project.view] !== undefined}
-						<th
-							class="p-3 font-semibold font-grey whitespace-nowrap"
-							on:click={() => (instanceHidden = !instanceHidden)}
-						>
-							instance
-							{#if instanceHidden}
-								<span class="ml-2 text-grey-darker">hidden</span>
-							{/if}
+<div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
+	<table>
+		<thead class="text-left sticky top-0 bg-background cursor-pointer z-10">
+			<tr class="border-b border-grey-lighter bg-background">
+				{#if $editTag !== undefined}
+					<th class="p-3 font-semibold font-grey">Included</th>
+				{/if}
+				{#if $project !== undefined && viewMap[$project.view] !== undefined}
+					<th
+						class="p-3 font-semibold font-grey whitespace-nowrap"
+						on:click={() => (instanceHidden = !instanceHidden)}
+					>
+						instance
+						{#if instanceHidden}
+							<span class="ml-2 text-grey-darker">hidden</span>
+						{/if}
+					</th>
+				{/if}
+				{#each columnHeader as header}
+					{#if header.name !== 'data_id'}
+						<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
+							<div class="flex">
+								{header.name}
+								<Icon
+									class="material-icons"
+									style="font-size: 14px; padding-top:3px; margin-left: 5px;"
+								>
+									{#if $sort[0] && $sort[0].name === header.name && $sort[1]}
+										keyboard_arrow_down
+									{:else if $sort[0] && $sort[0].name === header.name}
+										keyboard_arrow_up
+									{/if}
+								</Icon>
+							</div>
 						</th>
 					{/if}
-					{#each columnHeader as header}
-						{#if header.name !== 'data_id'}
-							<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
-								<div class="flex">
-									{header.name}
-									<Icon
-										class="material-icons"
-										style="font-size: 14px; padding-top:3px; margin-left: 5px;"
-									>
-										{#if $sort[0] && $sort[0].name === header.name && $sort[1]}
-											keyboard_arrow_down
-										{:else if $sort[0] && $sort[0].name === header.name}
-											keyboard_arrow_up
-										{/if}
-									</Icon>
-								</div>
-							</th>
-						{/if}
-					{/each}
-				</tr>
-			</thead>
-			<tbody>
+				{/each}
+			</tr>
+		</thead>
+		<tbody>
+			{#await tablePromise then table}
 				{#each table as tableContent (tableContent['data_id'])}
 					<tr class="border-b border-grey-lighter">
 						{#if $editTag !== undefined}
@@ -198,51 +197,53 @@
 						{/each}
 					</tr>
 				{/each}
-			</tbody>
-		</table>
-	</div>
-	<Pagination slot="paginate" class="pagination">
-		<svelte:fragment slot="rowsPerPage">
-			<Label>Rows Per Page</Label>
-			<Select variant="outlined" bind:value={$rowsPerPage} noLabel>
-				{#each sampleOptions as option}
-					<Option value={option}>{option}</Option>
-				{/each}
-			</Select>
-		</svelte:fragment>
-		<svelte:fragment slot="total">
-			{start + 1}-
-			{Math.min(end, currentResult ? currentResult[0].size : end)} of
-			{currentResult ? currentResult[0].size : ''}
-		</svelte:fragment>
+			{:catch e}
+				<p>error loading data: {e}</p>
+			{/await}
+		</tbody>
+	</table>
+</div>
+<Pagination slot="paginate" class="pagination">
+	<svelte:fragment slot="rowsPerPage">
+		<Label>Rows Per Page</Label>
+		<Select variant="outlined" bind:value={$rowsPerPage} noLabel>
+			{#each sampleOptions as option}
+				<Option value={option}>{option}</Option>
+			{/each}
+		</Select>
+	</svelte:fragment>
+	<svelte:fragment slot="total">
+		{start + 1} -
+		{Math.min(end, numberOfInstances)} of
+		{numberOfInstances}
+	</svelte:fragment>
 
-		<IconButton
-			class="material-icons"
-			action="first-page"
-			title="First page"
-			on:click={() => (currentPage = 0)}
-			disabled={currentPage === 0}>first_page</IconButton
-		>
-		<IconButton
-			class="material-icons"
-			action="prev-page"
-			title="Prev page"
-			on:click={() => currentPage--}
-			disabled={currentPage === 0}>chevron_left</IconButton
-		>
-		<IconButton
-			class="material-icons"
-			action="next-page"
-			title="Next page"
-			on:click={() => currentPage++}
-			disabled={currentPage >= lastPage}>chevron_right</IconButton
-		>
-		<IconButton
-			class="material-icons"
-			action="last-page"
-			title="Last page"
-			on:click={() => (currentPage = lastPage)}
-			disabled={currentPage >= lastPage}>last_page</IconButton
-		>
-	</Pagination>
-{/if}
+	<IconButton
+		class="material-icons"
+		action="first-page"
+		title="First page"
+		on:click={() => (currentPage = 0)}
+		disabled={currentPage === 0}>first_page</IconButton
+	>
+	<IconButton
+		class="material-icons"
+		action="prev-page"
+		title="Prev page"
+		on:click={() => currentPage--}
+		disabled={currentPage === 0}>chevron_left</IconButton
+	>
+	<IconButton
+		class="material-icons"
+		action="next-page"
+		title="Next page"
+		on:click={() => currentPage++}
+		disabled={currentPage >= lastPage}>chevron_right</IconButton
+	>
+	<IconButton
+		class="material-icons"
+		action="last-page"
+		title="Last page"
+		on:click={() => (currentPage = lastPage)}
+		disabled={currentPage >= lastPage}>last_page</IconButton
+	>
+</Pagination>

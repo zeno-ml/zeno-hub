@@ -3,10 +3,8 @@ import {
 	OpenAPI,
 	ZenoService,
 	type FilterPredicateGroup,
-	type Folder,
 	type Metric,
-	type Slice,
-	type Tag,
+	type ProjectState,
 	type ZenoColumn
 } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
@@ -33,27 +31,12 @@ export async function load({ cookies, params, url, depends }) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	const project = await ZenoService.getProject(params.owner, params.project);
-	if (!project) {
-		throw error(404, 'Could not load project config');
+	let project_result: ProjectState;
+	try {
+		project_result = await ZenoService.getProjectState(params.owner, params.project);
+	} catch (e) {
+		throw error(404, 'Could not load project configuration');
 	}
-
-	const requests = [
-		ZenoService.getSlices(project.uuid),
-		ZenoService.getColumns(project.uuid),
-		ZenoService.getModels(project.uuid),
-		ZenoService.getMetrics(project.uuid),
-		ZenoService.getFolders(project.uuid),
-		ZenoService.getTags(project.uuid)
-	];
-
-	const res = await Promise.all(requests);
-	const slices = res[0] as Slice[];
-	const columns = res[1] as ZenoColumn[];
-	const models = res[2] as string[];
-	const metrics = res[3] as Metric[];
-	const folders = res[4] as Folder[];
-	const tags = res[5] as Tag[];
 
 	// Get state from URL parameters.
 	let urlParams: URLParams | undefined;
@@ -66,10 +49,15 @@ export async function load({ cookies, params, url, depends }) {
 		}
 	}
 
-	let model: string | undefined = models.length > 0 ? models[0] : undefined;
-	let metric: Metric | undefined = metrics.length > 0 ? metrics[0] : undefined;
-	let comparisonModel: string | undefined = models.length > 1 ? models[1] : undefined;
-	let comparisonColumn: ZenoColumn | undefined = columns.find((c) => c.model === model);
+	let model: string | undefined =
+		project_result.models.length > 0 ? project_result.models[0] : undefined;
+	let metric: Metric | undefined =
+		project_result.metrics.length > 0 ? project_result.metrics[0] : undefined;
+	let comparisonModel: string | undefined =
+		project_result.models.length > 1 ? project_result.models[1] : undefined;
+	let comparisonColumn: ZenoColumn | undefined = project_result.columns.find(
+		(c) => c.model === model
+	);
 	let compareSort: [ZenoColumn | undefined, boolean] = [undefined, false];
 	let metricRange: [number, number] = [Infinity, -Infinity];
 	let selections: {
@@ -85,26 +73,28 @@ export async function load({ cookies, params, url, depends }) {
 	if (urlParams !== undefined) {
 		if (urlParams.metric !== undefined) {
 			urlParams.metric;
-			const foundMetric = metrics.find((m) => m.id === urlParams?.metric?.id);
+			const foundMetric = project_result.metrics.find((m) => m.id === urlParams?.metric?.id);
 			if (foundMetric) {
 				metric = foundMetric;
 			}
 		}
 
 		if (urlParams.model) {
-			if (models.find((m) => m === urlParams?.model)) {
+			if (project_result.models.find((m) => m === urlParams?.model)) {
 				model = urlParams.model;
 			}
 		}
 
 		if (urlParams.comparisonModel) {
-			if (models.find((m) => m === urlParams?.comparisonModel)) {
+			if (project_result.models.find((m) => m === urlParams?.comparisonModel)) {
 				comparisonModel = urlParams.comparisonModel;
 			}
 		}
 
 		if (urlParams.comparisonColumn) {
-			const foundColumn = columns.find((c) => c.id === urlParams?.comparisonColumn?.id);
+			const foundColumn = project_result.columns.find(
+				(c) => c.id === urlParams?.comparisonColumn?.id
+			);
 			if (foundColumn) {
 				comparisonColumn = foundColumn;
 			}
@@ -122,13 +112,13 @@ export async function load({ cookies, params, url, depends }) {
 	}
 
 	return {
-		project: project,
-		slices: slices,
-		columns: columns,
-		models: models,
-		metrics: metrics,
-		folders: folders,
-		tags: tags,
+		project: project_result.project,
+		slices: project_result.slices,
+		columns: project_result.columns,
+		models: project_result.models,
+		metrics: project_result.metrics,
+		folders: project_result.folders,
+		tags: project_result.tags,
 		model: model,
 		metric: metric,
 		comparisonModel: comparisonModel,

@@ -28,10 +28,11 @@
 	export let compare: boolean;
 
 	let selected = 'list';
-	let currentResult: GroupMetric[] | undefined = undefined;
+	let currentResult: Promise<GroupMetric[] | undefined>;
+	let modelAResult: Promise<GroupMetric[] | undefined>;
+	let modelBResult: Promise<GroupMetric[] | undefined>;
+	let numberOfInstances = 0;
 	let viewOptions: Record<string, unknown> | undefined = undefined;
-	let modelAResult: GroupMetric[] | undefined = undefined;
-	let modelBResult: GroupMetric[] | undefined = undefined;
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
 	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
@@ -39,15 +40,18 @@
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
 	$: if ($model) {
-		getMetricsForSlicesAndTags($model ? getMetricKeys($model, $metric, $selectionPredicates) : [], [
-			...new Set([...secureTagIds, ...secureSelectionIds])
-		]).then((res) => (currentResult = res));
+		currentResult = getMetricsForSlicesAndTags(
+			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
+			[...new Set([...secureTagIds, ...secureSelectionIds])]
+		);
 	}
 
-	$: getCompareResults($model, $metric, $selectionPredicates).then((r) => (modelAResult = r));
-	$: getCompareResults($comparisonModel, $metric, $selectionPredicates).then(
-		(r) => (modelBResult = r)
-	);
+	$: modelAResult = compare
+		? getCompareResults($model, $metric, $selectionPredicates)
+		: new Promise(() => undefined);
+	$: modelBResult = compare
+		? getCompareResults($comparisonModel, $metric, $selectionPredicates)
+		: new Promise(() => undefined);
 
 	onMount(() => {
 		if ($project === undefined || $project.view === '') {
@@ -90,6 +94,12 @@
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds);
 	}
+
+	$: currentResult.then((d) => {
+		if (d !== undefined && d.length > 0) {
+			numberOfInstances = d[0].size;
+		}
+	});
 </script>
 
 <div class="flex justify-between align-center">
@@ -104,12 +114,12 @@
 		<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
 	{/if}
 {:else if $editTag !== undefined}
-	<TableView {currentResult} {viewOptions} />
+	<TableView {numberOfInstances} {viewOptions} />
 {:else}
 	{#if selected === 'list'}
-		<ListView {currentResult} {viewOptions} />
+		<ListView {numberOfInstances} {viewOptions} />
 	{/if}
 	{#if selected === 'table'}
-		<TableView {currentResult} {viewOptions} />
+		<TableView {numberOfInstances} {viewOptions} />
 	{/if}
 {/if}

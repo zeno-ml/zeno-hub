@@ -20,11 +20,11 @@ from zeno_backend.classes.base import (
     GroupMetric,
     ZenoColumn,
 )
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
-from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -175,14 +175,19 @@ def get_server() -> FastAPI:
         return select.slices(project)
 
     @api_app.get(
-        "/charts/{project}",
+        "/charts/{owner}/{project}",
         response_model=list[Chart],
         tags=["zeno"],
     )
-    def get_charts(project: str, request: Request):
-        if not util.access_valid(project, request):
+    def get_charts(owner_name: str, project_name: str, request: Request):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        return select.charts(project)
+        return select.charts(project_uuid)
 
     @api_app.get(
         "/columns/{project}",
@@ -260,15 +265,30 @@ def get_server() -> FastAPI:
             )
         return filt_df.to_json(orient="records")
 
-    @api_app.post(
-        "/chart-data/{project}",
+    @api_app.get(
+        "/chart/{owner}/{project}/{chart_uuid}",
+        response_model=ChartResponse,
         tags=["zeno"],
-        response_model=str,
     )
-    def get_chart_data(chart: Chart, project: str, request: Request):
-        if not util.access_valid(project, request):
+    def get_chart(owner_name: str, project_name: str, chart_id: int, request: Request):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        project = select.project_from_uuid(project_uuid)
+        if project is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        return chart_data(chart, project)
+        chart = select.chart(project_uuid, chart_id)
+        if chart is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
+            )
+        return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
 
     @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
     def get_organizations(current_user=Depends(auth.claim())):
@@ -280,6 +300,33 @@ def get_server() -> FastAPI:
     @api_app.get("/project-public/{project_uuid}", response_model=bool, tags=["zeno"])
     def is_project_public(project_uuid: str):
         return select.project_public(project_uuid)
+
+    @api_app.get(
+        "/project-state/{owner}/{project}", response_model=ProjectState, tags=["zeno"]
+    )
+    def get_project_state(
+        owner_name: str,
+        project_name: str,
+        request: Request,
+        current_user=Depends(auth.claim()),
+    ):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        project = select.project_from_uuid(project_uuid)
+        if project is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
+            return Response(status_code=401)
+        user = select.user(current_user["username"])
+        if user is not None:
+            if user.name == project.owner_name:
+                project.editor = True
+        return select.project_state(project_uuid, project)
 
     @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
     def get_project(owner_name: str, project_name: str, request: Request):

@@ -1,24 +1,25 @@
 import { getEndpoint } from '$lib/util/util';
-import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
+import { OpenAPI, ZenoService, type ChartResponse } from '$lib/zenoapi/index.js';
 import { error } from '@sveltejs/kit';
 
-export async function load({ params }) {
+export async function load({ params, depends }) {
 	OpenAPI.BASE = getEndpoint() + '/api';
-	const uuid = await ZenoService.getProjectUuid(params.owner, params.project);
-	const charts = await ZenoService.getCharts(uuid);
-	const chart = charts.find((chart) => chart.id === parseInt(params.chartIndex));
-	if (!charts || chart === undefined) {
-		throw error(404, 'Could not load charts');
-	}
+	depends('app:chart');
 
-	const chartData = await ZenoService.getChartData(uuid, chart);
-	if (!chartData) {
-		throw error(404, 'Could not load chart data');
+	let chartResult: ChartResponse;
+	try {
+		chartResult = await ZenoService.getChart(
+			params.owner,
+			params.project,
+			parseInt(params.chartIndex)
+		);
+	} catch (e) {
+		throw error(404, 'Could not load chart');
 	}
 
 	return {
-		chart: chart,
-		chartData: JSON.parse(chartData),
+		chart: chartResult.chart,
+		chartData: JSON.parse(chartResult.chartData),
 		chartIndex: parseInt(params.chartIndex)
 	};
 }
