@@ -9,9 +9,7 @@
 
 	export let data;
 
-	$: {
-		charts.set(data.charts);
-	}
+	$: charts.set(data.charts);
 </script>
 
 <div class="flex flex-col m-5 w-full">
@@ -30,12 +28,10 @@
 						$project ? $project.uuid : '',
 						chartDefaults('New Chart', 0, ChartType.BAR)
 					).then((res) => {
-						charts.update((c) => [...c, chartDefaults('New Chart', res, ChartType.BAR)]);
-
 						goto(
 							`/project/${$project ? $project.ownerName : ''}/${
 								$project ? $project.name : ''
-							}/chart/${$charts[$charts.length - 1].id}?edit=true`
+							}/chart/${res}?edit=true`
 						);
 					});
 				}}

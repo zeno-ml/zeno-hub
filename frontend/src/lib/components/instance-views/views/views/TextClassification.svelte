@@ -8,22 +8,26 @@
 	export let modelColumn: string;
 </script>
 
-<div class="p-2.5 border border-grey-lighter">
+<div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded">
 	{#await resolveDataPoint(entry)}
 		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 	{:then textData}
-		<span>{textData}</span>
+		<p class="text-grey">
+			<span class="font-semibold">input: </span>
+			{textData}
+		</p>
 	{/await}
-	<br />
 	{#if entry['label'] !== undefined}
-		<span class="text-xs">label: </span>
-		<span class="text-xs">
+		<p class="mt-2 text-grey">
+			<span class="font-semibold">label: </span>
 			{entry['label']}
-		</span>
+		</p>
 	{/if}
 	{#if modelColumn && entry[modelColumn] !== undefined}
-		<br />
-		<span class="text-xs">output: </span>
-		<span class="text-xs">{entry[modelColumn]} </span>
+		<hr class="mt-2 mb-2 text-grey-darker" />
+		<p class=" text-grey">
+			<span class="font-semibold">output: </span>
+			{entry[modelColumn]}
+		</p>
 	{/if}
 </div>

@@ -1,17 +1,14 @@
 <script lang="ts">
 	import { project } from '$lib/stores';
 	import { chartDefaults } from '$lib/util/charts';
-	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
+	import { ChartType, type Chart } from '$lib/zenoapi';
 	import ChartElement from './ChartElement.svelte';
 
 	export let chart: Chart;
-	export let chartData: { table: Record<string, unknown> } | undefined;
 
 	async function updateChart(chartType: ChartType) {
 		if (chart.type !== chartType && $project) {
 			chart = { ...chartDefaults(chart.name, chart.id, chartType) };
-			chartData = undefined;
-			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}
 </script>

@@ -121,3 +121,15 @@ class ParametersEncoder(json.JSONEncoder):
             object: a dict to be encoded by a JSON encoder and saved into the database.
         """
         return o.__dict__
+
+
+class ChartResponse(CamelModel):
+    """Chart specification and data.
+
+    Parameters:
+        chart (Chart): The chart specification.
+        chart_data (str): The chart data in JSON string.
+    """
+
+    chart: Chart
+    chart_data: str

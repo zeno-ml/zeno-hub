@@ -14,12 +14,12 @@
 	};
 </script>
 
-<div class="flex flex-col">
+<div class="flex items-center cursor-pointer ml-5 mt-5">
 	<div
-		class="flex items-center cursor-pointer ml-5 mt-5"
+		class="flex items-center cursor-pointer"
 		on:keydown={() => ({})}
 		on:click={() => {
-			goto($page.url.href.substring(0, $page.url.href.lastIndexOf('/')));
+			goto($page.url.href.split('?')[0].substring(0, $page.url.href.lastIndexOf('/')));
 		}}
 		on:focus={() => ({})}
 		on:mouseover={() => {
@@ -38,15 +38,15 @@
 			<path class="fill-{ishover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
 		</SmuiElement>
 		<h4 class="text-grey-dark hover:text-black mr-4">Back to Chart Home</h4>
-		{#if $project?.editor}
-			<Button
-				variant="outlined"
-				on:mouseleave={blur}
-				on:focusout={blur}
-				on:click={() => (isChartEdit = !isChartEdit)}
-			>
-				<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
-			</Button>
-		{/if}
 	</div>
+	{#if $project?.editor}
+		<Button
+			variant="outlined"
+			on:mouseleave={blur}
+			on:focusout={blur}
+			on:click={() => (isChartEdit = !isChartEdit)}
+		>
+			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
+		</Button>
+	{/if}
 </div>
