@@ -8,7 +8,7 @@
 	export let modelColumn: string;
 </script>
 
-<div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded">
+<div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded break-words">
 	{#await resolveDataPoint(entry)}
 		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 	{:then textData}

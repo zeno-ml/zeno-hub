@@ -160,9 +160,9 @@ def histogram_metric_task(
             case_statement = sql.SQL("CASE ")
             for i, b in enumerate(col_request.buckets):
                 case_statement += sql.SQL("WHEN {} >= {} AND {} < {} THEN {} ").format(
-                    sql.Identifier(metric_col_id),
+                    sql.Identifier(col_id),
                     sql.Literal(b.bucket),
-                    sql.Identifier(metric_col_id),
+                    sql.Identifier(col_id),
                     sql.Literal(b.bucket_end),
                     sql.Literal(i),
                 )
