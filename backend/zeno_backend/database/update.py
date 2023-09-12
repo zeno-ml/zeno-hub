@@ -254,7 +254,7 @@ def report_element(element: ReportElement):
     """
     db = Database()
     db.connect_execute(
-        "UPDATE report_element SET type = %s, data = %s, chart_id = %s,"
+        "UPDATE report_elements SET type = %s, data = %s, chart_id = %s,"
         " WHERE id = %s;",
         [
             element.type,

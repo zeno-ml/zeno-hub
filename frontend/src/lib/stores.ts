@@ -6,7 +6,6 @@ import {
 	type Folder,
 	type Metric,
 	type Project,
-	type Report,
 	type Slice,
 	type Tag,
 	type ZenoColumn
@@ -15,7 +14,6 @@ import { interpolate } from 'd3-interpolate';
 import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 
 export const project: Writable<Project | undefined> = writable(undefined);
-export const report: Writable<Report | undefined> = writable(undefined);
 export const authToken: Writable<string | undefined> = writable(undefined);
 export const slices: Writable<Slice[]> = writable([]);
 export const columns: Writable<ZenoColumn[]> = writable([]);

@@ -45,8 +45,20 @@ class ReportElement(CamelModel):
         chart_id (int | None): id of the chart this element is linked to.
     """
 
-    id: int
+    id: int | None = None
     type: ReportElementType
-    data: str | None
-    chart_id: int | None
     position: int
+    data: str | None = None
+    chart_id: int | None = None
+
+
+class ReportResponse(CamelModel):
+    """Response for a report in Zeno.
+
+    Attributes:
+        report (Report): the report itself.
+        report_elements (list[ReportElement]): all elements of the report.
+    """
+
+    report: Report
+    report_elements: list[ReportElement]

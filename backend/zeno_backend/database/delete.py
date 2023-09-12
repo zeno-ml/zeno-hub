@@ -165,4 +165,4 @@ def report_element(id: int):
         id (int): ID of the element to be deleted.
     """
     db = Database()
-    db.connect_execute("DELETE FROM report_element WHERE id = %s;", [id])
+    db.connect_execute("DELETE FROM report_elements WHERE id = %s;", [id])

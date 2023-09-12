@@ -2,10 +2,9 @@ import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, params, url }) {
+export async function load({ cookies, params, url, depends }) {
+	depends('app:report');
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-
-	const reportPublic = ZenoService.isProjectPublic(params.report);
 
 	let cognitoUser = null;
 	const userCookie = cookies.get('loggedIn');
@@ -18,17 +17,16 @@ export async function load({ cookies, params, url }) {
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
-	} else if (!reportPublic) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	const report = await ZenoService.getReport(params.owner, params.report);
-	if (!report) {
+	const reportResponse = await ZenoService.getReport(params.owner, params.report);
+	if (!reportResponse) {
 		throw error(404, 'Could not load report');
 	}
 
 	return {
-		report: report,
+		report: reportResponse.report,
+		reportElements: reportResponse.reportElements,
 		cognitoUser: cognitoUser
 	};
 }

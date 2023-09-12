@@ -15,6 +15,14 @@ CREATE TABLE projects (
     public boolean NOT NULL DEFAULT false
 );
 
+CREATE TABLE charts (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    name text NOT NULL,
+    type text NOT NULL,
+    parameters text NOT NULL
+);
+
 CREATE TABLE reports (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL,
@@ -22,7 +30,8 @@ CREATE TABLE reports (
     public boolean NOT NULL DEFAULT false
 );
 
-CREATE TABLE report_element (
+CREATE TABLE report_elements (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type text NOT NULL,
     data text,
@@ -47,14 +56,6 @@ CREATE TABLE folders (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE,
     name text NOT NULL
-);
-
-CREATE TABLE charts (
-    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
-    name text NOT NULL,
-    type text NOT NULL,
-    parameters text NOT NULL
 );
 
 CREATE TABLE slices (

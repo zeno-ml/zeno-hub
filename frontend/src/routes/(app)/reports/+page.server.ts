@@ -2,7 +2,8 @@ import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService, type Report } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url }) {
+export async function load({ cookies, url, depends }) {
+	depends('app:reports');
 	const userCookie = cookies.get('loggedIn');
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 	let reports: Report[] = [];

@@ -19,6 +19,7 @@ import type { ProjectState } from '../models/ProjectState';
 import type { ProjectStats } from '../models/ProjectStats';
 import type { Report } from '../models/Report';
 import type { ReportElement } from '../models/ReportElement';
+import type { ReportResponse } from '../models/ReportResponse';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
@@ -512,12 +513,15 @@ export class ZenoService {
 	 * Get Report
 	 * @param ownerName
 	 * @param reportName
-	 * @returns Report Successful Response
+	 * @returns ReportResponse Successful Response
 	 * @throws ApiError
 	 */
-	public static getReport(ownerName: string, reportName: string): CancelablePromise<Report> {
+	public static getReport(
+		ownerName: string,
+		reportName: string
+	): CancelablePromise<ReportResponse> {
 		return __request(OpenAPI, {
-			method: 'POST',
+			method: 'GET',
 			url: '/report/{owner}/{report}',
 			query: {
 				owner_name: ownerName,
@@ -865,6 +869,50 @@ export class ZenoService {
 			url: '/report/{name}',
 			path: {
 				name: name
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Add Report Element
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static addReportElement(
+		reportId: number,
+		requestBody: ReportElement
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/report-element/{id}',
+			query: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report Element
+	 * @param id
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteReportElement(id: number): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/report-element/{id}',
+			path: {
+				id: id
 			},
 			errors: {
 				422: `Validation Error`
@@ -1332,25 +1380,6 @@ export class ZenoService {
 			},
 			body: requestBody,
 			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Delete Report Element
-	 * @param id
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static deleteReportElement(id: number): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'DELETE',
-			url: '/report-element/{id}',
-			path: {
-				id: id
-			},
 			errors: {
 				422: `Validation Error`
 			}

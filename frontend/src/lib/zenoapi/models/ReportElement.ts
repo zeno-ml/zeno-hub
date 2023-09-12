@@ -14,9 +14,9 @@ import type { ReportElementType } from './ReportElementType';
  * chart_id (int | None): id of the chart this element is linked to.
  */
 export type ReportElement = {
-	id: number;
+	id?: number | null;
 	type: ReportElementType;
-	data: string | null;
-	chartId: number | null;
 	position: number;
+	data?: string | null;
+	chartId?: number | null;
 };

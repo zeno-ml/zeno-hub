@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Report } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -53,7 +53,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteReport(report.id).then(() => invalidateAll());
+									ZenoService.deleteReport(report.id).then(() => invalidate('app:reports'));
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;

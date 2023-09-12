@@ -10,7 +10,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
-from zeno_backend.classes.report import Report, ReportElement
+from zeno_backend.classes.report import Report, ReportElement, ReportResponse
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.tag import Tag
@@ -197,7 +197,7 @@ def reports(user: User) -> list[Report]:
                         name=report[1],
                         owner_name=user.name,
                         linked_projects=[]
-                        if linked_projects is None
+                        if len(linked_projects) == 0
                         else list(map(lambda linked: str(linked[0]), linked_projects)),
                         editor=True,
                         public=report[2],
@@ -228,7 +228,7 @@ def reports(user: User) -> list[Report]:
                             name=res[1],
                             owner_name=str(owner_name),
                             linked_projects=[]
-                            if linked_projects is None
+                            if len(linked_projects) == 0
                             else list(
                                 map(lambda linked: str(linked[0]), linked_projects)
                             ),
@@ -263,7 +263,7 @@ def reports(user: User) -> list[Report]:
                             name=res[1],
                             owner_name=str(owner_name),
                             linked_projects=[]
-                            if linked_projects is None
+                            if len(linked_projects) == 0
                             else list(
                                 map(lambda linked: str(linked[0]), linked_projects)
                             ),
@@ -309,7 +309,7 @@ def public_reports() -> list[Report]:
                             name=res[1],
                             owner_name=str(owner_name),
                             linked_projects=[]
-                            if linked_projects is None
+                            if len(linked_projects) == 0
                             else list(
                                 map(lambda linked: str(linked[0]), linked_projects)
                             ),
@@ -331,9 +331,11 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         str | None: The uuid of the requested project.
     """
     with Database() as db:
+        print(owner_name, project_name)
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
+        print(owner_id)
 
         project_uuid = db.execute_return(
             "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
@@ -493,7 +495,9 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
         )
 
 
-def report(owner_name: str, report_name: str, user: User | None) -> Report | None:
+def report(
+    owner_name: str, report_name: str, user: User | None
+) -> ReportResponse | None:
     """Get the report data given an owner and report name.
 
     Args:
@@ -502,13 +506,13 @@ def report(owner_name: str, report_name: str, user: User | None) -> Report | Non
         user (User | None): The user making the request.
 
     Returns:
-        Report | None: the data for the requested report.
+        ReportResponse | None: the data for the requested report.
     """
     with Database() as db:
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
-        if owner_id is None:
+        if len(owner_id) == 0:
             raise Exception("Owner does not exist.")
         else:
             owner_id = owner_id[0][0]
@@ -518,7 +522,7 @@ def report(owner_name: str, report_name: str, user: User | None) -> Report | Non
             "WHERE name = %s AND owner_id = %s;",
             [report_name, owner_id],
         )
-        if report_result is None:
+        if len(report_result) == 0:
             raise Exception("Project does not exist.")
         id = report_result[0][0]
 
@@ -549,19 +553,35 @@ def report(owner_name: str, report_name: str, user: User | None) -> Report | Non
             [id],
         )
 
-        return (
-            Report(
+        element_result = db.connect_execute_return(
+            "SELECT id, type, data, chart_id, position FROM report_elements "
+            "WHERE report_id = %s ORDER BY position;",
+            [id],
+        )
+
+        return ReportResponse(
+            report=Report(
                 id=report_result[0][0] if isinstance(report_result[0][0], int) else -1,
                 name=str(report_result[0][1]),
                 owner_name=owner_name,
                 linked_projects=[]
-                if linked_projects is None
+                if len(linked_projects) == 0
                 else list(map(lambda linked: str(linked[0]), linked_projects)),
                 editor=editor,
                 public=bool(report_result[0][3]),
-            )
-            if report_result is not None
-            else None
+            ),
+            report_elements=list(
+                map(
+                    lambda element: ReportElement(
+                        id=element[0],
+                        type=element[1],
+                        data=element[2],
+                        chart_id=element[3],
+                        position=element[4],
+                    ),
+                    element_result,
+                )
+            ),
         )
 
 
@@ -614,33 +634,32 @@ def report_from_id(report_id: int) -> Report | None:
     """
     with Database() as db:
         report_result = db.execute_return(
-            "SELECT id, name, owner_id, public " "FROM reports WHERE id = %s;",
+            "SELECT id, name, owner_id, public FROM reports WHERE id = %s;",
             [report_id],
         )
-        if report_result is None:
+        if len(report_result) == 0:
             raise Exception("Project does not exist.")
+        else:
+            report_result = report_result[0]
         owner_result = db.execute_return(
-            "SELECT name from users WHERE id = %s;", [report_result[2]]
+            "SELECT name FROM users WHERE id = %s;", [report_result[2]]
         )
-        if owner_result is not None:
+        if len(owner_result) > 0:
             linked_projects = db.execute_return(
                 "SELECT project_uuid FROM report_project WHERE report_id = %s;",
                 [report_id],
             )
+            owner_result = owner_result[0]
 
-            return (
-                Report(
-                    id=report_result[0] if isinstance(report_result[0], int) else -1,
-                    name=str(report_result[1]),
-                    owner_name=str(owner_result[0]),
-                    linked_projects=[]
-                    if linked_projects is None
-                    else list(map(lambda linked: str(linked[0]), linked_projects)),
-                    editor=False,
-                    public=bool(report_result[3]),
-                )
-                if report_result is not None
-                else None
+            return Report(
+                id=report_result[0] if isinstance(report_result[0], int) else -1,
+                name=str(report_result[1]),
+                owner_name=str(owner_result[0]),
+                linked_projects=[]
+                if len(linked_projects) == 0
+                else list(map(lambda linked: str(linked[0]), linked_projects)),
+                editor=False,
+                public=bool(report_result[3]),
             )
 
 
@@ -655,7 +674,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
     """
     db = Database()
     element_result = db.connect_execute_return(
-        "SELECT id, type, data, chart_id, position FROM report_element "
+        "SELECT id, type, data, chart_id, position FROM report_elements "
         "WHERE report_id = %s ORDER BY position;",
         [report_id],
     )
@@ -672,6 +691,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
                 element_result,
             )
         )
+
 
 def project_state(project_uuid: str, project: Project) -> ProjectState | None:
     """Get the state variables of a project.
@@ -875,7 +895,7 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
         " WHERE project_uuid = %s AND id = ANY(%s);",
         [project_uuid, [metric_ids]],
     )
-    if metric_results is None:
+    if len(metric_results) == 0:
         return {}
 
     ret = {}
@@ -1255,7 +1275,7 @@ def tags(project: str) -> list[Tag]:
                 project,
             ],
         )
-        if tags_result is None:
+        if len(tags_result) == 0:
             return []
         tags: list[Tag] = []
         for tag_result in tags_result:

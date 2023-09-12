@@ -25,7 +25,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
-from zeno_backend.classes.report import Report, ReportElement
+from zeno_backend.classes.report import Report, ReportElement, ReportResponse
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -350,7 +350,9 @@ def get_server() -> FastAPI:
             owner_name, project_name, util.get_user_from_token(request)
         )
 
-    @api_app.post("/report/{owner}/{report}", response_model=Report, tags=["zeno"])
+    @api_app.get(
+        "/report/{owner}/{report}", response_model=ReportResponse, tags=["zeno"]
+    )
     def get_report(owner_name: str, report_name: str, request: Request):
         return select.report(owner_name, report_name, util.get_user_from_token(request))
 
@@ -604,6 +606,15 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         insert.report(name, user)
 
+    @api_app.post("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_report_element(
+        report_id: int, element: ReportElement, current_user=Depends(auth.claim())
+    ):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        insert.report_element(report_id, element)
+
     @api_app.post(
         "/tag/{project}",
         response_model=int,
@@ -702,8 +713,11 @@ def get_server() -> FastAPI:
     @api_app.delete("/report/{report_id}", tags=["zeno"])
     def delete_report(report_id: int, current_user=Depends(auth.claim())):
         report_obj = select.report_from_id(report_id)
+        # make sure only project owners can delete a project
         if report_obj is None or report_obj.owner_name != current_user["username"]:
-            return  # make sure only project owners can delete a project
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
         delete.report(report_id)
 
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
