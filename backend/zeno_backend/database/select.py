@@ -1000,7 +1000,7 @@ def user(name: str) -> User | None:
     user = db.connect_execute_return(
         "SELECT id, name FROM users WHERE name = %s", [name]
     )
-    if len(user) is None:
+    if len(user) == 0:
         return None
     user = user[0]
     return User(
