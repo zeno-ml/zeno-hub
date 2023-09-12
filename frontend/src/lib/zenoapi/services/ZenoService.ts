@@ -6,6 +6,7 @@ import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Body_upload_dataset } from '../models/Body_upload_dataset';
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Chart } from '../models/Chart';
+import type { ChartResponse } from '../models/ChartResponse';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -14,6 +15,7 @@ import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
+import type { ProjectState } from '../models/ProjectState';
 import type { ProjectStats } from '../models/ProjectStats';
 import type { Report } from '../models/Report';
 import type { ReportElement } from '../models/ReportElement';
@@ -67,6 +69,7 @@ export class ZenoService {
 	 * data_column (str | None, optional): the name of the column containing the
 	 * raw data. Only works for small text data. Defaults to None.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
@@ -100,6 +103,7 @@ export class ZenoService {
 	 * output_column (str): the name of the column containing the system output.
 	 * id_column (str): the name of the column containing the instance IDs.
 	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param project
 	 * @param formData
 	 * @returns any Successful Response
@@ -267,16 +271,18 @@ export class ZenoService {
 
 	/**
 	 * Get Charts
-	 * @param project
+	 * @param ownerName
+	 * @param projectName
 	 * @returns Chart Successful Response
 	 * @throws ApiError
 	 */
-	public static getCharts(project: string): CancelablePromise<Array<Chart>> {
+	public static getCharts(ownerName: string, projectName: string): CancelablePromise<Array<Chart>> {
 		return __request(OpenAPI, {
 			method: 'GET',
-			url: '/charts/{project}',
-			path: {
-				project: project
+			url: '/charts/{owner}/{project}',
+			query: {
+				owner_name: ownerName,
+				project_name: projectName
 			},
 			errors: {
 				422: `Validation Error`
@@ -398,21 +404,28 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Chart Data
-	 * @param project
-	 * @param requestBody
-	 * @returns string Successful Response
+	 * Get Chart
+	 * @param chartId
+	 * @param ownerName
+	 * @param projectName
+	 * @returns ChartResponse Successful Response
 	 * @throws ApiError
 	 */
-	public static getChartData(project: string, requestBody: Chart): CancelablePromise<string> {
+	public static getChart(
+		chartId: number,
+		ownerName: string,
+		projectName: string
+	): CancelablePromise<ChartResponse> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/chart-data/{project}',
+			method: 'GET',
+			url: '/chart/{owner}/{project}/{chart_id}',
 			path: {
-				project: project
+				chart_id: chartId
 			},
-			body: requestBody,
-			mediaType: 'application/json',
+			query: {
+				owner_name: ownerName,
+				project_name: projectName
+			},
 			errors: {
 				422: `Validation Error`
 			}
@@ -443,6 +456,30 @@ export class ZenoService {
 			url: '/project-public/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project State
+	 * @param ownerName
+	 * @param projectName
+	 * @returns ProjectState Successful Response
+	 * @throws ApiError
+	 */
+	public static getProjectState(
+		ownerName: string,
+		projectName: string
+	): CancelablePromise<ProjectState> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/project-state/{owner}/{project}',
+			query: {
+				owner_name: ownerName,
+				project_name: projectName
 			},
 			errors: {
 				422: `Validation Error`
@@ -631,44 +668,19 @@ export class ZenoService {
 	}
 
 	/**
-	 * Calculate Histogram Counts
+	 * Calculate Histograms
 	 * @param project
 	 * @param requestBody
-	 * @returns number Successful Response
+	 * @returns HistogramBucket Successful Response
 	 * @throws ApiError
 	 */
-	public static calculateHistogramCounts(
+	public static calculateHistograms(
 		project: string,
 		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number>>> {
+	): CancelablePromise<Array<Array<HistogramBucket>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/histogram-counts/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Calculate Histogram Metrics
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static calculateHistogramMetrics(
-		project: string,
-		requestBody: HistogramRequest
-	): CancelablePromise<Array<Array<number | null>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histogram-metrics/{project}',
 			path: {
 				project: project
 			},
@@ -778,10 +790,10 @@ export class ZenoService {
 	 * Add Folder
 	 * @param project
 	 * @param name
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addFolder(project: string, name: string): CancelablePromise<any> {
+	public static addFolder(project: string, name: string): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/folder/{project}',
@@ -801,10 +813,10 @@ export class ZenoService {
 	 * Add Slice
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addSlice(project: string, requestBody: Slice): CancelablePromise<any> {
+	public static addSlice(project: string, requestBody: Slice): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/slice/{project}',
@@ -823,10 +835,10 @@ export class ZenoService {
 	 * Add Chart
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addChart(project: string, requestBody: Chart): CancelablePromise<any> {
+	public static addChart(project: string, requestBody: Chart): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/chart/{project}',
@@ -864,10 +876,10 @@ export class ZenoService {
 	 * Add Tag
 	 * @param project
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addTag(project: string, requestBody: Tag): CancelablePromise<any> {
+	public static addTag(project: string, requestBody: Tag): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/tag/{project}',

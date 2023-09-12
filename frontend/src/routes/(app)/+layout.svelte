@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { navigating } from '$app/stores';
 	import Header from '$lib/components/general/Header.svelte';
-	import { authToken } from '$lib/stores.js';
-	import { getEndpoint } from '$lib/util/util.js';
-	import { OpenAPI } from '$lib/zenoapi/index.js';
+	import { authToken } from '$lib/stores';
+	import { getEndpoint } from '$lib/util/util';
+	import { OpenAPI } from '$lib/zenoapi/index';
 
 	export let data;
+
 	if (data.cognitoUser !== null) {
 		authToken.set(data.cognitoUser.accessToken);
 	}

@@ -3,12 +3,14 @@
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 	import { fade } from 'svelte/transition';
+	import FeatureFlagsPopup from '../popups/FeatureFlagsPopup.svelte';
 
 	export let email: string;
 	export let name: string;
 
 	let api_key = '';
 	let copied = false;
+	let showFeatureFlags = false;
 
 	function copyKey() {
 		navigator.clipboard.writeText(api_key);
@@ -19,6 +21,9 @@
 	}
 </script>
 
+{#if showFeatureFlags}
+	<FeatureFlagsPopup on:close={() => (showFeatureFlags = false)} />
+{/if}
 <div class="flex items-center">
 	<Textfield label="Username" value={name} disabled style="margin-right: 40px;" />
 	<Textfield label="Email" value={email} disabled style="margin-right: 40px;" />
@@ -34,6 +39,13 @@
 	<p class="italic mb-4">
 		Note: You can only have one API key at a time. Generating a new key will overwrite your existing
 		key.
+	</p>
+	<Button variant="raised" class="mb-2" on:click={() => (showFeatureFlags = true)}>
+		Enable feature flags
+	</Button>
+	<p class="italic mb-4">
+		Note: Feature flags are saved as browser cookies. If you clear your cookies or switch browsers,
+		your settings will be lost.
 	</p>
 	<div class="flex">
 		{#if api_key}

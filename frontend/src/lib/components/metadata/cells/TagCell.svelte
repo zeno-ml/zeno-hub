@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { getMetricsForTags } from '$lib/api/tag';
-	import { editTag, metric, model, project, selections, tagIds, tags } from '$lib/stores';
+	import { editTag, metric, model, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -27,9 +28,8 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteTag(tag).then(() => {
-			if ($project !== undefined) {
-				ZenoService.getTags($project.uuid).then((fetchedTags) => tags.set(fetchedTags));
-			}
+			invalidate('app:state');
+			tags.update((t) => t.filter((t) => t.id !== tag.id));
 		});
 		tagIds.set([]);
 	}
@@ -193,13 +193,15 @@
 				</div>
 			{/if}
 			{#await result then res}
-				{#if res !== null}
-					<span class="mr-2">
+				{#if res !== null && tag.dataIds.length > 0}
+					<span class="mr-2 w-full">
 						{res.metric !== undefined && res.metric !== null ? res.metric.toFixed(2) : ''}
 					</span>
 					<span class="italic text-grey-darker mr-1">
 						({res.size.toLocaleString()})
 					</span>
+				{:else}
+					<span class="italic text-grey-darker mr-1"> (0) </span>
 				{/if}
 			{/await}
 			{#if $editTag === undefined || $editTag.id !== tag.id}

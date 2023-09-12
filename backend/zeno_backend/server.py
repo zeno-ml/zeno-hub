@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import uvicorn
+from amplitude import Amplitude, BaseEvent
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,11 +20,11 @@ from zeno_backend.classes.base import (
     GroupMetric,
     ZenoColumn,
 )
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
-from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
@@ -36,13 +37,14 @@ from zeno_backend.processing.histogram_processing import (
     HistogramRequest,
     histogram_buckets,
     histogram_counts,
-    histogram_metrics,
 )
-from zeno_backend.processing.metrics import metric_map
+from zeno_backend.processing.metrics.map import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
 from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
+
+amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 def get_server() -> FastAPI:
@@ -56,7 +58,7 @@ def get_server() -> FastAPI:
     -------
         FastAPI: FastAPI endpoint
     """
-    app = FastAPI(title="Frontend API")
+    app = FastAPI(title="Frontend API", separate_input_output_schemas=False)
 
     # load env vars for cognito if available
     env_path = Path("../frontend/.env")
@@ -81,7 +83,9 @@ def get_server() -> FastAPI:
         )
 
     api_app = FastAPI(
-        title="Backend API", generate_unique_id_function=lambda route: route.name
+        title="Backend API",
+        generate_unique_id_function=lambda route: route.name,
+        separate_input_output_schemas=False,
     )
     api_app.include_router(sdk.router)
     app.mount("/api", api_app)
@@ -172,14 +176,19 @@ def get_server() -> FastAPI:
         return select.slices(project)
 
     @api_app.get(
-        "/charts/{project}",
+        "/charts/{owner}/{project}",
         response_model=list[Chart],
         tags=["zeno"],
     )
-    def get_charts(project: str, request: Request):
-        if not util.access_valid(project, request):
+    def get_charts(owner_name: str, project_name: str, request: Request):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        return select.charts(project)
+        return select.charts(project_uuid)
 
     @api_app.get(
         "/columns/{project}",
@@ -239,7 +248,7 @@ def get_server() -> FastAPI:
         if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
         filter_sql = table_filter(
-            project_uuid, None, req.filter_predicates, req.data_ids
+            project_uuid, req.model, req.filter_predicates, req.data_ids
         )
         sql_table = select.table_data_paginated(
             project_uuid, filter_sql, req.offset, req.limit, req.sort
@@ -249,7 +258,7 @@ def get_server() -> FastAPI:
         # Prepend the DATA_URL to the data column if it exists
         project = select.project_from_uuid(project_uuid)
         if project and project.data_url:
-            filt_df["data_id"] = project.data_url + filt_df["data_id"]
+            filt_df["data"] = project.data_url + filt_df["data"]
 
         if req.diff_column_1 and req.diff_column_2:
             filt_df = generate_diff_cols(
@@ -257,15 +266,30 @@ def get_server() -> FastAPI:
             )
         return filt_df.to_json(orient="records")
 
-    @api_app.post(
-        "/chart-data/{project}",
+    @api_app.get(
+        "/chart/{owner}/{project}/{chart_id}",
+        response_model=ChartResponse,
         tags=["zeno"],
-        response_model=str,
     )
-    def get_chart_data(chart: Chart, project: str, request: Request):
-        if not util.access_valid(project, request):
+    def get_chart(owner_name: str, project_name: str, chart_id: int, request: Request):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        project = select.project_from_uuid(project_uuid)
+        if project is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        return chart_data(chart, project)
+        chart = select.chart(project_uuid, chart_id)
+        if chart is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
+            )
+        return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
 
     @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
     def get_organizations(current_user=Depends(auth.claim())):
@@ -278,6 +302,36 @@ def get_server() -> FastAPI:
     def is_project_public(project_uuid: str):
         return select.project_public(project_uuid)
 
+    @api_app.get(
+        "/project-state/{owner}/{project}", response_model=ProjectState, tags=["zeno"]
+    )
+    def get_project_state(
+        owner_name: str,
+        project_name: str,
+        request: Request,
+        current_user=Depends(auth.claim()),
+    ):
+        project_uuid = select.project_uuid(owner_name, project_name)
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        project = select.project_from_uuid(project_uuid)
+        if project is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+        if not util.access_valid(project_uuid, request):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Project is private",
+            )
+        user = select.user(current_user["username"])
+        if user is not None:
+            if user.name == project.owner_name:
+                project.editor = True
+        return select.project_state(project_uuid, project)
+
     @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
     def get_project(owner_name: str, project_name: str, request: Request):
         uuid = select.project_uuid(owner_name, project_name)
@@ -285,6 +339,13 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if not util.access_valid(uuid, request):
             return Response(status_code=401)
+        amplitude_client.track(
+            BaseEvent(
+                event_type="Project Viewed",
+                user_id="ProjectViewedUser",
+                event_properties={"project_uuid": uuid},
+            )
+        )
         return select.project(
             owner_name, project_name, util.get_user_from_token(request)
         )
@@ -340,6 +401,12 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_public_projects():
+        amplitude_client.track(
+            BaseEvent(
+                event_type="Home Viewed",
+                user_id="HomeViewedUser",
+            )
+        )
         return select.public_projects()
 
     @api_app.get(
@@ -400,27 +467,13 @@ def get_server() -> FastAPI:
 
     @api_app.post(
         "/histogram-counts/{project}",
-        response_model=list[list[int]],
+        response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    def calculate_histogram_counts(
-        req: HistogramRequest, project: str, request: Request
-    ):
+    def calculate_histograms(req: HistogramRequest, project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
         return histogram_counts(project, req)
-
-    @api_app.post(
-        "/histogram-metrics/{project}",
-        response_model=list[list[float | None]],
-        tags=["zeno"],
-    )
-    def calculate_histogram_metrics(
-        req: HistogramRequest, project: str, request: Request
-    ):
-        if not util.access_valid(project, request):
-            return Response(status_code=401)
-        return histogram_metrics(project, req)
 
     @api_app.get(
         "/project-users/{project}",
@@ -459,7 +512,7 @@ def get_server() -> FastAPI:
     ):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return select.filered_short_string_column_values(project, req)
+        return select.filtered_short_string_column_values(project, req)
 
     ####################################################################### Insert
     @api_app.post(
@@ -476,7 +529,13 @@ def get_server() -> FastAPI:
         if fetched_user is None:
             try:
                 user = User(id=-1, name=name, admin=None)
-                insert.user(user)
+                user_id = insert.user(user)
+                amplitude_client.track(
+                    BaseEvent(
+                        event_type="User Registered",
+                        user_id="00000" + str(user_id) if user_id else "",
+                    )
+                )
                 insert.api_key(user)
                 return select.user(name)
             except Exception as exc:
@@ -485,19 +544,58 @@ def get_server() -> FastAPI:
                     detail=str(exc),
                 ) from exc
         else:
+            amplitude_client.track(
+                BaseEvent(
+                    event_type="User Logged In",
+                    user_id="00000" + str(fetched_user.id),
+                )
+            )
             return fetched_user
 
-    @api_app.post("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/folder/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_folder(project: str, name: str):
-        insert.folder(project, name)
+        id = insert.folder(project, name)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert folder",
+            )
+        return id
 
-    @api_app.post("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/slice/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_slice(project: str, req: Slice):
-        insert.slice(project, req)
+        id = insert.slice(project, req)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert slice",
+            )
+        return id
 
-    @api_app.post("/chart/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/chart/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_chart(project: str, chart: Chart):
-        insert.chart(project, chart)
+        id = insert.chart(project, chart)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert chart",
+            )
+        return id
 
     @api_app.post("/report/{name}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_report(name: str, current_user=Depends(auth.claim())):
@@ -506,9 +604,20 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         insert.report(name, user)
 
-    @api_app.post("/tag/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post(
+        "/tag/{project}",
+        response_model=int,
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
     def add_tag(tag: Tag, project: str):
-        insert.tag(project, tag)
+        id = insert.tag(project, tag)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert tag",
+            )
+        return id
 
     @api_app.post("/add-organization", tags=["zeno"], dependencies=[Depends(auth)])
     def add_organization(user: User, organization: Organization):

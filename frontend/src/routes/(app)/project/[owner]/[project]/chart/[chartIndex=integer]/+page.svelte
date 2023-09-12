@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
 	import ViewHeader from '$lib/components/chart/chart-page/chart-header/ViewHeader.svelte';
 	import Encoding from '$lib/components/chart/chart-page/encoding/Encoding.svelte';
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
-	import { chartMap } from '$lib/components/chart/chartUtil.js';
-	import { charts, project } from '$lib/stores.js';
+	import { project } from '$lib/stores';
+	import { chartMap } from '$lib/util/charts';
 	import { ZenoService, type Chart } from '$lib/zenoapi';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
@@ -15,10 +16,10 @@
 
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
-	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
+	let chartData: { table: Record<string, unknown> } | undefined;
 
+	$: chartData = data.chartData;
 	$: updateEditUrl(isChartEdit);
-	$: reloadData(chart);
 	$: updateChart(chart);
 
 	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
@@ -36,17 +37,10 @@
 	}
 
 	function updateChart(chart: Chart) {
-		if ($project) {
+		if ($project && $project.editor && browser) {
 			ZenoService.updateChart($project.uuid, chart).then(() => {
-				if ($project)
-					ZenoService.getCharts($project.uuid).then((fetchedCharts) => charts.set(fetchedCharts));
+				invalidate('app:chart');
 			});
-		}
-	}
-
-	async function reloadData(chart: Chart) {
-		if ($project && browser) {
-			chartData = JSON.parse(await ZenoService.getChartData($project.uuid, chart));
 		}
 	}
 </script>
@@ -55,7 +49,7 @@
 	{#if isChartEdit && $project?.editor}
 		<div class="h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]">
 			<EditHeader bind:isChartEdit bind:chart />
-			<ViewSelection bind:chart bind:chartData />
+			<ViewSelection bind:chart />
 			<Encoding bind:chart />
 		</div>
 	{:else}

@@ -1,22 +1,20 @@
 import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService, type Project } from '$lib/zenoapi';
-import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url }) {
-	const userCookie = cookies.get('loggedIn');
-	OpenAPI.BASE = getEndpoint() + '/api';
+export async function load({ cookies, depends }) {
+	depends('app:projects');
+	OpenAPI.BASE = `${getEndpoint()}/api`;
+
 	let projects: Project[] = [];
+	const userCookie = cookies.get('loggedIn');
 	if (userCookie) {
 		const cognitoUser = JSON.parse(userCookie);
-		// If the user is not authenticated, redirect to the login page
-		if (!cognitoUser.id || !cognitoUser.accessToken) {
-			throw redirect(303, `/login?redirectTo=${url.pathname}`);
-		}
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
 		projects = await ZenoService.getProjects();
 	}
+
 	const publicProjects = await ZenoService.getPublicProjects();
 
 	return {

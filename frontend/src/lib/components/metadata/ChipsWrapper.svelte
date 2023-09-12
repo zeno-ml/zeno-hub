@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { selectionIds, selectionPredicates, selections, tagIds } from '$lib/stores';
 	import { Join, type FilterPredicate } from '$lib/zenoapi';
+	import Button from '@smui/button';
 	import IdsChip from './chips/IdsChip.svelte';
 	import MetadataChip from './chips/MetadataChip.svelte';
 	import SliceChip from './chips/SliceChip.svelte';
@@ -13,7 +14,9 @@
 
 <div class="flex flex-wrap height-fit items-center py-1">
 	{#if $selections.slices.length + $selections.tags.length + filters.length === 0 && $selectionIds === undefined}
-		<p style="margin: 0px">Filter with the selected predicates.</p>
+		<p style="margin: 0px">
+			Filter by selecting slices or interacting with the feature distribution charts.
+		</p>
 	{:else}
 		{#each $selections.slices as sliceIdx}
 			<SliceChip {sliceIdx} />
@@ -28,8 +31,9 @@
 			<IdsChip />
 		{/if}
 		{#if $selectionPredicates !== undefined || $tagIds !== undefined || $selectionIds !== undefined}
-			<span
-				class="p-1 ml-2.5 cursor-pointer hover:bg-yellowish hover:rounded"
+			<Button
+				variant="outlined"
+				class="ml-2"
 				on:keydown={() => ({})}
 				on:click={() => {
 					selections.update((m) => {
@@ -46,7 +50,7 @@
 				}}
 			>
 				clear all
-			</span>
+			</Button>
 		{/if}
 	{/if}
 </div>

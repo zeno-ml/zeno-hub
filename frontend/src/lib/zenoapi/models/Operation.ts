@@ -13,5 +13,7 @@ export enum Operation {
 	LT = 'LT',
 	LTE = 'LTE',
 	GTE = 'GTE',
-	LIKE = 'LIKE'
+	LIKE = 'LIKE',
+	ILIKE = 'ILIKE',
+	REGEX = 'REGEX'
 }

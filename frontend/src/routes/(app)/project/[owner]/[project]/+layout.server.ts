@@ -1,11 +1,18 @@
-import { getEndpoint } from '$lib/util/util';
-import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
+import { getEndpoint, type URLParams } from '$lib/util/util';
+import {
+	OpenAPI,
+	ZenoService,
+	type FilterPredicateGroup,
+	type Metric,
+	type ProjectState,
+	type ZenoColumn
+} from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, params, url }) {
-	OpenAPI.BASE = getEndpoint() + '/api';
+export async function load({ cookies, params, url, depends }) {
+	depends('app:state');
 
-	const projectPublic = ZenoService.isProjectPublic(params.project);
+	OpenAPI.BASE = getEndpoint() + '/api';
 
 	let cognitoUser = null;
 	const userCookie = cookies.get('loggedIn');
@@ -18,47 +25,103 @@ export async function load({ cookies, params, url }) {
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
-	} else if (!projectPublic) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
-	const project = await ZenoService.getProject(params.owner, params.project);
-	if (!project) {
-		throw error(404, 'Could not load project config');
+	let project_result: ProjectState;
+	try {
+		project_result = await ZenoService.getProjectState(params.owner, params.project);
+	} catch (e) {
+		throw error(404, 'Could not load project configuration');
 	}
-	const slices = await ZenoService.getSlices(project.uuid);
-	if (!slices) {
-		throw error(404, 'Could not load slices');
+
+	// Get state from URL parameters.
+	let urlParams: URLParams | undefined;
+	let pars = '';
+	if (url.searchParams.has('params')) {
+		pars = url.searchParams.get('params') ?? '';
+		const decodedString = atob(pars);
+		if (decodedString) {
+			urlParams = JSON.parse(decodedString) as URLParams;
+		}
 	}
-	const columns = await ZenoService.getColumns(project.uuid);
-	if (!columns) {
-		throw error(404, 'Could not load columns');
-	}
-	const models = await ZenoService.getModels(project.uuid);
-	if (!slices) {
-		throw error(404, 'Could not load models');
-	}
-	const metrics = await ZenoService.getMetrics(project.uuid);
-	if (!metrics) {
-		throw error(404, 'Could not load metrics');
-	}
-	const folders = await ZenoService.getFolders(project.uuid);
-	if (!folders) {
-		throw error(404, 'Could not load folders');
-	}
-	const tags = await ZenoService.getTags(project.uuid);
-	if (!tags) {
-		throw error(404, 'Could not load tags');
+
+	let model: string | undefined =
+		project_result.models.length > 0 ? project_result.models[0] : undefined;
+	let metric: Metric | undefined =
+		project_result.metrics.length > 0 ? project_result.metrics[0] : undefined;
+	let comparisonModel: string | undefined =
+		project_result.models.length > 1 ? project_result.models[1] : undefined;
+	let comparisonColumn: ZenoColumn | undefined = project_result.columns.find(
+		(c) => c.model === model
+	);
+	let compareSort: [ZenoColumn | undefined, boolean] = [undefined, false];
+	let metricRange: [number, number] = [Infinity, -Infinity];
+	let selections: {
+		metadata: Record<string, FilterPredicateGroup>;
+		slices: number[];
+		tags: number[];
+	} = {
+		metadata: {},
+		slices: [],
+		tags: []
+	};
+
+	if (urlParams !== undefined) {
+		if (urlParams.metric !== undefined) {
+			urlParams.metric;
+			const foundMetric = project_result.metrics.find((m) => m.id === urlParams?.metric?.id);
+			if (foundMetric) {
+				metric = foundMetric;
+			}
+		}
+
+		if (urlParams.model) {
+			if (project_result.models.find((m) => m === urlParams?.model)) {
+				model = urlParams.model;
+			}
+		}
+
+		if (urlParams.comparisonModel) {
+			if (project_result.models.find((m) => m === urlParams?.comparisonModel)) {
+				comparisonModel = urlParams.comparisonModel;
+			}
+		}
+
+		if (urlParams.comparisonColumn) {
+			const foundColumn = project_result.columns.find(
+				(c) => c.id === urlParams?.comparisonColumn?.id
+			);
+			if (foundColumn) {
+				comparisonColumn = foundColumn;
+			}
+		}
+
+		if (urlParams.compareSort) {
+			compareSort = urlParams.compareSort;
+		}
+		if (urlParams.metricRange) {
+			metricRange = urlParams.metricRange;
+		}
+		if (urlParams.selections) {
+			selections = urlParams.selections;
+		}
 	}
 
 	return {
-		project: project,
-		slices: slices,
-		columns: columns,
-		models: models,
-		metrics: metrics,
-		folders: folders,
-		tags: tags,
+		project: project_result.project,
+		slices: project_result.slices,
+		columns: project_result.columns,
+		models: project_result.models,
+		metrics: project_result.metrics,
+		folders: project_result.folders,
+		tags: project_result.tags,
+		model: model,
+		metric: metric,
+		comparisonModel: comparisonModel,
+		comparisonColumn: comparisonColumn,
+		compareSort: compareSort,
+		metricRange: metricRange,
+		selections: selections,
 		cognitoUser: cognitoUser
 	};
 }

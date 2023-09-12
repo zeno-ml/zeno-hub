@@ -73,18 +73,18 @@
 			}}
 		/>
 	</div>
-	<div class="mr-2.5">
+	<div class="mr-2.5 w-20">
 		{#if predicate.column}
-			{#if predicate.column.dataType === MetadataType.BOOLEAN || predicate.column.dataType === MetadataType.NOMINAL}
+			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
 					on:change={operationChange}
 					value={inverseOperationMap[predicate.operation]}
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', 'LIKE']}
+					options={[inverseOperationMap[Operation.EQUAL], inverseOperationMap[Operation.DIFFERENT]]}
 				/>
-			{:else}
+			{:else if predicate.column.dataType === MetadataType.CONTINUOUS}
 				<!-- renderer function avoids HTML sanitation issues-->
 				<Svelecte
 					on:change={operationChange}
@@ -92,8 +92,30 @@
 					valueField="label"
 					placeholder={'Operation'}
 					searchable={false}
-					options={['==', '!=', '>', '<', '>=', '<=', 'LIKE']}
+					options={[
+						inverseOperationMap[Operation.EQUAL],
+						inverseOperationMap[Operation.DIFFERENT],
+						inverseOperationMap[Operation.GT],
+						inverseOperationMap[Operation.LT],
+						inverseOperationMap[Operation.GTE],
+						inverseOperationMap[Operation.LTE]
+					]}
 					renderer={renderOptions}
+				/>
+			{:else}
+				<Svelecte
+					on:change={operationChange}
+					value={inverseOperationMap[predicate.operation]}
+					valueField="label"
+					placeholder={'Operation'}
+					searchable={false}
+					options={[
+						inverseOperationMap[Operation.EQUAL],
+						inverseOperationMap[Operation.DIFFERENT],
+						inverseOperationMap[Operation.LIKE],
+						inverseOperationMap[Operation.ILIKE],
+						inverseOperationMap[Operation.REGEX]
+					]}
 				/>
 			{/if}
 		{/if}
@@ -110,7 +132,7 @@
 					searchable={false}
 					options={['true', 'false']}
 				/>
-			{:else if predicate.column.dataType !== MetadataType.OTHER}
+			{:else}
 				<input
 					type="text"
 					bind:value={predicate.value}

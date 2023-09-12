@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
 	import { ZenoService, type Tag } from '$lib/zenoapi';
@@ -13,20 +14,26 @@
 
 	function saveChanges() {
 		if ($editTag === undefined || $project === undefined) return;
-		ZenoService.updateTag($project.uuid, { ...$editTag, dataIds: $editedIds }).then(() => {
+		ZenoService.updateTag($project.uuid, {
+			...$editTag,
+			dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
+		}).then(() => {
+			invalidate('app:state');
+			tags.update((t) => {
+				const index = t.findIndex((tag) => tag.id === $editTag?.id);
+				if (index !== -1 && $editTag !== undefined) {
+					t[index] = { ...$editTag, dataIds: $editedIds };
+				}
+				return t;
+			});
+			let s = new Set<string>();
+			$selections.tags.forEach((tagId) => {
+				const tag: Tag | undefined = $tags.find((cur) => cur.id === tagId);
+				if (tag !== undefined) tag.dataIds.forEach((item) => s.add(item));
+				tagIds.set([...s]);
+			});
 			editTag.set(undefined);
 			editedIds.set([]);
-			if ($project !== undefined) {
-				ZenoService.getTags($project.uuid).then((fetchedTags) => {
-					tags.set(fetchedTags);
-					let s = new Set<string>();
-					$selections.tags.forEach((tagId) => {
-						const tag: Tag | undefined = $tags.find((cur) => cur.id === tagId);
-						if (tag !== undefined) tag.dataIds.forEach((item) => s.add(item));
-						tagIds.set([...s]);
-					});
-				});
-			}
 		});
 	}
 </script>
@@ -40,7 +47,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-darker"
 			use:tooltip={{
-				content: 'Tags are named sets of data instances.',
+				content: 'Tags are named sets of data instances',
 				position: 'right',
 				theme: 'zeno-tooltip'
 			}}
@@ -55,7 +62,7 @@
 			<div>
 				<div
 					use:tooltip={{
-						content: 'Create a new tag.',
+						content: 'Create a new tag',
 						position: 'left',
 						theme: 'zeno-tooltip'
 					}}
@@ -79,13 +86,15 @@
 	{#each [...$tags.values()] as t}
 		{#if $editTag !== undefined && $editTag.id === t.id}
 			<div style="display: flex; align-items: center">
-				<div class="mr-2">
+				<div class="mr-2 w-full">
 					<TagCell tag={t} />
 				</div>
 				<Button
 					style="background-color: var(--N1); margin-top: 5px; color: white; "
-					on:click={saveChanges}>Done</Button
+					on:click={saveChanges}
 				>
+					Done
+				</Button>
 			</div>
 		{:else}
 			<TagCell tag={t} />

@@ -102,7 +102,12 @@ export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 		return (n: number) => {
 			if (max === Infinity || min === Infinity) return colorScale(1);
 			if (max - min === 0) return colorScale(0.5);
+			if (n < min) return colorScale(0);
+			if (n > max) return colorScale(1);
 			return colorScale((n - min) / (max - min));
 		};
 	}
 );
+
+// Store the current state of feature flags
+export const featureFlags: Writable<Record<string, boolean>> = writable({});

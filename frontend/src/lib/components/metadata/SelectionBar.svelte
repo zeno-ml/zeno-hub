@@ -5,7 +5,7 @@
 	import Button, { Group } from '@smui/button';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
-	export let currentResult: GroupMetric[] | undefined;
+	export let currentResult: Promise<GroupMetric[] | undefined>;
 	export let selected = 'list';
 
 	let CHOICES: string[];
@@ -26,20 +26,22 @@
 		<div
 			class="flex flex-wrap justify-between w-full items-center py-2.5 border-b border-grey-lighter"
 		>
-			<div>
-				{#if currentResult}
-					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
-						<span class="text-grey-dark mr-3">
-							{$metric ? $metric.name + ':' : ''}
-						</span>
-						<span class="text-primary mr-3">
-							{currentResult[0].metric.toFixed(2)}
-						</span>
+			<div class="flex">
+				<span class="text-grey-dark mr-3">
+					{$metric ? $metric.name + ':' : ''}
+				</span>
+				{#await currentResult then res}
+					{#if res !== undefined && res.length > 0}
+						{#if res[0].metric !== undefined && res[0].metric !== null}
+							<span class="text-primary mr-3">
+								{res[0].metric.toFixed(2)}
+							</span>
+						{/if}
+						<span class="italic text-grey-darker mr-2.5"
+							>({res[0].size.toLocaleString()} instances)</span
+						>
 					{/if}
-					<span class="italic text-grey-darker mr-2.5"
-						>({currentResult[0].size.toLocaleString()} instances)</span
-					>
-				{/if}
+				{/await}
 			</div>
 			<div class="flex items-center">
 				{#if $editTag === undefined}

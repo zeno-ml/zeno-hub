@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { instanceOfFilterPredicate, setModelForFilterPredicateGroup } from '$lib/api/slice';
+	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import {
 		columns,
@@ -9,7 +8,6 @@
 		comparisonModel,
 		metric,
 		model,
-		models,
 		project,
 		rowsPerPage,
 		selectionIds,
@@ -26,18 +24,16 @@
 	import { viewMap } from './views/viewMap';
 
 	export let viewOptions: Record<string, unknown> | undefined;
-	export let modelAResult: GroupMetric[] | undefined;
-	export let modelBResult: GroupMetric[] | undefined;
+	export let modelAResult: Promise<GroupMetric[] | undefined>;
+	export let modelBResult: Promise<GroupMetric[] | undefined>;
 
-	let table: Record<string, string | number | boolean>[] | undefined;
+	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
 	let instanceContainer: HTMLDivElement;
 
 	// Which model column to show sort for.
 	let sortModel = '';
 	let currentPage = 0;
 	let lastPage = 0;
-	let metricA = 0;
-	let metricB = 0;
 
 	let sampleOptions = [
 		...new Set(
@@ -52,16 +48,11 @@
 	$: if (currentPage > lastPage) {
 		currentPage = lastPage;
 	}
-	$: if (modelAResult !== undefined) {
-		lastPage = Math.max(Math.ceil(modelAResult[0].size / $rowsPerPage) - 1, 0);
-		if (modelAResult[0].metric !== undefined && modelAResult[0].metric !== null)
-			metricA = Math.round(modelAResult[0].metric * 100) / 100;
-	}
-	$: if (modelBResult !== undefined) {
-		lastPage = Math.max(Math.ceil(modelBResult[0].size / $rowsPerPage) - 1, 0);
-		if (modelBResult[0].metric !== undefined && modelBResult[0].metric !== null)
-			metricB = Math.round(modelBResult[0].metric * 100) / 100;
-	}
+	$: modelAResult.then((r) => {
+		if (r !== undefined && r.length > 0) {
+			lastPage = Math.max(Math.ceil(r[0].size / $rowsPerPage) - 1, 0);
+		}
+	});
 
 	$: modelAColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
@@ -74,9 +65,9 @@
 	$: {
 		currentPage;
 		$comparisonModel;
+		$comparisonColumn;
 		$rowsPerPage;
 		$model;
-		$comparisonModel;
 		$compareSort;
 		$selectionIds;
 		$selectionPredicates;
@@ -86,18 +77,6 @@
 		end;
 		updateTable();
 	}
-
-	comparisonColumn.subscribe((_) => {
-		table = undefined;
-		compareSort.set([undefined, true]);
-	});
-
-	model.subscribe((model) => {
-		// make sure Model A and Model B are exclusive
-		if ($comparisonModel && $comparisonModel === model) {
-			$comparisonModel = $models.filter((m) => m !== model)[0];
-		}
-	});
 
 	// reset page on selection change
 	selectionPredicates.subscribe(() => {
@@ -132,12 +111,9 @@
 	}
 
 	function updateTable() {
-		if (!browser || isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start) return;
 		if ($model !== undefined && $comparisonModel !== undefined) {
-			let predicates =
-				$selectionPredicates === undefined
-					? undefined
-					: setModelForFilterPredicateGroup($selectionPredicates, $model);
+			let predicates = $selectionPredicates;
 			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 				predicates = {
 					join: Join._,
@@ -147,7 +123,7 @@
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			getFilteredTable(
+			tablePromise = getFilteredTable(
 				$columns,
 				[$model, $comparisonModel],
 				$comparisonColumn,
@@ -156,12 +132,10 @@
 				$compareSort,
 				dataIds,
 				predicates
-			).then((res) => {
-				table = res;
-				if (instanceContainer) {
-					instanceContainer.scrollTop = 0;
-				}
-			});
+			);
+			if (instanceContainer) {
+				instanceContainer.scrollTop = 0;
+			}
 		}
 	}
 
@@ -179,44 +153,56 @@
 	}
 </script>
 
-<div class="w-full overflow-auto" bind:this={instanceContainer}>
-	{#if table}
-		<table class="mt-2">
-			<thead
-				class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
-			>
-				<th class="p-3">
-					<div>A: {$model}</div>
-					<div>
-						<span class="font-normal text-sm mr-3.5 text-grey-dark">
-							{$metric ? $metric.name + ':' : ''}
-						</span>
-						<span class="font-normal mr-3.5 text-primary">
-							{metricA}
-						</span>
-					</div>
-				</th>
-				<th class="p-3">
-					<div>B: {$comparisonModel}</div>
-					<div>
-						<span class="font-normal text-sm mr-3.5 text-grey-dark">
-							{$metric ? $metric.name + ':' : ''}
-						</span>
-						<span class="font-normal text-sm mr-3.5 text-primary">
-							{metricB}
-						</span>
-					</div>
-				</th>
-				<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-w-[150px]">
-					<ComparisonViewTableHeader {sortModel} header={$model} />
-				</th>
-				<th on:click={() => updateSort($comparisonModel)} class="cursor-pointer p-3 min-w-[150px]">
-					<ComparisonViewTableHeader {sortModel} header={$comparisonModel} />
-				</th>
-				<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-w-[150px]">
-					<ComparisonViewTableHeader {sortModel} header={''} />
-				</th>
-			</thead>
+<div class="w-full h-full overflow-auto" bind:this={instanceContainer}>
+	<table class="mt-2">
+		<thead
+			class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
+		>
+			<th class="p-3">
+				<div>A: {$model}</div>
+				<div>
+					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+						{$metric ? $metric.name + ':' : ''}
+					</span>
+					<span class="font-normal mr-3.5 text-primary">
+						{#await modelAResult then res}
+							{#if res !== undefined && res.length > 0}
+								{#if res[0].metric !== undefined && res[0].metric !== null}
+									{res[0].metric.toFixed(2)}
+								{/if}
+							{/if}
+						{/await}
+					</span>
+				</div>
+			</th>
+			<th class="p-3">
+				<div>B: {$comparisonModel}</div>
+				<div>
+					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+						{$metric ? $metric.name + ':' : ''}
+					</span>
+					<span class="font-normal text-sm mr-3.5 text-primary">
+						{#await modelBResult then res}
+							{#if res !== undefined && res.length > 0}
+								{#if res[0].metric !== undefined && res[0].metric !== null}
+									{res[0].metric.toFixed(2)}
+								{/if}
+							{/if}
+						{/await}
+					</span>
+				</div>
+			</th>
+			<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-w-[150px]">
+				<ComparisonViewTableHeader {sortModel} header={$model} />
+			</th>
+			<th on:click={() => updateSort($comparisonModel)} class="cursor-pointer p-3 min-w-[150px]">
+				<ComparisonViewTableHeader {sortModel} header={$comparisonModel} />
+			</th>
+			<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-w-[150px]">
+				<ComparisonViewTableHeader {sortModel} header={''} />
+			</th>
+		</thead>
+		{#await tablePromise then table}
 			<tbody>
 				{#each table as tableContent}
 					<tr>
@@ -243,9 +229,10 @@
 							</td>
 						{/if}
 						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td class="p-3">{modelValueAndDiff($model, tableContent)}</td>
-							<td class="p-3">{modelValueAndDiff($comparisonModel, tableContent)}</td>
-							<td class="p-3"
+							<td class="p-3 align-text-top">{modelValueAndDiff($model, tableContent)}</td>
+							<td class="p-3 align-text-top">{modelValueAndDiff($comparisonModel, tableContent)}</td
+							>
+							<td class="p-3 align-text-top"
 								>{Number(tableContent['diff'])
 									? Number(tableContent['diff']).toFixed(2)
 									: tableContent['diff']}</td
@@ -254,8 +241,10 @@
 					</tr>
 				{/each}
 			</tbody>
-		</table>
-	{/if}
+		{:catch e}
+			<p>error loading data: {e}</p>
+		{/await}
+	</table>
 </div>
 
 <Pagination slot="paginate" class="pagination">
@@ -268,9 +257,11 @@
 		</Select>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
-		{start + 1}-
-		{Math.min(end, modelAResult ? modelAResult[0].size : end)} of
-		{modelAResult ? modelAResult[0].size : ''}
+		{start + 1} -
+		{#await modelAResult then res}
+			{Math.min(end, res ? res[0].size : end)} of
+			{res ? res[0].size : ''}
+		{/await}
 	</svelte:fragment>
 
 	<IconButton

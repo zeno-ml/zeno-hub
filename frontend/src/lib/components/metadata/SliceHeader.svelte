@@ -35,7 +35,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-dark"
 			use:tooltip={{
-				content: 'Slices are named combinations of filters.',
+				content: 'Slices are named combinations of filters',
 				position: 'right',
 				theme: 'zeno-tooltip'
 			}}
@@ -50,7 +50,7 @@
 			<div
 				use:tooltip={{
 					content: !$page.url.href.includes('compare')
-						? 'Find underperforming slices.'
+						? 'Find underperforming slices'
 						: 'Find slices with the largest output differences between models',
 					position: 'left',
 					theme: 'zeno-tooltip',
@@ -73,7 +73,7 @@
 			</div>
 			<div
 				use:tooltip={{
-					content: 'Create a new folder.',
+					content: 'Create a new folder',
 					position: 'left',
 					theme: 'zeno-tooltip'
 				}}
@@ -90,7 +90,7 @@
 			</div>
 			<div
 				use:tooltip={{
-					content: 'Create a new slice.',
+					content: 'Create a new slice',
 					position: 'left',
 					theme: 'zeno-tooltip'
 				}}

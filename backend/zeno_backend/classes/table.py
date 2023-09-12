@@ -8,6 +8,7 @@ class TableRequest(CamelModel):
     """A request specification for table data."""
 
     columns: list[ZenoColumn]
+    model: str | None = None
     diff_column_1: ZenoColumn | None = None
     diff_column_2: ZenoColumn | None = None
     offset: int

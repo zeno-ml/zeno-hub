@@ -11,7 +11,7 @@
 
 <a
 	class="flex items-center cursor-pointer"
-	href={$page.url.href.substring(0, $page.url.href.lastIndexOf('/'))}
+	href={$page.url.href.split('?')[0].substring(0, $page.url.href.lastIndexOf('/'))}
 	on:click={updateChart}
 	on:focus={() => ({})}
 	on:mouseover={() => {

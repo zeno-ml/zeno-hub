@@ -96,7 +96,7 @@ def tag(tag: Tag, project: str):
                 tag.id,
             ],
         )
-        if len(data_ids_result) == 0:
+        if data_ids_result is None:
             return
 
         existing_data = set(map(lambda d: d[0], data_ids_result))

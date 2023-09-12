@@ -1,5 +1,6 @@
 """Type representations for metric data."""
 from zeno_backend.classes.base import CamelModel, ZenoColumn
+from zeno_backend.classes.filter import Operation
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import FilterPredicateGroup
 
@@ -9,6 +10,9 @@ class HistogramBucket(CamelModel):
 
     bucket: float | bool | int | str
     bucket_end: float | bool | int | str | None = None
+    size: int | None = None
+    filtered_size: int | None = None
+    metric: float | None = None
 
 
 class HistogramColumnRequest(CamelModel):
@@ -33,6 +37,4 @@ class StringFilterRequest(CamelModel):
 
     column: ZenoColumn
     filter_string: str
-    is_regex: bool
-    case_match: bool
-    whole_word_match: bool
+    operation: Operation

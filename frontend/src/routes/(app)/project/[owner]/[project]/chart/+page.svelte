@@ -1,18 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
-	import { chartDefaults } from '$lib/components/chart/chartUtil';
-	import { project } from '$lib/stores';
-	import { charts } from '$lib/stores.js';
+	import { charts, project } from '$lib/stores';
+	import { chartDefaults } from '$lib/util/charts';
 	import { ChartType, ZenoService } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/icon-button';
 
 	export let data;
 
-	$: {
-		charts.set(data.charts);
-	}
+	$: charts.set(data.charts);
 </script>
 
 <div class="flex flex-col m-5 w-full">
@@ -30,15 +27,12 @@
 					ZenoService.addChart(
 						$project ? $project.uuid : '',
 						chartDefaults('New Chart', 0, ChartType.BAR)
-					).then(() => {
-						ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) => {
-							charts.set(fetchedCharts);
-							goto(
-								`/project/${$project ? $project.ownerName : ''}/${
-									$project ? $project.name : ''
-								}/chart/${fetchedCharts[fetchedCharts.length - 1].id}?edit=true`
-							);
-						});
+					).then((res) => {
+						goto(
+							`/project/${$project ? $project.ownerName : ''}/${
+								$project ? $project.name : ''
+							}/chart/${res}?edit=true`
+						);
 					});
 				}}
 			>

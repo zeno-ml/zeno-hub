@@ -18,7 +18,7 @@ from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import Slice
 from zeno_backend.database.select import metrics, slices
 from zeno_backend.processing.filtering import table_filter
-from zeno_backend.processing.metrics import metric_map
+from zeno_backend.processing.metrics.map import metric_map
 
 
 def xyc_data(chart: Chart, project: str) -> str:
@@ -34,12 +34,25 @@ def xyc_data(chart: Chart, project: str) -> str:
     elements: list[dict[str, Any]] = []
     if not (isinstance(chart.parameters, XCParameters)):
         return json.dumps({"table": elements})
+
     all_metrics = metrics(project)
     selected_metric = next(
         (x for x in all_metrics if x.id == chart.parameters.metric),
         Metric(id=-1, name="count", type="count", columns=[]),
     )
+
     selected_slices = slices(project, chart.parameters.slices)
+    if -1 in chart.parameters.slices:
+        selected_slices = selected_slices + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
+
     selected_models = chart.parameters.models
     for current_slice in selected_slices:
         for model in selected_models:
@@ -57,6 +70,7 @@ def xyc_data(chart: Chart, project: str) -> str:
                     "size": metric.size,
                 }
             )
+
     return json.dumps({"table": elements})
 
 
@@ -75,9 +89,22 @@ def table_data(chart: Chart, project: str) -> str:
     if not isinstance(params, TableParameters):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
+    if -1 in params.slices:
+        selected_slices = selected_slices + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
     selected_models = params.models
 
     for current_metric in selected_metrics:
@@ -119,9 +146,22 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, BeeswarmParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
+    if -1 in params.slices:
+        selected_slices = selected_slices + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
     selected_models = params.models
 
     for current_metric in selected_metrics:
@@ -162,9 +202,22 @@ def radar_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, RadarParameters)):
         return json.dumps({"table": elements})
     selected_metrics = list(
-        filter(lambda metric: metric.id in params.metrics, metrics(project))
+        filter(
+            lambda metric: metric.id in params.metrics,
+            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+        )
     )
     selected_slices = slices(project, params.slices)
+    if -1 in params.slices:
+        selected_slices = selected_slices + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
     selected_models = params.models
 
     for current_metric in selected_metrics:
@@ -211,12 +264,33 @@ def heatmap_data(chart: Chart, project: str) -> str:
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
-    selected_x: list[Slice] | list[str] = (
+    selected_x = (
         slices(project, params.x_values) if x_slice else params.x_values  # type: ignore
     )
+    if x_slice and -1 in params.x_values:
+        selected_x = selected_x + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
+
     selected_y = (
         slices(project, params.y_values) if y_slice else params.y_values  # type: ignore
     )
+    if y_slice and -1 in params.y_values:
+        selected_y = selected_y + [
+            Slice(
+                id=-1,
+                slice_name="All instances",
+                filter_predicates=FilterPredicateGroup(
+                    predicates=[], join=Join.OMITTED
+                ),
+            )
+        ]
 
     for current_x in selected_x:
         for current_y in selected_y:

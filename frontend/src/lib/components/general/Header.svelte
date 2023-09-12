@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { authToken, collapseHeader, project } from '$lib/stores';
+	import { authToken, collapseHeader, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -13,6 +13,7 @@
 		mdiCog,
 		mdiCompare,
 		mdiCompassOutline,
+		mdiLogin,
 		mdiLogout
 	} from '@mdi/js';
 	import HeaderIcon from './HeaderIcon.svelte';
@@ -20,6 +21,8 @@
 	export let user: User | null;
 
 	let projectEdit = false;
+
+	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
 {#if projectEdit && $project && user !== null}
@@ -35,19 +38,21 @@
 				<div class="flex flex-col mt-3">
 					<HeaderIcon
 						pageName={'explore'}
-						tooltipContent={'Explore your data and model outputs.'}
+						tooltipContent={'Explore your data and model outputs'}
 						icon={mdiCompassOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
 					/>
-					<HeaderIcon
-						pageName={'compare'}
-						tooltipContent={'Qualitatively compare model outputs.'}
-						icon={mdiCompare}
-						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
-					/>
+					{#if $models.length > 1}
+						<HeaderIcon
+							pageName={'compare'}
+							tooltipContent={'Qualitatively compare model outputs'}
+							icon={mdiCompare}
+							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
+						/>
+					{/if}
 					<HeaderIcon
 						pageName={'chart'}
-						tooltipContent={'Create charts from your slices and metrics.'}
+						tooltipContent={'Create charts from your slices and metrics'}
 						icon={mdiChartBoxOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
 					/>
@@ -55,38 +60,42 @@
 			{/if}
 		</div>
 		<div>
-			{#if $page.url.href.includes('project')}
+			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
 				<HeaderIcon
 					pageName={'$collapseHeader'}
-					tooltipContent={$collapseHeader ? 'Expand ' : 'Collapse ' + 'sidebar.'}
+					tooltipContent={$collapseHeader ? 'Expand sidebar' : 'Collapse sidebar'}
 					icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
 					on:click={() => collapseHeader.set(!$collapseHeader)}
 				/>
 			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mb-3">
-			{#if $page.url.href.includes('project') && $project && $project.ownerName === user?.name}
+			{#if (currentTab?.includes('explore') || currentTab?.includes('compare') || currentTab?.includes('chart')) && $project?.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}
-					tooltipContent={"Edit your project's configuration."}
+					tooltipContent={"Edit your project's configuration"}
 					icon={mdiCog}
 					on:click={() => (projectEdit = true)}
 				/>
 			{/if}
-			<HeaderIcon
-				pageName={'account'}
-				tooltipContent={'Manage your account.'}
-				icon={mdiAccount}
-				on:click={() => goto(`/account`)}
-			/>
-			<form method="POST" action="/logout">
+			{#if $authToken}
 				<HeaderIcon
-					pageName={'logout'}
-					tooltipContent={'Logout.'}
-					icon={mdiLogout}
-					on:click={() => authToken.set(undefined)}
+					pageName={'account'}
+					tooltipContent={'Manage your account'}
+					icon={mdiAccount}
+					on:click={() => goto(`/account`)}
 				/>
-			</form>
+				<form method="POST" action="/logout">
+					<HeaderIcon pageName={'logout'} tooltipContent={'Logout'} icon={mdiLogout} />
+				</form>
+			{:else}
+				<HeaderIcon
+					pageName={'login'}
+					tooltipContent={'Login'}
+					icon={mdiLogin}
+					on:click={() => goto(`/login`)}
+				/>
+			{/if}
 		</div>
 	</header>
 </nav>

@@ -71,7 +71,7 @@
 							<div class="flex items-center justify-end">
 								<div
 									use:tooltip={{
-										content: 'Manage this organization. You can only do this if you are an admin.',
+										content: 'Manage this organization. You can only do this if you are an admin',
 										position: 'left',
 										theme: 'zeno-tooltip'
 									}}
@@ -90,7 +90,7 @@
 								<div
 									use:tooltip={{
 										content:
-											'Leave this organization. You can only do this if there is an admin left.',
+											'Leave this organization. You can only do this if there is an admin left',
 										position: 'left',
 										theme: 'zeno-tooltip'
 									}}
@@ -126,7 +126,7 @@
 								</div>
 								<div
 									use:tooltip={{
-										content: 'Delete this organization. You can only do this if you are an admin.',
+										content: 'Delete this organization. You can only do this if you are an admin',
 										position: 'left',
 										theme: 'zeno-tooltip'
 									}}

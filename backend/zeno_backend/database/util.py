@@ -18,6 +18,8 @@ def resolve_metadata_type(data_frame: pd.DataFrame, column: str) -> MetadataType
     """
     dtype = data_frame[column].dtype
     if pd.api.types.is_any_real_numeric_dtype(dtype):
+        if data_frame[column].nunique() < 20:
+            return MetadataType.NOMINAL
         return MetadataType.CONTINUOUS
     elif pd.api.types.is_bool_dtype(dtype):
         return MetadataType.BOOLEAN

@@ -9,9 +9,8 @@
 		mdiViewGrid
 	} from '@mdi/js';
 
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import { charts, project } from '$lib/stores';
+	import { goto, invalidate } from '$app/navigation';
+	import { project } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
@@ -33,7 +32,7 @@
 
 <button
 	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
-	on:click={() => goto(`${$page.url}/${chart.id}?edit=false`)}
+	on:click={() => goto(`chart/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
 		<div class="m-4 min-w-[24px]">
@@ -55,7 +54,16 @@
 				</Icon>
 			</IconButton>
 			{#if showOptions}
-				<div class="z-10 absolute ml-5" use:clickOutside={() => (showOptions = !showOptions)}>
+				<div
+					class="z-10 absolute ml-5"
+					use:clickOutside={() => (showOptions = !showOptions)}
+					on:click={(e) => e.stopPropagation()}
+					on:keydown={(e) => {
+						if (e.key === 'Escape') {
+							showOptions = false;
+						}
+					}}
+				>
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
 							<div
@@ -70,9 +78,7 @@
 										type: chart.type,
 										parameters: chart.parameters
 									}).then(() => {
-										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-											charts.set(fetchedCharts)
-										);
+										invalidate('app:charts');
 									});
 								}}
 							>
@@ -85,11 +91,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteChart(chart).then(() => {
-										ZenoService.getCharts($project ? $project.uuid : '').then((fetchedCharts) =>
-											charts.set(fetchedCharts)
-										);
-									});
+									ZenoService.deleteChart(chart).then(() => invalidate('app:charts'));
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;

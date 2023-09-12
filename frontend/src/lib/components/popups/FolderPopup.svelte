@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { folders, project } from '$lib/stores';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import Button from '@smui/button';
@@ -26,11 +27,14 @@
 				...folderToEdit,
 				name: folderName
 			}).then(() => {
-				if ($project) {
-					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
-						folders.set(fetchedFolders)
-					);
-				}
+				invalidate('app:state');
+				folders.update((f) => {
+					const index = f.findIndex((f) => f.id === folderToEdit?.id);
+					if (index !== -1 && folderToEdit) {
+						f[index] = { ...folderToEdit, name: folderName };
+					}
+					return f;
+				});
 			});
 		}
 		dispatch('close');
@@ -39,12 +43,15 @@
 	/** Create a folder using the folderName variable **/
 	function createFolder() {
 		if ($project) {
-			ZenoService.addFolder($project.uuid, folderName).then(() => {
-				if ($project) {
-					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
-						folders.set(fetchedFolders)
-					);
-				}
+			ZenoService.addFolder($project.uuid, folderName).then((res) => {
+				invalidate('app:state');
+				folders.update((f) => [
+					...f,
+					{
+						id: res,
+						name: folderName
+					}
+				]);
 			});
 		}
 		dispatch('close');

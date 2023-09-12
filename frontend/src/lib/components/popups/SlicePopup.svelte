@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { columns, project, selectionPredicates, selections, slices } from '$lib/stores';
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
@@ -113,6 +114,18 @@
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
+			}).then(() => {
+				slices.update((s) => {
+					const index = s.findIndex((slice) => slice.id === sliceToEdit?.id);
+					s[index] = {
+						id: sliceToEdit ? sliceToEdit.id : -1,
+						sliceName,
+						filterPredicates: predicateGroup,
+						folderId: folderId
+					};
+					return s;
+				});
+				invalidate('app:state');
 			});
 		} else {
 			ZenoService.addSlice($project ? $project.uuid : '', {
@@ -120,18 +133,25 @@
 				sliceName,
 				filterPredicates: predicateGroup,
 				folderId: folderId
-			}).then(() => {
-				ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) => {
-					slices.set(fetchedSlices);
-					selections.update(() => ({
-						slices: [],
-						metadata: {},
-						tags: []
-					}));
-					dispatch('close');
-				});
+			}).then((res) => {
+				invalidate('app:state');
+				slices.update((s) => [
+					...s,
+					{
+						id: res,
+						sliceName,
+						filterPredicates: predicateGroup,
+						folderId: folderId
+					}
+				]);
+				selections.update(() => ({
+					slices: [],
+					metadata: {},
+					tags: []
+				}));
 			});
 		}
+		dispatch('close');
 	}
 
 	function submit(e: KeyboardEvent) {

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { collapseHeader } from '$lib/stores';
 	import Histograms from './Histograms.svelte';
+	import HistogramsHeader from './HistogramsHeader.svelte';
 	import MetadataHeader from './MetadataHeader.svelte';
 	import Slices from './Slices.svelte';
 	import Tags from './Tags.svelte';
+
+	export let compare = false;
 </script>
 
 <div
@@ -14,7 +17,10 @@
 	<MetadataHeader />
 	<Slices />
 	<Tags />
-	<Histograms />
+	{#if !compare}
+		<HistogramsHeader />
+		<Histograms />
+	{/if}
 </div>
 
 <style>

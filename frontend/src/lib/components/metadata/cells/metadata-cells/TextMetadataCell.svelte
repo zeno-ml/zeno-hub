@@ -12,19 +12,15 @@
 	import { Label } from '@smui/common';
 	import AutoComplete from 'simple-svelte-autocomplete';
 	import SearchOption from './SearchOption.svelte';
-	import MatchWholeWordIcon from './static/MatchWholeWordIcon.svelte';
 	import RegexIcon from './static/RegexIcon.svelte';
 
 	export let col: ZenoColumn;
 	export let filterPredicates: FilterPredicate[];
 	export let updatePredicates: (predicates: FilterPredicate[]) => void;
 
+	let operation = Operation.ILIKE;
 	let searchString = '';
-	let isRegex = false;
 	let regexValid = true;
-	let caseMatch = false;
-	let wholeWordMatch = false;
-	let refresh = 0;
 	let noResultsText = 'No results';
 	let results: string[] = [];
 	let blur = function (ev: CustomEvent) {
@@ -33,7 +29,7 @@
 
 	$: {
 		regexValid = true;
-		if (isRegex) {
+		if (operation === Operation.REGEX) {
 			try {
 				new RegExp(searchString);
 			} catch (e) {
@@ -49,20 +45,22 @@
 
 		filterPredicates.push({
 			column: col,
-			operation: Operation.LIKE,
+			operation: operation,
 			value: searchString,
 			join: Join._
 		});
+
 		if (filterPredicates.length > 1) {
 			filterPredicates[filterPredicates.length - 1].join = Join.OR;
 		}
+
 		updatePredicates(filterPredicates);
 
 		searchString = '';
 	}
 
 	async function searchData(input: string): Promise<string[]> {
-		if (isRegex) {
+		if (operation === Operation.REGEX) {
 			try {
 				new RegExp(input);
 				noResultsText = 'No results';
@@ -77,9 +75,7 @@
 				results = await ZenoService.filterStringMetadata($project.uuid, {
 					column: col,
 					filterString: input,
-					isRegex: isRegex,
-					caseMatch: caseMatch,
-					wholeWordMatch: wholeWordMatch
+					operation: operation
 				});
 				return results;
 			}
@@ -89,67 +85,42 @@
 		}
 		return results;
 	}
-
-	function optionClick(e: MouseEvent) {
-		if (e.currentTarget instanceof HTMLElement) {
-			let id = e.currentTarget.id;
-			if (id === 'caseMatch') {
-				caseMatch = !caseMatch;
-			} else if (id === 'wholeWordMatch') {
-				wholeWordMatch = !wholeWordMatch;
-			} else {
-				if (isRegex) {
-					isRegex = false;
-					noResultsText = 'No results';
-					regexValid = true;
-				} else {
-					isRegex = true;
-				}
-			}
-		}
-		refresh++;
-	}
 </script>
 
 <div class="flex items-center ml-1">
-	{#key refresh}
-		<AutoComplete
-			id="autoinput"
-			bind:text={searchString}
-			placeholder={'Search'}
-			{noResultsText}
-			hideArrow={true}
-			searchFunction={searchData}
-			cleanUserText={false}
-			ignoreAccents={false}
-			localFiltering={false}
-			delay={200}
-		>
-			<div slot="no-results" let:noResultsText>
-				<span style:color={regexValid ? '' : 'red'}>{noResultsText}</span>
-			</div>
-		</AutoComplete>
-	{/key}
-	<div class="ml-2.5 flex items-center">
+	<AutoComplete
+		id="autoinput"
+		bind:text={searchString}
+		placeholder={'Search'}
+		{noResultsText}
+		hideArrow={true}
+		searchFunction={searchData}
+		cleanUserText={false}
+		ignoreAccents={false}
+		localFiltering={false}
+		delay={200}
+	>
+		<div slot="no-results" let:noResultsText>
+			<span style:color={regexValid ? '' : 'red'}>{noResultsText}</span>
+		</div>
+	</AutoComplete>
+	<div class="ml-2.5 flex items-center border rounded-md border-grey-light">
 		<SearchOption
 			id={'caseMatch'}
-			highlighted={caseMatch}
-			on:click={optionClick}
+			highlighted={operation === Operation.LIKE}
+			on:click={() =>
+				operation === Operation.LIKE ? (operation = Operation.ILIKE) : (operation = Operation.LIKE)}
 			tooltipContent={'Match Case'}>Aa</SearchOption
 		>
-		<SearchOption
-			id={'wholeWordMatch'}
-			highlighted={wholeWordMatch}
-			on:click={optionClick}
-			tooltipContent={'Match Whole Word'}
-		>
-			<svelte:component this={MatchWholeWordIcon} />
-		</SearchOption>
+		<div class="w-px h-6 bg-grey-light" />
 		<SearchOption
 			id={'typeSelection'}
-			highlighted={isRegex}
-			on:click={optionClick}
-			tooltipContent={'Use Regular Expression'}
+			highlighted={operation === Operation.REGEX}
+			on:click={() =>
+				operation === Operation.REGEX
+					? (operation = Operation.ILIKE)
+					: (operation = Operation.REGEX)}
+			tooltipContent={'Use POSIX Regular Expression'}
 		>
 			<svelte:component this={RegexIcon} />
 		</SearchOption>
@@ -169,9 +140,7 @@
 	{#each filterPredicates as pred}
 		<div class="px-1 py-2.5 bg-primary-light mx-1 my rouded width-fit">
 			<span>
-				{pred.operation === Operation.LIKE ? '/' : ''}
 				{pred.value}
-				{pred.operation === Operation.LIKE ? '/' : ''}
 			</span>
 			<TrailingIcon
 				class="remove material-icons"

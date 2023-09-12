@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { doesModelDependOnPredicates } from '$lib/api/slice';
+	import { invalidate } from '$app/navigation';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
@@ -11,7 +11,6 @@
 	import SliceDetails from '../../general/SliceDetails.svelte';
 	import SlicePopup from '../../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
-	import { selectSliceCell } from './sliceCellUtil';
 
 	export let slice: Slice;
 	export let compare: boolean;
@@ -21,10 +20,6 @@
 	let hovering = false;
 	let showOptions = false;
 	let editing = false;
-
-	let compareButton = slice
-		? doesModelDependOnPredicates(slice.filterPredicates.predicates)
-		: false;
 
 	$: selected = $selections.slices.includes(slice.id);
 	$: transferData =
@@ -41,17 +36,9 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		ZenoService.deleteSlice(slice).then(() => {
-			if ($project) {
-				ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
-			}
+			slices.update((s) => s.filter((s) => s.id !== slice.id));
+			invalidate('app:state');
 		});
-	}
-
-	function setSelected(e: MouseEvent) {
-		if (compare && compareButton) {
-			return;
-		}
-		selectSliceCell(e, slice);
 	}
 
 	function dragStart(e: DragEvent) {
@@ -69,14 +56,60 @@
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
 					if (slice && $project) {
-						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() => {
-							ZenoService.getSlices($project ? $project.uuid : '').then((fetchedSlices) =>
-								slices.set(fetchedSlices)
-							);
-						});
+						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
+							slices.update((s) => {
+								invalidate('app:state');
+								const index = s.findIndex((s) => s.id === slice.id);
+								if (index !== -1) {
+									s[index].folderId = undefined;
+								}
+								return s;
+							})
+						);
 					}
 				});
 			}
+		}
+	}
+
+	function selectSliceCell(e: MouseEvent, slice: Slice) {
+		if (
+			$selections.slices.length === 1 &&
+			$selections.slices.some((currentSlice) => currentSlice === slice.id)
+		) {
+			selections.update((s) => ({
+				slices: [],
+				metadata: s.metadata,
+				tags: s.tags
+			}));
+			return;
+		}
+		if (e.shiftKey) {
+			if ($selections.slices.some((currentSlice) => currentSlice === slice.id)) {
+				selections.update((sel) => {
+					sel.slices.splice(
+						sel.slices.findIndex((currentSlice) => currentSlice === slice.id),
+						1
+					);
+					return {
+						slices: [...sel.slices],
+						metadata: sel.metadata,
+						tags: sel.tags
+					};
+				});
+			} else {
+				selections.update((sel) => ({
+					slices: [...sel.slices, slice.id],
+					metadata: sel.metadata,
+					tags: sel.tags
+				}));
+			}
+		} else {
+			selections.update((sel) => ({
+				slices: [slice.id],
+				metadata: sel.metadata,
+				tags: sel.tags
+			}));
 		}
 	}
 </script>
@@ -85,10 +118,10 @@
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
 <button
-	class="overflow-auto border border-grey-lighter rounded mt-1 flex h-9 items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	class="border border-grey-lighter rounded mt-1 flex items-center w-full px-2.5 justify-between text-grey overflow-visible relative
 	{selected ? ' bg-primary-light' : ''} 
-	{compare ? ' py-1' : ''}"
-	on:click={(e) => setSelected(e)}
+	{compare ? ' py-1 h-11' : 'h-9'}"
+	on:click={(e) => selectSliceCell(e, slice)}
 	draggable="true"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}

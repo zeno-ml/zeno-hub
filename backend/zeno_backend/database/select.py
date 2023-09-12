@@ -1,16 +1,15 @@
 """Functions to select data from the database."""
 import json
-import re
 
 from psycopg import sql
 
 from zeno_backend.classes.base import ZenoColumn
 from zeno_backend.classes.chart import Chart
-from zeno_backend.classes.filter import FilterPredicateGroup, Join
+from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
-from zeno_backend.classes.project import Project, ProjectStats
+from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
@@ -674,6 +673,130 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
             )
         )
 
+def project_state(project_uuid: str, project: Project) -> ProjectState | None:
+    """Get the state variables of a project.
+
+    Args:
+        project_uuid (str): the uuid of the project to be fetched.
+        project (Project): the project object with project metadata.
+
+    Returns:
+        ProjectState | None: state variables of the requested project.
+    """
+    with Database() as db:
+        metric_results = db.execute_return(
+            "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+            [project_uuid],
+        )
+        metrics = list(
+            map(
+                lambda metric: Metric(
+                    id=metric[0],
+                    name=metric[1],
+                    type=metric[2],
+                    columns=metric[3],
+                ),
+                metric_results,
+            )
+        )
+
+        slice_results = db.execute_return(
+            "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid = %s;",
+            [
+                project_uuid,
+            ],
+        )
+        slices = list(
+            map(
+                lambda slice: Slice(
+                    id=slice[0],
+                    slice_name=slice[1],
+                    folder_id=slice[2],
+                    filter_predicates=FilterPredicateGroup(
+                        predicates=json.loads(slice[3])["predicates"],
+                        join=Join.OMITTED,
+                    ),
+                ),
+                slice_results,
+            )
+        )
+
+        folder_results = db.execute_return(
+            "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
+            [
+                project_uuid,
+            ],
+        )
+        folders = list(
+            map(
+                lambda folder: Folder(id=folder[0], name=folder[1]),
+                folder_results,
+            )
+        )
+
+        tags_result = db.execute_return(
+            "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
+            [
+                project_uuid,
+            ],
+        )
+        tags: list[Tag] = []
+        for tag_result in tags_result:
+            data_results = db.execute_return(
+                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                    sql.Identifier(f"{project_uuid}_tags_datapoints")
+                ),
+                [
+                    tag_result[0],
+                ],
+            )
+            tags.append(
+                Tag(
+                    id=tag_result[0],
+                    tag_name=tag_result[1],
+                    folder_id=tag_result[2],
+                    data_ids=[]
+                    if len(data_results) == 0
+                    else [d[0] for d in data_results],
+                )
+            )
+
+        column_results = db.execute_return(
+            sql.SQL("SELECT column_id, name, type, model, data_type FROM {};").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+        )
+
+        columns = list(
+            map(
+                lambda column: ZenoColumn(
+                    id=column[0],
+                    name=column[1],
+                    column_type=column[2],
+                    model=column[3],
+                    data_type=column[4],
+                ),
+                column_results,
+            )
+        )
+
+        model_results = db.execute_return(
+            sql.SQL("SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+        )
+        models = [m[0] for m in model_results]
+
+        return ProjectState(
+            project=project,
+            metrics=metrics,
+            folders=folders,
+            columns=columns,
+            slices=slices,
+            tags=tags,
+            models=models,
+        )
+
 
 def project_stats(project: str) -> ProjectStats | None:
     """Get statistics for a specified project.
@@ -747,28 +870,23 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
         list[Metric]: list of metrics as requested by the user.
     """
     db = Database()
-    # Get all metrics for the project and filter out the ones that are not in the list
     metric_results = db.connect_execute_return(
-        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
-        [project_uuid],
+        "SELECT id, name, type, columns FROM metrics"
+        " WHERE project_uuid = %s AND id = ANY(%s);",
+        [project_uuid, [metric_ids]],
     )
     if metric_results is None:
         return {}
 
-    returned_ids = list(map(lambda metric: metric[0], metric_results))
-    metric_objects = {}
-    for i, requested_metric in enumerate(metric_ids):
-        if requested_metric not in returned_ids:
-            metric_objects[requested_metric] = None
-        else:
-            metric_objects[requested_metric] = Metric(
-                id=requested_metric,
-                name=metric_results[i][1],
-                type=metric_results[i][2],
-                columns=metric_results[i][3],
-            )
-
-    return metric_objects
+    ret = {}
+    for m in metric_results:
+        ret[m[0]] = Metric(
+            id=m[0],
+            name=m[1],
+            type=m[2],
+            columns=m[3],
+        )
+    return ret
 
 
 def folders(project: str) -> list[Folder]:
@@ -864,6 +982,36 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
             ),
             slice_results,
         )
+    )
+
+
+def chart(project_uuid: str, chart_id: int):
+    """Get a project chart by its ID.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        chart_id (int): the ID of the chart to be fetched.
+
+
+    Returns:
+        Chart | None: the requested chart.
+    """
+    db = Database()
+    chart_result = db.connect_execute_return(
+        "SELECT id, name, type, parameters FROM "
+        "charts WHERE id = %s AND project_uuid = %s;",
+        [
+            chart_id,
+            project_uuid,
+        ],
+    )
+    if len(chart_result) == 0:
+        return None
+    return Chart(
+        id=chart_result[0][0],
+        name=chart_result[0][1],
+        type=chart_result[0][2],
+        parameters=json.loads(chart_result[0][3]),
     )
 
 
@@ -977,7 +1125,7 @@ def table_data_paginated(
                 db.cur.execute(
                     sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
                     + filter_sql
-                    + sql.SQL("ORDER BY {} {} LIMIT {} OFFSET {};").format(
+                    + sql.SQL(" ORDER BY {} {} LIMIT {} OFFSET {};").format(
                         sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
                         sql.SQL("DESC" if sort_by[1] else "ASC"),
                         sql.Literal(limit),
@@ -1126,7 +1274,7 @@ def tags(project: str) -> list[Tag]:
                     folder_id=tag_result[2],
                     data_ids=[]
                     if len(data_results) == 0
-                    else list(map(lambda d: d[0], data_results[0])),
+                    else [d[0] for d in data_results],
                 )
             )
         return tags
@@ -1145,7 +1293,7 @@ def user(name: str) -> User | None:
     user = db.connect_execute_return(
         "SELECT id, name FROM users WHERE name = %s", [name]
     )
-    if len(user) is None:
+    if len(user) == 0:
         return None
     user = user[0]
     return User(
@@ -1282,7 +1430,7 @@ def project_orgs(project: str) -> list[Organization]:
     )
 
 
-def filered_short_string_column_values(
+def filtered_short_string_column_values(
     project: str, req: StringFilterRequest
 ) -> list[str]:
     """Select distinct string values of a column and return their short representation.
@@ -1296,65 +1444,33 @@ def filered_short_string_column_values(
         list[str]: the filtered string column data.
     """
     db = Database()
+
+    if req.operation == Operation.LIKE or req.operation == Operation.ILIKE:
+        req.filter_string = "%" + req.filter_string + "%"
+
+    returned_strings = db.connect_execute_return(
+        sql.SQL("SELECT {} from {} WHERE {} {} %s;").format(
+            sql.Identifier(req.column.id),
+            sql.Identifier(project),
+            sql.Identifier(req.column.id),
+            sql.SQL(req.operation.literal()),
+        ),
+        [
+            req.filter_string,
+        ],
+    )
+
     short_ret: list[str] = []
-    if not req.is_regex:
-        if not req.whole_word_match:
-            req.filter_string = f"%{req.filter_string}%"
-        if not req.case_match:
-            req.filter_string = req.filter_string.lower()
-            returned_strings = db.connect_execute_return(
-                sql.SQL("SELECT {} from {} WHERE UPPER({}) LIKE %s;").format(
-                    sql.Identifier(req.column.id),
-                    sql.Identifier(project),
-                    sql.Identifier(req.column.id),
-                ),
-                [
-                    req.filter_string,
-                ],
-            )
-        else:
-            returned_strings = db.connect_execute_return(
-                sql.SQL("SELECT {} from {} WHERE {} LIKE %s").format(
-                    sql.Identifier(req.column.id),
-                    sql.Identifier(project),
-                    sql.Identifier(req.column.id),
-                ),
-                [
-                    req.filter_string,
-                ],
-            )
-
-        if len(returned_strings) == 0:
-            return short_ret
-        for result in returned_strings[0:5]:
-            idx = result[0].find(req.filter_string)
-            loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
-            if len(result[0]) > 40 + len(req.filter_string):
-                if idx - 20 > 0:
-                    loc_str = "..." + loc_str
-                if idx + 20 < len(result[0]):
-                    loc_str = loc_str + "..."
-            short_ret.append(loc_str)
-
-    else:
-        returned_strings = db.connect_execute_return(
-            sql.SQL("SELECT {} from {} WHERE {} LIKE %s").format(
-                sql.Identifier(req.column.id),
-                sql.Identifier(project),
-                sql.Identifier(req.column.id),
-            ),
-            [
-                req.filter_string,
-            ],
-        )
-
-        if len(returned_strings) == 0:
-            return short_ret
-        for result in returned_strings:
-            idx = re.search(req.filter_string, result[0])
-            if idx is not None:
-                idx = idx.start()
-                loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
-                short_ret.append(loc_str)
+    if len(returned_strings) == 0:
+        return short_ret
+    for result in returned_strings[0:5]:
+        idx = result[0].find(req.filter_string)
+        loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
+        if len(result[0]) > 40 + len(req.filter_string):
+            if idx - 20 > 0:
+                loc_str = "..." + loc_str
+            if idx + 20 < len(result[0]):
+                loc_str = loc_str + "..."
+        short_ret.append(loc_str)
 
     return short_ret

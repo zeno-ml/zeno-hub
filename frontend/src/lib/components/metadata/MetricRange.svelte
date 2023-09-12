@@ -2,7 +2,7 @@
 	import { metric, metricRange, metrics } from '$lib/stores';
 </script>
 
-{#if $metrics.length !== 0 && $metricRange[0] !== Infinity}
+{#if $metrics.length !== 0 && $metricRange[0] !== Infinity && $metricRange[0] !== null}
 	<div class="flex items-center mr-1 text-grey-dark">
 		<span class="mr-[15px]">
 			{$metric ? $metric.name + ':' : ''}
