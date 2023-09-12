@@ -1,6 +1,5 @@
 """Functions for creating the frontend metadata histograms."""
 
-import asyncio
 
 import numpy as np
 import pandas as pd
@@ -17,7 +16,7 @@ from zeno_backend.processing.filtering import bucket_filter, table_filter
 from zeno_backend.processing.metrics.map import metric_map
 
 
-async def histogram_bucket(project_uuid: str, col: ZenoColumn, num_bins: int | str):
+def histogram_bucket(project_uuid: str, col: ZenoColumn, num_bins: int | str):
     """Calculate the histogram buckets for a single column.
 
     Args:
@@ -64,7 +63,7 @@ async def histogram_bucket(project_uuid: str, col: ZenoColumn, num_bins: int | s
         return []
 
 
-async def histogram_buckets(
+def histogram_buckets(
     project: str, req: list[ZenoColumn], num_bins: int | str = "doane"
 ) -> list[list[HistogramBucket]]:
     """Calculate the histogram buckets for a list of columns.
@@ -81,12 +80,13 @@ async def histogram_buckets(
     Returns:
         List[List[HistogramBucket]]: for each zeno column return a list of buckets
     """
-    tasks = [histogram_bucket(project, col, num_bins) for col in req]
-    res = await asyncio.gather(*tasks)
+    res = []
+    for col in req:
+        res.append(histogram_bucket(project, col, num_bins))
     return res
 
 
-async def histogram_metric_task(
+def histogram_metric_task(
     request: HistogramRequest,
     col_request: HistogramColumnRequest,
     bucket: HistogramBucket,
@@ -122,7 +122,7 @@ async def histogram_metric_task(
     )
 
 
-async def histogram_count(
+def histogram_count(
     request: HistogramRequest,
     col_request: HistogramColumnRequest,
     project_uuid: str,
@@ -198,14 +198,15 @@ async def histogram_count(
         else:
             return []
     else:
-        tasks = [
-            histogram_metric_task(request, col_request, b, project_uuid, filter_sql)
-            for b in col_request.buckets
-        ]
-        return await asyncio.gather(*tasks)
+        res = []
+        for b in col_request.buckets:
+            res.append(
+                histogram_metric_task(request, col_request, b, project_uuid, filter_sql)
+            )
+        return res
 
 
-async def histogram_counts(
+def histogram_counts(
     project_uuid: str, req: HistogramRequest
 ) -> list[list[HistogramBucket]]:
     """Calculate count and optionally metric for each bucket in each column histogram.
@@ -223,11 +224,16 @@ async def histogram_counts(
     filter_sql = table_filter(
         project_uuid, req.model, req.filter_predicates, req.data_ids
     )
-    tasks = [
-        histogram_count(
-            req, r, project_uuid, filter_sql, project_obj.calculate_histogram_metrics
+    res = []
+    for r in req.column_requests:
+        res.append(
+            histogram_count(
+                req,
+                r,
+                project_uuid,
+                filter_sql,
+                project_obj.calculate_histogram_metrics,
+            )
         )
-        for r in req.column_requests
-    ]
-    res = await asyncio.gather(*tasks)
+
     return res

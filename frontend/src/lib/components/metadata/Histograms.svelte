@@ -3,77 +3,66 @@
 	import { calculateHistograms, getHistograms } from '$lib/api/metadata';
 	import MetadataCell from '$lib/components/metadata/cells/MetadataCell.svelte';
 	import { columns, metric, model, project, selectionIds, selectionPredicates } from '$lib/stores';
-	import { ZenoColumnType, type HistogramBucket } from '$lib/zenoapi';
+	import {
+		ZenoColumnType,
+		type FilterPredicateGroup,
+		type HistogramBucket,
+		type Metric
+	} from '$lib/zenoapi';
+	import { derived, type Readable } from 'svelte/store';
 
 	let metadataHistograms: Map<string, HistogramBucket[]> = new Map();
 
-	getHistograms($project?.uuid, $columns, $model).then((res) => {
-		calculateHistograms(
-			$project?.uuid,
-			$columns,
-			res,
-			undefined,
-			$selectionIds,
-			$model,
-			$metric
-		).then((res) => {
-			metadataHistograms = res;
-		});
+	type HistogramState = {
+		model: string | undefined;
+		metric: Metric | undefined;
+		selectionPredicates: FilterPredicateGroup | undefined;
+	};
+
+	// Derived store to only update histograms once at startup.
+	const histogramState: Readable<HistogramState> = derived(
+		[model, metric, selectionPredicates],
+		([$model, $metric, $selectionPredicates]) => {
+			return {
+				model: $model,
+				metric: $metric,
+				selectionPredicates: $selectionPredicates
+			};
+		}
+	);
+
+	model.subscribe(() => {
+		metadataHistograms = new Map();
 	});
 
-	metric.subscribe((m) => {
-		calculateHistograms(
-			$project?.uuid,
-			$columns,
-			metadataHistograms,
-			$selectionPredicates,
-			$selectionIds,
-			$model,
-			m
-		).then((r) => (metadataHistograms = r));
-	});
-
-	model.subscribe((m) => {
-		getHistograms($project?.uuid, $columns, $model).then((res) => {
+	histogramState.subscribe((s) => {
+		if (metadataHistograms.size === 0) {
+			getHistograms($project?.uuid, $columns, $model).then((res) => {
+				calculateHistograms(
+					$project?.uuid,
+					$columns,
+					res,
+					s.selectionPredicates,
+					$selectionIds,
+					s.model,
+					s.metric
+				).then((res) => {
+					metadataHistograms = res;
+				});
+			});
+		} else {
 			calculateHistograms(
 				$project?.uuid,
 				$columns,
-				res,
-				$selectionPredicates,
+				metadataHistograms,
+				s.selectionPredicates,
 				$selectionIds,
-				m,
-				$metric
-			).then((r) => (metadataHistograms = r));
-		});
-	});
-
-	// when the selection Ids change, update the histograms
-	selectionIds.subscribe((selectionIds) =>
-		calculateHistograms(
-			$project?.uuid,
-			$columns,
-			metadataHistograms,
-			$selectionPredicates,
-			selectionIds,
-			$model,
-			$metric
-		).then((r) => (metadataHistograms = r))
-	);
-
-	// Update counts and metrics when selection changes.
-	selectionPredicates.subscribe((sels) => {
-		if (metadataHistograms.size === 0) {
-			return;
+				s.model,
+				s.metric
+			).then((res) => {
+				metadataHistograms = res;
+			});
 		}
-		calculateHistograms(
-			$project?.uuid,
-			$columns,
-			metadataHistograms,
-			sels,
-			$selectionIds,
-			$model,
-			$metric
-		).then((r) => (metadataHistograms = r));
 	});
 </script>
 

@@ -321,7 +321,10 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
         if not util.access_valid(project_uuid, request):
-            return Response(status_code=401)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Project is private",
+            )
         user = select.user(current_user["username"])
         if user is not None:
             if user.name == project.owner_name:
@@ -425,24 +428,20 @@ def get_server() -> FastAPI:
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    async def get_histogram_buckets(
-        req: list[ZenoColumn], project: str, request: Request
-    ):
+    def get_histogram_buckets(req: list[ZenoColumn], project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return await histogram_buckets(project, req)
+        return histogram_buckets(project, req)
 
     @api_app.post(
         "/histogram-counts/{project}",
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    async def calculate_histograms(
-        req: HistogramRequest, project: str, request: Request
-    ):
+    def calculate_histograms(req: HistogramRequest, project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return await histogram_counts(project, req)
+        return histogram_counts(project, req)
 
     @api_app.get(
         "/project-users/{project}",

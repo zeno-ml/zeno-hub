@@ -78,9 +78,7 @@
 
 	// reset page on selection change
 	selectionPredicates.subscribe(() => {
-		if (currentPage === 0) {
-			updateTable();
-		} else {
+		if (currentPage !== 0) {
 			currentPage = 0;
 		}
 	});

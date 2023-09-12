@@ -40,9 +40,9 @@ def filter_to_sql(
             ]:
                 val = "True" if str(f.value).lower() == "true" else "False"
             else:
-                val = str(f.value)
+                val = f.value
                 if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
-                    val = "%" + val + "%"
+                    val = "%" + str(val) + "%"
             column_id = (
                 f.column.id
                 if f.column.model is None or model is None
