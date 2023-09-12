@@ -3,7 +3,6 @@
 	import { editTag, metric, project } from '$lib/stores';
 	import type { GroupMetric } from '$lib/zenoapi';
 	import Button, { Group } from '@smui/button';
-	import CircularProgress from '@smui/circular-progress';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
 	export let currentResult: Promise<GroupMetric[] | undefined>;
@@ -28,13 +27,10 @@
 			class="flex flex-wrap justify-between w-full items-center py-2.5 border-b border-grey-lighter"
 		>
 			<div class="flex">
-				<div />
 				<span class="text-grey-dark mr-3">
 					{$metric ? $metric.name + ':' : ''}
 				</span>
-				{#await currentResult}
-					<CircularProgress style="height: 20px; width: 20px; margin-right:20px" indeterminate />
-				{:then res}
+				{#await currentResult then res}
 					{#if res !== undefined && res.length > 0}
 						{#if res[0].metric !== undefined && res[0].metric !== null}
 							<span class="text-primary mr-3">

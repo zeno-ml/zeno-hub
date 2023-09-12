@@ -28,9 +28,9 @@
 	export let compare: boolean;
 
 	let selected = 'list';
-	let currentResult: Promise<GroupMetric[] | undefined>;
-	let modelAResult: Promise<GroupMetric[] | undefined>;
-	let modelBResult: Promise<GroupMetric[] | undefined>;
+	let currentResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
+	let modelAResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
+	let modelBResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let numberOfInstances = 0;
 	let viewOptions: Record<string, unknown> | undefined = undefined;
 
