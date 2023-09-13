@@ -20,10 +20,10 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col"
+	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col hover:bg-primary-ligther"
 >
 	<div class="flex justify-between items-center w-full px-2 py-1">
-		<span class="mr-2 text-base truncate">{report.name}</span>
+		<p class="mr-2 mt-2 mb-2 truncate text-black text-lg">{report.name}</p>
 		<div
 			class="w-9 h-9 relative"
 			use:clickOutside={() => {

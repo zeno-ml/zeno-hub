@@ -1195,14 +1195,21 @@ export class ZenoService {
 
 	/**
 	 * Update Report Element
+	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReportElement(requestBody: ReportElement): CancelablePromise<any> {
+	public static updateReportElement(
+		reportId: number,
+		requestBody: ReportElement
+	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/report-element/update',
+			url: '/report-element/update/{report_id}',
+			path: {
+				report_id: reportId
+			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

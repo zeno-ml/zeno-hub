@@ -36,53 +36,56 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col"
+	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col p-2 hover:bg-primary-ligther"
 >
-	<div class="flex justify-between items-center w-full px-2 py-1">
-		<span class="mr-2 text-base truncate">{project.name}</span>
-		<div
-			class="w-9 h-9 relative"
-			use:clickOutside={() => {
-				showOptions = false;
-			}}
-		>
-			{#if hovering && deletable}
-				<IconButton
-					size="button"
-					style="padding: 0px"
-					on:click={(e) => {
-						e.stopPropagation();
-						showOptions = !showOptions;
-					}}
-				>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path fill="black" d={mdiDotsHorizontal} />
-					</Icon>
-				</IconButton>
-			{/if}
-			{#if showOptions}
-				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
-					<Paper style="padding: 3px 0px;" elevation={7}>
-						<Content>
-							<button
-								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
-								on:click={(e) => {
-									e.stopPropagation();
-									showOptions = false;
-									ZenoService.deleteProject(project.uuid).then(() => invalidate('app:projects'));
-								}}
-							>
-								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-								<span class="text-xs">Remove</span>
-							</button>
-						</Content>
-					</Paper>
-				</div>
-			{/if}
+	<div class="flex flex-col w-full">
+		<div class="flex justify-between items-center">
+			<p class="mr-2 truncate text-black text-lg">{project.name}</p>
+			<div
+				class="w-9 h-9 relative"
+				use:clickOutside={() => {
+					showOptions = false;
+				}}
+			>
+				{#if hovering && deletable}
+					<IconButton
+						size="button"
+						style="padding: 0px"
+						on:click={(e) => {
+							e.stopPropagation();
+							showOptions = !showOptions;
+						}}
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path fill="black" d={mdiDotsHorizontal} />
+						</Icon>
+					</IconButton>
+				{/if}
+				{#if showOptions}
+					<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+						<Paper style="padding: 3px 0px;" elevation={7}>
+							<Content>
+								<button
+									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+									on:click={(e) => {
+										e.stopPropagation();
+										showOptions = false;
+										ZenoService.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+									}}
+								>
+									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+									<span class="text-xs">Remove</span>
+								</button>
+							</Content>
+						</Paper>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
+	<p class="mr-2 text-base truncate">{project.ownerName}</p>
 	{#if $featureFlags['PROJECT_STATS']}
-		<div class="flex items-center w-full px-2 mb-2">
+		<div class="flex items-center w-full mb-2 mt-3">
 			{#await ZenoService.getProjectStats(project.uuid)}
 				<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 			{:then stats}

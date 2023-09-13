@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ReportElementType, type ReportElement } from '$lib/zenoapi';
-	import { mdiCheck, mdiClose, mdiFileEdit, mdiPlus } from '@mdi/js';
+	import { mdiCheck, mdiClose, mdiFileEdit } from '@mdi/js';
 	import { Svg } from '@smui/common';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { createEventDispatcher } from 'svelte';
@@ -11,25 +11,20 @@
 	export let element: ReportElement;
 	export let isEdit: boolean;
 
+	let elementToEdit = false;
+
 	const dispatch = createEventDispatcher();
 	const dispatchUpdate = createEventDispatcher<{
-		updateElement: { element: ReportElement };
+		update: { element: ReportElement };
 	}>();
 
-	let elementToEdit = false;
-	function deleteElement() {
-		dispatch('deleteElement');
-	}
 	function updateElement() {
 		elementToEdit = false;
-		dispatchUpdate('updateElement', { element: element });
-	}
-	function addElement() {
-		dispatch('addElement');
+		dispatchUpdate('update', { element: element });
 	}
 </script>
 
-<div class="flex items-center whitespace-nowrap">
+<div class="flex items-center whitespace-nowrap my-5">
 	<div class="w-[800px]">
 		{#if !elementToEdit}
 			{#if element.type === ReportElementType.TEXT}
@@ -48,12 +43,7 @@
 					<path fill="black" d={mdiFileEdit} />
 				</Icon>
 			</IconButton>
-			<IconButton on:click={addElement}>
-				<Icon component={Svg} viewBox="0 0 24 24">
-					<path fill="black" d={mdiPlus} />
-				</Icon>
-			</IconButton>
-			<IconButton on:click={deleteElement}>
+			<IconButton on:click={() => dispatch('delete')}>
 				<Icon component={Svg} viewBox="0 0 24 24">
 					<path fill="black" d={mdiClose} />
 				</Icon>

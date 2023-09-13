@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ChartContainer from '../chart/ChartContainer.svelte';
+
 	// import BarChartReport from '../report/bar-chart/BarChartReport.svelte';
 	// import BeeswarmChartReport from '../report/beeswarm-chart/BeeswarmChartReport.svelte';
 	// import HeatMapReport from '../report/heatmap-chart/HeatMapReport.svelte';
@@ -20,5 +22,8 @@
 	// export let element: ReportChartElement;
 </script>
 
+<ChartContainer chartName={chart.name}>
+	<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
+</ChartContainer>
 <!-- 
 <svelte:component this={ChartMap[element.type]} passedReport={$reports[element.reportIndex]} /> -->
