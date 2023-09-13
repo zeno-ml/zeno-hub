@@ -25,7 +25,7 @@
 	}
 </script>
 
-<div class="flex items-center my-5">
+<div class="flex items-center my-5 {isEdit ? 'border border-grey-light rounded p-4' : ''}">
 	<div class="w-[800px]">
 		{#if !elementToEdit}
 			{#if element.type === ReportElementType.TEXT}
@@ -40,7 +40,7 @@
 		{/if}
 	</div>
 	{#if isEdit && !elementToEdit}
-		<div>
+		<div class="flex">
 			<IconButton on:click={() => (elementToEdit = true)}>
 				<SmuiElement tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiFileEdit} />

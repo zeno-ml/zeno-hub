@@ -29,7 +29,9 @@
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav class="z-20">
-	<header class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center">
+	<header
+		class="h-full w-12 flex bg-white justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+	>
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
 				<img class="w-8 mt-5" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />

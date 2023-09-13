@@ -31,7 +31,7 @@
 </script>
 
 <button
-	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
+	class="border-solid mr-2 rounded-sm border-grey-light border shadow-sm flex flex-col py-2 px-2 hover:shadow-md"
 	on:click={() => goto(`chart/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">

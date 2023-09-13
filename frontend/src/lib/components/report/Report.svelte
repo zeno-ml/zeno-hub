@@ -20,10 +20,10 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid m-1 rounded-lg border-primary border-2 w-64 flex flex-col hover:bg-primary-ligther"
+	class="border-solid mr-2 rounded-sm border-grey-light border shadow-sm flex flex-col py-2 px-5 hover:shadow-md"
 >
-	<div class="flex justify-between items-center w-full px-2 py-1">
-		<p class="mr-2 mt-2 mb-2 truncate text-black text-lg">{report.name}</p>
+	<div class="flex justify-between items-center w-full py-1">
+		<p class="text-black text-lg mr-5">{report.name}</p>
 		<div
 			class="w-9 h-9 relative"
 			use:clickOutside={() => {
@@ -33,7 +33,6 @@
 			{#if hovering && deletable}
 				<IconButton
 					size="button"
-					style="padding: 0px"
 					on:click={(e) => {
 						e.stopPropagation();
 						showOptions = !showOptions;
