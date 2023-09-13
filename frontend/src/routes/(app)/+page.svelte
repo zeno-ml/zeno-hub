@@ -14,7 +14,7 @@
 	export let data;
 
 	let reportName = '';
-
+	let showNewReport = false;
 	let dispatch = createEventDispatcher();
 
 	$: invalidName = data.reports.filter((rep) => rep.name === reportName).length > 0;
@@ -38,8 +38,6 @@
 			ownProjects.find((own) => own.uuid === proj.uuid) === undefined &&
 			sharedProjects.find((shared) => shared.uuid === proj.uuid) === undefined
 	);
-
-	let showNewReport = false;
 </script>
 
 <div class="ml-4 mt-3 mr-2 w-full">
@@ -136,7 +134,7 @@
 					{
 						ZenoService.addReport(reportName).then(() => {
 							invalidate('app:reports');
-							goto(`/report/${data.user.name}/${reportName}`);
+							goto(`/report/${data.user?.name}/${reportName}`);
 						});
 					}
 				}}

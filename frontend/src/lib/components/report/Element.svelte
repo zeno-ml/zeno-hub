@@ -32,7 +32,7 @@
 				<TextElement {element} />
 			{:else if element.type === ReportElementType.CHART}
 				{#await chartOptions then options}
-					<ChartElement {element} chart={options.filter((c) => c.id === element.chartId)[0]} />
+					<ChartElement chart={options.filter((c) => c.id === element.chartId)[0]} />
 				{/await}
 			{/if}
 		{:else}

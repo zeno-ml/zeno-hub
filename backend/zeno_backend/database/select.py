@@ -331,11 +331,9 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
         str | None: The uuid of the requested project.
     """
     with Database() as db:
-        print(owner_name, project_name)
         owner_id = db.execute_return(
             "SELECT id FROM users WHERE name = %s;", [owner_name]
         )
-        print(owner_id)
 
         project_uuid = db.execute_return(
             "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",

@@ -9,6 +9,5 @@
 </script>
 
 <div class="flex flex-wrap [&>p]:text-base w-full">
-	<!-- eslint-disable-line svelte/no-html -->
 	{@html renderedInput}
 </div>

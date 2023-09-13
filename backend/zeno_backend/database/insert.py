@@ -339,7 +339,6 @@ def report_element(report_id: int, element: ReportElement):
         element (ReportElement): the element to be added to the report.
     """
     db = Database()
-    print("add?")
     db.connect_execute(
         "INSERT INTO report_elements (report_id, type, data, chart_id, position)"
         " VALUES (%s,%s,%s,%s,%s);",
