@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div">
+<div>
 	<Svelecte
 		value={element.type === ReportElementType.CHART ? 'Chart' : 'Text'}
 		on:change={setDefaults}
