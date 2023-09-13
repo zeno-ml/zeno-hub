@@ -18,6 +18,14 @@ class Metric(CamelModel):
     type: str
     columns: list[str]
 
+    def __hash__(self):
+        """Hash representation of metric, based on id since guaranteed unique.
+
+        Returns:
+            int: the hash of the metric.
+        """
+        return self.id
+
 
 class MetricKey(CamelModel):
     """Specification of metric keys in zeno.
