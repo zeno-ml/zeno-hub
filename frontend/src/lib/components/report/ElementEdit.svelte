@@ -5,30 +5,32 @@
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
+
+	function setDefaults(e: any) {
+		if (e.detail.label === 'Chart') {
+			element = {
+				id: element.id,
+				data: null,
+				chartId: null,
+				type: ReportElementType.CHART,
+				position: element.position
+			};
+		} else {
+			element = {
+				id: element.id,
+				data: '',
+				chartId: null,
+				type: ReportElementType.TEXT,
+				position: element.position
+			};
+		}
+	}
 </script>
 
 <div>
 	<Svelecte
 		value={element.type === ReportElementType.CHART ? 'Chart' : 'Text'}
-		on:change={(e) => {
-			if (e.detail.label === 'Chart') {
-				element = {
-					id: element.id,
-					data: null,
-					chartId: null,
-					type: ReportElementType.CHART,
-					position: element.position
-				};
-			} else {
-				element = {
-					id: element.id,
-					data: '',
-					chartId: null,
-					type: ReportElementType.TEXT,
-					position: element.position
-				};
-			}
-		}}
+		on:change={setDefaults}
 		style="padding-bottom: 20px;"
 		searchable={false}
 		valueField="label"
