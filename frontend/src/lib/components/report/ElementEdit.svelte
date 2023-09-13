@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
-	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';
 
 	export let element: ReportElement;
@@ -38,13 +37,17 @@
 	/>
 	{#if element.type === ReportElementType.CHART}
 		{#await chartOptions then options}
-			<div class="ml-8">
+			<div>
 				<Svelecte searchable={false} bind:value={element.chartId} {options} />
 			</div>
 		{/await}
 	{:else if element.type === ReportElementType.TEXT}
-		<div class="ml-8">
-			<Textfield textarea label="Text" bind:value={element.data} style="width: 100%;" />
+		<div>
+			<textarea
+				class="h-44 border rounded border-grey-light p-2"
+				bind:value={element.data}
+				style="width: 100%;"
+			/>
 		</div>
 	{/if}
 </div>

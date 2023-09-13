@@ -80,7 +80,7 @@
 		{/if}
 	</div>
 	{#if $featureFlags['REPORTS']}
-		<div class="flex flex-col bg-yellowish-light p-6 shadow-md rounded">
+		<div class="flex flex-col bg-white p-6 shadow-md rounded">
 			{#if data.user}
 				<div class="flex items-center mb-4">
 					<h1 class="text-xl mr-4">Your Reports</h1>

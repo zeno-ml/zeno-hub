@@ -71,30 +71,7 @@
 	}
 </script>
 
-<div>
-	<div class="flex items-center mb-4 mt-2">
-		<h4 class="mr-4">fixed dimension:</h4>
-		<div class="mr-2">
-			{#if parameters.fixedChannel === SlicesMetricsOrModels.SLICES}
-				<SliceDetailsContainer sli={$slices.find((sli) => sli.id === parameters.slices[0])} />
-			{:else if parameters.fixedChannel === SlicesMetricsOrModels.MODELS}
-				{parameters.models[0]}
-			{:else if parameters.fixedChannel === SlicesMetricsOrModels.METRICS}
-				{#if parameters.metrics[0] === -1}
-					slice size
-				{:else}
-					{$metrics.find((met) => met.id === parameters.metrics[0])?.name}
-				{/if}
-			{/if}
-		</div>
-		<div>
-			{parameters.fixedChannel === SlicesMetricsOrModels.SLICES
-				? '(Slice)'
-				: parameters.fixedChannel === SlicesMetricsOrModels.MODELS
-				? '(Model)'
-				: '(Metric)'}
-		</div>
-	</div>
+<div class="my-2">
 	<DataTable>
 		<Head>
 			<Row>

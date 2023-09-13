@@ -13,6 +13,8 @@
 			size: number;
 		}>;
 	};
+	export let width = 1000;
+	export let height = 400;
 
 	$: parameters = chart.parameters as RadarParameters;
 
@@ -30,12 +32,12 @@
 
 <h4 class="m-0">{getFixedName()}</h4>
 <Vega
-	spec={generateSpec(parameters)}
+	spec={generateSpec(parameters, width, height)}
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: 800,
-		height: 700,
+		width: width,
+		height: height,
 		scaleFactor: {
 			png: 3
 		}

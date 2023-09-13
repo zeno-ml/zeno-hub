@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
-	import { mdiCheck, mdiClose, mdiFileEdit } from '@mdi/js';
+	import { mdiClose } from '@mdi/js';
 	import { SmuiElement } from '@smui/common';
 	import IconButton from '@smui/icon-button';
 	import { createEventDispatcher } from 'svelte';
@@ -12,22 +12,21 @@
 	export let isEdit: boolean;
 	export let chartOptions: Promise<Chart[]>;
 
-	let elementToEdit = false;
-
 	const dispatch = createEventDispatcher();
 	const dispatchUpdate = createEventDispatcher<{
 		update: { element: ReportElement };
 	}>();
 
-	function updateElement() {
-		elementToEdit = false;
-		dispatchUpdate('update', { element: element });
+	$: updateElement(element);
+
+	function updateElement(elem: ReportElement) {
+		dispatchUpdate('update', { element: elem });
 	}
 </script>
 
-<div class="flex items-center my-5 {isEdit ? 'border border-grey-light rounded p-4' : ''}">
+<div class="flex items-center my-2 {isEdit ? 'border border-grey-light rounded p-4' : ''}">
 	<div class="w-[800px]">
-		{#if !elementToEdit}
+		{#if !isEdit}
 			{#if element.type === ReportElementType.TEXT}
 				<TextElement {element} />
 			{:else if element.type === ReportElementType.CHART}
@@ -39,24 +38,11 @@
 			<ElementEdit bind:element {chartOptions} />
 		{/if}
 	</div>
-	{#if isEdit && !elementToEdit}
+	{#if isEdit}
 		<div class="flex">
-			<IconButton on:click={() => (elementToEdit = true)}>
-				<SmuiElement tag="svg" viewBox="0 0 24 24">
-					<path fill="black" d={mdiFileEdit} />
-				</SmuiElement>
-			</IconButton>
 			<IconButton on:click={() => dispatch('delete')}>
 				<SmuiElement tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiClose} />
-				</SmuiElement>
-			</IconButton>
-		</div>
-	{:else if isEdit && elementToEdit}
-		<div>
-			<IconButton on:click={updateElement}>
-				<SmuiElement tag="svg" viewBox="0 0 24 24">
-					<path fill="black" d={mdiCheck} />
 				</SmuiElement>
 			</IconButton>
 		</div>

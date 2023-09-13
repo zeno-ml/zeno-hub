@@ -25,7 +25,7 @@
 		<HomeButton />
 		<Button
 			class="ml-3"
-			variant="outlined"
+			variant="raised"
 			on:mouseleave={blur}
 			on:focusout={blur}
 			on:click={() => (isChartEdit = !isChartEdit)}

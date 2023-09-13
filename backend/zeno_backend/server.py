@@ -322,7 +322,6 @@ def get_server() -> FastAPI:
         owner_name: str,
         project_name: str,
         request: Request,
-        current_user=Depends(auth.claim()),
     ):
         project_uuid = select.project_uuid(owner_name, project_name)
         if project_uuid is None:
@@ -334,12 +333,12 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-        if not util.access_valid(project_uuid, request):
+        if not project.public and not util.access_valid(project_uuid, request):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Project is private",
             )
-        user = select.user(current_user["username"])
+        user = util.get_user_from_token(request)
         if user is not None:
             if user.name == project.owner_name:
                 project.editor = True

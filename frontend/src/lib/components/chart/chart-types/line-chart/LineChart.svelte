@@ -5,17 +5,17 @@
 
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
+	export let width = 1000;
+	export let height = 400;
 
 	$: parameters = chart.parameters as XCParameters;
 </script>
 
 <VegaLite
-	spec={generateSpec(parameters)}
+	spec={generateSpec(parameters, width, height)}
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: 1000,
-		height: 400,
 		scaleFactor: {
 			png: 3
 		}

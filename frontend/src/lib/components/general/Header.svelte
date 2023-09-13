@@ -87,15 +87,22 @@
 					icon={mdiAccount}
 					on:click={() => goto(`/account`)}
 				/>
-				<form method="POST" action="/logout">
-					<HeaderIcon pageName={'logout'} tooltipContent={'Logout'} icon={mdiLogout} />
-				</form>
+				<HeaderIcon
+					pageName={'logout'}
+					tooltipContent={'Logout'}
+					icon={mdiLogout}
+					on:click={() => {
+						authToken.set(undefined);
+						fetch('/logout', { method: 'POST' });
+						location.reload();
+					}}
+				/>
 			{:else}
 				<HeaderIcon
 					pageName={'login'}
 					tooltipContent={'Login'}
 					icon={mdiLogin}
-					on:click={() => goto(`/login`)}
+					on:click={() => goto(`/login?redirect=${$page.url.href}`)}
 				/>
 			{/if}
 		</div>

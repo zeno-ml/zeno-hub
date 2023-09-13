@@ -5,9 +5,11 @@
 
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
+	export let height = 500;
+	export let width = 1000;
 
 	$: parameters = chart.parameters as XCParameters;
-	$: spec = generateSpec(parameters);
+	$: spec = generateSpec(parameters, height, width);
 </script>
 
 <VegaLite
@@ -15,8 +17,8 @@
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: 1000,
-		height: 500,
+		width: width,
+		height: height,
 		scaleFactor: {
 			png: 3
 		}

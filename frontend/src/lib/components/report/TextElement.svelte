@@ -8,7 +8,7 @@
 	let renderedInput = element.data ? purify.sanitize(parse(element.data)) : '';
 </script>
 
-<div class="flex flex-wrap [&>p]:text-base w-full">
+<article class="prose">
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html renderedInput}
-</div>
+</article>

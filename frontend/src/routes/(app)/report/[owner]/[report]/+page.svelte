@@ -32,9 +32,7 @@
 	}
 
 	function updateElement(event: CustomEvent<{ element: ReportElement }>) {
-		ZenoService.updateReportElement(report.id, event.detail.element as ReportElement).then(() =>
-			invalidate('app:report')
-		);
+		ZenoService.updateReportElement(report.id, event.detail.element as ReportElement);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -51,10 +49,10 @@
 </script>
 
 <div class="w-full bg-yellowish overflow-scroll">
-	<div class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 mt-6 rounded shadow">
+	<div class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 mt-6 mb-6 rounded shadow">
 		<div class="flex items-center mt-12 justify-between">
 			<h1
-				class="text-4xl mr-6"
+				class="text-5xl mr-6 text-grey-darkest"
 				contenteditable={isEdit ? true : false}
 				on:blur={(e) => updateReportName(e)}
 			>
@@ -71,6 +69,7 @@
 				</Button>
 			{/if}
 		</div>
+		<h5 class="mt-4 ml-1 text-lg">Author: {report.ownerName}</h5>
 
 		{#if isEdit}
 			<div>
@@ -86,7 +85,7 @@
 			</div>
 		{/if}
 		<hr class="mt-6 mb-2 text-grey-light" />
-		<div class="flex flex-col overflow-y-auto">
+		<div class="flex flex-col">
 			{#each elements.sort((a, b) => a.position - b.position) as element (element.id)}
 				<Element
 					{element}
