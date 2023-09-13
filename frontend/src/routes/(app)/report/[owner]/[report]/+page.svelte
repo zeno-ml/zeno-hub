@@ -1,15 +1,22 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Element from '$lib/components/report/Element.svelte';
-	import { ReportElementType, ZenoService, type ReportElement } from '$lib/zenoapi';
+	import { ReportElementType, ZenoService, type Chart, type ReportElement } from '$lib/zenoapi';
 	import Button, { Label } from '@smui/button';
+	import Svelecte from 'svelecte';
 
 	export let data;
 
+	let selectedProjects = data.report.linkedProjects ?? [];
+	let chartOptions: Promise<Chart[]> =
+		selectedProjects.length > 0
+			? ZenoService.getChartsForProjects(selectedProjects)
+			: new Promise(() => []);
 	let isEdit = false;
 
 	$: report = data.report;
 	$: elements = data.reportElements;
+	$: updateReportProjects(selectedProjects);
 
 	function deleteElement(elementIndex: number) {
 		if (elementIndex < 0) return;
@@ -29,12 +36,27 @@
 			invalidate('app:report')
 		);
 	}
+
+	function updateReportName(e: any) {
+		ZenoService.updateReport({ ...report, name: e.target.textContent }).then(() => {
+			goto('/report/' + report.ownerName + '/' + e.target.textContent);
+		});
+	}
+
+	function updateReportProjects(project_uuids: string[]) {
+		ZenoService.updateReportProjects(report.id, project_uuids);
+		if (project_uuids.length > 0) chartOptions = ZenoService.getChartsForProjects(project_uuids);
+	}
 </script>
 
-<div class="w-full bg-primary-light">
-	<div class="flex flex-col h-full max-w-4xl m-auto bg-background px-10">
+<div class="w-full bg-primary-light overflow-scroll">
+	<div class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20">
 		<div class="flex items-center mt-12">
-			<h1 class="text-4xl mr-6" contenteditable={isEdit ? true : false}>
+			<h1
+				class="text-4xl mr-6"
+				contenteditable={isEdit ? true : false}
+				on:blur={(e) => updateReportName(e)}
+			>
 				{report.name}
 			</h1>
 			{#if report.editor}
@@ -48,17 +70,33 @@
 				</Button>
 			{/if}
 		</div>
-		<div class="flex flex-col overflow-y-auto py-5">
-			{#each elements as element}
+
+		{#if isEdit}
+			<div>
+				<p class="mt-4 mb-2">Associated Projects</p>
+				{#await ZenoService.getProjects() then projects}
+					<Svelecte
+						bind:value={selectedProjects}
+						searchable={false}
+						multiple={true}
+						options={projects}
+					/>
+				{/await}
+			</div>
+		{/if}
+		<hr class="mt-6 mb-2 text-primary-mid" />
+		<div class="flex flex-col overflow-y-auto">
+			{#each elements.sort((a, b) => a.position - b.position) as element (element.id)}
 				<Element
 					{element}
 					{isEdit}
+					{chartOptions}
 					on:update={updateElement}
 					on:delete={() => deleteElement(element.id ?? -1)}
 				/>
 			{/each}
 			{#if isEdit}
-				<Button style="background-color:var(--G5);" on:click={() => addElement(0)}
+				<Button style="background-color:var(--G5);" on:click={() => addElement(elements.length)}
 					>Add Element</Button
 				>
 			{/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { ReportElementType, type ReportElement } from '$lib/zenoapi';
+	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
 	import { mdiCheck, mdiClose, mdiFileEdit } from '@mdi/js';
-	import { Svg } from '@smui/common';
-	import IconButton, { Icon } from '@smui/icon-button';
+	import { SmuiElement } from '@smui/common';
+	import IconButton from '@smui/icon-button';
 	import { createEventDispatcher } from 'svelte';
 	import ChartElement from './ChartElement.svelte';
 	import ElementEdit from './ElementEdit.svelte';
@@ -10,6 +10,7 @@
 
 	export let element: ReportElement;
 	export let isEdit: boolean;
+	export let chartOptions: Promise<Chart[]>;
 
 	let elementToEdit = false;
 
@@ -24,37 +25,39 @@
 	}
 </script>
 
-<div class="flex items-center whitespace-nowrap my-5">
+<div class="flex items-center my-5">
 	<div class="w-[800px]">
 		{#if !elementToEdit}
 			{#if element.type === ReportElementType.TEXT}
 				<TextElement {element} />
 			{:else if element.type === ReportElementType.CHART}
-				<ChartElement {element} />
+				{#await chartOptions then options}
+					<ChartElement {element} chart={options.filter((c) => c.id === element.chartId)[0]} />
+				{/await}
 			{/if}
 		{:else}
-			<ElementEdit bind:element />
+			<ElementEdit bind:element {chartOptions} />
 		{/if}
 	</div>
 	{#if isEdit && !elementToEdit}
 		<div>
 			<IconButton on:click={() => (elementToEdit = true)}>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<SmuiElement tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiFileEdit} />
-				</Icon>
+				</SmuiElement>
 			</IconButton>
 			<IconButton on:click={() => dispatch('delete')}>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<SmuiElement tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiClose} />
-				</Icon>
+				</SmuiElement>
 			</IconButton>
 		</div>
 	{:else if isEdit && elementToEdit}
 		<div>
 			<IconButton on:click={updateElement}>
-				<Icon component={Svg} viewBox="0 0 24 24">
+				<SmuiElement tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiCheck} />
-				</Icon>
+				</SmuiElement>
 			</IconButton>
 		</div>
 	{/if}

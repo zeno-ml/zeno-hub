@@ -2,6 +2,8 @@ import { env } from '$env/dynamic/public';
 import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
+export const ssr = false;
+
 export async function load({ cookies, params, url, depends }) {
 	depends('app:report');
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';

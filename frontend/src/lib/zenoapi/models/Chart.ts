@@ -23,4 +23,5 @@ export type Chart = {
 		| BeeswarmParameters
 		| RadarParameters
 		| HeatmapParameters;
+	projectUuid?: string | null;
 };

@@ -434,6 +434,27 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Chart Data
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static getChartData(projectUuid: string, chartId: number): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Organizations
 	 * @returns Organization Successful Response
 	 * @throws ApiError
@@ -618,6 +639,24 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'GET',
 			url: '/public-reports'
+		});
+	}
+
+	/**
+	 * Get Charts For Projects
+	 * @param requestBody
+	 * @returns Chart Successful Response
+	 * @throws ApiError
+	 */
+	public static getChartsForProjects(requestBody: Array<string>): CancelablePromise<Array<Chart>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/charts-for-projects/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
@@ -814,6 +853,28 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update Folder
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateFolder(project: string, requestBody: Folder): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
+			url: '/folder/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Add Slice
 	 * @param project
 	 * @param requestBody
@@ -836,6 +897,28 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update Slice
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateSlice(project: string, requestBody: Slice): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
+			url: '/slice/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Add Chart
 	 * @param project
 	 * @param requestBody
@@ -845,6 +928,28 @@ export class ZenoService {
 	public static addChart(project: string, requestBody: Chart): CancelablePromise<number> {
 		return __request(OpenAPI, {
 			method: 'POST',
+			url: '/chart/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Chart
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateChart(project: string, requestBody: Chart): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
 			url: '/chart/{project}',
 			path: {
 				project: project
@@ -943,6 +1048,28 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update Tag
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateTag(project: string, requestBody: Tag): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
+			url: '/tag/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Add Organization
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1005,94 +1132,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Update Slice
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static updateSlice(project: string, requestBody: Slice): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/slice/update/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Update Chart
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static updateChart(project: string, requestBody: Chart): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/chart/update/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Update Folder
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static updateFolder(project: string, requestBody: Folder): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/folder/update/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Update Tag
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static updateTag(project: string, requestBody: Tag): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/tag/update/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Update User
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1100,8 +1139,8 @@ export class ZenoService {
 	 */
 	public static updateUser(requestBody: User): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/user/update',
+			method: 'PATCH',
+			url: '/user/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -1118,8 +1157,8 @@ export class ZenoService {
 	 */
 	public static updateOrganization(requestBody: Organization): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/organization/update',
+			method: 'PATCH',
+			url: '/organization/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -1136,8 +1175,8 @@ export class ZenoService {
 	 */
 	public static updateProject(requestBody: Project): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/project/update',
+			method: 'PATCH',
+			url: '/project/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -1155,8 +1194,30 @@ export class ZenoService {
 	 */
 	public static updateProjectUser(project: string, requestBody: User): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/project-user/update/{project}',
+			method: 'PATCH',
+			url: '/project-user/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Project User
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/project-user/{project}',
 			path: {
 				project: project
 			},
@@ -1180,8 +1241,33 @@ export class ZenoService {
 		requestBody: Organization
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/project-org/update/{project}',
+			method: 'PATCH',
+			url: '/project-org/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Project Org
+	 * @param project
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static deleteProjectOrg(
+		project: string,
+		requestBody: Organization
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'DELETE',
+			url: '/project-org/{project}',
 			path: {
 				project: project
 			},
@@ -1205,9 +1291,52 @@ export class ZenoService {
 		requestBody: ReportElement
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/report-element/update/{report_id}',
+			method: 'PATCH',
+			url: '/report-element/{report_id}',
 			path: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Report
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateReport(requestBody: Report): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
+			url: '/report/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Report Projects
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static updateReportProjects(
+		reportId: number,
+		requestBody: Array<string>
+	): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'PATCH',
+			url: '/report-projects/',
+			query: {
 				report_id: reportId
 			},
 			body: requestBody,
@@ -1338,53 +1467,6 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'DELETE',
 			url: '/organization',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Delete Project User
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'DELETE',
-			url: '/project-user/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Delete Project Org
-	 * @param project
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public static deleteProjectOrg(
-		project: string,
-		requestBody: Organization
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
-			method: 'DELETE',
-			url: '/project-org/{project}',
-			path: {
-				project: project
-			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

@@ -1,5 +1,12 @@
 <script lang="ts">
-	import ChartContainer from '../chart/ChartContainer.svelte';
+	import BarChart from '$lib/components/chart/chart-types/bar-chart/BarChart.svelte';
+	import { ChartType, ZenoService, type Chart, type ReportElement } from '$lib/zenoapi';
+	import type { ComponentType } from 'svelte';
+	import BeeswarmChart from '../chart/chart-types/beeswarm-chart/BeeswarmChart.svelte';
+	import HeatMap from '../chart/chart-types/heatmap-chart/HeatMap.svelte';
+	import LineChart from '../chart/chart-types/line-chart/LineChart.svelte';
+	import RadarChart from '../chart/chart-types/radar-chart/RadarChart.svelte';
+	import Table from '../chart/chart-types/table/Table.svelte';
 
 	// import BarChartReport from '../report/bar-chart/BarChartReport.svelte';
 	// import BeeswarmChartReport from '../report/beeswarm-chart/BeeswarmChartReport.svelte';
@@ -19,11 +26,29 @@
 	// 	[ChartType.HEATMAP]: HeatMapReport
 	// };
 
+	const chartMap: Record<string, ComponentType> = {
+		[ChartType.BAR]: BarChart,
+		[ChartType.LINE]: LineChart,
+		[ChartType.TABLE]: Table,
+		[ChartType.BEESWARM]: BeeswarmChart,
+		[ChartType.RADAR]: RadarChart,
+		[ChartType.HEATMAP]: HeatMap
+	};
+
 	// export let element: ReportChartElement;
+	export let element: ReportElement;
+	export let chart: Chart;
+
+	$: chartData = chart.projectUuid ? ZenoService.getChartData(chart.projectUuid, chart.id) : '';
 </script>
 
-<ChartContainer chartName={chart.name}>
+{#await chartData}
+	<p>Loading...</p>
+{:then data}
+	<svelte:component this={chartMap[chart.type]} {chart} data={JSON.parse(data)} />
+{/await}
+<!-- <ChartContainer chartName={chart.name}>
 	<svelte:component this={chartMap[chart.type]} {chart} data={chartData} />
-</ChartContainer>
+</ChartContainer> -->
 <!-- 
 <svelte:component this={ChartMap[element.type]} passedReport={$reports[element.reportIndex]} /> -->

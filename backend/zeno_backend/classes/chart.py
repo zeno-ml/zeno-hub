@@ -98,6 +98,7 @@ class Chart(CamelModel):
         | RadarParameters
         | HeatmapParameters
     )
+    project_uuid: str | None = None
 
 
 class ParametersEncoder(json.JSONEncoder):

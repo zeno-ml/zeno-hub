@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { ReportElementType, type ReportElement } from '$lib/zenoapi';
+	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
 	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';
 
 	export let element: ReportElement;
-
-	const chartOptions: { id: number; name: string }[] = [];
+	export let chartOptions: Promise<Chart[]>;
 </script>
 
 <div>
@@ -36,9 +35,11 @@
 		options={['Chart', 'Text']}
 	/>
 	{#if element.type === ReportElementType.CHART}
-		<div class="ml-8">
-			<Svelecte searchable={false} bind:value={element.chartId} options={chartOptions} />
-		</div>
+		{#await chartOptions then options}
+			<div class="ml-8">
+				<Svelecte searchable={false} bind:value={element.chartId} {options} />
+			</div>
+		{/await}
 	{:else if element.type === ReportElementType.TEXT}
 		<div class="ml-8">
 			<Textfield textarea label="Text" bind:value={element.data} style="width: 100%;" />

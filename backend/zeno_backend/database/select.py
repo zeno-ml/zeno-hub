@@ -585,6 +585,41 @@ def report(
         )
 
 
+def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
+    """Get all charts for a list of projects.
+
+    Args:
+        project_uuids (list[str]): the list of project uuids.
+
+
+    Returns:
+        list[Chart]: the list of charts.
+    """
+    db = Database()
+    chart_results = db.connect_execute_return(
+        sql.SQL(
+            "SELECT id, name, type, parameters, project_uuid"
+            " FROM charts WHERE project_uuid IN ({})"
+        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+    )
+
+    if len(chart_results) == 0:
+        return []
+
+    return list(
+        map(
+            lambda r: Chart(
+                id=r[0],
+                name=r[1],
+                type=r[2],
+                parameters=json.loads(r[3]),
+                project_uuid=r[4],
+            ),
+            chart_results,
+        )
+    )
+
+
 def project_from_uuid(project_uuid: str) -> Project | None:
     """Get the project data given a UUID.
 
