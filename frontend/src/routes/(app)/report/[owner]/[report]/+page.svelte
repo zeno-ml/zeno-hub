@@ -37,9 +37,10 @@
 		);
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function updateReportName(e: any) {
-		ZenoService.updateReport({ ...report, name: e.target.textContent }).then(() => {
-			goto('/report/' + report.ownerName + '/' + e.target.textContent);
+		ZenoService.updateReport({ ...report, name: e.target?.textContent }).then(() => {
+			goto('/report/' + report.ownerName + '/' + e.target?.textContent);
 		});
 	}
 

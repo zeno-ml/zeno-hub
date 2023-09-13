@@ -6,7 +6,7 @@
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
 
-	function setDefaults(e: any) {
+	function setDefaults(e: CustomEvent) {
 		if (e.detail.label === 'Chart') {
 			element = {
 				id: element.id,
