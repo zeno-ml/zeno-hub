@@ -82,42 +82,44 @@
 		{/if}
 	</div>
 	<hr />
-	<div class="flex flex-col">
-		{#if data.user}
-			<h1 class="text-xl mt-3 mb-4">Your Reports</h1>
-			<div class="mb-4 flex flex-wrap items-start">
-				{#each ownReports as report}
-					<Report {report} deletable />
-				{/each}
-				<button
-					class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg px-2.5 w-48 h-14 mt-1 hover:bg-primary-light"
-					on:click={() => (showNewReport = true)}
-				>
-					<div class="w-6 h-6">
-						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
-							<path fill="black" d={mdiPlus} />
-						</Icon>
-					</div>
-				</button>
-			</div>
-			{#if sharedReports.length > 0}
-				<h1 class="text-xl mt-3 mb-4">Shared Reports</h1>
+	{#if $featureFlags['REPORTS']}
+		<div class="flex flex-col">
+			{#if data.user}
+				<h1 class="text-xl mt-3 mb-4">Your Reports</h1>
 				<div class="mb-4 flex flex-wrap items-start">
-					{#each sharedReports as report}
+					{#each ownReports as report}
+						<Report {report} deletable />
+					{/each}
+					<button
+						class="flex flex-col justify-around items-center border-2 border-grey-lighter rounded-lg px-2.5 w-48 h-14 mt-1 hover:bg-primary-light"
+						on:click={() => (showNewReport = true)}
+					>
+						<div class="w-6 h-6">
+							<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+								<path fill="black" d={mdiPlus} />
+							</Icon>
+						</div>
+					</button>
+				</div>
+				{#if sharedReports.length > 0}
+					<h1 class="text-xl mt-3 mb-4">Shared Reports</h1>
+					<div class="mb-4 flex flex-wrap items-start">
+						{#each sharedReports as report}
+							<Report {report} />
+						{/each}
+					</div>
+				{/if}
+			{/if}
+			{#if publicReports.length > 0}
+				<h1 class="text-xl mt-3 mb-4">Public Reports</h1>
+				<div class="mb-4 flex flex-wrap items-start">
+					{#each publicReports as report}
 						<Report {report} />
 					{/each}
 				</div>
 			{/if}
-		{/if}
-		{#if publicReports.length > 0}
-			<h1 class="text-xl mt-3 mb-4">Public Reports</h1>
-			<div class="mb-4 flex flex-wrap items-start">
-				{#each publicReports as report}
-					<Report {report} />
-				{/each}
-			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
 {#if showNewReport}
 	<Popup on:close>
