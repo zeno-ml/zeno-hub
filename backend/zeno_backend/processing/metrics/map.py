@@ -5,8 +5,10 @@ from functools import lru_cache
 from psycopg import sql
 
 from zeno_backend.classes.base import GroupMetric
+from zeno_backend.classes.filter import FilterPredicateGroup
 from zeno_backend.classes.metric import Metric
 from zeno_backend.database.database import Database
+from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.metrics.bleu import bleu
 from zeno_backend.processing.metrics.f1 import f1, precision, recall
 from zeno_backend.processing.metrics.mean import mean
@@ -55,10 +57,11 @@ def count(
 
 @lru_cache(maxsize=4096)
 def metric_map(
-    metric: Metric | None,
     project: str,
-    model: str | None,
-    sql_filter: sql.Composed | None,
+    metric: Metric | None = None,
+    model: str | None = None,
+    filter_predicates: FilterPredicateGroup | None = None,
+    data_ids: tuple[str] | None = None,
 ) -> GroupMetric:
     """Call a metric function based on the selected metric.
 
@@ -66,12 +69,20 @@ def metric_map(
         metric (Metric): the metric for which to call a metric function.
         project (str): the project the user is currently working with.
         model (str): the model for which to calculate the metric.
-        sql_filter (str | None): the filter to apply to the data before metric
-        calculation.
+        filter_predicates (FilterPredicateGroup): the filter to be applied before
+            calculating the metric.
+        data_ids (tuple[str]): the ids of the datapoints to be used for the metric.
 
     Returns:
         GroupMetric: the metric result calculated on the data as specified.
     """
+    sql_filter = table_filter(
+        project,
+        model,
+        filter_predicates,
+        list(data_ids) if data_ids is not None else None,
+    )
+    print(sql_filter)
     if metric is None or model is None:
         return count(project, sql_filter)
 

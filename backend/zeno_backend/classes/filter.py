@@ -1,7 +1,9 @@
 """Classes required for specifying data filters."""
 import json
 from enum import Enum
-from typing import LiteralString
+from typing import TYPE_CHECKING, LiteralString
+
+from pydantic import ConfigDict
 
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 
@@ -55,6 +57,8 @@ class Join(str, Enum):
 class FilterPredicate(CamelModel):
     """Predicates to specify a filter operation on a column of the data table."""
 
+    model_config = ConfigDict(frozen=True)
+
     column: ZenoColumn
     operation: Operation
     value: str | float | int | bool
@@ -64,8 +68,15 @@ class FilterPredicate(CamelModel):
 class FilterPredicateGroup(CamelModel):
     """Group of filter predicates that might be joined by a Join operator."""
 
-    predicates: list["FilterPredicateGroup | FilterPredicate"]
+    model_config = ConfigDict(frozen=True)
+
+    predicates: tuple["FilterPredicateGroup | FilterPredicate"]
     join: Join
+
+    if TYPE_CHECKING:
+
+        def __hash__(self) -> int:
+            ...
 
 
 class PredicatesEncoder(json.JSONEncoder):

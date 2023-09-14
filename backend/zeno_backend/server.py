@@ -218,16 +218,19 @@ def get_server() -> FastAPI:
     def get_metric_for_tag(metric_key: TagMetricKey, project: str, request: Request):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        filter_sql = table_filter(
-            project, metric_key.model, None, metric_key.tag.data_ids
-        )
 
         if metric_key.metric is None:
-            return metric_map(None, project, metric_key.model, filter_sql)
+            return metric_map(
+                project, None, metric_key.model, None, tuple(metric_key.tag.data_ids)
+            )
 
         metric = select.metrics_by_id([metric_key.metric], project)
         return metric_map(
-            metric.get(metric_key.metric), project, metric_key.model, filter_sql
+            project,
+            metric.get(metric_key.metric),
+            metric_key.model,
+            None,
+            tuple(metric_key.tag.data_ids),
         )
 
     @api_app.post(
@@ -462,18 +465,13 @@ def get_server() -> FastAPI:
         return_metrics: list[GroupMetric] = []
         metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project)
         for metric_key in req.metric_keys:
-            filter_sql = table_filter(
-                project,
-                metric_key.model,
-                metric_key.slice.filter_predicates,
-                req.data_ids,
-            )
             return_metrics.append(
                 metric_map(
-                    metrics.get(metric_key.metric),
                     project,
+                    metrics.get(metric_key.metric),
                     metric_key.model,
-                    filter_sql,
+                    metric_key.slice.filter_predicates,
+                    tuple(req.data_ids) if req.data_ids is not None else None,
                 )
             )
         return return_metrics

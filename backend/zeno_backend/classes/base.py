@@ -84,6 +84,8 @@ class ZenoColumn(CamelModel):
         model (str | None): The name of the model that produced the column.
     """
 
+    model_config = ConfigDict(frozen=True)
+
     id: str
     name: str
     column_type: ZenoColumnType

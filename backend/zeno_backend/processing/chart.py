@@ -17,7 +17,6 @@ from zeno_backend.classes.filter import FilterPredicateGroup, Join
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import Slice
 from zeno_backend.database.select import metrics, slices
-from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.metrics.map import metric_map
 
 
@@ -56,8 +55,9 @@ def xyc_data(chart: Chart, project: str) -> str:
     selected_models = chart.parameters.models
     for current_slice in selected_slices:
         for model in selected_models:
-            filter_sql = table_filter(project, model, current_slice.filter_predicates)
-            metric = metric_map(selected_metric, project, model, filter_sql)
+            metric = metric_map(
+                project, selected_metric, model, current_slice.filter_predicates
+            )
             elements.append(
                 {
                     "x_value": current_slice.slice_name
@@ -110,10 +110,9 @@ def table_data(chart: Chart, project: str) -> str:
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
-                    project, model, current_slice.filter_predicates
+                metric = metric_map(
+                    project, current_metric, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "x_value": current_slice.id
@@ -167,10 +166,9 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
-                    project, model, current_slice.filter_predicates
+                metric = metric_map(
+                    project, current_metric, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "color_value": current_slice.slice_name
@@ -223,10 +221,9 @@ def radar_data(chart: Chart, project: str) -> str:
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
-                    project, model, current_slice.filter_predicates
+                metric = metric_map(
+                    project, current_metric, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "axis_value": current_slice.slice_name
@@ -297,8 +294,15 @@ def heatmap_data(chart: Chart, project: str) -> str:
             metric = {"metric": None, "size": 0}
             if x_slice and y_slice:
                 current_y.filter_predicates.join = Join.AND  # type: ignore
-                filter_sql = table_filter(
+                metric = metric_map(
                     project,
+                    selected_metric,
+                    params.model,
+                )
+            else:
+                metric = metric_map(
+                    project,
+                    selected_metric,
                     params.model,
                     FilterPredicateGroup(
                         predicates=[
@@ -308,18 +312,6 @@ def heatmap_data(chart: Chart, project: str) -> str:
                         join=Join.OMITTED,
                     ),
                 )
-                metric = metric_map(selected_metric, project, params.model, filter_sql)
-            else:
-                filter_sql = table_filter(
-                    project,
-                    params.model,
-                    (
-                        current_x.filter_predicates  # type: ignore
-                        if x_slice
-                        else current_y.filter_predicates  # type: ignore
-                    ),
-                )
-                metric = metric_map(selected_metric, project, params.model, filter_sql)
             elements.append(
                 {
                     "x_value": current_x.slice_name  # type: ignore
