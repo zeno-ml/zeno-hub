@@ -3,7 +3,11 @@ import { SlicesOrModels, type XCParameters } from '$lib/zenoapi';
 import type { VegaLiteSpec } from 'svelte-vega';
 import { get } from 'svelte/store';
 
-export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
+export default function generateSpec(
+	parameters: XCParameters,
+	height: number,
+	width: number
+): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
 	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
 	const metric = get(metrics).find((metric) => metric.id === parameters.metric);
@@ -12,9 +16,8 @@ export default function generateSpec(parameters: XCParameters): VegaLiteSpec {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		description: 'A simple bar chart with embedded data.',
 		autosize: 'pad',
-		width: {
-			step: 30
-		},
+		width: width,
+		height: height,
 		data: {
 			name: 'table'
 		},

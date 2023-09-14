@@ -30,8 +30,11 @@ export default {
 			black: {
 				DEFAULT: '#000000',
 				transparent: '#0000000A'
+			},
+			white: {
+				DEFAULT: '#ffffff'
 			}
 		}
 	},
-	plugins: []
+	plugins: [require('@tailwindcss/typography')]
 };

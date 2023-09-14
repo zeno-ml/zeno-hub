@@ -31,11 +31,11 @@
 </script>
 
 <button
-	class="flex flex-col items-center mr-2 mb-2 border border-grey-lighter rounded-lg hover:bg-primary-ligther cursor-pointer max-w-[500px]"
+	class="border-solid mr-2 rounded-sm border-grey-light border shadow-sm flex flex-col py-2 px-5 hover:shadow-md"
 	on:click={() => goto(`chart/${chart.id}?edit=false`)}
 >
 	<div class="flex justify-between items-center w-full">
-		<div class="m-4 min-w-[24px]">
+		<div class="min-w-[24px]">
 			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>

@@ -25,6 +25,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
+from zeno_backend.classes.report import Report, ReportElement, ReportResponse
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -290,6 +291,19 @@ def get_server() -> FastAPI:
             )
         return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
 
+    @api_app.get(
+        "/chart-data/{project_uuid}/{chart_id}",
+        response_model=str,
+        tags=["zeno"],
+    )
+    def get_chart_data(project_uuid: str, chart_id: int, request: Request):
+        chart = select.chart(project_uuid, chart_id)
+        if chart is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
+            )
+        return chart_data(chart, project_uuid)
+
     @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
     def get_organizations(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
@@ -308,7 +322,6 @@ def get_server() -> FastAPI:
         owner_name: str,
         project_name: str,
         request: Request,
-        current_user=Depends(auth.claim()),
     ):
         project_uuid = select.project_uuid(owner_name, project_name)
         if project_uuid is None:
@@ -320,12 +333,12 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-        if not util.access_valid(project_uuid, request):
+        if not project.public and not util.access_valid(project_uuid, request):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Project is private",
             )
-        user = select.user(current_user["username"])
+        user = util.get_user_from_token(request)
         if user is not None:
             if user.name == project.owner_name:
                 project.editor = True
@@ -348,6 +361,21 @@ def get_server() -> FastAPI:
         return select.project(
             owner_name, project_name, util.get_user_from_token(request)
         )
+
+    @api_app.get(
+        "/report/{owner}/{report}", response_model=ReportResponse, tags=["zeno"]
+    )
+    def get_report(owner_name: str, report_name: str, request: Request):
+        rep = select.report(owner_name, report_name, util.get_user_from_token(request))
+        return rep
+
+    @api_app.post(
+        "/report-elements/{report_id}",
+        response_model=list[ReportElement],
+        tags=["zeno"],
+    )
+    def get_report_elements(report_id):
+        return select.report_elements(report_id)
 
     @api_app.get(
         "/project-uuid/{owner_name}/{project_name}",
@@ -395,6 +423,33 @@ def get_server() -> FastAPI:
             )
         )
         return select.public_projects()
+
+    @api_app.get(
+        "/reports",
+        response_model=list[Report],
+        tags=["zeno"],
+    )
+    def get_reports(current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return select.reports(user)
+
+    @api_app.get(
+        "/public-reports",
+        response_model=list[Report],
+        tags=["zeno"],
+    )
+    def get_public_reports():
+        return select.public_reports()
+
+    @api_app.post(
+        "/charts-for-projects/",
+        response_model=list[Chart],
+        tags=["zeno"],
+    )
+    def get_charts_for_projects(req: list[str]):
+        return select.charts_for_projects(req)
 
     @api_app.post(
         "/slice-metrics/{project}",
@@ -565,6 +620,22 @@ def get_server() -> FastAPI:
             )
         return id
 
+    @api_app.post("/report/{name}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_report(name: str, current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        insert.report(name, user)
+
+    @api_app.post("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
+    def add_report_element(
+        report_id: int, element: ReportElement, current_user=Depends(auth.claim())
+    ):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        insert.report_element(report_id, element)
+
     @api_app.post(
         "/tag/{project}",
         response_model=int,
@@ -599,51 +670,61 @@ def get_server() -> FastAPI:
         insert.project_org(project, organization)
 
     ####################################################################### Update
-    @api_app.post(
-        "/slice/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
+    @api_app.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def update_slice(req: Slice, project: str):
         update.slice(req, project)
 
-    @api_app.post(
-        "/chart/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
+    @api_app.patch("/chart/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def update_chart(chart: Chart, project: str):
         update.chart(chart, project)
 
-    @api_app.post(
-        "/folder/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
+    @api_app.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def update_folder(folder: Folder, project: str):
         update.folder(folder, project)
 
-    @api_app.post("/tag/update/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.patch("/tag/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def update_tag(tag: Tag, project: str):
         update.tag(tag, project)
 
-    @api_app.post("/user/update", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.patch("/user/", tags=["zeno"], dependencies=[Depends(auth)])
     def update_user(user: User):
         update.user(user)
 
-    @api_app.post("/organization/update", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.patch("/organization/", tags=["zeno"], dependencies=[Depends(auth)])
     def update_organization(organization: Organization):
         update.organization(organization)
 
-    @api_app.post("/project/update", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.patch("/project/", tags=["zeno"], dependencies=[Depends(auth)])
     def update_project(project: Project):
         update.project(project)
 
-    @api_app.post(
-        "/project-user/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+    @api_app.patch(
+        "/project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def update_project_user(project: str, user: User):
         update.project_user(project, user)
 
-    @api_app.post(
-        "/project-org/update/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+    @api_app.patch(
+        "/project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def update_project_org(project: str, organization: Organization):
         update.project_org(project, organization)
+
+    @api_app.patch(
+        "/report-element/{report_id}",
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    def update_report_element(report_id: int, element: ReportElement):
+        update.report_element(element)
+
+    @api_app.patch("/report/", tags=["zeno"], dependencies=[Depends(auth)])
+    def update_report(report: Report):
+        update.report(report)
+
+    @api_app.patch("/report-projects/", tags=["zeno"], dependencies=[Depends(auth)])
+    def update_report_projects(report_id: int, project_uuids: list[str]):
+        update.report_projects(report_id, project_uuids)
 
     ####################################################################### Delete
     @api_app.delete("/project/{project}", tags=["zeno"])
@@ -655,6 +736,16 @@ def get_server() -> FastAPI:
         if data_path.exists():
             shutil.rmtree(data_path)
         delete.project(project)
+
+    @api_app.delete("/report/{report_id}", tags=["zeno"])
+    def delete_report(report_id: int, current_user=Depends(auth.claim())):
+        report_obj = select.report_from_id(report_id)
+        # make sure only project owners can delete a project
+        if report_obj is None or report_obj.owner_name != current_user["username"]:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        delete.report(report_id)
 
     @api_app.delete("/slice", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_slice(req: Slice):
@@ -687,6 +778,10 @@ def get_server() -> FastAPI:
     )
     def delete_project_org(project: str, organization: Organization):
         delete.project_org(project, organization)
+
+    @api_app.delete("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
+    def delete_report_element(id: int):
+        delete.report_element(id)
 
     return app
 

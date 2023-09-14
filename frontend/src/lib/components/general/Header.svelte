@@ -29,7 +29,9 @@
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav class="z-20">
-	<header class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center">
+	<header
+		class="h-full w-12 flex bg-white justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+	>
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
 				<img class="w-8 mt-5" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
@@ -85,15 +87,22 @@
 					icon={mdiAccount}
 					on:click={() => goto(`/account`)}
 				/>
-				<form method="POST" action="/logout">
-					<HeaderIcon pageName={'logout'} tooltipContent={'Logout'} icon={mdiLogout} />
-				</form>
+				<HeaderIcon
+					pageName={'logout'}
+					tooltipContent={'Logout'}
+					icon={mdiLogout}
+					on:click={() => {
+						authToken.set(undefined);
+						fetch('/logout', { method: 'POST' });
+						location.reload();
+					}}
+				/>
 			{:else}
 				<HeaderIcon
 					pageName={'login'}
 					tooltipContent={'Login'}
 					icon={mdiLogin}
-					on:click={() => goto(`/login`)}
+					on:click={() => goto(`/login?redirect=${$page.url.href}`)}
 				/>
 			{/if}
 		</div>

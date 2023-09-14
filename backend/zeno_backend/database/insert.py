@@ -11,6 +11,7 @@ from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.project import Project
+from zeno_backend.classes.report import ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
@@ -314,6 +315,35 @@ def system(
             )
         db.execute("DROP TABLE tmp;")
         db.commit()
+
+
+def report(name: str, user: User):
+    """Adding a report to Zeno.
+
+    Args:
+        name (str): how the report is called.
+        user (User): user who created the report.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
+        [name, user.id, False],
+    )
+
+
+def report_element(report_id: int, element: ReportElement):
+    """Adding a report element to a Zeno Report.
+
+    Args:
+        report_id (int): the id of the report the element is added to.
+        element (ReportElement): the element to be added to the report.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO report_elements (report_id, type, data, chart_id, position)"
+        " VALUES (%s,%s,%s,%s,%s);",
+        [report_id, element.type, element.data, element.chart_id, element.position],
+    )
 
 
 def folder(project: str, name: str) -> int | None:

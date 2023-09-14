@@ -17,9 +17,11 @@
 	};
 </script>
 
-<div class="flex flex-col w-full m-5">
-	<h1 class="text-xl mb-3">Account management</h1>
-	<Account name={cognitoUser.name} email={cognitoUser.email} />
-	<hr class="mt-5 text-grey-lighter" />
-	<OrganizationsTable {organizations} {user} />
+<div class="flex flex-col w-full bg-yellowish">
+	<div class="flex flex-col bg-white p-6 m-4 shadow-md rounded">
+		<h1 class="text-xl mb-3">Account management</h1>
+		<Account name={cognitoUser.name} email={cognitoUser.email} />
+		<hr class="mt-5 text-grey-lighter" />
+		<OrganizationsTable {organizations} {user} />
+	</div>
 </div>

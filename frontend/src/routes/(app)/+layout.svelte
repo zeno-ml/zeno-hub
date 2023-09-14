@@ -7,13 +7,10 @@
 
 	export let data;
 
-	if (data.cognitoUser !== null) {
-		authToken.set(data.cognitoUser.accessToken);
-	}
-
 	$: {
 		OpenAPI.BASE = `${getEndpoint()}/api`;
 		if (data.cognitoUser !== null) {
+			authToken.set(data.cognitoUser.accessToken);
 			OpenAPI.HEADERS = {
 				Authorization: 'Bearer ' + data.cognitoUser.accessToken
 			};

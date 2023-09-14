@@ -87,15 +87,6 @@ a:visited {
 	overflow: visible;
 }
 
-html,
-body {
-	position: relative;
-	width: 100%;
-	height: 100%;
-	background-color: theme.$surface;
-	color: theme.$on-surface;
-}
-
 body {
 	color: var(--G1);
 	margin: 0;
@@ -137,31 +128,8 @@ body {
 	min-width: 100px !important;
 }
 
-p {
-	font-size: 14px;
-	color: var(--G2);
-}
-
-h4 {
-	font-size: 14px;
-	font-weight: 600;
-	color: var(--G2);
-}
-
-h2 {
-	font-weight: 500;
-}
-
-small {
-	font-size: 10px;
-	color: var(--G2);
-}
 .mdc-data-table__pagination {
 	border-top-width: 0px;
-}
-
-table {
-	overflow: visible;
 }
 
 .end-cell {

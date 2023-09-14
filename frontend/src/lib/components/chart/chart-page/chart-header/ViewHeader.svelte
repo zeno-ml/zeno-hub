@@ -41,7 +41,7 @@
 	</div>
 	{#if $project?.editor}
 		<Button
-			variant="outlined"
+			variant="raised"
 			on:mouseleave={blur}
 			on:focusout={blur}
 			on:click={() => (isChartEdit = !isChartEdit)}

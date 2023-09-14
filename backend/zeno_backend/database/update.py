@@ -7,10 +7,12 @@ from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.project import Project
+from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.select import user as get_user
 
 
 def folder(folder: Folder, project: str):
@@ -216,6 +218,46 @@ def project(project: Project):
     )
 
 
+def report(report: Report):
+    """Update a report's configuration.
+
+    Args:
+        report (Report): the configuration of the report.
+    """
+    owner_id = get_user(report.owner_name)
+    if owner_id is None:
+        return
+    db = Database()
+    db.connect_execute(
+        "UPDATE reports SET name = %s, owner_id = %s, public = %s WHERE id = %s;",
+        [
+            report.name,
+            owner_id.id,
+            report.public,
+            report.id,
+        ],
+    )
+
+
+def report_projects(report_id: int, project_uuids: list):
+    """Update a report's projects.
+
+    Args:
+        report_id (str): the id of the report.
+        project_uuids (list): the list of project ids.
+    """
+    db = Database()
+    db.connect_execute(
+        "DELETE FROM report_project WHERE report_id = %s;",
+        [report_id],
+    )
+    for project_uuid in project_uuids:
+        db.connect_execute(
+            "INSERT INTO report_project (report_id, project_uuid) VALUES (%s,%s);",
+            [report_id, project_uuid],
+        )
+
+
 def project_user(project: str, user: User):
     """Update a user's project access in the database.
 
@@ -242,4 +284,23 @@ def project_org(project: str, organization: Organization):
         "UPDATE organization_project SET editor = %s WHERE project_uuid = %s "
         "AND organization_id = %s;",
         [organization.admin, project, organization.id],
+    )
+
+
+def report_element(element: ReportElement):
+    """Update an elements for a report.
+
+    Args:
+        element (ReportElement): the element to be updated.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE report_elements SET type = %s, data = %s, chart_id = %s"
+        " WHERE id = %s;",
+        [
+            element.type,
+            element.data,
+            element.chart_id,
+            element.id,
+        ],
     )
