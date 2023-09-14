@@ -17,7 +17,6 @@ from zeno_backend.classes.chart import (
 from zeno_backend.classes.filter import FilterPredicateGroup, Join
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.slice import Slice
-from zeno_backend.database.select import chart as get_chart
 from zeno_backend.database.select import metrics, slices
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.metrics.map import metric_map
@@ -338,20 +337,16 @@ def heatmap_data(chart: Chart, project: str) -> str:
 
 
 @lru_cache(4096)
-def chart_data(chart_id: int, project: str) -> str:
+def chart_data(chart: Chart, project: str) -> str:
     """Extract the chart data for a specific chart that the user created.
 
     Args:
-        chart_id (int): the ID of the chart for which to extract data
+        chart (Chart): the chart for which to generate data.
         project (str): the project the user is currently working with
 
     Returns:
         str: JSON representation of the chart data the user requested.
     """
-    chart = get_chart(project, chart_id)
-    if chart is None:
-        return json.dumps({"table": []})
-
     if chart.type == ChartType.BAR or chart.type == ChartType.LINE:
         return xyc_data(chart, project)
     elif chart.type == ChartType.TABLE:
