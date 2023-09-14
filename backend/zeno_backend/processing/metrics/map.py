@@ -1,7 +1,5 @@
 """Map metric names to metric functions."""
 
-from functools import lru_cache
-
 from psycopg import sql
 
 from zeno_backend.classes.base import GroupMetric
@@ -53,7 +51,6 @@ def count(
         )
 
 
-@lru_cache(maxsize=4096)
 def metric_map(
     metric: Metric | None,
     project: str,

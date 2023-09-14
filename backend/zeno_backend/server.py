@@ -289,7 +289,7 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
             )
-        return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
+        return ChartResponse(chart=chart, chart_data=chart_data(chart_id, project_uuid))
 
     @api_app.get(
         "/chart-data/{project_uuid}/{chart_id}",
@@ -302,7 +302,7 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
             )
-        return chart_data(chart, project_uuid)
+        return chart_data(chart_id, project_uuid)
 
     @api_app.post("/organizations", tags=["zeno"], response_model=list[Organization])
     def get_organizations(current_user=Depends(auth.claim())):
