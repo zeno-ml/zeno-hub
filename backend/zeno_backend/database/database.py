@@ -1,4 +1,5 @@
 """Functionality to interact with the database."""
+import asyncio
 import os
 from configparser import ConfigParser
 from pathlib import Path
@@ -48,6 +49,9 @@ def config(
         return db
 
 
+# create event loop
+if asyncio.get_event_loop().is_closed():
+    asyncio.set_event_loop(asyncio.new_event_loop())
 db_pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in config().items()]))
 
 
