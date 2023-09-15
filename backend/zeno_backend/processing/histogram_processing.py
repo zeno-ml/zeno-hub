@@ -3,7 +3,6 @@
 import math
 
 from psycopg import sql
-from psycopg_pool import AsyncConnectionPool
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.metadata import (
@@ -11,11 +10,10 @@ from zeno_backend.classes.metadata import (
     HistogramColumnRequest,
     HistogramRequest,
 )
+from zeno_backend.database.database import db_pool
 
 
-async def histogram_bucket(
-    project_uuid: str, col: ZenoColumn, db_pool: AsyncConnectionPool
-):
+async def histogram_bucket(project_uuid: str, col: ZenoColumn):
     """Calculate the histogram buckets for a single column.
 
     Args:
@@ -100,7 +98,6 @@ async def histogram_metric_and_count(
     project_uuid: str,
     filter_sql: sql.Composed | None,
     calculate_histograms: bool,
-    db_pool: AsyncConnectionPool,
 ) -> list[HistogramBucket]:
     """Calculate the metric and count for a column.
 

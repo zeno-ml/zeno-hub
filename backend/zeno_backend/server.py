@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cloudauth.cognito import Cognito
-from psycopg_pool import AsyncConnectionPool
 
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
@@ -33,7 +32,6 @@ from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderRet
 from zeno_backend.classes.table import TableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import config
 from zeno_backend.processing.chart import chart_data
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import (
@@ -92,10 +90,6 @@ def get_server() -> FastAPI:
     )
     api_app.include_router(sdk.router)
     app.mount("/api", api_app)
-
-    db_pool = AsyncConnectionPool(
-            " ".join([f"{k}={v}" for k, v in config().items()])
-        )
 
     # ping server route to check if live
     @app.get("/ping")
@@ -496,7 +490,7 @@ def get_server() -> FastAPI:
         if not util.access_valid(project, request):
             return Response(status_code=401)
 
-        return await asyncio.gather(*[histogram_bucket(project, col, db_pool) for col in req])
+        return await asyncio.gather(*[histogram_bucket(project, col) for col in req])
 
     @api_app.post(
         "/histogram-counts/{project_uuid}",
@@ -525,7 +519,6 @@ def get_server() -> FastAPI:
                     project_uuid,
                     filter_sql,
                     project_obj.calculate_histogram_metrics,
-                    db_pool,
                 )
                 for r in req.column_requests
             ]

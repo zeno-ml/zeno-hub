@@ -33,16 +33,7 @@ services:
       DB_NAME: zeno
       DB_USER: myuser
       DB_PASSWORD: mypassword
-    command:
-      [
-        "poetry",
-        "run",
-        "uvicorn",
-        "zeno_backend.server:get_server",
-        "--reload",
-        "--host",
-        "0.0.0.0",
-      ]
+    command: poetry run uvicorn zeno_backend.server:get_server --reload --host 0.0.0.0
   postgres:
     container_name: zeno-postgres
     image: postgres:latest

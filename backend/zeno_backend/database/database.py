@@ -6,6 +6,7 @@ from typing import Any, LiteralString
 
 import psycopg
 from psycopg import sql
+from psycopg_pool import AsyncConnectionPool
 
 
 def config(
@@ -45,6 +46,9 @@ def config(
         db["user"] = os.environ["DB_USER"]
         db["password"] = os.environ["DB_PASSWORD"]
         return db
+
+
+db_pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in config().items()]))
 
 
 class Database:
