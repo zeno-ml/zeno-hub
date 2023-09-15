@@ -26,10 +26,11 @@ async def histogram_bucket(project_uuid: str, col: ZenoColumn):
     async with db_pool.connection() as conn:
         async with conn.cursor() as db:
             await db.execute(
-                sql.SQL("SELECT column_id FROM {} WHERE name = %s;").format(
-                    sql.Identifier(f"{project_uuid}_column_map")
-                ),
-                [col.name],
+                sql.SQL(
+                    "SELECT column_id FROM {} WHERE name = %s AND"
+                    " (model = %s OR model IS NULL);"
+                ).format(sql.Identifier(f"{project_uuid}_column_map")),
+                [col.name, col.model],
             )
             id_col = await db.fetchone()
             if id_col is None:
