@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 import uvicorn
-from amplitude import Amplitude, BaseEvent
+from amplitude import Amplitude
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -344,24 +344,6 @@ def get_server() -> FastAPI:
                 project.editor = True
         return select.project_state(project_uuid, project)
 
-    @api_app.post("/project/{owner}/{project}", response_model=Project, tags=["zeno"])
-    def get_project(owner_name: str, project_name: str, request: Request):
-        uuid = select.project_uuid(owner_name, project_name)
-        if uuid is None:
-            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        if not util.access_valid(uuid, request):
-            return Response(status_code=401)
-        amplitude_client.track(
-            BaseEvent(
-                event_type="Project Viewed",
-                user_id="ProjectViewedUser",
-                event_properties={"project_uuid": uuid},
-            )
-        )
-        return select.project(
-            owner_name, project_name, util.get_user_from_token(request)
-        )
-
     @api_app.get(
         "/report/{owner}/{report}", response_model=ReportResponse, tags=["zeno"]
     )
@@ -416,12 +398,6 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_public_projects():
-        amplitude_client.track(
-            BaseEvent(
-                event_type="Home Viewed",
-                user_id="HomeViewedUser",
-            )
-        )
         return select.public_projects()
 
     @api_app.get(
@@ -552,13 +528,7 @@ def get_server() -> FastAPI:
         if fetched_user is None:
             try:
                 user = User(id=-1, name=name, admin=None)
-                user_id = insert.user(user)
-                amplitude_client.track(
-                    BaseEvent(
-                        event_type="User Registered",
-                        user_id="00000" + str(user_id) if user_id else "",
-                    )
-                )
+                insert.user(user)
                 insert.api_key(user)
                 return select.user(name)
             except Exception as exc:
@@ -567,12 +537,6 @@ def get_server() -> FastAPI:
                     detail=str(exc),
                 ) from exc
         else:
-            amplitude_client.track(
-                BaseEvent(
-                    event_type="User Logged In",
-                    user_id="00000" + str(fetched_user.id),
-                )
-            )
             return fetched_user
 
     @api_app.post(
