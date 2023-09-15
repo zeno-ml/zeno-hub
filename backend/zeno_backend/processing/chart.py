@@ -1,5 +1,6 @@
 """Functions for extracting chart data from SQL."""
 import json
+from functools import lru_cache
 from typing import Any
 
 from zeno_backend.classes.chart import (
@@ -335,11 +336,12 @@ def heatmap_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
+@lru_cache(4096)
 def chart_data(chart: Chart, project: str) -> str:
     """Extract the chart data for a specific chart that the user created.
 
     Args:
-        chart (Chart): the chart for which to extract the data.
+        chart (Chart): the chart for which to generate data.
         project (str): the project the user is currently working with
 
     Returns:

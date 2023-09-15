@@ -40,6 +40,20 @@ class XCParameters(CamelModel):
     color_channel: SlicesOrModels
     x_channel: SlicesOrModels
 
+    def __hash__(self) -> int:
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(tuple(self.slices))
+            + hash(self.metric)
+            + hash(tuple(self.models))
+            + hash(self.color_channel)
+            + hash(self.x_channel)
+        )
+
 
 class TableParameters(CamelModel):
     """Parameter specification for a tabular visualization."""
@@ -50,6 +64,21 @@ class TableParameters(CamelModel):
     y_channel: SlicesOrModels
     x_channel: SlicesMetricsOrModels
     fixed_channel: SlicesMetricsOrModels
+
+    def __hash__(self) -> int:
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(tuple(self.metrics))
+            + hash(tuple(self.slices))
+            + hash(tuple(self.models))
+            + hash(self.y_channel)
+            + hash(self.x_channel)
+            + hash(self.fixed_channel)
+        )
 
 
 class BeeswarmParameters(CamelModel):
@@ -62,6 +91,21 @@ class BeeswarmParameters(CamelModel):
     color_channel: SlicesOrModels
     fixed_dimension: str
 
+    def __hash__(self):
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(tuple(self.metrics))
+            + hash(tuple(self.slices))
+            + hash(tuple(self.models))
+            + hash(self.y_channel)
+            + hash(self.color_channel)
+            + hash(self.fixed_dimension)
+        )
+
 
 class RadarParameters(CamelModel):
     """Parameter specification for a radar chart."""
@@ -73,6 +117,21 @@ class RadarParameters(CamelModel):
     layer_channel: SlicesOrModels
     fixed_channel: SlicesMetricsOrModels
 
+    def __hash__(self):
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(tuple(self.metrics))
+            + hash(tuple(self.slices))
+            + hash(tuple(self.models))
+            + hash(self.axis_channel)
+            + hash(self.layer_channel)
+            + hash(self.fixed_channel)
+        )
+
 
 class HeatmapParameters(CamelModel):
     """Parameter specirication for a heatmap chart."""
@@ -83,6 +142,21 @@ class HeatmapParameters(CamelModel):
     model: str
     y_channel: SlicesOrModels
     x_channel: SlicesOrModels
+
+    def __hash__(self) -> int:
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(self.metric)
+            + hash(tuple(self.x_values))
+            + hash(tuple(self.y_values))
+            + hash(self.model)
+            + hash(self.y_channel)
+            + hash(self.x_channel)
+        )
 
 
 class Chart(CamelModel):
@@ -99,6 +173,19 @@ class Chart(CamelModel):
         | HeatmapParameters
     )
     project_uuid: str | None = None
+
+    def __hash__(self) -> int:
+        """Hash the chart parameters.
+
+        Returns:
+            int: The hash of the chart parameters.
+        """
+        return hash(
+            hash(self.name)
+            + hash(self.type)
+            + hash(self.parameters)
+            + hash(self.project_uuid)
+        )
 
 
 class ParametersEncoder(json.JSONEncoder):

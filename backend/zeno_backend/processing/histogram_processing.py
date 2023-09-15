@@ -1,6 +1,8 @@
 """Functions for creating the frontend metadata histograms."""
 
 
+import asyncio
+
 import numpy as np
 import pandas as pd
 from psycopg import sql
@@ -228,7 +230,7 @@ def histogram_metric_task(
             return []
 
 
-def histogram_count(
+async def histogram_count(
     request: HistogramRequest,
     col_request: HistogramColumnRequest,
     project_uuid: str,
@@ -325,16 +327,25 @@ def histogram_counts(
     filter_sql = table_filter(
         project_uuid, req.model, req.filter_predicates, req.data_ids
     )
-    res = []
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    tasks = []
     for r in req.column_requests:
-        res.append(
-            histogram_count(
-                req,
-                r,
-                project_uuid,
-                filter_sql,
-                project_obj.calculate_histogram_metrics,
+        tasks.append(
+            loop.create_task(
+                histogram_count(
+                    req,
+                    r,
+                    project_uuid,
+                    filter_sql,
+                    project_obj.calculate_histogram_metrics,
+                )
             )
         )
+
+    res = loop.run_until_complete(asyncio.gather(*tasks))
+    loop.close()
 
     return res

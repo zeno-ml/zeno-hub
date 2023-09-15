@@ -7,17 +7,19 @@ import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ cookies, url }) => {
+	OpenAPI.BASE = getEndpoint() + '/api';
 	const userCookie = cookies.get('loggedIn');
+
 	if (userCookie) {
-		const cognitoUser = JSON.parse(userCookie) as AuthUser;
+		let cognitoUser = JSON.parse(userCookie) as AuthUser;
 		if (new Date() > new Date(cognitoUser.accessTokenExpires * 1000)) {
 			try {
 				const res = await refreshAccessToken(cognitoUser.refreshToken);
-				const user = extractUserFromSession(res);
+				cognitoUser = extractUserFromSession(res);
 				OpenAPI.HEADERS = {
-					Authorization: 'Bearer ' + user.accessToken
+					Authorization: 'Bearer ' + cognitoUser.accessToken
 				};
-				cookies.set('loggedIn', JSON.stringify(user), {
+				cookies.set('loggedIn', JSON.stringify(cognitoUser), {
 					path: '/',
 					httpOnly: true,
 					sameSite: 'strict',
@@ -30,11 +32,10 @@ export const load = async ({ cookies, url }) => {
 			}
 		}
 		// If the user is not authenticated, redirect to the login page
-		if (!cognitoUser.id || !cognitoUser.accessToken) {
+		if (!cognitoUser || !cognitoUser.id || !cognitoUser.accessToken) {
 			throw redirect(303, `/login?redirectTo=${url.pathname}`);
 		}
 
-		OpenAPI.BASE = getEndpoint() + '/api';
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};
