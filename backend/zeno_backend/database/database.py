@@ -1,5 +1,4 @@
 """Functionality to interact with the database."""
-import asyncio
 import os
 from configparser import ConfigParser
 from pathlib import Path
@@ -7,7 +6,6 @@ from typing import Any, LiteralString
 
 import psycopg
 from psycopg import sql
-from psycopg_pool import AsyncConnectionPool
 
 
 def config(
@@ -47,12 +45,6 @@ def config(
         db["user"] = os.environ["DB_USER"]
         db["password"] = os.environ["DB_PASSWORD"]
         return db
-
-
-# create event loop
-if asyncio.get_event_loop().is_closed():
-    asyncio.set_event_loop(asyncio.new_event_loop())
-db_pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in config().items()]))
 
 
 class Database:
