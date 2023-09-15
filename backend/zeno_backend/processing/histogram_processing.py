@@ -13,7 +13,7 @@ from zeno_backend.classes.metadata import (
     HistogramColumnRequest,
     HistogramRequest,
 )
-from zeno_backend.database.database import Database
+from zeno_backend.database.database import db_pool
 from zeno_backend.database.select import (
     column,
     column_id_from_name_and_model,
@@ -92,7 +92,7 @@ def histogram_buckets(
     return res
 
 
-def histogram_metric_task(
+async def histogram_metric_task(
     request: HistogramRequest,
     col_request: HistogramColumnRequest,
     project_uuid: str,
@@ -120,114 +120,125 @@ def histogram_metric_task(
         project_uuid, request.metric.columns[0], request.model
     )
 
-    with Database() as db:
-        if col.data_type == MetadataType.NOMINAL:
-            unique = db.execute_return(
-                sql.SQL("SELECT COUNT(DISTINCT {}) FROM {}").format(
-                    sql.Identifier(col_id),
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as db:
+            if col.data_type == MetadataType.NOMINAL:
+                await db.execute(
+                    sql.SQL("SELECT COUNT(DISTINCT {}) FROM {}").format(
+                        sql.Identifier(col_id),
+                        sql.Identifier(project_uuid),
+                    )
+                )
+                unique = await db.fetchall()
+                if len(unique) > 0 and unique[0][0] > 30:
+                    return []
+                else:
+                    statement = sql.SQL("SELECT {}, AVG({}), COUNT(*) FROM {}").format(
+                        sql.Identifier(col_id),
+                        sql.Identifier(metric_col_id),
+                        sql.Identifier(project_uuid),
+                    )
+                    if filter_sql:
+                        statement = sql.SQL("{} WHERE {} GROUP BY {}").format(
+                            statement, filter_sql, sql.Identifier(col_id)
+                        )
+                    else:
+                        statement = sql.SQL("{} GROUP BY {}").format(
+                            statement, sql.Identifier(col_id)
+                        )
+                    await db.execute(statement)
+                    db_res = await db.fetchall()
+                    results_map = {r[0]: (r[1], r[2]) for r in db_res}
+
+                    return [
+                        HistogramBucket(
+                            bucket=b.bucket,
+                            metric=results_map[b.bucket][0]
+                            if b.bucket in results_map
+                            else 0,
+                            size=results_map[b.bucket][1]
+                            if b.bucket in results_map
+                            else 0,
+                        )
+                        for b in col_request.buckets
+                    ]
+
+            elif col.data_type == MetadataType.CONTINUOUS:
+                case_statement = sql.SQL("CASE ")
+                for i, b in enumerate(col_request.buckets):
+                    case_statement += sql.SQL(
+                        "WHEN {} >= {} AND {} < {} THEN {} "
+                    ).format(
+                        sql.Identifier(col_id),
+                        sql.Literal(b.bucket),
+                        sql.Identifier(col_id),
+                        sql.Literal(b.bucket_end),
+                        sql.Literal(i),
+                    )
+                case_statement += sql.SQL("END AS bucket")
+                statement = sql.SQL("SELECT {}, AVG({}), COUNT(*) FROM {}").format(
+                    case_statement,
+                    sql.Identifier(metric_col_id),
                     sql.Identifier(project_uuid),
                 )
-            )
-            if len(unique) > 0 and unique[0][0] > 30:
-                return []
-            else:
-                statement = sql.SQL("SELECT {}, AVG({}), COUNT(*) FROM {}").format(
+
+                if filter_sql:
+                    statement = sql.SQL("{} WHERE {} GROUP BY bucket").format(
+                        statement, filter_sql
+                    )
+                else:
+                    statement = sql.SQL("{} GROUP BY bucket").format(statement)
+                await db.execute(statement)
+                db_res = await db.fetchall()
+                results_map = {
+                    int(r[0]): (r[1], r[2]) for r in db_res if r[0] is not None
+                }
+
+                return [
+                    HistogramBucket(
+                        bucket=b.bucket,
+                        bucket_end=b.bucket_end,
+                        metric=results_map[i][0] if i in results_map else 0,
+                        size=results_map[i][1] if i in results_map else 0,
+                    )
+                    for i, b in enumerate(col_request.buckets)
+                ]
+
+            elif col.data_type == MetadataType.BOOLEAN:
+                statement = sql.SQL(
+                    "SELECT CASE WHEN {} = TRUE THEN 0 WHEN {} = FALSE"
+                    " THEN 1 END AS bucket, AVG({}), COUNT(*) FROM {}"
+                ).format(
+                    sql.Identifier(col_id),
                     sql.Identifier(col_id),
                     sql.Identifier(metric_col_id),
                     sql.Identifier(project_uuid),
                 )
                 if filter_sql:
-                    statement = sql.SQL("{} WHERE {} GROUP BY {}").format(
-                        statement, filter_sql, sql.Identifier(col_id)
+                    statement = sql.SQL("{} WHERE {} GROUP BY bucket").format(
+                        statement, filter_sql
                     )
                 else:
-                    statement = sql.SQL("{} GROUP BY {}").format(
-                        statement, sql.Identifier(col_id)
-                    )
-                db_res = db.execute_return(statement)
-                results_map = {r[0]: (r[1], r[2]) for r in db_res}
+                    statement = sql.SQL("{} GROUP BY bucket").format(statement)
+                await db.execute(statement)
+                res = await db.fetchall()
 
+                true_res = [r for r in res if r[0] == 0]
+                false_res = [r for r in res if r[0] == 1]
                 return [
                     HistogramBucket(
-                        bucket=b.bucket,
-                        metric=results_map[b.bucket][0]
-                        if b.bucket in results_map
-                        else 0,
-                        size=results_map[b.bucket][1] if b.bucket in results_map else 0,
-                    )
-                    for b in col_request.buckets
+                        bucket=True,
+                        size=true_res[0][2] if len(true_res) > 0 else 0,
+                        metric=true_res[0][1] if len(true_res) > 0 else 0,
+                    ),
+                    HistogramBucket(
+                        bucket=False,
+                        size=false_res[0][2] if len(false_res) > 0 else 0,
+                        metric=false_res[0][1] if len(false_res) > 0 else 0,
+                    ),
                 ]
-
-        elif col.data_type == MetadataType.CONTINUOUS:
-            case_statement = sql.SQL("CASE ")
-            for i, b in enumerate(col_request.buckets):
-                case_statement += sql.SQL("WHEN {} >= {} AND {} < {} THEN {} ").format(
-                    sql.Identifier(col_id),
-                    sql.Literal(b.bucket),
-                    sql.Identifier(col_id),
-                    sql.Literal(b.bucket_end),
-                    sql.Literal(i),
-                )
-            case_statement += sql.SQL("END AS bucket")
-            statement = sql.SQL("SELECT {}, AVG({}), COUNT(*) FROM {}").format(
-                case_statement,
-                sql.Identifier(metric_col_id),
-                sql.Identifier(project_uuid),
-            )
-
-            if filter_sql:
-                statement = sql.SQL("{} WHERE {} GROUP BY bucket").format(
-                    statement, filter_sql
-                )
             else:
-                statement = sql.SQL("{} GROUP BY bucket").format(statement)
-            db_res = db.execute_return(statement)
-            results_map = {int(r[0]): (r[1], r[2]) for r in db_res if r[0] is not None}
-
-            return [
-                HistogramBucket(
-                    bucket=b.bucket,
-                    bucket_end=b.bucket_end,
-                    metric=results_map[i][0] if i in results_map else 0,
-                    size=results_map[i][1] if i in results_map else 0,
-                )
-                for i, b in enumerate(col_request.buckets)
-            ]
-
-        elif col.data_type == MetadataType.BOOLEAN:
-            statement = sql.SQL(
-                "SELECT CASE WHEN {} = TRUE THEN 0 WHEN {} = FALSE"
-                " THEN 1 END AS bucket, AVG({}), COUNT(*) FROM {}"
-            ).format(
-                sql.Identifier(col_id),
-                sql.Identifier(col_id),
-                sql.Identifier(metric_col_id),
-                sql.Identifier(project_uuid),
-            )
-            if filter_sql:
-                statement = sql.SQL("{} WHERE {} GROUP BY bucket").format(
-                    statement, filter_sql
-                )
-            else:
-                statement = sql.SQL("{} GROUP BY bucket").format(statement)
-            res = db.execute_return(statement)
-
-            true_res = [r for r in res if r[0] == 0]
-            false_res = [r for r in res if r[0] == 1]
-            return [
-                HistogramBucket(
-                    bucket=True,
-                    size=true_res[0][2] if len(true_res) > 0 else 0,
-                    metric=true_res[0][1] if len(true_res) > 0 else 0,
-                ),
-                HistogramBucket(
-                    bucket=False,
-                    size=false_res[0][2] if len(false_res) > 0 else 0,
-                    metric=false_res[0][1] if len(false_res) > 0 else 0,
-                ),
-            ]
-        else:
-            return []
+                return []
 
 
 async def histogram_count(
@@ -306,7 +317,9 @@ async def histogram_count(
         else:
             return []
     else:
-        return histogram_metric_task(request, col_request, project_uuid, filter_sql)
+        return await histogram_metric_task(
+            request, col_request, project_uuid, filter_sql
+        )
 
 
 def histogram_counts(
