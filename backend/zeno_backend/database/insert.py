@@ -16,6 +16,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.database import config as config_db
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 
 
@@ -142,9 +143,11 @@ def dataset(
     """
     with Database() as db:
         # Drop the primary table and column_map since they will be recreated.
-        db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
         db.execute(
-            sql.SQL("DROP TABLE {} CASCADE;").format(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(sql.Identifier(project))
+        )
+        db.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{project}_column_map")
             )
         )
@@ -194,7 +197,7 @@ def dataset(
     )
 
     # Connect to the db engine using SQLAlchemy and write the data to a table.
-    config = db.config()
+    config = config_db()
     engine = create_engine(
         f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
     )
@@ -271,7 +274,7 @@ def system(
 
     # Connect to the db engine using SQLAlchemy and write the data to a table.
     db = Database()
-    config = db.config()
+    config = config_db()
     engine = create_engine(
         f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
     )
