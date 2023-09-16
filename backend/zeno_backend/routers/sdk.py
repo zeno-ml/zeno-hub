@@ -20,8 +20,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from zeno_backend.classes.project import Project
 from zeno_backend.database import insert, select
 
-amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
-
 
 class APIKeyBearer(HTTPBearer):
     """API key bearer authentication scheme."""
@@ -97,6 +95,7 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
         )
 
     project.uuid = str(uuid.uuid4())
+    amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
     amplitude_client.track(
         BaseEvent(
             event_type="Project Created",
@@ -197,6 +196,7 @@ def upload_system(
             detail=("ERROR: Unable to create system table: " + str(e)),
         ) from e
 
+    amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
     amplitude_client.track(
         BaseEvent(
             event_type="System Uploaded",

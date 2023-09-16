@@ -44,8 +44,6 @@ from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
 
-amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
-
 
 def get_server() -> FastAPI:
     """Provide the FastAPI server and specifies its inputs.
@@ -64,6 +62,8 @@ def get_server() -> FastAPI:
     env_path = Path("../frontend/.env")
     if env_path.exists():
         load_dotenv(env_path)
+
+    amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
     # function to get the user from cognito
     auth = Cognito(
