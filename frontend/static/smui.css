@@ -340,9 +340,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-button .mdc-button__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -364,9 +362,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-button.mdc-ripple-upgraded--foreground-activation .mdc-button__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-button.mdc-ripple-upgraded--foreground-deactivation .mdc-button__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -595,9 +591,7 @@ svg.mdc-button__icon {
 	border-radius: var(--mdc-protected-button-container-shape, var(--mdc-shape-small, 4px));
 	--mdc-elevation-box-shadow-for-gss: 0px 3px 1px -2px rgba(0, 0, 0, 0.2),
 		0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-	box-shadow:
-		0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-		0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 	box-shadow: var(
 		--mdc-protected-button-container-elevation,
@@ -666,9 +660,7 @@ svg.mdc-button__icon {
 .mdc-button--raised:not(.mdc-ripple-upgraded):focus {
 	--mdc-elevation-box-shadow-for-gss: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
 		0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-	box-shadow:
-		0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-		0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 	box-shadow: var(
 		--mdc-protected-button-focus-container-elevation,
@@ -678,9 +670,7 @@ svg.mdc-button__icon {
 .mdc-button--raised:hover {
 	--mdc-elevation-box-shadow-for-gss: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
 		0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-	box-shadow:
-		0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-		0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 	box-shadow: var(
 		--mdc-protected-button-hover-container-elevation,
@@ -690,9 +680,7 @@ svg.mdc-button__icon {
 .mdc-button--raised:not(:disabled):active {
 	--mdc-elevation-box-shadow-for-gss: 0px 5px 5px -3px rgba(0, 0, 0, 0.2),
 		0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
-	box-shadow:
-		0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-		0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14),
 		0px 3px 14px 2px rgba(0, 0, 0, 0.12);
 	box-shadow: var(
 		--mdc-protected-button-pressed-container-elevation,
@@ -702,9 +690,7 @@ svg.mdc-button__icon {
 .mdc-button--raised:disabled {
 	--mdc-elevation-box-shadow-for-gss: 0px 0px 0px 0px rgba(0, 0, 0, 0.2),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 0px 0px rgba(0, 0, 0, 0.12);
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 	box-shadow: var(
 		--mdc-protected-button-disabled-container-elevation,
@@ -875,9 +861,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-ripple-surface::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -899,9 +883,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-ripple-surface.mdc-ripple-upgraded--foreground-activation::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-ripple-surface.mdc-ripple-upgraded--foreground-deactivation::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -1159,18 +1141,14 @@ svg.mdc-button__icon {
 .smui-button__group.smui-button__group--raised {
 	border-radius: 4px;
 	border-radius: var(--mdc-shape-small, 4px);
-	box-shadow:
-		0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-		0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-button__group > .mdc-button--raised,
 .smui-button__group > .smui-button__group-item > .mdc-button--raised {
 	border-radius: 4px;
 	border-radius: var(--mdc-shape-small, 4px);
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-button__group > .mdc-button--raised .mdc-button__ripple,
@@ -1182,23 +1160,17 @@ svg.mdc-button__icon {
 .smui-button__group > .mdc-button--raised:focus,
 .smui-button__group > .smui-button__group-item > .mdc-button--raised:hover,
 .smui-button__group > .smui-button__group-item > .mdc-button--raised:focus {
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-button__group > .mdc-button--raised:active,
 .smui-button__group > .smui-button__group-item > .mdc-button--raised:active {
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-button__group > .mdc-button--raised:disabled,
 .smui-button__group > .smui-button__group-item > .mdc-button--raised:disabled {
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-button__group > .mdc-button--outlined:not(:last-child),
@@ -1211,9 +1183,7 @@ svg.mdc-button__icon {
 	background-color: #ffffff;
 	background-color: var(--mdc-theme-surface, #ffffff);
 	position: relative;
-	box-shadow:
-		0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-		0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 	display: flex;
 	flex-direction: column;
@@ -1246,9 +1216,7 @@ svg.mdc-button__icon {
 	}
 }
 .mdc-card--outlined {
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 	border-width: 1px;
 	border-style: solid;
@@ -1415,9 +1383,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-card__primary-action .mdc-card__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -1439,9 +1405,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-card__primary-action.mdc-ripple-upgraded--foreground-activation .mdc-card__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-card__primary-action.mdc-ripple-upgraded--foreground-deactivation .mdc-card__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -1674,9 +1638,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-icon-button .mdc-icon-button__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -1698,9 +1660,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-icon-button.mdc-ripple-upgraded--foreground-activation .mdc-icon-button__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-icon-button.mdc-ripple-upgraded--foreground-deactivation .mdc-icon-button__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -2332,8 +2292,7 @@ svg.mdc-button__icon {
 	background-color: rgba(0, 0, 0, 0);
 	pointer-events: none;
 	will-change: background-color, border-color;
-	transition:
-		background-color 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
+	transition: background-color 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
 		border-color 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
 }
 .mdc-checkbox__checkmark {
@@ -2363,8 +2322,7 @@ svg.mdc-button__icon {
 	border-width: 1px;
 	border-style: solid;
 	opacity: 0;
-	transition:
-		opacity 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
+	transition: opacity 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
 		transform 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
 }
 .mdc-checkbox--anim-unchecked-checked .mdc-checkbox__background,
@@ -2409,8 +2367,7 @@ svg.mdc-button__icon {
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background,
 .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background,
 .mdc-checkbox__native-control[data-indeterminate='true'] ~ .mdc-checkbox__background {
-	transition:
-		border-color 90ms 0ms cubic-bezier(0, 0, 0.2, 1),
+	transition: border-color 90ms 0ms cubic-bezier(0, 0, 0.2, 1),
 		background-color 90ms 0ms cubic-bezier(0, 0, 0.2, 1);
 }
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark-path,
@@ -2458,8 +2415,7 @@ svg.mdc-button__icon {
 	height: var(--mdc-checkbox-state-layer-size, 48px);
 }
 .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background .mdc-checkbox__checkmark {
-	transition:
-		opacity 180ms 0ms cubic-bezier(0, 0, 0.2, 1),
+	transition: opacity 180ms 0ms cubic-bezier(0, 0, 0.2, 1),
 		transform 180ms 0ms cubic-bezier(0, 0, 0.2, 1);
 	opacity: 1;
 }
@@ -2472,8 +2428,7 @@ svg.mdc-button__icon {
 	.mdc-checkbox__checkmark {
 	transform: rotate(45deg);
 	opacity: 0;
-	transition:
-		opacity 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
+	transition: opacity 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1),
 		transform 90ms 0ms cubic-bezier(0.4, 0, 0.6, 1);
 }
 .mdc-checkbox__native-control:indeterminate ~ .mdc-checkbox__background .mdc-checkbox__mixedmark,
@@ -2508,9 +2463,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-checkbox .mdc-checkbox__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -2532,9 +2485,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-checkbox.mdc-ripple-upgraded--foreground-activation .mdc-checkbox__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-checkbox.mdc-ripple-upgraded--foreground-deactivation .mdc-checkbox__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -2678,9 +2629,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-deprecated-chip-trailing-action .mdc-deprecated-chip-trailing-action__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -2706,9 +2655,7 @@ svg.mdc-button__icon {
 }
 .mdc-deprecated-chip-trailing-action.mdc-ripple-upgraded--foreground-activation
 	.mdc-deprecated-chip-trailing-action__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-deprecated-chip-trailing-action.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-deprecated-chip-trailing-action__ripple::after {
@@ -2898,11 +2845,8 @@ svg.mdc-button__icon {
 	transform: translateY(-50%);
 }
 .mdc-chip--exit {
-	transition:
-		opacity 75ms cubic-bezier(0.4, 0, 0.2, 1),
-		width 150ms cubic-bezier(0, 0, 0.2, 1),
-		padding 100ms linear,
-		margin 100ms linear;
+	transition: opacity 75ms cubic-bezier(0.4, 0, 0.2, 1), width 150ms cubic-bezier(0, 0, 0.2, 1),
+		padding 100ms linear, margin 100ms linear;
 	opacity: 0;
 }
 .mdc-chip__overflow {
@@ -3011,9 +2955,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-chip .mdc-chip__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -3035,9 +2977,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-chip.mdc-ripple-upgraded--foreground-activation .mdc-chip__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-chip.mdc-ripple-upgraded--foreground-deactivation .mdc-chip__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -3380,23 +3320,23 @@ svg.mdc-button__icon {
 		both;
 }
 .mdc-circular-progress--indeterminate .mdc-circular-progress__color-1 {
-	animation:
-		mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+	animation: mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite
+			both,
 		mdc-circular-progress-color-1-fade-in-out 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
 }
 .mdc-circular-progress--indeterminate .mdc-circular-progress__color-2 {
-	animation:
-		mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+	animation: mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite
+			both,
 		mdc-circular-progress-color-2-fade-in-out 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
 }
 .mdc-circular-progress--indeterminate .mdc-circular-progress__color-3 {
-	animation:
-		mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+	animation: mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite
+			both,
 		mdc-circular-progress-color-3-fade-in-out 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
 }
 .mdc-circular-progress--indeterminate .mdc-circular-progress__color-4 {
-	animation:
-		mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both,
+	animation: mdc-circular-progress-spinner-layer-rotate 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite
+			both,
 		mdc-circular-progress-color-4-fade-in-out 5332ms cubic-bezier(0.4, 0, 0.2, 1) infinite both;
 }
 .mdc-circular-progress--indeterminate
@@ -3441,9 +3381,7 @@ svg.mdc-button__icon {
 	cursor: text;
 	overflow: hidden;
 	will-change: transform;
-	transition:
-		transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
-		color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+	transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), color 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 [dir='rtl'] .mdc-floating-label,
 .mdc-floating-label[dir='rtl'] {
@@ -3510,8 +3448,7 @@ svg.mdc-button__icon {
 	z-index: 2;
 }
 .mdc-line-ripple::after {
-	transition:
-		transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+	transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
 		opacity 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .mdc-line-ripple--active::after {
@@ -4525,9 +4462,7 @@ svg.mdc-button__icon {
 	content: '';
 }
 .mdc-select__anchor .mdc-select__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -4549,9 +4484,7 @@ svg.mdc-button__icon {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-select__anchor.mdc-ripple-upgraded--foreground-activation .mdc-select__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-select__anchor.mdc-ripple-upgraded--foreground-deactivation .mdc-select__ripple::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -7081,9 +7014,7 @@ a.mdc-list-item {
 }
 :not(.mdc-deprecated-list-item--disabled).mdc-deprecated-list-item
 	.mdc-deprecated-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7112,9 +7043,7 @@ a.mdc-list-item {
 		.mdc-deprecated-list-item--disabled
 	).mdc-deprecated-list-item.mdc-ripple-upgraded--foreground-activation
 	.mdc-deprecated-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 :not(
 		.mdc-deprecated-list-item--disabled
@@ -7132,9 +7061,7 @@ a.mdc-list-item {
 	content: '';
 }
 :not(.mdc-deprecated-list-item--disabled).mdc-deprecated-list-item .mdc-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7162,9 +7089,7 @@ a.mdc-list-item {
 		.mdc-deprecated-list-item--disabled
 	).mdc-deprecated-list-item.mdc-ripple-upgraded--foreground-activation
 	.mdc-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 :not(
 		.mdc-deprecated-list-item--disabled
@@ -7508,9 +7433,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-deprecated-list-item--disabled .mdc-deprecated-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7534,9 +7457,7 @@ a.mdc-list-item {
 }
 .mdc-deprecated-list-item--disabled.mdc-ripple-upgraded--foreground-activation
 	.mdc-deprecated-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-deprecated-list-item--disabled.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-deprecated-list-item__ripple::after {
@@ -7552,9 +7473,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-deprecated-list-item--disabled .mdc-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7577,9 +7496,7 @@ a.mdc-list-item {
 }
 .mdc-deprecated-list-item--disabled.mdc-ripple-upgraded--foreground-activation
 	.mdc-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-deprecated-list-item--disabled.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-list-item__ripple::after {
@@ -7661,9 +7578,7 @@ a.mdc-list-item {
 	content: '';
 }
 :not(.mdc-list-item--disabled).mdc-list-item .mdc-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7687,9 +7602,7 @@ a.mdc-list-item {
 }
 :not(.mdc-list-item--disabled).mdc-list-item.mdc-ripple-upgraded--foreground-activation
 	.mdc-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 :not(.mdc-list-item--disabled).mdc-list-item.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-list-item__ripple::after {
@@ -7838,9 +7751,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-list-item--disabled .mdc-list-item__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -7862,9 +7773,7 @@ a.mdc-list-item {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-list-item--disabled.mdc-ripple-upgraded--foreground-activation .mdc-list-item__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-list-item--disabled.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-list-item__ripple::after {
@@ -7929,13 +7838,9 @@ a.mdc-list-item {
 	overflow: auto;
 	will-change: transform, opacity;
 	z-index: 8;
-	transition:
-		opacity 0.03s linear,
-		transform 0.12s cubic-bezier(0, 0, 0.2, 1),
+	transition: opacity 0.03s linear, transform 0.12s cubic-bezier(0, 0, 0.2, 1),
 		height 250ms cubic-bezier(0, 0, 0.2, 1);
-	box-shadow:
-		0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-		0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14),
 		0px 3px 14px 2px rgba(0, 0, 0, 0.12);
 	background-color: #ffffff;
 	background-color: var(--mdc-theme-surface, #ffffff);
@@ -9067,9 +8972,7 @@ a.mdc-list-item {
 	margin-bottom: 0;
 }
 .mdc-dialog.mdc-dialog-scroll-divider-header.mdc-dialog--fullscreen .mdc-dialog__header {
-	box-shadow:
-		0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-		0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
 .mdc-dialog .mdc-dialog__surface {
@@ -9077,9 +8980,7 @@ a.mdc-list-item {
 	border-radius: var(--mdc-shape-medium, 4px);
 }
 .mdc-dialog__surface {
-	box-shadow:
-		0px 11px 15px -7px rgba(0, 0, 0, 0.2),
-		0px 24px 38px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14),
 		0px 9px 46px 8px rgba(0, 0, 0, 0.12);
 }
 .mdc-dialog__title {
@@ -9455,9 +9356,7 @@ a.mdc-list-item {
 	transition: opacity 150ms linear;
 }
 .mdc-dialog--opening .mdc-dialog__container {
-	transition:
-		opacity 75ms linear,
-		transform 150ms 0ms cubic-bezier(0, 0, 0.2, 1);
+	transition: opacity 75ms linear, transform 150ms 0ms cubic-bezier(0, 0, 0.2, 1);
 }
 .mdc-dialog--closing .mdc-dialog__scrim,
 .mdc-dialog--closing .mdc-dialog__container {
@@ -10283,153 +10182,103 @@ a.mdc-list-item {
 	color: var(--mdc-theme-on-surface, #000);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z0 {
-	box-shadow:
-		0px 0px 0px 0px rgba(0, 0, 0, 0.2),
-		0px 0px 0px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14),
 		0px 0px 0px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z1 {
-	box-shadow:
-		0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-		0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z2 {
-	box-shadow:
-		0px 3px 1px -2px rgba(0, 0, 0, 0.2),
-		0px 2px 2px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z3 {
-	box-shadow:
-		0px 3px 3px -2px rgba(0, 0, 0, 0.2),
-		0px 3px 4px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 3px -2px rgba(0, 0, 0, 0.2), 0px 3px 4px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 8px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z4 {
-	box-shadow:
-		0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-		0px 4px 5px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2), 0px 4px 5px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z5 {
-	box-shadow:
-		0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-		0px 5px 8px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 5px 8px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 14px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z6 {
-	box-shadow:
-		0px 3px 5px -1px rgba(0, 0, 0, 0.2),
-		0px 6px 10px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(0, 0, 0, 0.2), 0px 6px 10px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 18px 0px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z7 {
-	box-shadow:
-		0px 4px 5px -2px rgba(0, 0, 0, 0.2),
-		0px 7px 10px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 4px 5px -2px rgba(0, 0, 0, 0.2), 0px 7px 10px 1px rgba(0, 0, 0, 0.14),
 		0px 2px 16px 1px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z8 {
-	box-shadow:
-		0px 5px 5px -3px rgba(0, 0, 0, 0.2),
-		0px 8px 10px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14),
 		0px 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z9 {
-	box-shadow:
-		0px 5px 6px -3px rgba(0, 0, 0, 0.2),
-		0px 9px 12px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 5px 6px -3px rgba(0, 0, 0, 0.2), 0px 9px 12px 1px rgba(0, 0, 0, 0.14),
 		0px 3px 16px 2px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z10 {
-	box-shadow:
-		0px 6px 6px -3px rgba(0, 0, 0, 0.2),
-		0px 10px 14px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 6px 6px -3px rgba(0, 0, 0, 0.2), 0px 10px 14px 1px rgba(0, 0, 0, 0.14),
 		0px 4px 18px 3px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z11 {
-	box-shadow:
-		0px 6px 7px -4px rgba(0, 0, 0, 0.2),
-		0px 11px 15px 1px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 6px 7px -4px rgba(0, 0, 0, 0.2), 0px 11px 15px 1px rgba(0, 0, 0, 0.14),
 		0px 4px 20px 3px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z12 {
-	box-shadow:
-		0px 7px 8px -4px rgba(0, 0, 0, 0.2),
-		0px 12px 17px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.2), 0px 12px 17px 2px rgba(0, 0, 0, 0.14),
 		0px 5px 22px 4px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z13 {
-	box-shadow:
-		0px 7px 8px -4px rgba(0, 0, 0, 0.2),
-		0px 13px 19px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(0, 0, 0, 0.2), 0px 13px 19px 2px rgba(0, 0, 0, 0.14),
 		0px 5px 24px 4px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z14 {
-	box-shadow:
-		0px 7px 9px -4px rgba(0, 0, 0, 0.2),
-		0px 14px 21px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 7px 9px -4px rgba(0, 0, 0, 0.2), 0px 14px 21px 2px rgba(0, 0, 0, 0.14),
 		0px 5px 26px 4px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z15 {
-	box-shadow:
-		0px 8px 9px -5px rgba(0, 0, 0, 0.2),
-		0px 15px 22px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 8px 9px -5px rgba(0, 0, 0, 0.2), 0px 15px 22px 2px rgba(0, 0, 0, 0.14),
 		0px 6px 28px 5px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z16 {
-	box-shadow:
-		0px 8px 10px -5px rgba(0, 0, 0, 0.2),
-		0px 16px 24px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 8px 10px -5px rgba(0, 0, 0, 0.2), 0px 16px 24px 2px rgba(0, 0, 0, 0.14),
 		0px 6px 30px 5px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z17 {
-	box-shadow:
-		0px 8px 11px -5px rgba(0, 0, 0, 0.2),
-		0px 17px 26px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 8px 11px -5px rgba(0, 0, 0, 0.2), 0px 17px 26px 2px rgba(0, 0, 0, 0.14),
 		0px 6px 32px 5px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z18 {
-	box-shadow:
-		0px 9px 11px -5px rgba(0, 0, 0, 0.2),
-		0px 18px 28px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 9px 11px -5px rgba(0, 0, 0, 0.2), 0px 18px 28px 2px rgba(0, 0, 0, 0.14),
 		0px 7px 34px 6px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z19 {
-	box-shadow:
-		0px 9px 12px -6px rgba(0, 0, 0, 0.2),
-		0px 19px 29px 2px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 9px 12px -6px rgba(0, 0, 0, 0.2), 0px 19px 29px 2px rgba(0, 0, 0, 0.14),
 		0px 7px 36px 6px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z20 {
-	box-shadow:
-		0px 10px 13px -6px rgba(0, 0, 0, 0.2),
-		0px 20px 31px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.2), 0px 20px 31px 3px rgba(0, 0, 0, 0.14),
 		0px 8px 38px 7px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z21 {
-	box-shadow:
-		0px 10px 13px -6px rgba(0, 0, 0, 0.2),
-		0px 21px 33px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 10px 13px -6px rgba(0, 0, 0, 0.2), 0px 21px 33px 3px rgba(0, 0, 0, 0.14),
 		0px 8px 40px 7px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z22 {
-	box-shadow:
-		0px 10px 14px -6px rgba(0, 0, 0, 0.2),
-		0px 22px 35px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 10px 14px -6px rgba(0, 0, 0, 0.2), 0px 22px 35px 3px rgba(0, 0, 0, 0.14),
 		0px 8px 42px 7px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z23 {
-	box-shadow:
-		0px 11px 14px -7px rgba(0, 0, 0, 0.2),
-		0px 23px 36px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 11px 14px -7px rgba(0, 0, 0, 0.2), 0px 23px 36px 3px rgba(0, 0, 0, 0.14),
 		0px 9px 44px 8px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--raised.smui-paper--elevation-z24 {
-	box-shadow:
-		0px 11px 15px -7px rgba(0, 0, 0, 0.2),
-		0px 24px 38px 3px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 11px 15px -7px rgba(0, 0, 0, 0.2), 0px 24px 38px 3px rgba(0, 0, 0, 0.14),
 		0px 9px 46px 8px rgba(0, 0, 0, 0.12);
 }
 .smui-paper.smui-paper--outlined {
@@ -10521,153 +10370,103 @@ a.mdc-list-item {
 	color: var(--mdc-theme-on-primary, #fff);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z0 {
-	box-shadow:
-		0px 0px 0px 0px rgba(106, 27, 154, 0.2),
-		0px 0px 0px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(106, 27, 154, 0.2), 0px 0px 0px 0px rgba(106, 27, 154, 0.14),
 		0px 0px 0px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z1 {
-	box-shadow:
-		0px 2px 1px -1px rgba(106, 27, 154, 0.2),
-		0px 1px 1px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 2px 1px -1px rgba(106, 27, 154, 0.2), 0px 1px 1px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 3px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z2 {
-	box-shadow:
-		0px 3px 1px -2px rgba(106, 27, 154, 0.2),
-		0px 2px 2px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(106, 27, 154, 0.2), 0px 2px 2px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 5px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z3 {
-	box-shadow:
-		0px 3px 3px -2px rgba(106, 27, 154, 0.2),
-		0px 3px 4px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 3px 3px -2px rgba(106, 27, 154, 0.2), 0px 3px 4px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 8px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z4 {
-	box-shadow:
-		0px 2px 4px -1px rgba(106, 27, 154, 0.2),
-		0px 4px 5px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 2px 4px -1px rgba(106, 27, 154, 0.2), 0px 4px 5px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 10px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z5 {
-	box-shadow:
-		0px 3px 5px -1px rgba(106, 27, 154, 0.2),
-		0px 5px 8px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(106, 27, 154, 0.2), 0px 5px 8px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 14px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z6 {
-	box-shadow:
-		0px 3px 5px -1px rgba(106, 27, 154, 0.2),
-		0px 6px 10px 0px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(106, 27, 154, 0.2), 0px 6px 10px 0px rgba(106, 27, 154, 0.14),
 		0px 1px 18px 0px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z7 {
-	box-shadow:
-		0px 4px 5px -2px rgba(106, 27, 154, 0.2),
-		0px 7px 10px 1px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 4px 5px -2px rgba(106, 27, 154, 0.2), 0px 7px 10px 1px rgba(106, 27, 154, 0.14),
 		0px 2px 16px 1px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z8 {
-	box-shadow:
-		0px 5px 5px -3px rgba(106, 27, 154, 0.2),
-		0px 8px 10px 1px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 5px 5px -3px rgba(106, 27, 154, 0.2), 0px 8px 10px 1px rgba(106, 27, 154, 0.14),
 		0px 3px 14px 2px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z9 {
-	box-shadow:
-		0px 5px 6px -3px rgba(106, 27, 154, 0.2),
-		0px 9px 12px 1px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 5px 6px -3px rgba(106, 27, 154, 0.2), 0px 9px 12px 1px rgba(106, 27, 154, 0.14),
 		0px 3px 16px 2px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z10 {
-	box-shadow:
-		0px 6px 6px -3px rgba(106, 27, 154, 0.2),
-		0px 10px 14px 1px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 6px 6px -3px rgba(106, 27, 154, 0.2), 0px 10px 14px 1px rgba(106, 27, 154, 0.14),
 		0px 4px 18px 3px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z11 {
-	box-shadow:
-		0px 6px 7px -4px rgba(106, 27, 154, 0.2),
-		0px 11px 15px 1px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 6px 7px -4px rgba(106, 27, 154, 0.2), 0px 11px 15px 1px rgba(106, 27, 154, 0.14),
 		0px 4px 20px 3px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z12 {
-	box-shadow:
-		0px 7px 8px -4px rgba(106, 27, 154, 0.2),
-		0px 12px 17px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(106, 27, 154, 0.2), 0px 12px 17px 2px rgba(106, 27, 154, 0.14),
 		0px 5px 22px 4px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z13 {
-	box-shadow:
-		0px 7px 8px -4px rgba(106, 27, 154, 0.2),
-		0px 13px 19px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(106, 27, 154, 0.2), 0px 13px 19px 2px rgba(106, 27, 154, 0.14),
 		0px 5px 24px 4px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z14 {
-	box-shadow:
-		0px 7px 9px -4px rgba(106, 27, 154, 0.2),
-		0px 14px 21px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 7px 9px -4px rgba(106, 27, 154, 0.2), 0px 14px 21px 2px rgba(106, 27, 154, 0.14),
 		0px 5px 26px 4px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z15 {
-	box-shadow:
-		0px 8px 9px -5px rgba(106, 27, 154, 0.2),
-		0px 15px 22px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 8px 9px -5px rgba(106, 27, 154, 0.2), 0px 15px 22px 2px rgba(106, 27, 154, 0.14),
 		0px 6px 28px 5px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z16 {
-	box-shadow:
-		0px 8px 10px -5px rgba(106, 27, 154, 0.2),
-		0px 16px 24px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 8px 10px -5px rgba(106, 27, 154, 0.2), 0px 16px 24px 2px rgba(106, 27, 154, 0.14),
 		0px 6px 30px 5px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z17 {
-	box-shadow:
-		0px 8px 11px -5px rgba(106, 27, 154, 0.2),
-		0px 17px 26px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 8px 11px -5px rgba(106, 27, 154, 0.2), 0px 17px 26px 2px rgba(106, 27, 154, 0.14),
 		0px 6px 32px 5px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z18 {
-	box-shadow:
-		0px 9px 11px -5px rgba(106, 27, 154, 0.2),
-		0px 18px 28px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 9px 11px -5px rgba(106, 27, 154, 0.2), 0px 18px 28px 2px rgba(106, 27, 154, 0.14),
 		0px 7px 34px 6px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z19 {
-	box-shadow:
-		0px 9px 12px -6px rgba(106, 27, 154, 0.2),
-		0px 19px 29px 2px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 9px 12px -6px rgba(106, 27, 154, 0.2), 0px 19px 29px 2px rgba(106, 27, 154, 0.14),
 		0px 7px 36px 6px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z20 {
-	box-shadow:
-		0px 10px 13px -6px rgba(106, 27, 154, 0.2),
-		0px 20px 31px 3px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 10px 13px -6px rgba(106, 27, 154, 0.2), 0px 20px 31px 3px rgba(106, 27, 154, 0.14),
 		0px 8px 38px 7px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z21 {
-	box-shadow:
-		0px 10px 13px -6px rgba(106, 27, 154, 0.2),
-		0px 21px 33px 3px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 10px 13px -6px rgba(106, 27, 154, 0.2), 0px 21px 33px 3px rgba(106, 27, 154, 0.14),
 		0px 8px 40px 7px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z22 {
-	box-shadow:
-		0px 10px 14px -6px rgba(106, 27, 154, 0.2),
-		0px 22px 35px 3px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 10px 14px -6px rgba(106, 27, 154, 0.2), 0px 22px 35px 3px rgba(106, 27, 154, 0.14),
 		0px 8px 42px 7px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z23 {
-	box-shadow:
-		0px 11px 14px -7px rgba(106, 27, 154, 0.2),
-		0px 23px 36px 3px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 11px 14px -7px rgba(106, 27, 154, 0.2), 0px 23px 36px 3px rgba(106, 27, 154, 0.14),
 		0px 9px 44px 8px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--raised.smui-paper--elevation-z24 {
-	box-shadow:
-		0px 11px 15px -7px rgba(106, 27, 154, 0.2),
-		0px 24px 38px 3px rgba(106, 27, 154, 0.14),
+	box-shadow: 0px 11px 15px -7px rgba(106, 27, 154, 0.2), 0px 24px 38px 3px rgba(106, 27, 154, 0.14),
 		0px 9px 46px 8px rgba(106, 27, 154, 0.12);
 }
 .smui-paper.smui-paper--color-primary.smui-paper--outlined {
@@ -10684,154 +10483,104 @@ a.mdc-list-item {
 	color: var(--mdc-theme-on-secondary, #000);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z0 {
-	box-shadow:
-		0px 0px 0px 0px rgba(152, 152, 149, 0.2),
-		0px 0px 0px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 0px 0px 0px rgba(152, 152, 149, 0.2), 0px 0px 0px 0px rgba(152, 152, 149, 0.14),
 		0px 0px 0px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z1 {
-	box-shadow:
-		0px 2px 1px -1px rgba(152, 152, 149, 0.2),
-		0px 1px 1px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 2px 1px -1px rgba(152, 152, 149, 0.2), 0px 1px 1px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 3px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z2 {
-	box-shadow:
-		0px 3px 1px -2px rgba(152, 152, 149, 0.2),
-		0px 2px 2px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 3px 1px -2px rgba(152, 152, 149, 0.2), 0px 2px 2px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 5px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z3 {
-	box-shadow:
-		0px 3px 3px -2px rgba(152, 152, 149, 0.2),
-		0px 3px 4px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 3px 3px -2px rgba(152, 152, 149, 0.2), 0px 3px 4px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 8px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z4 {
-	box-shadow:
-		0px 2px 4px -1px rgba(152, 152, 149, 0.2),
-		0px 4px 5px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 2px 4px -1px rgba(152, 152, 149, 0.2), 0px 4px 5px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 10px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z5 {
-	box-shadow:
-		0px 3px 5px -1px rgba(152, 152, 149, 0.2),
-		0px 5px 8px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(152, 152, 149, 0.2), 0px 5px 8px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 14px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z6 {
-	box-shadow:
-		0px 3px 5px -1px rgba(152, 152, 149, 0.2),
-		0px 6px 10px 0px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 3px 5px -1px rgba(152, 152, 149, 0.2), 0px 6px 10px 0px rgba(152, 152, 149, 0.14),
 		0px 1px 18px 0px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z7 {
-	box-shadow:
-		0px 4px 5px -2px rgba(152, 152, 149, 0.2),
-		0px 7px 10px 1px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 4px 5px -2px rgba(152, 152, 149, 0.2), 0px 7px 10px 1px rgba(152, 152, 149, 0.14),
 		0px 2px 16px 1px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z8 {
-	box-shadow:
-		0px 5px 5px -3px rgba(152, 152, 149, 0.2),
-		0px 8px 10px 1px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 5px 5px -3px rgba(152, 152, 149, 0.2), 0px 8px 10px 1px rgba(152, 152, 149, 0.14),
 		0px 3px 14px 2px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z9 {
-	box-shadow:
-		0px 5px 6px -3px rgba(152, 152, 149, 0.2),
-		0px 9px 12px 1px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 5px 6px -3px rgba(152, 152, 149, 0.2), 0px 9px 12px 1px rgba(152, 152, 149, 0.14),
 		0px 3px 16px 2px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z10 {
-	box-shadow:
-		0px 6px 6px -3px rgba(152, 152, 149, 0.2),
-		0px 10px 14px 1px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 6px 6px -3px rgba(152, 152, 149, 0.2), 0px 10px 14px 1px rgba(152, 152, 149, 0.14),
 		0px 4px 18px 3px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z11 {
-	box-shadow:
-		0px 6px 7px -4px rgba(152, 152, 149, 0.2),
-		0px 11px 15px 1px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 6px 7px -4px rgba(152, 152, 149, 0.2), 0px 11px 15px 1px rgba(152, 152, 149, 0.14),
 		0px 4px 20px 3px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z12 {
-	box-shadow:
-		0px 7px 8px -4px rgba(152, 152, 149, 0.2),
-		0px 12px 17px 2px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(152, 152, 149, 0.2), 0px 12px 17px 2px rgba(152, 152, 149, 0.14),
 		0px 5px 22px 4px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z13 {
-	box-shadow:
-		0px 7px 8px -4px rgba(152, 152, 149, 0.2),
-		0px 13px 19px 2px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 7px 8px -4px rgba(152, 152, 149, 0.2), 0px 13px 19px 2px rgba(152, 152, 149, 0.14),
 		0px 5px 24px 4px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z14 {
-	box-shadow:
-		0px 7px 9px -4px rgba(152, 152, 149, 0.2),
-		0px 14px 21px 2px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 7px 9px -4px rgba(152, 152, 149, 0.2), 0px 14px 21px 2px rgba(152, 152, 149, 0.14),
 		0px 5px 26px 4px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z15 {
-	box-shadow:
-		0px 8px 9px -5px rgba(152, 152, 149, 0.2),
-		0px 15px 22px 2px rgba(152, 152, 149, 0.14),
+	box-shadow: 0px 8px 9px -5px rgba(152, 152, 149, 0.2), 0px 15px 22px 2px rgba(152, 152, 149, 0.14),
 		0px 6px 28px 5px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z16 {
-	box-shadow:
-		0px 8px 10px -5px rgba(152, 152, 149, 0.2),
-		0px 16px 24px 2px rgba(152, 152, 149, 0.14),
-		0px 6px 30px 5px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 8px 10px -5px rgba(152, 152, 149, 0.2),
+		0px 16px 24px 2px rgba(152, 152, 149, 0.14), 0px 6px 30px 5px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z17 {
-	box-shadow:
-		0px 8px 11px -5px rgba(152, 152, 149, 0.2),
-		0px 17px 26px 2px rgba(152, 152, 149, 0.14),
-		0px 6px 32px 5px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 8px 11px -5px rgba(152, 152, 149, 0.2),
+		0px 17px 26px 2px rgba(152, 152, 149, 0.14), 0px 6px 32px 5px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z18 {
-	box-shadow:
-		0px 9px 11px -5px rgba(152, 152, 149, 0.2),
-		0px 18px 28px 2px rgba(152, 152, 149, 0.14),
-		0px 7px 34px 6px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 9px 11px -5px rgba(152, 152, 149, 0.2),
+		0px 18px 28px 2px rgba(152, 152, 149, 0.14), 0px 7px 34px 6px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z19 {
-	box-shadow:
-		0px 9px 12px -6px rgba(152, 152, 149, 0.2),
-		0px 19px 29px 2px rgba(152, 152, 149, 0.14),
-		0px 7px 36px 6px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 9px 12px -6px rgba(152, 152, 149, 0.2),
+		0px 19px 29px 2px rgba(152, 152, 149, 0.14), 0px 7px 36px 6px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z20 {
-	box-shadow:
-		0px 10px 13px -6px rgba(152, 152, 149, 0.2),
-		0px 20px 31px 3px rgba(152, 152, 149, 0.14),
-		0px 8px 38px 7px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 10px 13px -6px rgba(152, 152, 149, 0.2),
+		0px 20px 31px 3px rgba(152, 152, 149, 0.14), 0px 8px 38px 7px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z21 {
-	box-shadow:
-		0px 10px 13px -6px rgba(152, 152, 149, 0.2),
-		0px 21px 33px 3px rgba(152, 152, 149, 0.14),
-		0px 8px 40px 7px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 10px 13px -6px rgba(152, 152, 149, 0.2),
+		0px 21px 33px 3px rgba(152, 152, 149, 0.14), 0px 8px 40px 7px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z22 {
-	box-shadow:
-		0px 10px 14px -6px rgba(152, 152, 149, 0.2),
-		0px 22px 35px 3px rgba(152, 152, 149, 0.14),
-		0px 8px 42px 7px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 10px 14px -6px rgba(152, 152, 149, 0.2),
+		0px 22px 35px 3px rgba(152, 152, 149, 0.14), 0px 8px 42px 7px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z23 {
-	box-shadow:
-		0px 11px 14px -7px rgba(152, 152, 149, 0.2),
-		0px 23px 36px 3px rgba(152, 152, 149, 0.14),
-		0px 9px 44px 8px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 11px 14px -7px rgba(152, 152, 149, 0.2),
+		0px 23px 36px 3px rgba(152, 152, 149, 0.14), 0px 9px 44px 8px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--raised.smui-paper--elevation-z24 {
-	box-shadow:
-		0px 11px 15px -7px rgba(152, 152, 149, 0.2),
-		0px 24px 38px 3px rgba(152, 152, 149, 0.14),
-		0px 9px 46px 8px rgba(152, 152, 149, 0.12);
+	box-shadow: 0px 11px 15px -7px rgba(152, 152, 149, 0.2),
+		0px 24px 38px 3px rgba(152, 152, 149, 0.14), 0px 9px 46px 8px rgba(152, 152, 149, 0.12);
 }
 .smui-paper.smui-paper--color-secondary.smui-paper--outlined {
 	border-width: 1px;
@@ -10964,9 +10713,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-segmented-button__segment .mdc-segmented-button__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -10989,9 +10736,7 @@ a.mdc-list-item {
 }
 .mdc-segmented-button__segment.mdc-ripple-upgraded--foreground-activation
 	.mdc-segmented-button__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-segmented-button__segment.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-segmented-button__ripple::after {
@@ -11070,9 +10815,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-slider__thumb::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -11094,9 +10837,7 @@ a.mdc-list-item {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-slider__thumb.mdc-ripple-upgraded--foreground-activation::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-slider__thumb.mdc-ripple-upgraded--foreground-deactivation::after {
 	animation: mdc-ripple-fg-opacity-out 150ms;
@@ -11346,9 +11087,7 @@ a.mdc-list-item {
 	box-sizing: content-box;
 }
 .mdc-slider .mdc-slider__thumb-knob {
-	box-shadow:
-		0px 2px 1px -1px rgba(0, 0, 0, 0.2),
-		0px 1px 1px 0px rgba(0, 0, 0, 0.14),
+	box-shadow: 0px 2px 1px -1px rgba(0, 0, 0, 0.2), 0px 1px 1px 0px rgba(0, 0, 0, 0.14),
 		0px 1px 3px 0px rgba(0, 0, 0, 0.12);
 	border: 10px solid;
 	border-radius: 50%;
@@ -11499,9 +11238,7 @@ a.mdc-list-item {
 	content: '';
 }
 .mdc-text-field--filled .mdc-text-field__ripple::before {
-	transition:
-		opacity 15ms linear,
-		background-color 15ms linear;
+	transition: opacity 15ms linear, background-color 15ms linear;
 	z-index: 1;
 	z-index: var(--mdc-ripple-z-index, 1);
 }
@@ -11523,9 +11260,7 @@ a.mdc-list-item {
 	left: var(--mdc-ripple-left, 0);
 }
 .mdc-text-field--filled.mdc-ripple-upgraded--foreground-activation .mdc-text-field__ripple::after {
-	animation:
-		mdc-ripple-fg-radius-in 225ms forwards,
-		mdc-ripple-fg-opacity-in 75ms forwards;
+	animation: mdc-ripple-fg-radius-in 225ms forwards, mdc-ripple-fg-opacity-in 75ms forwards;
 }
 .mdc-text-field--filled.mdc-ripple-upgraded--foreground-deactivation
 	.mdc-text-field__ripple::after {
