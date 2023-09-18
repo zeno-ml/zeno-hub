@@ -24,7 +24,7 @@
 		"@smui/chips": "7.0.0-beta.8",
 		"@smui/circular-progress": "7.0.0-beta.14",
 		"@smui/data-table": "7.0.0-beta.15",
-		"@smui/dialog": "^7.0.0-beta.14",
+		"@smui/dialog": "^7.0.0-beta.15",
 		"@smui/form-field": "7.0.0-beta.14",
 		"@smui/icon-button": "^7.0.0-beta.8",
 		"@smui/layout-grid": "7.0.0-beta.14",
