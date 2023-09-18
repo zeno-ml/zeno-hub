@@ -1117,16 +1117,16 @@
     "@smui/ripple" "^7.0.0-beta.15"
     svelte2tsx "^0.6.21"
 
-"@smui/slider@^7.0.0-beta.8":
-  version "7.0.0-beta.14"
-  resolved "https://registry.npmjs.org/@smui/slider/-/slider-7.0.0-beta.14.tgz"
-  integrity sha512-O2eECIqfLoStpHbs9zpaDqs8Pm/KwTgu/YvWivcSSn+7kLZnZ76CHro/gBJauekRdt4Wns5N6Qav9VTaC99v2Q==
+"@smui/slider@^7.0.0-beta.15":
+  version "7.0.0-beta.15"
+  resolved "https://registry.yarnpkg.com/@smui/slider/-/slider-7.0.0-beta.15.tgz#c4a5ef59130575551dc24b42759bda07f333a62d"
+  integrity sha512-ylPmBISV49RA7huYc3nHImINQuwGfkxvzAYSEo2fFZF+eX+8X+5kBSqoS2xVN2FvkMWJpdag99rbm8v0nglwew==
   dependencies:
     "@material/dom" "^14.0.0"
     "@material/slider" "^14.0.0"
-    "@smui/common" "^7.0.0-beta.14"
-    "@smui/ripple" "^7.0.0-beta.14"
-    svelte2tsx "^0.6.15"
+    "@smui/common" "^7.0.0-beta.15"
+    "@smui/ripple" "^7.0.0-beta.15"
+    svelte2tsx "^0.6.21"
 
 "@smui/textfield@^7.0.0-beta.15":
   version "7.0.0-beta.15"
