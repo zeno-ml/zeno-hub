@@ -282,6 +282,34 @@ def system(
     columns.append(output_col_object)
 
     with Database() as db:
+        # Check whether the system has the same columns as existing systems.
+        system_columns = db.execute_return(
+            sql.SQL("SELECT column_id, name FROM {} WHERE model IS NOT NULL;").format(
+                sql.Identifier(f"{project}_column_map")
+            )
+        )
+        system_column_names = list(set(map(lambda x: x[1], system_columns)))
+        if len(system_column_names) > 0 and (
+            len(columns) != len(system_column_names)
+            or not all(map(lambda x: x.name in system_column_names, columns))
+        ):
+            raise Exception(
+                "ERROR: The system you are trying to add does not have the same "
+                "columns as existing systems."
+            )
+
+        # Check whether there are values for all data points.
+        num_matches = db.execute_return(
+            sql.SQL(
+                "SELECT COUNT(*) FROM tmp JOIN {} ON tmp.data_id = {}.data_id;"
+            ).format(sql.Identifier(project), sql.Identifier(project))
+        )
+        if num_matches[0][0] != len(data_frame.index):
+            raise Exception(
+                "ERROR: The system you are trying to add does not have values "
+                "for all data points."
+            )
+
         for col in columns:
             data_type = db.execute_return(
                 sql.SQL(
