@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import * as amplitude from '@amplitude/analytics-browser';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
@@ -49,14 +48,7 @@
 			label="Repeat password"
 			class="w-56 mb-3"
 		/>
-		<Button
-			type="submit"
-			variant="raised"
-			class="mt-5"
-			on:click={() => amplitude.track('User Registered')}
-		>
-			Sign Up
-		</Button>
+		<Button type="submit" variant="raised" class="mt-5">Sign Up</Button>
 		<p class="mt-5">
 			Already have an account? <a href="/">Log in now!</a>
 		</p>
