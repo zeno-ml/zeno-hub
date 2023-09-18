@@ -4,7 +4,7 @@ import HeatMap from '$lib/components/chart/chart-types/heatmap-chart/HeatMap.sve
 import LineChart from '$lib/components/chart/chart-types/line-chart/LineChart.svelte';
 import RadarChart from '$lib/components/chart/chart-types/radar-chart/RadarChart.svelte';
 import Table from '$lib/components/chart/chart-types/table/Table.svelte';
-import { metrics, models, slices } from '$lib/stores';
+import { metrics, models } from '$lib/stores';
 import {
 	ChartType,
 	SlicesMetricsOrModels,
@@ -28,9 +28,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				name: name,
 				type: type,
 				parameters: <XCParameters>{
-					slices: get(slices)
-						.map((slice) => slice.id)
-						.slice(0, 2),
+					slices: [-1],
 					metric: -1,
 					models: get(models),
 					xChannel: SlicesOrModels.SLICES,
@@ -44,9 +42,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				type: ChartType.TABLE,
 				parameters: <TableParameters>{
 					models: get(models),
-					slices: get(slices)
-						.map((slice) => slice.id)
-						.slice(0, 2),
+					slices: [-1],
 					metrics: [-1],
 					xChannel: SlicesMetricsOrModels.MODELS,
 					yChannel: SlicesOrModels.SLICES,
@@ -60,9 +56,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				type: ChartType.BEESWARM,
 				parameters: <BeeswarmParameters>{
 					models: [get(models)[0]],
-					slices: get(slices)
-						.map((slice) => slice.id)
-						.slice(0, 2),
+					slices: [-1],
 					metrics: get(metrics).map((m) => m.id),
 					yChannel: SlicesOrModels.MODELS,
 					colorChannel: SlicesOrModels.SLICES,
@@ -76,10 +70,8 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				type: ChartType.RADAR,
 				parameters: <RadarParameters>{
 					models: [get(models)[0]],
-					slices: get(slices)
-						.map((slice) => slice.id)
-						.slice(0, 2),
-					metrics: get(metrics).map((m) => m.id),
+					slices: [-1],
+					metrics: [...get(metrics).map((m) => m.id), -1],
 					axisChannel: SlicesMetricsOrModels.METRICS,
 					fixedChannel: SlicesMetricsOrModels.MODELS,
 					layerChannel: SlicesOrModels.SLICES
@@ -91,9 +83,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				name: name,
 				type: ChartType.HEATMAP,
 				parameters: <HeatmapParameters>{
-					xValues: get(slices)
-						.map((slice) => slice.id)
-						.slice(0, 2),
+					xValues: [-1],
 					yValues: get(models),
 					metric: -1,
 					model: get(models)[0],
