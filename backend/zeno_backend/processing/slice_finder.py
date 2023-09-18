@@ -18,11 +18,11 @@ def cont_cols_df(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     """Discretize continuous valued columns.
 
     Args:
-        df (pd.DataFrame): _description_
-        cols (list[str]): _description_
+        df (pd.DataFrame): the dataframe to be discretized.
+        cols (list[str]): the columns to be discretized.
 
     Returns:
-        pd.DataFrame: _description_
+        pd.DataFrame: discretized dataframe.
     """
     new_df = pd.DataFrame()
     for col in cols:
@@ -38,9 +38,10 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
     Args:
         project (str): the project the user is currently working with
-        req (SliceFinderRequest): Request with columns, metrics, and options.
+        req (SliceFinderRequest): request with columns, metrics, and options.
 
-    Returns a SliceFinderMetricReturn Object.
+    Returns:
+        SliceFinderMetricReturn: object containing the return values of slice finder.
     """
     cont_search_cols: list[ZenoColumn] = []
     not_cont_search_cols: list[ZenoColumn] = []
