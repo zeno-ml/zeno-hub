@@ -23,8 +23,10 @@
 		}>;
 	};
 
+	let range: [number, number] = [0, 0];
 	let metrics: Metric[] = [];
 	let slices: Slice[] = [];
+
 	ZenoService.getMetrics(chart.projectUuid).then((met) => {
 		metrics = met;
 	});
@@ -32,7 +34,12 @@
 		slices = sli;
 	});
 
-	$: range = extent(data.table, (d) => d.x_value);
+	$: {
+		let ext = extent(data.table, (d) => d.x_value);
+		if (ext[0] !== undefined && ext[1] !== undefined) {
+			range = [ext[0] as number, ext[1] as number];
+		}
+	}
 	$: parameters = chart.parameters as BeeswarmParameters;
 	$: rows =
 		parameters.fixedDimension === 'y'

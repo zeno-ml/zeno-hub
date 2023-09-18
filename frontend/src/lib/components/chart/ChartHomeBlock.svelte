@@ -76,6 +76,7 @@
 										id: 0,
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
+										projectUuid: $project ? $project.uuid : '',
 										parameters: chart.parameters
 									}).then(() => {
 										invalidate('app:charts');
