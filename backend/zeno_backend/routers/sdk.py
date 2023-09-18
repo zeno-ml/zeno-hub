@@ -1,10 +1,9 @@
 """FastAPI server endpoints for the Zeno SDK."""
 import io
-import os
 import uuid
 
 import pandas as pd
-from amplitude import Amplitude, BaseEvent
+from amplitude import BaseEvent
 from fastapi import (
     APIRouter,
     Depends,
@@ -17,10 +16,9 @@ from fastapi import (
 )
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
 from zeno_backend.database import insert, select
-
-amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 class APIKeyBearer(HTTPBearer):
@@ -97,7 +95,7 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
         )
 
     project.uuid = str(uuid.uuid4())
-    amplitude_client.track(
+    AmplitudeHandler().track(
         BaseEvent(
             event_type="Project Created",
             user_id="00000" + str(user_id),
@@ -197,7 +195,7 @@ def upload_system(
             detail=("ERROR: Unable to create system table: " + str(e)),
         ) from e
 
-    amplitude_client.track(
+    AmplitudeHandler().track(
         BaseEvent(
             event_type="System Uploaded",
             user_id="00000" + str(user_id),

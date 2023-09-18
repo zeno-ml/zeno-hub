@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 import uvicorn
-from amplitude import Amplitude, BaseEvent
+from amplitude import BaseEvent
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,7 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
+from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.base import (
     GroupMetric,
     ZenoColumn,
@@ -44,8 +45,6 @@ from zeno_backend.processing.slice_finder import slice_finder
 from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
-
-amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 def get_server() -> FastAPI:
@@ -352,7 +351,7 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         if not util.access_valid(uuid, request):
             return Response(status_code=401)
-        amplitude_client.track(
+        AmplitudeHandler().track(
             BaseEvent(
                 event_type="Project Viewed",
                 user_id="ProjectViewedUser",
@@ -417,7 +416,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_public_projects():
-        amplitude_client.track(
+        AmplitudeHandler().track(
             BaseEvent(
                 event_type="Home Viewed",
                 user_id="HomeViewedUser",
@@ -579,7 +578,7 @@ def get_server() -> FastAPI:
             try:
                 user = User(id=-1, name=name, admin=None)
                 user_id = insert.user(user)
-                amplitude_client.track(
+                AmplitudeHandler().track(
                     BaseEvent(
                         event_type="User Registered",
                         user_id="00000" + str(user_id) if user_id else "",
@@ -593,7 +592,7 @@ def get_server() -> FastAPI:
                     detail=str(exc),
                 ) from exc
         else:
-            amplitude_client.track(
+            AmplitudeHandler().track(
                 BaseEvent(
                     event_type="User Logged In",
                     user_id="00000" + str(fetched_user.id),
