@@ -31,6 +31,11 @@ class MetricKey(CamelModel):
     """Specification of metric keys in zeno.
 
     Metric keys map to a specific slice, model, and metric.
+
+    Attributes:
+        slice (Slice): the slice to be used for the metric.
+        model (str): the model to be used for the metric.
+        metric (int): the metric to be used for the metric.
     """
 
     slice: Slice
@@ -42,6 +47,10 @@ class MetricRequest(CamelModel):
     """Specification of a metric request in Zeno.
 
     Can be used to request metric calculation on specific data subsets.
+
+    Attributes:
+        metric_keys (list[MetricKey]): the metric keys to be used for the metric.
+        data_ids (list[str] | None): the data ids to be used for the metric.
     """
 
     metric_keys: list[MetricKey]

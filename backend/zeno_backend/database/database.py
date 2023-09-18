@@ -6,6 +6,49 @@ from typing import Any, LiteralString
 
 import psycopg
 from psycopg import sql
+from psycopg_pool import AsyncConnectionPool
+
+
+def config(
+    filename: str = "zeno_backend/database/database.ini",
+    section: str = "postgresql",
+) -> dict[str, Any]:
+    """Get the configuration of the database.
+
+    Args:
+        filename (str, optional): the path to the database.ini.
+            Defaults to "zeno_backend/database/database.ini".
+        section (str, optional): which section in the database.ini to read.
+            Defaults to "postgresql".
+
+    Raises:
+        Exception: reading the configuration failed.
+
+    Returns:
+        dict[str, Any]: the database configuration.
+    """
+    if Path(filename).exists():
+        parser = ConfigParser()
+        parser.read(filename)
+        db: dict[str, Any] = {}
+        if parser.has_section(section):
+            params = parser.items(section)
+            for param in params:
+                db[param[0]] = param[1]
+        else:
+            raise Exception(f"Section {section} not found in the {filename} file")
+        return db
+    else:
+        db: dict[str, Any] = {}
+        db["host"] = os.environ["DB_HOST"]
+        db["port"] = os.environ["DB_PORT"]
+        db["dbname"] = os.environ["DB_NAME"]
+        db["user"] = os.environ["DB_USER"]
+        db["password"] = os.environ["DB_PASSWORD"]
+        return db
+
+
+db_pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in config().items()]))
 
 
 class Database:
@@ -22,7 +65,7 @@ class Database:
         Raises:
             Exception: the connection to the database failed.
         """
-        params = self.config()
+        params = config()
         try:
             self.conn = psycopg.connect(**params)
             self.cur = self.conn.cursor()
@@ -53,7 +96,7 @@ class Database:
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute.
@@ -74,7 +117,7 @@ class Database:
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute.
@@ -98,14 +141,13 @@ class Database:
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
-            the first. Defaults to False.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute
 
         Returns:
-            Any: the data as fetched by the query.
+            list[tuple[Any, ...]]: the data as fetched by the query.
         """
         if self.cur is None:
             raise Exception("No connection to the database")
@@ -125,14 +167,13 @@ class Database:
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
-            the first. Defaults to False.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute
 
         Returns:
-            Any: the data as fetched by the query.
+            list[tuple[Any, ...]]: the data as fetched by the query.
         """
         try:
             self.connect()
@@ -144,50 +185,11 @@ class Database:
         finally:
             self.disconnect()
 
-    def config(
-        self,
-        filename: str = "zeno_backend/database/database.ini",
-        section: str = "postgresql",
-    ) -> dict[str, Any]:
-        """Get the configuration of the database.
-
-        Args:
-            filename (str, optional): the path to the database.ini.
-            Defaults to "zeno_backend/database/database.ini".
-            section (str, optional): which section in the database.ini to read.
-            Defaults to "postgresql".
-
-        Raises:
-            Exception: reading the configuration failed.
-
-        Returns:
-            dict[str, Any]: the database configuration.
-        """
-        if Path(filename).exists():
-            parser = ConfigParser()
-            parser.read(filename)
-            db: dict[str, Any] = {}
-            if parser.has_section(section):
-                params = parser.items(section)
-                for param in params:
-                    db[param[0]] = param[1]
-            else:
-                raise Exception(f"Section {section} not found in the {filename} file")
-            return db
-        else:
-            db: dict[str, Any] = {}
-            db["host"] = os.environ["DB_HOST"]
-            db["port"] = os.environ["DB_PORT"]
-            db["dbname"] = os.environ["DB_NAME"]
-            db["user"] = os.environ["DB_USER"]
-            db["password"] = os.environ["DB_PASSWORD"]
-            return db
-
     def __enter__(self):
         """Connect to the database.
 
         Returns:
-            Database: The database object.
+            Database: database object.
         """
         self.connect()
         return self

@@ -27,11 +27,11 @@ class ZenoColumnType(str, Enum):
     """Enumeration of possible column types in Zeno.
 
     Attributes:
-        DATA: Input data instance. Either raw data or filename.
-        LABEL: Ground truth label.
-        OUTPUT: Model output.
-        FEATURE: Metadata feature for an input data instance.
-        EMBEDDING: Vector embedding representing a data instance or output.
+        DATA: input data instance. Either raw data or filename.
+        LABEL: ground truth label.
+        OUTPUT: model output.
+        FEATURE: metadata feature for an input data instance.
+        EMBEDDING: vector embedding representing a data instance or output.
     """
 
     DATA = "DATA"
@@ -45,11 +45,11 @@ class MetadataType(str, Enum):
     """Enumeration of possible metadata types in Zeno.
 
     Attributes:
-        NOMINAL: Nominal metadata type, e.g. string or small cardinality number.
-        CONTINUOUS: Continuous metadata type, e.g. large cardinality number.
-        BOOLEAN: Boolean metadata type, e.g. True or False.
-        DATETIME: Datetime metadata type, e.g. 2021-01-01 00:00:00.
-        OTHER: Any other metadata type, e.g. strings.
+        NOMINAL: nominal metadata type, e.g. string or small cardinality number.
+        CONTINUOUS: continuous metadata type, e.g. large cardinality number.
+        BOOLEAN: boolean metadata type, e.g. True or False.
+        DATETIME: datetime metadata type, e.g. 2021-01-01 00:00:00.
+        OTHER: any other metadata type, e.g. strings.
     """
 
     NOMINAL = "NOMINAL"
@@ -77,11 +77,11 @@ class ZenoColumn(CamelModel):
     """Representation of a column in a Zeno project.
 
     Attributes:
-        id (str): The ID of the column.
-        name (str): The name of the column.
-        column_type (ZenoColumnType): The type of the column.
-        data_type (MetadataType): The data type of the column.
-        model (str | None): The name of the model that produced the column.
+        id (str): ID of the column.
+        name (str): name of the column.
+        column_type (ZenoColumnType): type of the column.
+        data_type (MetadataType): data type of the column.
+        model (str | None): name of the model that produced the column.
     """
 
     id: str

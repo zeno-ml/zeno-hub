@@ -8,7 +8,7 @@
 
 	async function updateChart(chartType: ChartType) {
 		if (chart.type !== chartType && $project) {
-			chart = { ...chartDefaults(chart.name, chart.id, chartType) };
+			chart = chartDefaults(chart.name, chart.id, chartType);
 		}
 	}
 </script>

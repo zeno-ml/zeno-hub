@@ -1,11 +1,11 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
+import asyncio
 import os
 import shutil
 from pathlib import Path
 
 import pandas as pd
 import uvicorn
-from amplitude import Amplitude
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,16 +35,14 @@ from zeno_backend.processing.chart import chart_data
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import (
     HistogramRequest,
-    histogram_buckets,
-    histogram_counts,
+    histogram_bucket,
+    histogram_metric_and_count,
 )
 from zeno_backend.processing.metrics.map import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
 from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
-
-amplitude_client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
 
 
 def get_server() -> FastAPI:
@@ -459,20 +457,45 @@ def get_server() -> FastAPI:
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    def get_histogram_buckets(req: list[ZenoColumn], project: str, request: Request):
+    async def get_histogram_buckets(
+        req: list[ZenoColumn], project: str, request: Request
+    ):
         if not util.access_valid(project, request):
             return Response(status_code=401)
-        return histogram_buckets(project, req)
+
+        return await asyncio.gather(*[histogram_bucket(project, col) for col in req])
 
     @api_app.post(
-        "/histogram-counts/{project}",
+        "/histogram-counts/{project_uuid}",
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
-    def calculate_histograms(req: HistogramRequest, project: str, request: Request):
-        if not util.access_valid(project, request):
+    async def calculate_histograms(
+        req: HistogramRequest, project_uuid: str, request: Request
+    ):
+        if not util.access_valid(project_uuid, request):
             return Response(status_code=401)
-        return histogram_counts(project, req)
+
+        project_obj = select.project_from_uuid(project_uuid)
+        if project_obj is None:
+            return []
+
+        filter_sql = table_filter(
+            project_uuid, req.model, req.filter_predicates, req.data_ids
+        )
+
+        return await asyncio.gather(
+            *[
+                histogram_metric_and_count(
+                    req,
+                    r,
+                    project_uuid,
+                    filter_sql,
+                    project_obj.calculate_histogram_metrics,
+                )
+                for r in req.column_requests
+            ]
+        )
 
     @api_app.get(
         "/project-users/{project}",

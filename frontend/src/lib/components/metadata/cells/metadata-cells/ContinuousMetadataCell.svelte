@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { metricRange } from '$lib/stores';
+	import { metricRange, project } from '$lib/stores';
 	import {
 		Join,
 		Operation,
@@ -66,7 +66,7 @@
 <div id="histogram" on:mouseup={setSelection}>
 	<VegaLite
 		bind:view
-		spec={continuousVegaSpec($metricRange)}
+		spec={continuousVegaSpec($metricRange, $project?.calculateHistogramMetrics ?? false)}
 		data={{ table: histogram.map((h) => Object.assign({}, h)) }}
 		options={{
 			tooltip: true,

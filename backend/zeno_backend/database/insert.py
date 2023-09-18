@@ -16,6 +16,7 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
+from zeno_backend.database.database import config as config_db
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 
 
@@ -56,7 +57,7 @@ def project(project_config: Project, owner_id: int):
 
     Raises:
         Exception: something went wrong in the process of creating the new project in
-        the database.
+            the database.
     """
     with Database() as db:
         db.execute(
@@ -134,17 +135,19 @@ def dataset(
     """Adds a dataset to an existing project.
 
     Args:
-        project (str): The project the user is currently working with.
-        data_frame (pd.DataFrame): The dataset to be added.
-        id_column (str): The name of the column containing the instance IDs.
-        label_column (str): The name of the column containing the instance labels.
-        data_column (str): The name of the column containing the raw data.
+        project (str): project the user is currently working with.
+        data_frame (pd.DataFrame): dataset to be added.
+        id_column (str): name of the column containing the instance IDs.
+        label_column (str): name of the column containing the instance labels.
+        data_column (str): name of the column containing the raw data.
     """
     with Database() as db:
         # Drop the primary table and column_map since they will be recreated.
-        db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
         db.execute(
-            sql.SQL("DROP TABLE {} CASCADE;").format(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(sql.Identifier(project))
+        )
+        db.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{project}_column_map")
             )
         )
@@ -194,7 +197,7 @@ def dataset(
     )
 
     # Connect to the db engine using SQLAlchemy and write the data to a table.
-    config = db.config()
+    config = config_db()
     engine = create_engine(
         f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
     )
@@ -230,11 +233,11 @@ def system(
     """Adds a system to an existing project.
 
     Args:
-        project (str): The project the user is currently working with.
-        data_frame (pd.DataFrame): The system data to be added.
-        system_name (str): The name of the system that produced the output.
-        output_column (str): The name of the column containing the system output.
-        id_column (str): The name of the column containing the instance IDs.
+        project (str): project the user is currently working with.
+        data_frame (pd.DataFrame): system data to be added.
+        system_name (str): name of the system that produced the output.
+        output_column (str): name of the column containing the system output.
+        id_column (str): name of the column containing the instance IDs.
     """
     # Add all non-id and non-output columns to the column list.
     columns: list[ZenoColumn] = []
@@ -271,7 +274,7 @@ def system(
 
     # Connect to the db engine using SQLAlchemy and write the data to a table.
     db = Database()
-    config = db.config()
+    config = config_db()
     engine = create_engine(
         f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
     )
@@ -279,6 +282,34 @@ def system(
     columns.append(output_col_object)
 
     with Database() as db:
+        # Check whether the system has the same columns as existing systems.
+        system_columns = db.execute_return(
+            sql.SQL("SELECT column_id, name FROM {} WHERE model IS NOT NULL;").format(
+                sql.Identifier(f"{project}_column_map")
+            )
+        )
+        system_column_names = list(set(map(lambda x: x[1], system_columns)))
+        if len(system_column_names) > 0 and (
+            len(columns) != len(system_column_names)
+            or not all(map(lambda x: x.name in system_column_names, columns))
+        ):
+            raise Exception(
+                "ERROR: The system you are trying to add does not have the same "
+                "columns as existing systems."
+            )
+
+        # Check whether there are values for all data points.
+        num_matches = db.execute_return(
+            sql.SQL(
+                "SELECT COUNT(*) FROM tmp JOIN {} ON tmp.data_id = {}.data_id;"
+            ).format(sql.Identifier(project), sql.Identifier(project))
+        )
+        if num_matches[0][0] != len(data_frame.index):
+            raise Exception(
+                "ERROR: The system you are trying to add does not have values "
+                "for all data points."
+            )
+
         for col in columns:
             data_type = db.execute_return(
                 sql.SQL(

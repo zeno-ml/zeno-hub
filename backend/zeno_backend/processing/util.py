@@ -14,13 +14,13 @@ def generate_diff_cols(
     """Generate new difference column based on the dataframe and specified columns.
 
     Args:
-        df (DataFrame): The original dataframe.
-        diff_col_1 (ZenoColumn): The first column used to calculate the difference.
-        diff_col_2 (ZenoColumn): The second column used to calculate the difference.
-        project (str): The project id for which to get the diff column.
+        df (DataFrame): original dataframe.
+        diff_col_1 (ZenoColumn): first column used to calculate the difference.
+        diff_col_2 (ZenoColumn): second column used to calculate the difference.
+        project (str): project id for which to get the diff column.
 
     Returns:
-        DataFrame: Return the new dataframe containing the diff column.
+        DataFrame: new dataframe containing the diff column.
     """
     if (
         diff_col_1.column_type != diff_col_2.column_type

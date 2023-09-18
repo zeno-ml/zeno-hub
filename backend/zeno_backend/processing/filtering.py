@@ -17,7 +17,7 @@ def filter_to_sql(
         filter (FilterPredicateGroup): the filter to be converted to sql.
         project (str): the project the user is currently working with.
         model (Optional[str], optional): model for which to get a SQL filter.
-        Defaults to None.
+            Defaults to None.
 
     Returns:
         sql.Composed: filter to be used in a SQL query.
@@ -72,7 +72,7 @@ def table_filter(
         project (str): the project the user is currently working with
         model (Optional[str]): the model for which to generate the filter.
         filter_predicates (Optional[FilterPredicateGroup], optional): The filter
-        predicates to apply to the table. Default None.
+            predicates to apply to the table. Default None.
         data_ids (Optional[List[str]], optional): a list of datapoints to limit the
             table output to. Default None.
 

@@ -7,10 +7,10 @@ class Tag(CamelModel):
     """Specification of the tag type in Zeno.
 
     Attributes:
-        id (int): The id of the tag.
-        tag_name (str): The name of the tag.
-        data_ids (list[str]): The ids of the data belonging to the tag.
-        folder_id (Optiona[int]): The id of the folder the tag belongs to. Default None.
+        id (int): id of the tag.
+        tag_name (str): name of the tag.
+        data_ids (list[str]): ids of the data belonging to the tag.
+        folder_id (Optiona[int]): id of the folder the tag belongs to. Default None.
     """
 
     id: int
@@ -25,9 +25,9 @@ class TagMetricKey(CamelModel):
     TagMetricKeys can be used to calculate metrics for specific tags.
 
     Attributes:
-        tag (Tag): The tag to calculate metrics for.
-        model (str | None): The model to calculate metrics for.
-        metric (int | None): The metric to calculate.
+        tag (Tag): tag to calculate metrics for.
+        model (str | None): model to calculate metrics for.
+        metric (int | None): metric to calculate.
     """
 
     tag: Tag
