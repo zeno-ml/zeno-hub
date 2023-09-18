@@ -80,7 +80,7 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
     """Create a new project.
 
     Args:
-        project (Project): Project object.
+        project (Project): project object.
         api_key (str, optional): API key.
     """
     user_id = select.user_id_by_api_key(api_key)

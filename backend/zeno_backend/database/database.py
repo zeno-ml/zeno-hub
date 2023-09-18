@@ -17,9 +17,9 @@ def config(
 
     Args:
         filename (str, optional): the path to the database.ini.
-        Defaults to "zeno_backend/database/database.ini".
+            Defaults to "zeno_backend/database/database.ini".
         section (str, optional): which section in the database.ini to read.
-        Defaults to "postgresql".
+            Defaults to "postgresql".
 
     Raises:
         Exception: reading the configuration failed.
@@ -96,7 +96,7 @@ class Database:
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute.
@@ -117,7 +117,7 @@ class Database:
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute.
@@ -141,14 +141,13 @@ class Database:
         Args:
             query (Union[LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
-            the first. Defaults to False.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute
 
         Returns:
-            Any: the data as fetched by the query.
+            list[tuple[Any, ...]]: the data as fetched by the query.
         """
         if self.cur is None:
             raise Exception("No connection to the database")
@@ -168,14 +167,13 @@ class Database:
         Args:
             query (Union[sql.LiteralString, sql.Composed]): the query to be executed.
             params (list[Any], optional): any parameters to be passed to the query.
-            Defaults to None.
-            the first. Defaults to False.
+                Defaults to None.
 
         Raises:
             Exception: the query failed to execute
 
         Returns:
-            Any: the data as fetched by the query.
+            list[tuple[Any, ...]]: the data as fetched by the query.
         """
         try:
             self.connect()
@@ -191,7 +189,7 @@ class Database:
         """Connect to the database.
 
         Returns:
-            Database: The database object.
+            Database: database object.
         """
         self.connect()
         return self

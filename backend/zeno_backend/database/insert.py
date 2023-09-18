@@ -57,7 +57,7 @@ def project(project_config: Project, owner_id: int):
 
     Raises:
         Exception: something went wrong in the process of creating the new project in
-        the database.
+            the database.
     """
     with Database() as db:
         db.execute(
@@ -135,11 +135,11 @@ def dataset(
     """Adds a dataset to an existing project.
 
     Args:
-        project (str): The project the user is currently working with.
-        data_frame (pd.DataFrame): The dataset to be added.
-        id_column (str): The name of the column containing the instance IDs.
-        label_column (str): The name of the column containing the instance labels.
-        data_column (str): The name of the column containing the raw data.
+        project (str): project the user is currently working with.
+        data_frame (pd.DataFrame): dataset to be added.
+        id_column (str): name of the column containing the instance IDs.
+        label_column (str): name of the column containing the instance labels.
+        data_column (str): name of the column containing the raw data.
     """
     with Database() as db:
         # Drop the primary table and column_map since they will be recreated.
@@ -233,11 +233,11 @@ def system(
     """Adds a system to an existing project.
 
     Args:
-        project (str): The project the user is currently working with.
-        data_frame (pd.DataFrame): The system data to be added.
-        system_name (str): The name of the system that produced the output.
-        output_column (str): The name of the column containing the system output.
-        id_column (str): The name of the column containing the instance IDs.
+        project (str): project the user is currently working with.
+        data_frame (pd.DataFrame): system data to be added.
+        system_name (str): name of the system that produced the output.
+        output_column (str): name of the column containing the system output.
+        id_column (str): name of the column containing the instance IDs.
     """
     # Add all non-id and non-output columns to the column list.
     columns: list[ZenoColumn] = []

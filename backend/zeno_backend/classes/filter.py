@@ -7,7 +7,19 @@ from zeno_backend.classes.base import CamelModel, ZenoColumn
 
 
 class Operation(str, Enum):
-    """Enumeration of possible filter operations."""
+    """Enumeration of possible filter operations.
+
+    Attributes:
+        EQUAL: equal to.
+        DIFFERENT: different from.
+        GT: greater than.
+        LT: less than.
+        LTE: less than or equal to.
+        GTE: greater than or equal to.
+        LIKE: like.
+        ILIKE: ilike.
+        REGEX: regex.
+    """
 
     EQUAL = "EQUAL"
     DIFFERENT = "DIFFERENT"
@@ -23,7 +35,7 @@ class Operation(str, Enum):
         """Obtain a string representation to be used in a SQL filter.
 
         Returns:
-            str: the SQL filter string for an operation.
+            str: SQL filter string for an operation.
         """
         if self == Operation.EQUAL:
             return "="
@@ -45,7 +57,13 @@ class Operation(str, Enum):
 
 
 class Join(str, Enum):
-    """Enumeration of the join operators between filter predicates."""
+    """Enumeration of the join operators between filter predicates.
+
+    Attributes:
+        AND: logical AND.
+        OR: logical OR.
+        OMITTED: no join.
+    """
 
     AND = "AND"
     OR = "OR"
@@ -53,7 +71,14 @@ class Join(str, Enum):
 
 
 class FilterPredicate(CamelModel):
-    """Predicates to specify a filter operation on a column of the data table."""
+    """Predicates to specify a filter operation on a column of the data table.
+
+    Attributes:
+        column (ZenoColumn): column to be filtered.
+        operation (Operation): operation to be applied.
+        value (str | float | int | bool): value to be compared against.
+        join (Join): join operator to be used.
+    """
 
     column: ZenoColumn
     operation: Operation
@@ -62,7 +87,13 @@ class FilterPredicate(CamelModel):
 
 
 class FilterPredicateGroup(CamelModel):
-    """Group of filter predicates that might be joined by a Join operator."""
+    """Group of filter predicates that might be joined by a Join operator.
+
+    Attributes:
+        predicates (list[FilterPredicateGroup | FilterPredicate]): predicates to be
+            applied for the filter.
+        join (Join): join operator to be used between groups.
+    """
 
     predicates: list["FilterPredicateGroup | FilterPredicate"]
     join: Join
@@ -75,7 +106,7 @@ class PredicatesEncoder(json.JSONEncoder):
         """Transform a FilterPredicateGroup into JSON data to be saved in a SQL table.
 
         Args:
-            o (FilterPredicateGroup): The predicates to be converted.
+            o (FilterPredicateGroup): predicates to be converted.
 
         Returns:
             dict: a dictionary representation that can be parsed by a JSON encoder.

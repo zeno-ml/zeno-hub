@@ -64,9 +64,9 @@ class BleuScorer:
         """Initialize the scorer.
 
         Args:
-            weights (tuple, optional): Statistic weights.
+            weights (tuple, optional): statistic weights.
                 Defaults to (0.25, 0.25, 0.25, 0.25).
-            case_insensitive (bool, optional): Case sensitivity.
+            case_insensitive (bool, optional): case sensitivity.
                 Defaults to False.
         """
         self.weights = weights
@@ -76,11 +76,11 @@ class BleuScorer:
         """Score a corpus using BLEU score.
 
         Args:
-          ref: A reference corpus
-          out: An output corpus
+          ref: a reference corpus
+          out: an output corpus
 
         Returns:
-          A tuple containing a single value for the BLEU score and a
+          a tuple containing a single value for the BLEU score and a
             string summarizing auxiliary information
         """
         cached_stats = self.cache_stats(ref, out)
@@ -90,12 +90,12 @@ class BleuScorer:
         """Caculate n-gram precision.
 
         Args:
-          ref: A reference sentence
-          out: An output sentence
-          n: The ngram length to consider
+          ref: reference sentence
+          out: an output sentence
+          n: the ngram length to consider
 
         Returns:
-          Numerator and denominator of the precision
+          numerator and denominator of the precision
         """
         out_ngram = sent_ngrams_list(out, n)
         ref_ngram = sent_ngrams_list(ref, n)
@@ -115,12 +115,12 @@ class BleuScorer:
         """Cache sufficient statistics for caculating BLEU score.
 
         Args:
-          ref: A reference corpus
-          out: An output corpus
-          src: A source courpus. Ignored if passed
+          ref: a reference corpus
+          out: an output corpus
+          src: a source courpus. Ignored if passed
 
         Returns:
-          A list of cached statistics
+          a list of cached statistics
         """
         if self.case_insensitive:
             ref = ref.lower()
@@ -140,11 +140,11 @@ class BleuScorer:
         """Score a corpus using BLEU score with cache.
 
         Args:
-          sent_ids: The sentence ids for reference and output corpora
-          cached_stats: A list of cached statistics
+          sent_ids: the sentence ids for reference and output corpora
+          cached_stats: a list of cached statistics
 
         Returns:
-          A tuple containing a single value for the BLEU score and a
+          a tuple containing a single value for the BLEU score and a
             string summarizing auxiliary information
         """
         if len(cached_stats) == 0:
@@ -183,11 +183,11 @@ def sent_ngrams_list(words, n):
     """Create a list with all the n-grams in a sentence.
 
     Arguments:
-      words: A list of strings representing a sentence
-      n: The ngram length to consider
+      words: a list of strings representing a sentence
+      n: the ngram length to consider
 
     Returns:
-      A list of n-grams in the sentence
+      a list of n-grams in the sentence
     """
     word_ngram = []
     for i in range(len(words) - n + 1):

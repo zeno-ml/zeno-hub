@@ -324,11 +324,11 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
     """Get the project uuid given an owner and project name.
 
     Args:
-        owner_name (str): The name of the owner of the project.
-        project_name (str): The name of the project.
+        owner_name (str): name of the owner of the project.
+        project_name (str): name of the project.
 
     Returns:
-        str | None: The uuid of the requested project.
+        str | None: uuid of the requested project.
     """
     with Database() as db:
         owner_id = db.execute_return(
@@ -349,7 +349,7 @@ def project_public(project_uuid: str) -> bool:
         project_uuid (str): UUID of the project to be checked.
 
     Returns:
-        bool: Whether the project is public.
+        bool: whether the project is public.
     """
     db = Database()
     public = db.connect_execute_return(
@@ -401,15 +401,15 @@ def project_exists(owner_id: int, project_name: str) -> bool:
 
     Args:
         owner_id (int): the ID of the owner of the project.
-        project_name (str): The name of the project.
+        project_name (str): name of the project.
 
 
     Returns:
-        bool: Whether the project exists.
+        bool: whether the project exists.
 
 
     Raises:
-        Exception: Something went wrong while checking whether the project exists.
+        Exception: something went wrong while checking whether the project exists.
     """
     db = Database()
     exists = db.connect_execute_return(
@@ -426,9 +426,9 @@ def project(owner_name: str, project_name: str, user: User | None) -> Project | 
     """Get the project data given an owner and project name.
 
     Args:
-        owner_name (str): The name of the project owner.
-        project_name (str): The name of the project.
-        user (User | None): The user making the request.
+        owner_name (str): name of the project owner.
+        project_name (str): name of the project.
+        user (User | None): user making the request.
 
     Returns:
         Project | None: the data for the requested project.
@@ -499,9 +499,9 @@ def report(
     """Get the report data given an owner and report name.
 
     Args:
-        owner_name (str): The name of the report owner.
-        report_name (str): The name of the report.
-        user (User | None): The user making the request.
+        owner_name (str): name of the report owner.
+        report_name (str): name of the report.
+        user (User | None): user making the request.
 
     Returns:
         ReportResponse | None: the data for the requested report.
@@ -973,7 +973,7 @@ def folder(id: int) -> Folder | None:
         id (int): id of the folder to be fetched.
 
     Returns:
-        Folder | None: Folder as requested by the user.
+        Folder | None: folder as requested by the user.
     """
     db = Database()
     folder_result = db.connect_execute_return(
@@ -997,8 +997,8 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
 
     Args:
         project (str): the project the user is currently working with.
-        ids (list[int] | None, optional): Limited list of slice IDs to fetch from,
-        using all slices of the project if None. Defaults to None.
+        ids (list[int] | None, optional): limited list of slice IDs to fetch from,
+            using all slices of the project if None. Defaults to None.
 
     Returns:
         list[Slice]: list of requested slices.
@@ -1139,7 +1139,7 @@ def table_data_paginated(
     Args:
         project (str): the project the user is currently working with.
         filter_sql (sql.Composed | None): filter to apply before fetching a slice of
-        the data.
+            the data.
         offset (int): where in the remaining data to start extracting the slice.
         limit (int): maximum slice length to be extracted.
         sort_by (tuple[ZenoColumn | None, bool]): column to sort by and whether to
@@ -1244,7 +1244,7 @@ def column_id_from_name_and_model(project: str, column_name: str, model: str) ->
         model (str): the model of the column to be fetched.
 
     Returns:
-        str: _description_
+        str: column id retreived by name and model.
     """
     db = Database()
     column_result = db.connect_execute_return(
@@ -1265,12 +1265,12 @@ def column(
     Args:
         project (str): the project the user is currently working with.
         column (ZenoColumn): the column for which to fetch the data.
-        filter_sql (sql.Composed | None, optional): Any filters to apply before
-        fetching the column data. Defaults to None.
+        filter_sql (sql.Composed | None, optional): any filters to apply before
+            fetching the column data. Defaults to None.
 
     Returns:
         list[str | int | float | bool]: the data that is stored in the requested
-        column.
+            column.
     """
     db = Database()
     if filter_sql is None:
