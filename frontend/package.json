@@ -33,7 +33,7 @@
 		"@smui/ripple": "7.0.0-beta.14",
 		"@smui/segmented-button": "^7.0.0-beta.8",
 		"@smui/select": "7.0.0-beta.15",
-		"@smui/slider": "^7.0.0-beta.8",
+		"@smui/slider": "^7.0.0-beta.15",
 		"@smui/textfield": "^7.0.0-beta.15",
 		"@svelte-plugins/tooltips": "^0.1.6",
 		"@sveltejs/adapter-node": "^1.3.1",
