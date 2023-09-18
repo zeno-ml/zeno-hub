@@ -9,8 +9,8 @@ import type { Chart } from './Chart';
  * Chart specification and data.
  *
  * Parameters:
- * chart (Chart): The chart specification.
- * chart_data (str): The chart data in JSON string.
+ * chart (Chart): chart specification.
+ * chart_data (str): chart data in a JSON string.
  */
 export type ChartResponse = {
 	chart: Chart;

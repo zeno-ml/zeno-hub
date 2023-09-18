@@ -229,14 +229,15 @@ class Chart(CamelModel):
     Attributes:
         id (int): the id of the chart.
         name (str): the name of the chart.
+        project_uuid (str): the project uuid of the chart.
         type (ChartType): the type of the chart.
         parameters (XCParameters | TableParameters | BeeswarmParameters |
             RadarParameters | HeatmapParameters): the parameters of the chart.
-        project_uuid (str | None): the project uuid of the chart.
     """
 
     id: int
     name: str
+    project_uuid: str
     type: ChartType
     parameters: (
         XCParameters
@@ -245,7 +246,6 @@ class Chart(CamelModel):
         | RadarParameters
         | HeatmapParameters
     )
-    project_uuid: str | None = None
 
     def __hash__(self) -> int:
         """Hash the chart parameters.

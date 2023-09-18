@@ -22,7 +22,7 @@
 					on:click={() => {
 						ZenoService.addChart(
 							$project ? $project.uuid : '',
-							chartDefaults('New Chart', 0, ChartType.BAR)
+							chartDefaults('New Chart', 0, $project?.uuid ?? '', ChartType.BAR)
 						).then((res) => {
 							goto(
 								`/project/${$project ? $project.ownerName : ''}/${

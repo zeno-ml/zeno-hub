@@ -1,16 +1,14 @@
-import { metrics } from '$lib/stores';
 import { SlicesOrModels, type XCParameters } from '$lib/zenoapi';
 import type { VegaLiteSpec } from 'svelte-vega';
-import { get } from 'svelte/store';
 
 export default function generateSpec(
 	parameters: XCParameters,
+	metricName: string,
 	width: number,
 	height: number
 ): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
 	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
-	const metric = get(metrics).find((metric) => metric.id === parameters.metric);
 
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -35,7 +33,7 @@ export default function generateSpec(
 				sort: null
 			},
 			y: {
-				title: metric?.name ?? '',
+				title: metricName,
 				field: 'y_value',
 				type: 'quantitative',
 				axis: {
@@ -76,7 +74,7 @@ export default function generateSpec(
 				encoding: {
 					tooltip: [
 						{ field: 'x_value', type: 'ordinal', title: x_name },
-						{ field: 'y_value', type: 'quantitative', title: metric?.name ?? '' },
+						{ field: 'y_value', type: 'quantitative', title: metricName, format: '.4f' },
 						{ field: 'color_value', type: 'ordinal', title: color_name },
 						{ field: 'size', type: 'quantitative' }
 					]
@@ -106,7 +104,8 @@ export default function generateSpec(
 				encoding: {
 					text: {
 						field: 'y_value',
-						type: 'quantitative'
+						type: 'quantitative',
+						format: '.4f'
 					},
 					color: { value: 'black' }
 				}

@@ -1,15 +1,24 @@
 <script lang="ts">
-	import type { Chart, XCParameters } from '$lib/zenoapi';
-	import { VegaLite } from 'svelte-vega';
+	import { ZenoService, type Chart, type XCParameters } from '$lib/zenoapi';
+	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
 	import generateSpec from './vegaSpec-bar';
 
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
-	export let height = 500;
+	export let height = 400;
 	export let width = 1000;
 
+	let spec: VegaLiteSpec;
+
 	$: parameters = chart.parameters as XCParameters;
-	$: spec = generateSpec(parameters, height, width);
+	$: ZenoService.getMetrics(chart.projectUuid).then((metrics) => {
+		const metric = metrics.find((m) => m.id === parameters.metric);
+		if (metric) {
+			spec = generateSpec(parameters, metric.name, height, width);
+		} else {
+			spec = generateSpec(parameters, 'slice size', height, width);
+		}
+	});
 </script>
 
 <VegaLite
@@ -21,6 +30,8 @@
 		height: height,
 		scaleFactor: {
 			png: 3
-		}
+		},
+		renderer: 'svg',
+		theme: 'vox'
 	}}
 />

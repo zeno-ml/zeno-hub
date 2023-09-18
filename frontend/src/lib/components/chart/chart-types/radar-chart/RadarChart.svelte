@@ -40,6 +40,8 @@
 		height: height,
 		scaleFactor: {
 			png: 3
-		}
+		},
+		renderer: 'svg',
+		theme: 'vox'
 	}}
 />

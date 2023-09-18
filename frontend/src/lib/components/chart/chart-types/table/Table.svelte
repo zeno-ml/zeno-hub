@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { metrics, slices } from '$lib/stores';
 	import {
 		SlicesMetricsOrModels,
 		SlicesOrModels,
+		ZenoService,
 		type Chart,
+		type Metric,
+		type Slice,
 		type TableParameters
 	} from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
@@ -20,6 +22,15 @@
 			size: number;
 		}>;
 	};
+
+	let metrics: Metric[] = [];
+	let slices: Slice[] = [];
+	ZenoService.getMetrics(chart.projectUuid).then((met) => {
+		metrics = met;
+	});
+	ZenoService.getSlices(chart.projectUuid).then((sli) => {
+		slices = sli;
+	});
 
 	let tableRecord: Record<
 		string | number,
@@ -98,9 +109,9 @@
 						<div style="display: flex;">
 							<div style="margin:auto;overflow: hidden">
 								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
-									<SliceDetailsContainer sli={$slices.find((sli) => sli.id === column)} />
+									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
 								{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
-									{$metrics.find((met) => met.id === column)?.name}
+									{metrics.find((met) => met.id === column)?.name}
 								{:else}
 									{column}
 								{/if}
@@ -119,7 +130,7 @@
 		</Head>
 		<Body style="overflow: visible">
 			{#each rows as row}
-				<TableRow {columns} {tableRecord} {parameters} {row} />
+				<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
 			{/each}
 		</Body>
 	</DataTable>

@@ -1,10 +1,18 @@
 <script lang="ts">
-	import { metrics, slices } from '$lib/stores';
-	import { SlicesOrModels, type BeeswarmParameters, type Chart } from '$lib/zenoapi';
+	import {
+		SlicesOrModels,
+		ZenoService,
+		type BeeswarmParameters,
+		type Chart,
+		type Metric,
+		type Slice
+	} from '$lib/zenoapi';
+	import { extent } from 'd3-array';
 	import { Vega } from 'svelte-vega';
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
+	export let width = 800;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -15,13 +23,23 @@
 		}>;
 	};
 
+	let metrics: Metric[] = [];
+	let slices: Slice[] = [];
+	ZenoService.getMetrics(chart.projectUuid).then((met) => {
+		metrics = met;
+	});
+	ZenoService.getSlices(chart.projectUuid).then((sli) => {
+		slices = sli;
+	});
+
+	$: range = extent(data.table, (d) => d.x_value);
 	$: parameters = chart.parameters as BeeswarmParameters;
 	$: rows =
 		parameters.fixedDimension === 'y'
-			? parameters.metrics.map((id) => $metrics.find((metric) => metric.id === id)?.name ?? 'count')
+			? parameters.metrics.map((id) => metrics.find((metric) => metric.id === id)?.name ?? 'count')
 			: parameters.yChannel === SlicesOrModels.MODELS
 			? parameters.models
-			: parameters.slices.map((id) => $slices.find((sli) => sli.id === id)?.sliceName ?? '');
+			: parameters.slices.map((id) => slices.find((sli) => sli.id === id)?.sliceName ?? '');
 
 	function dataFilter(
 		data: {
@@ -55,12 +73,12 @@
 	}
 </script>
 
-{#each rows as row}
+{#each rows as row, i}
 	<h4 class="mb-2.5">
 		{parameters.fixedDimension === 'y'
 			? parameters.yChannel === SlicesOrModels.MODELS
 				? parameters.models[0]
-				: $slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
+				: slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
 			: row}
 	</h4>
 	<Vega
@@ -68,16 +86,18 @@
 			parameters,
 			parameters.fixedDimension === 'y'
 				? row
-				: $metrics.find((met) => met.id === parameters.metrics[0])?.name ?? ''
+				: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
+			range,
+			i === 0
 		)}
 		data={dataFilter(
 			data,
 			parameters.fixedDimension === 'y'
 				? row
-				: $metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
+				: metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
 			parameters.colorChannel === SlicesOrModels.MODELS
 				? parameters.fixedDimension === 'y'
-					? $slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
+					? slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
 					: row
 				: undefined,
 			parameters.colorChannel === SlicesOrModels.SLICES
@@ -88,11 +108,13 @@
 		)}
 		options={{
 			actions: { source: false, editor: false, compiled: false },
-			width: 800,
-			height: 100,
+			width: width,
+			height: 80,
 			scaleFactor: {
 				png: 3
-			}
+			},
+			renderer: 'svg',
+			theme: 'vox'
 		}}
 	/>
 {/each}

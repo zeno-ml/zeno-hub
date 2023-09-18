@@ -3,7 +3,9 @@ import type { VisualizationSpec } from 'vega-embed';
 
 export default function generateSpec(
 	parameters: BeeswarmParameters,
-	xLabel: string
+	xLabel: string,
+	domain: [number, number],
+	showLegend: boolean
 ): VisualizationSpec {
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
@@ -39,10 +41,7 @@ export default function generateSpec(
 		scales: [
 			{
 				name: 'xscale',
-				domain: {
-					data: 'table',
-					field: 'x_value'
-				},
+				domain: domain,
 				range: 'width',
 				nice: true,
 				zero: false
@@ -53,7 +52,7 @@ export default function generateSpec(
 					data: 'table',
 					field: 'size'
 				},
-				range: [80, 800]
+				range: [30, 1000]
 			},
 			{
 				name: 'color',
@@ -73,14 +72,15 @@ export default function generateSpec(
 			}
 		],
 
-		legends: [
-			{
-				type: 'symbol',
-				title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
-				fill: 'color'
-			}
-		],
-
+		legends: showLegend
+			? [
+					{
+						type: 'symbol',
+						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
+						fill: 'color'
+					}
+			  ]
+			: [],
 		marks: [
 			{
 				name: 'nodes',
@@ -107,7 +107,7 @@ export default function generateSpec(
 						strokeWidth: { value: 3 },
 						zindex: { value: 1 },
 						tooltip: {
-							signal: `{'size': datum.size, '${xLabel}': datum.x_value, '${
+							signal: `{'size': datum.size, '${xLabel}': format(datum.x_value, '.4f'), '${
 								parameters.yChannel === SlicesOrModels.MODELS ? 'model' : 'slice'
 							}': datum.y_value, '${
 								parameters.colorChannel === SlicesOrModels.MODELS ? 'model' : 'slice'

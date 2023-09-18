@@ -1064,15 +1064,16 @@ def chart(project_uuid: str, chart_id: int):
         id=chart_result[0][0],
         name=chart_result[0][1],
         type=chart_result[0][2],
+        project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
     )
 
 
-def charts(project: str) -> list[Chart]:
+def charts(project_uuid: str) -> list[Chart]:
     """Get a list of all charts created in the project.
 
     Args:
-        project (str): the project the user is currently working with.
+        project_uuid (str): the project the user is currently working with.
 
     Returns:
         list[Chart]: list of all the charts in the project.
@@ -1081,7 +1082,7 @@ def charts(project: str) -> list[Chart]:
     chart_results = db.connect_execute_return(
         "SELECT id, name, type, parameters FROM charts WHERE project_uuid = %s;",
         [
-            project,
+            project_uuid,
         ],
     )
     return list(
@@ -1089,6 +1090,7 @@ def charts(project: str) -> list[Chart]:
             lambda chart: Chart(
                 id=chart[0],
                 name=chart[1],
+                project_uuid=project_uuid,
                 type=chart[2],
                 parameters=json.loads(chart[3]),
             ),
