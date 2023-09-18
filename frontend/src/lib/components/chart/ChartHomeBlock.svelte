@@ -77,9 +77,7 @@
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
 										parameters: chart.parameters
-									}).then(() => {
-										invalidate('app:charts');
-									});
+									}).then(() => invalidate('app:charts'));
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">content_copy</Icon>&nbsp;

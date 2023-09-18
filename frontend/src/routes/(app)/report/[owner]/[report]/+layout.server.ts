@@ -6,6 +6,7 @@ export const ssr = false;
 
 export async function load({ cookies, params, url, depends }) {
 	depends('app:report');
+
 	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
 
 	let cognitoUser = null;
