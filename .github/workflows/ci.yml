@@ -95,4 +95,4 @@ jobs:
       - name: Build frontend
         run: |
           cd frontend/
-          npm run build
+          PUBLIC_AMPLITUDE_API_KEY="" npm run build
