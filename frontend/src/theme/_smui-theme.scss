@@ -145,3 +145,9 @@ body {
 	--tooltip-color: var(--G1);
 	--tooltip-font-family: 'Open Sans', 'Roboto', sans-serif;
 }
+
+/* Fix: smui + tailwind adds left & right borders within textfields */
+.mdc-text-field--outlined .mdc-notched-outline--notched .mdc-notched-outline__notch {
+	border-left: 0;
+	border-right: 0;
+}

@@ -34,11 +34,6 @@
 		</Button>
 	</div>
 	<div>
-		<Textfield
-			style="width: -webkit-fill-available"
-			variant="outlined"
-			label="Chart Name"
-			bind:value={title}
-		/>
+		<Textfield variant="outlined" label="Chart Name" bind:value={title} />
 	</div>
 </div>

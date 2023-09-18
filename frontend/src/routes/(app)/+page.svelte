@@ -38,7 +38,7 @@
 	);
 </script>
 
-<div class="p-4 w-full bg-yellowish">
+<div class="p-4 w-full bg-yellowish overflow-x-scroll">
 	<div class="flex flex-col bg-white p-6 shadow-md rounded mb-4">
 		{#if data.user}
 			{#if ownProjects.length > 0}
