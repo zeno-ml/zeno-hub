@@ -9,9 +9,9 @@ import {
 } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, params, url, depends }) {
-	depends('app:state');
+export const ssr = false;
 
+export async function load({ cookies, params, url }) {
 	OpenAPI.BASE = getEndpoint() + '/api';
 
 	let cognitoUser = null;

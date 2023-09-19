@@ -35,10 +35,9 @@
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		ZenoService.deleteSlice(slice).then(() => {
-			slices.update((s) => s.filter((s) => s.id !== slice.id));
-			invalidate('app:state');
-		});
+		ZenoService.deleteSlice(slice).then(() =>
+			slices.update((s) => s.filter((s) => s.id !== slice.id))
+		);
 	}
 
 	function dragStart(e: DragEvent) {
