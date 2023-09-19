@@ -8,15 +8,15 @@
 </script>
 
 {#if sli !== undefined}
-	<button
-		class="text-primary"
+	<div
+		class="text-primary cursor-default"
 		on:mouseover={() => (showTooltip = true)}
 		on:mouseout={() => (showTooltip = false)}
 		on:focus={() => (showTooltip = true)}
 		on:blur={() => (showTooltip = false)}
 	>
 		{sli.sliceName}
-	</button>
+	</div>
 	{#if sli.sliceName !== 'All Instances' && showTooltip}
 		<div class="z-10 absolute">
 			<div class="bg-background p-2.5 rounded-lg shadow-xl">
