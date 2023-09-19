@@ -23,7 +23,7 @@ jobs:
       - name: Install modules
         run: cd frontend && npm i
       - name: Svelte check
-        run: cd frontend && npm run check
+        run: cd frontend && PUBLIC_AMPLITUDE_API_KEY="" npm run check
 
   format-backend:
     runs-on: ubuntu-latest
@@ -95,4 +95,4 @@ jobs:
       - name: Build frontend
         run: |
           cd frontend/
-          npm run build
+          PUBLIC_AMPLITUDE_API_KEY="" npm run build
