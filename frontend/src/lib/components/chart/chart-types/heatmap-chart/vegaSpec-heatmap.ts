@@ -1,12 +1,12 @@
-import { metrics } from '$lib/stores';
 import { SlicesOrModels, type HeatmapParameters } from '$lib/zenoapi';
 import type { VegaLiteSpec } from 'svelte-vega';
-import { get } from 'svelte/store';
 
-export default function generateSpec(parameters: HeatmapParameters): VegaLiteSpec {
+export default function generateSpec(
+	parameters: HeatmapParameters,
+	metricName: string
+): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
 	const y_name = parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
-	const metric = get(metrics).find((metric) => metric.id === parameters.metric);
 
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -70,11 +70,11 @@ export default function generateSpec(parameters: HeatmapParameters): VegaLiteSpe
 					tooltip: [
 						{ field: 'x_value', type: 'ordinal', title: x_name },
 						{ field: 'y_value', type: 'ordinal', title: y_name },
-						{ field: 'fixed_value', type: 'quantitative', title: metric?.name },
+						{ field: 'fixed_value', type: 'quantitative', title: metricName },
 						{ field: 'size', type: 'quantitative' }
 					],
 					color: {
-						title: metric?.name,
+						title: metricName,
 						field: 'fixed_value',
 						type: 'quantitative',
 						scale: { scheme: 'purples' }

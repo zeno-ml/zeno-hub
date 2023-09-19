@@ -1,9 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import SliceDetails from '$lib/components/general/SliceDetails.svelte';
-	import { selections } from '$lib/stores';
-	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { Slice } from '$lib/zenoapi';
 
 	export let sli: Slice | undefined;
@@ -12,23 +8,15 @@
 </script>
 
 {#if sli !== undefined}
-	<button
-		class="text-primary"
-		on:click={() => {
-			selections.update((sel) => ({
-				slices: sli !== undefined && sli.sliceName !== 'All Instances' ? [sli.id] : [],
-				metadata: sel.metadata,
-				tags: sel.tags
-			}));
-			goto(`${getProjectRouteFromURL($page.url)}/explore`);
-		}}
+	<div
+		class="text-primary cursor-default"
 		on:mouseover={() => (showTooltip = true)}
 		on:mouseout={() => (showTooltip = false)}
 		on:focus={() => (showTooltip = true)}
 		on:blur={() => (showTooltip = false)}
 	>
 		{sli.sliceName}
-	</button>
+	</div>
 	{#if sli.sliceName !== 'All Instances' && showTooltip}
 		<div class="z-10 absolute">
 			<div class="bg-background p-2.5 rounded-lg shadow-xl">

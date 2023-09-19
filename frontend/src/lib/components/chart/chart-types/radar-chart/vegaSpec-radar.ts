@@ -74,7 +74,7 @@ export default function generateSpec(
 				name: 'color',
 				type: 'ordinal',
 				domain: { data: 'table', field: 'layer_value' },
-				range: { scheme: 'category10' }
+				range: { scheme: 'category20' }
 			}
 		],
 		legends: [
@@ -175,8 +175,8 @@ export default function generateSpec(
 				zindex: 1,
 				encode: {
 					enter: {
-						x: { signal: "(radius + 5) * cos(scale('angular', datum.axis_value))" },
-						y: { signal: "(radius + 10) * sin(scale('angular', datum.axis_value))" },
+						x: { signal: "(radius + 10) * cos(scale('angular', datum.axis_value))" },
+						y: { signal: "(radius + 15) * sin(scale('angular', datum.axis_value))" },
 						text: { field: 'axis_value' },
 						align: [
 							{
@@ -201,8 +201,7 @@ export default function generateSpec(
 							}
 						],
 						fill: { value: 'black' },
-						fontSize: { value: 12 },
-						fontWeight: { value: 'bold' }
+						fontSize: { value: 12 }
 					}
 				}
 			}

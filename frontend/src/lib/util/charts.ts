@@ -19,7 +19,12 @@ import {
 import type { ComponentType } from 'svelte';
 import { get } from 'svelte/store';
 
-export function chartDefaults(name: string, id: number, type: ChartType): Chart {
+export function chartDefaults(
+	name: string,
+	id: number,
+	project_uuid: string,
+	type: ChartType
+): Chart {
 	switch (type) {
 		case ChartType.BAR:
 		case ChartType.LINE:
@@ -27,6 +32,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 				id: id,
 				name: name,
 				type: type,
+				projectUuid: project_uuid,
 				parameters: <XCParameters>{
 					slices: [-1],
 					metric: -1,
@@ -39,6 +45,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 			return {
 				id: id,
 				name: name,
+				projectUuid: project_uuid,
 				type: ChartType.TABLE,
 				parameters: <TableParameters>{
 					models: get(models),
@@ -53,6 +60,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 			return {
 				id: id,
 				name: name,
+				projectUuid: project_uuid,
 				type: ChartType.BEESWARM,
 				parameters: <BeeswarmParameters>{
 					models: [get(models)[0]],
@@ -67,6 +75,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 			return {
 				id: id,
 				name: name,
+				projectUuid: project_uuid,
 				type: ChartType.RADAR,
 				parameters: <RadarParameters>{
 					models: [get(models)[0]],
@@ -81,6 +90,7 @@ export function chartDefaults(name: string, id: number, type: ChartType): Chart 
 			return {
 				id: id,
 				name: name,
+				projectUuid: project_uuid,
 				type: ChartType.HEATMAP,
 				parameters: <HeatmapParameters>{
 					xValues: [-1],

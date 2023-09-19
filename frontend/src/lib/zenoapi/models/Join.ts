@@ -5,6 +5,11 @@
 
 /**
  * Enumeration of the join operators between filter predicates.
+ *
+ * Attributes:
+ * AND: logical AND.
+ * OR: logical OR.
+ * OMITTED: no join.
  */
 export enum Join {
 	AND = 'AND',

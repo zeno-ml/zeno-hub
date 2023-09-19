@@ -14,7 +14,7 @@
 
 <div class="flex flex-col w-full bg-yellowish">
 	<div class="flex flex-col bg-white p-6 m-4 shadow-md rounded">
-		<div class="flex align-center mb-4">
+		<div class="flex align-center mb-7">
 			<h3 class="text-xl mr-5">Charts</h3>
 			{#if $project && $project.editor}
 				<button
@@ -22,7 +22,7 @@
 					on:click={() => {
 						ZenoService.addChart(
 							$project ? $project.uuid : '',
-							chartDefaults('New Chart', 0, ChartType.BAR)
+							chartDefaults('New Chart', 0, $project?.uuid ?? '', ChartType.BAR)
 						).then((res) => {
 							goto(
 								`/project/${$project ? $project.ownerName : ''}/${
@@ -49,7 +49,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-wrap overflow-y-auto">
-			{#each $charts as chart}
+			{#each $charts.sort((a, b) => a.id - b.id) as chart}
 				<ChartHomeBlock {chart} />
 			{/each}
 		</div>

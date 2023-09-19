@@ -8,6 +8,10 @@ import type { ZenoColumn } from './ZenoColumn';
 
 /**
  * Specification of a histogram column request in Zeno.
+ *
+ * Attributes:
+ * column (ZenoColumn): the column to be used for the histogram.
+ * buckets (list[HistogramBucket]): the buckets to be used for the histogram.
  */
 export type HistogramColumnRequest = {
 	column: ZenoColumn;

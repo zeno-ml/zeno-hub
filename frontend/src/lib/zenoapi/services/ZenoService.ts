@@ -40,7 +40,7 @@ export class ZenoService {
 	 * Create a new project.
 	 *
 	 * Args:
-	 * project (Project): Project object.
+	 * project (Project): project object.
 	 * api_key (str, optional): API key.
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -712,20 +712,20 @@ export class ZenoService {
 
 	/**
 	 * Calculate Histograms
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns HistogramBucket Successful Response
 	 * @throws ApiError
 	 */
 	public static calculateHistograms(
-		project: string,
+		projectUuid: string,
 		requestBody: HistogramRequest
 	): CancelablePromise<Array<Array<HistogramBucket>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/histogram-counts/{project}',
+			url: '/histogram-counts/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',

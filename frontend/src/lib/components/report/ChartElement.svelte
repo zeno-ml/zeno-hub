@@ -19,7 +19,7 @@
 
 	export let chart: Chart;
 
-	$: chartData = chart.projectUuid ? ZenoService.getChartData(chart.projectUuid, chart.id) : '';
+	$: chartData = ZenoService.getChartData(chart.projectUuid, chart.id);
 </script>
 
 {#await chartData}
@@ -32,7 +32,7 @@
 			{chart}
 			data={JSON.parse(data)}
 			width={650}
-			height={300}
+			height={chart.type == ChartType.RADAR ? 600 : 300}
 		/>
 	</div>
 {/await}
