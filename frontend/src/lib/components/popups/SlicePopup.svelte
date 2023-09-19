@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
 	import { columns, project, selectionPredicates, selections, slices } from '$lib/stores';
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
@@ -125,7 +124,6 @@
 					};
 					return s;
 				});
-				invalidate('app:state');
 			});
 		} else {
 			ZenoService.addSlice($project ? $project.uuid : '', {
@@ -134,7 +132,6 @@
 				filterPredicates: predicateGroup,
 				folderId: folderId
 			}).then((res) => {
-				invalidate('app:state');
 				slices.update((s) => [
 					...s,
 					{
