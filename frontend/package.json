@@ -67,6 +67,7 @@
 		"vitest": "^0.25.3"
 	},
 	"dependencies": {
+		"@amplitude/analytics-browser": "^2.2.3",
 		"@auth/core": "^0.13.0",
 		"@auth/sveltekit": "^0.3.6",
 		"@mdi/js": "^7.2.96",
