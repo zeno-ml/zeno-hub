@@ -11,11 +11,7 @@
 	let CHOICES: string[];
 
 	$: CHOICES =
-		$editTag === undefined
-			? $project !== undefined && $project.view !== ''
-				? ['list', 'table']
-				: ['table']
-			: ['table'];
+		$editTag === undefined ? ($project.view !== '' ? ['list', 'table'] : ['table']) : ['table'];
 </script>
 
 <div class="w-full">
@@ -47,15 +43,13 @@
 				{#if $editTag === undefined}
 					<slot />
 					<Group>
-						{#if $project !== undefined}
-							{#each CHOICES as choice}
-								<Button
-									style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
-									variant="outlined"
-									on:click={() => (selected = choice)}>{choice}</Button
-								>
-							{/each}
-						{/if}
+						{#each CHOICES as choice}
+							<Button
+								style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
+								variant="outlined"
+								on:click={() => (selected = choice)}>{choice}</Button
+							>
+						{/each}
 					</Group>
 				{:else}
 					<div class="flex items-center" style="margin-right: 10px">

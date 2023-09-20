@@ -25,7 +25,7 @@
 	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
-{#if projectEdit && $project && user !== null}
+{#if projectEdit && user !== null}
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <nav class="z-20">

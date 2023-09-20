@@ -21,7 +21,7 @@
 	}
 
 	function editFolder() {
-		if (folderToEdit && $project) {
+		if (folderToEdit) {
 			ZenoService.updateFolder($project.uuid, {
 				...folderToEdit,
 				name: folderName
@@ -40,17 +40,15 @@
 
 	/** Create a folder using the folderName variable **/
 	function createFolder() {
-		if ($project) {
-			ZenoService.addFolder($project.uuid, folderName).then((res) => {
-				folders.update((f) => [
-					...f,
-					{
-						id: res,
-						name: folderName
-					}
-				]);
-			});
-		}
+		ZenoService.addFolder($project.uuid, folderName).then((res) => {
+			folders.update((f) => [
+				...f,
+				{
+					id: res,
+					name: folderName
+				}
+			]);
+		});
 		dispatch('close');
 	}
 

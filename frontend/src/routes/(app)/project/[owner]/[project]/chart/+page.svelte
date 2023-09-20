@@ -16,19 +16,15 @@
 	<div class="flex flex-col bg-white p-6 m-4 shadow-md rounded">
 		<div class="flex align-center mb-7">
 			<h3 class="text-xl mr-5">Charts</h3>
-			{#if $project && $project.editor}
+			{#if $project.editor}
 				<button
 					class="border-solid rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md p-1 pr-3 pl-1"
 					on:click={() => {
 						ZenoService.addChart(
-							$project ? $project.uuid : '',
-							chartDefaults('New Chart', 0, $project?.uuid ?? '', ChartType.BAR)
+							$project.uuid,
+							chartDefaults('New Chart', 0, $project.uuid, ChartType.BAR)
 						).then((res) => {
-							goto(
-								`/project/${$project ? $project.ownerName : ''}/${
-									$project ? $project.name : ''
-								}/chart/${res}?edit=true`
-							);
+							goto(`/project/${$project.ownerName}/${$project.name}/chart/${res}?edit=true`);
 						});
 					}}
 				>

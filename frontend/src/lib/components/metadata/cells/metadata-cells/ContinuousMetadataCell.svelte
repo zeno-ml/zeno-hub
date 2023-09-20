@@ -66,7 +66,7 @@
 <div id="histogram" on:mouseup={setSelection}>
 	<VegaLite
 		bind:view
-		spec={continuousVegaSpec($metricRange, $project?.calculateHistogramMetrics ?? false)}
+		spec={continuousVegaSpec($metricRange, $project.calculateHistogramMetrics ?? false)}
 		data={{ table: histogram.map((h) => Object.assign({}, h)) }}
 		options={{
 			tooltip: true,

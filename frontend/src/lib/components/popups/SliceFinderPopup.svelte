@@ -101,7 +101,7 @@
 			return;
 		}
 		sliceFinderMessage = 'Generating Slices...';
-		if ($project !== undefined && metricColumn !== undefined) {
+		if (metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];

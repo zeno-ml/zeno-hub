@@ -54,7 +54,7 @@
 		: new Promise(() => undefined);
 
 	onMount(() => {
-		if ($project === undefined || $project.view === '') {
+		if ($project.view === '') {
 			selected = 'table';
 		}
 	});
@@ -104,7 +104,7 @@
 
 <div class="flex justify-between align-center">
 	<SelectionBar bind:selected {currentResult}>
-		{#if $project !== undefined && optionsMap[$project.view] !== undefined}
+		{#if optionsMap[$project.view] !== undefined}
 			<svelte:component this={optionsMap[$project.view]} bind:viewOptions />
 		{/if}
 	</SelectionBar>

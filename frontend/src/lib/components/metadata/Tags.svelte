@@ -12,7 +12,7 @@
 	let showNewTag = false;
 
 	function saveChanges() {
-		if ($editTag === undefined || $project === undefined) return;
+		if ($editTag === undefined) return;
 		ZenoService.updateTag($project.uuid, {
 			...$editTag,
 			dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
@@ -55,7 +55,7 @@
 			</Icon>
 		</div>
 	</div>
-	{#if $project && $project.editor && !$page.url.href.includes('compare')}
+	{#if $project.editor && !$page.url.href.includes('compare')}
 		<div class="flex items-center justify-between">
 			<div>
 				<div

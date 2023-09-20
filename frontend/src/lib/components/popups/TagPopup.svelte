@@ -26,23 +26,21 @@
 			tagName = 'Tag ' + $tags.length;
 		}
 
-		if ($project !== undefined) {
-			ZenoService.addTag($project.uuid, {
-				id: 0,
-				tagName,
-				dataIds: []
-			}).then((res) => {
-				tags.update((t) => [
-					...t,
-					{
-						id: res,
-						tagName,
-						dataIds: []
-					}
-				]);
-				dispatch('close');
-			});
-		}
+		ZenoService.addTag($project.uuid, {
+			id: 0,
+			tagName,
+			dataIds: []
+		}).then((res) => {
+			tags.update((t) => [
+				...t,
+				{
+					id: res,
+					tagName,
+					dataIds: []
+				}
+			]);
+			dispatch('close');
+		});
 	}
 
 	function submit(e: KeyboardEvent) {

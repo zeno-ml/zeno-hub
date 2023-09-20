@@ -46,7 +46,7 @@
 </script>
 
 <div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
-	{#if isChartEdit && $project?.editor}
+	{#if isChartEdit && $project.editor}
 		<div
 			class="border-r border-r-grey-lighter h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]"
 		>

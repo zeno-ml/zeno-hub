@@ -50,11 +50,11 @@
 	function dragEnd(e: DragEvent) {
 		if (e.dataTransfer !== null) {
 			// If dragged out of a folder, remove from the folder it was in.
-			if (e.dataTransfer.dropEffect === 'none' && $project) {
+			if (e.dataTransfer.dropEffect === 'none') {
 				const data = transferData.split(',');
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
-					if (slice && $project) {
+					if (slice) {
 						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
 							slices.update((s) => {
 								invalidate('app:state');

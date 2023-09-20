@@ -28,7 +28,7 @@
 			const data = ev.dataTransfer.getData('text/plain').split(',');
 			data.forEach((element) => {
 				const slice = $slices.find((slice) => slice.id === parseInt(element));
-				if (slice && $project) {
+				if (slice) {
 					ZenoService.updateSlice($project.uuid, {
 						...slice,
 						folderId: folder.id

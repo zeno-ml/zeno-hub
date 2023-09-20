@@ -37,9 +37,9 @@
 
 	histogramState.subscribe((s) => {
 		if (metadataHistograms.size === 0) {
-			getHistograms($project?.uuid, $columns, $model).then((res) => {
+			getHistograms($project.uuid, $columns, $model).then((res) => {
 				calculateHistograms(
-					$project?.uuid,
+					$project.uuid,
 					$columns,
 					res,
 					s.selectionPredicates,
@@ -52,7 +52,7 @@
 			});
 		} else {
 			calculateHistograms(
-				$project?.uuid,
+				$project.uuid,
 				$columns,
 				metadataHistograms,
 				s.selectionPredicates,

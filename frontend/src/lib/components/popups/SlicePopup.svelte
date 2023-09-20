@@ -107,7 +107,7 @@
 			sliceName = 'Slice ' + $slices.length;
 		}
 
-		if (sliceToEdit && $project) {
+		if (sliceToEdit) {
 			ZenoService.updateSlice($project.uuid, {
 				id: sliceToEdit.id,
 				sliceName,
@@ -126,7 +126,7 @@
 				});
 			});
 		} else {
-			ZenoService.addSlice($project ? $project.uuid : '', {
+			ZenoService.addSlice($project.uuid, {
 				id: 0,
 				sliceName,
 				filterPredicates: predicateGroup,

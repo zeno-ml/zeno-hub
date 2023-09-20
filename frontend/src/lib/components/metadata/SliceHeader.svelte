@@ -45,7 +45,7 @@
 			</Icon>
 		</div>
 	</div>
-	{#if $project && $project.editor}
+	{#if $project.editor}
 		<div class="flex items-center justify-between">
 			<div
 				use:tooltip={{

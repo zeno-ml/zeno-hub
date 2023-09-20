@@ -39,7 +39,7 @@
 		</SmuiElement>
 		<h4 class="text-grey-dark hover:text-black mr-4">Back to Chart Home</h4>
 	</div>
-	{#if $project?.editor}
+	{#if $project.editor}
 		<Button
 			variant="raised"
 			on:mouseleave={blur}

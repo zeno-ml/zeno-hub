@@ -37,7 +37,7 @@
 
 	let sampleOptions = [
 		...new Set(
-			$project !== undefined && $project.samplesPerPage !== undefined
+			$project.samplesPerPage !== undefined
 				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
@@ -206,7 +206,7 @@
 			<tbody>
 				{#each table as tableContent}
 					<tr>
-						{#if $project !== undefined && viewMap[$project.view] !== undefined}
+						{#if viewMap[$project.view] !== undefined}
 							<td class="p-3 align-baseline">
 								<div class="instance">
 									<svelte:component

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { project } from '$lib/stores';
 	import { chartDefaults } from '$lib/util/charts';
 	import { ChartType, type Chart } from '$lib/zenoapi';
 	import ChartElement from './ChartElement.svelte';
@@ -7,7 +6,7 @@
 	export let chart: Chart;
 
 	async function updateChart(chartType: ChartType) {
-		if (chart.type !== chartType && $project) {
+		if (chart.type !== chartType) {
 			chart = chartDefaults(chart.name, chart.id, chart.projectUuid, chartType);
 		}
 	}
