@@ -246,16 +246,17 @@ def report_projects(report_id: int, project_uuids: list):
         report_id (str): the id of the report.
         project_uuids (list): the list of project ids.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM report_project WHERE report_id = %s;",
-        [report_id],
-    )
-    for project_uuid in project_uuids:
-        db.connect_execute(
-            "INSERT INTO report_project (report_id, project_uuid) VALUES (%s,%s);",
-            [report_id, project_uuid],
+    with Database() as db:
+        db.execute(
+            "DELETE FROM report_project WHERE report_id = %s;",
+            [report_id],
         )
+        for project_uuid in project_uuids:
+            db.execute(
+                "INSERT INTO report_project (report_id, project_uuid) VALUES (%s,%s);",
+                [report_id, project_uuid],
+            )
+        db.commit()
 
 
 def project_user(project: str, user: User):
@@ -295,12 +296,13 @@ def report_element(element: ReportElement):
     """
     db = Database()
     db.connect_execute(
-        "UPDATE report_elements SET type = %s, data = %s, chart_id = %s"
+        "UPDATE report_elements SET type = %s, data = %s, chart_id = %s, position = %s"
         " WHERE id = %s;",
         [
             element.type,
             element.data,
             element.chart_id,
+            element.position,
             element.id,
         ],
     )
