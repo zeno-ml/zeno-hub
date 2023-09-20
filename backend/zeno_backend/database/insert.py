@@ -368,7 +368,7 @@ def report_element(report_id: int, element: ReportElement) -> int | None:
     Args:
         report_id (int): the id of the report the element is added to.
         element (ReportElement): the element to be added to the report.
-        
+
 
     Returns:
         int | None: the id of the newly created report element.
