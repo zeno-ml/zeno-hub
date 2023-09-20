@@ -1,7 +1,8 @@
+import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
 import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService, type Project, type Report } from '$lib/zenoapi';
 
-export async function load({ cookies, depends }) {
+export async function load({ cookies, depends, url }) {
 	depends('app:projects');
 	depends('app:reports');
 
@@ -12,7 +13,8 @@ export async function load({ cookies, depends }) {
 	let reports: Report[] = [];
 	let projects: Project[] = [];
 	if (userCookie) {
-		const cognitoUser = JSON.parse(userCookie);
+		let cognitoUser = JSON.parse(userCookie);
+		cognitoUser = await checkRefreshCookie(cognitoUser, cookies, url);
 		OpenAPI.HEADERS = {
 			Authorization: 'Bearer ' + cognitoUser.accessToken
 		};

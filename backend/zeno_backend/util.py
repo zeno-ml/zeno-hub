@@ -4,6 +4,7 @@ import os
 import cognitojwt
 from fastapi import Request
 
+from zeno_backend import util
 from zeno_backend.classes.user import User
 from zeno_backend.database import select
 
@@ -42,8 +43,13 @@ def access_valid(project: str, request: Request) -> bool:
     """
     if not select.project_public(project):
         token = request.headers.get("authorization")
-        if token is None or not verify_token(token):
+        user = util.get_user_from_token(request)
+        if token is None or not verify_token(token) or user is None:
             return False
+        available_project_ids = map(lambda x: x.uuid, select.projects(user))
+        if project not in available_project_ids:
+            return False
+
     return True
 
 

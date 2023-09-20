@@ -23,6 +23,12 @@
 	let projectEdit = false;
 
 	$: currentTab = $page.url.href.split('/').pop();
+
+	async function logout() {
+		authToken.set(undefined);
+		await fetch('/api/logout', { method: 'POST' });
+		location.reload();
+	}
 </script>
 
 {#if projectEdit && $project && user !== null}
@@ -91,11 +97,7 @@
 					pageName={'logout'}
 					tooltipContent={'Logout'}
 					icon={mdiLogout}
-					on:click={() => {
-						authToken.set(undefined);
-						fetch('/logout', { method: 'POST' });
-						location.reload();
-					}}
+					on:click={logout}
 				/>
 			{:else}
 				<HeaderIcon

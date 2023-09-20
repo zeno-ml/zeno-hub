@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/public';
+import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
 import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
 import { error, redirect } from '@sveltejs/kit';
 
@@ -13,6 +14,7 @@ export async function load({ cookies, params, url, depends }) {
 	const userCookie = cookies.get('loggedIn');
 	if (userCookie) {
 		cognitoUser = JSON.parse(userCookie);
+		cognitoUser = await checkRefreshCookie(cognitoUser, cookies, url);
 		// If the user is not authenticated, redirect to the login page
 		if (!cognitoUser.id || !cognitoUser.accessToken) {
 			throw redirect(303, `/login?redirectTo=${url.pathname}`);
