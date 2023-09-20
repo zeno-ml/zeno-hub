@@ -115,7 +115,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_data(project: str, data_id: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         file_path = Path("data", project, data_id)
         if not Path.is_file(file_path):
@@ -129,7 +129,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_project_stats(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.project_stats(project)
 
@@ -139,7 +139,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_models(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.models(project)
 
@@ -149,7 +149,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_metrics(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.metrics(project)
 
@@ -159,7 +159,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_folders(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.folders(project)
 
@@ -169,7 +169,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_slices(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.slices(project)
 
@@ -184,7 +184,7 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-        if not util.access_valid(project_uuid, request):
+        if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         return select.charts(project_uuid)
 
@@ -194,7 +194,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_columns(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.columns(project)
 
@@ -204,7 +204,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_tags(project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.tags(project)
 
@@ -214,7 +214,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_metric_for_tag(metric_key: TagMetricKey, project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         filter_sql = table_filter(
             project, metric_key.model, None, metric_key.tag.data_ids
@@ -243,7 +243,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
-        if not util.access_valid(project_uuid, request):
+        if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         filter_sql = table_filter(
             project_uuid, req.model, req.filter_predicates, req.data_ids
@@ -280,7 +280,7 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-        if not util.access_valid(project_uuid, request):
+        if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         chart = select.chart(project_uuid, chart_id)
         if chart is None:
@@ -331,7 +331,7 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
-        if not project.public and not util.access_valid(project_uuid, request):
+        if not util.project_access_valid(project_uuid, request):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Project is private",
@@ -347,6 +347,15 @@ def get_server() -> FastAPI:
     )
     def get_report(owner_name: str, report_name: str, request: Request):
         rep = select.report(owner_name, report_name, util.get_user_from_token(request))
+        if not rep:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+            )
+        if not util.report_access_valid(rep.report.id, request):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="report is private",
+            )
         return rep
 
     @api_app.post(
@@ -375,7 +384,7 @@ def get_server() -> FastAPI:
                     + " does not exist."
                 ),
             )
-        if not util.access_valid(uuid, request):
+        if not util.project_access_valid(uuid, request):
             return Response(status_code=401)
         return uuid
 
@@ -431,7 +440,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_metrics_for_slices(req: MetricRequest, project: str, request: Request):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return_metrics: list[GroupMetric] = []
         metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project)
@@ -460,7 +469,7 @@ def get_server() -> FastAPI:
     async def get_histogram_buckets(
         req: list[ZenoColumn], project: str, request: Request
     ):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
 
         return await asyncio.gather(*[histogram_bucket(project, col) for col in req])
@@ -473,7 +482,7 @@ def get_server() -> FastAPI:
     async def calculate_histograms(
         req: HistogramRequest, project_uuid: str, request: Request
     ):
-        if not util.access_valid(project_uuid, request):
+        if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
 
         project_obj = select.project_from_uuid(project_uuid)
@@ -532,7 +541,7 @@ def get_server() -> FastAPI:
     def filter_string_metadata(
         project: str, req: StringFilterRequest, request: Request
     ):
-        if not util.access_valid(project, request):
+        if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.filtered_short_string_column_values(project, req)
 

@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { OpenAPI, ZenoService } from '$lib/zenoapi/index.js';
+import { ApiError, OpenAPI, ZenoService, type ReportResponse } from '$lib/zenoapi';
 import { error, redirect } from '@sveltejs/kit';
 
 export const ssr = false;
@@ -24,8 +24,17 @@ export async function load({ cookies, params, url, depends }) {
 		};
 	}
 
-	const reportResponse = await ZenoService.getReport(params.owner, params.report);
-	if (!reportResponse) {
+	let reportResponse: ReportResponse;
+	try {
+		reportResponse = await ZenoService.getReport(params.owner, params.report);
+	} catch (e: unknown) {
+		if ((e as ApiError).status === 401) {
+			if (cognitoUser !== null) {
+				throw redirect(303, `/auth`);
+			} else {
+				throw redirect(303, `/login?redirectTo=${url.pathname}`);
+			}
+		}
 		throw error(404, 'Could not load report');
 	}
 

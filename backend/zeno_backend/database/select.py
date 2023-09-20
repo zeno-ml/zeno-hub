@@ -358,6 +358,22 @@ def project_public(project_uuid: str) -> bool:
     return bool(public[0][0]) if len(public) > 0 else False
 
 
+def report_public(report: int) -> bool:
+    """Check whether a report is public.
+
+    Args:
+        report (int): ID of the report to be checked.
+
+    Returns:
+        bool: whether the report is public.
+    """
+    db = Database()
+    public = db.connect_execute_return(
+        "SELECT public FROM reports WHERE id = %s;", [report]
+    )
+    return bool(public[0][0]) if len(public) > 0 else False
+
+
 def api_key_exists(api_key: str) -> bool:
     """Check whether an API key exists.
 
@@ -422,77 +438,6 @@ def project_exists(owner_id: int, project_name: str) -> bool:
         raise Exception("Error while checking whether project exists.")
 
 
-def project(owner_name: str, project_name: str, user: User | None) -> Project | None:
-    """Get the project data given an owner and project name.
-
-    Args:
-        owner_name (str): name of the project owner.
-        project_name (str): name of the project.
-        user (User | None): user making the request.
-
-    Returns:
-        Project | None: the data for the requested project.
-    """
-    with Database() as db:
-        owner_id = db.execute_return(
-            "SELECT id FROM users WHERE name = %s;", [owner_name]
-        )
-        if len(owner_id) == 0:
-            raise Exception("Owner does not exist.")
-        else:
-            owner_id = owner_id[0][0]
-
-        project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
-            "samples_per_page, public FROM projects WHERE name = %s AND owner_id = %s;",
-            [project_name, owner_id],
-        )
-        if len(project_result) == 0:
-            raise Exception("Project does not exist.")
-        project_result = project_result[0]
-        project_uuid = project_result[0][0]
-
-        if user is None:
-            editor = False
-        elif owner_name == user.name:
-            # Owners can always edit projects
-            editor = True
-        else:
-            # Check whether the user or an org of the user have project edit rights
-            user_editor = db.execute_return(
-                "SELECT editor FROM user_project WHERE user_id = %s "
-                "AND project_uuid = %s",
-                [user.id, project_uuid],
-            )
-            org_editor = db.execute_return(
-                "SELECT editor FROM organization_project AS p JOIN user_organization "
-                "AS o ON p.organization_id = o.organization_id "
-                "WHERE p.project_uuid = %s AND o.user_id = %s",
-                [project_uuid, user.id],
-            )
-            editor = (bool(org_editor[0][0]) if len(org_editor) > 0 else False) or (
-                bool(user_editor[0][0]) if len(user_editor) > 0 else False
-            )
-
-        return (
-            Project(
-                uuid=str(project_result[0]),
-                name=str(project_result[1]),
-                owner_name=owner_name,
-                view=str(project_result[3]),
-                data_url=str(project_result[4]),
-                calculate_histogram_metrics=bool(project_result[5]),
-                samples_per_page=project_result[6]
-                if isinstance(project_result[6], int)
-                else 10,
-                editor=editor,
-                public=bool(project_result[7]),
-            )
-            if project_result is not None
-            else None
-        )
-
-
 def report(
     owner_name: str, report_name: str, user: User | None
 ) -> ReportResponse | None:
@@ -539,11 +484,17 @@ def report(
             org_editor = db.execute_return(
                 "SELECT editor FROM organization_report AS r JOIN user_organization "
                 "AS o ON r.organization_id = o.organization_id "
-                "WHERE p.report_id = %s AND o.user_id = %s",
-                [project_uuid, user.id],
+                "WHERE r.report_id = %s AND o.user_id = %s;",
+                [id, user.id],
             )
-            editor = (bool(org_editor[0]) if org_editor is not None else False) or (
-                bool(user_editor) if user_editor is not None else False
+            editor = (
+                bool(org_editor[0])
+                if org_editor is not None and len(org_editor) > 0
+                else False
+            ) or (
+                bool(user_editor)
+                if user_editor is not None and len(user_editor) > 0
+                else False
             )
 
         linked_projects = db.execute_return(

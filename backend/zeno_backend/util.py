@@ -30,12 +30,11 @@ def verify_token(token: str) -> bool:
         return False
 
 
-def access_valid(project: str, request: Request) -> bool:
+def project_access_valid(project: str, request: Request) -> bool:
     """Check whether accessing a resource is valid.
 
     Args:
         project (str): the project for which to access a resource.
-        public (bool): whether the project is public.
         request (Request): the request to get the access token if needed.
 
     Returns:
@@ -48,6 +47,28 @@ def access_valid(project: str, request: Request) -> bool:
             return False
         available_project_ids = map(lambda x: x.uuid, select.projects(user))
         if project not in available_project_ids:
+            return False
+
+    return True
+
+
+def report_access_valid(report: int, request: Request) -> bool:
+    """Check whether accessing a resource is valid.
+
+    Args:
+        report (int): the report for which to access a resource.
+        request (Request): the request to get the access token if needed.
+
+    Returns:
+        bool: whether or not othe project data can be accessed.
+    """
+    if not select.report_public(report):
+        token = request.headers.get("authorization")
+        user = util.get_user_from_token(request)
+        if token is None or not verify_token(token) or user is None:
+            return False
+        available_report_ids = map(lambda x: x.id, select.reports(user))
+        if report not in available_report_ids:
             return False
 
     return True
