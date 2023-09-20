@@ -12,7 +12,7 @@
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
-	export let width = 800;
+	export let width = 850;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -81,47 +81,49 @@
 </script>
 
 {#each rows as row, i}
-	<h4 class="mb-2.5">
-		{parameters.fixedDimension === 'y'
-			? parameters.yChannel === SlicesOrModels.MODELS
-				? parameters.models[0]
-				: slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
-			: row}
-	</h4>
-	<Vega
-		spec={generateSpec(
-			parameters,
-			parameters.fixedDimension === 'y'
-				? row
-				: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
-			range,
-			i === 0
-		)}
-		data={dataFilter(
-			data,
-			parameters.fixedDimension === 'y'
-				? row
-				: metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
-			parameters.colorChannel === SlicesOrModels.MODELS
-				? parameters.fixedDimension === 'y'
-					? slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
-					: row
-				: undefined,
-			parameters.colorChannel === SlicesOrModels.SLICES
-				? parameters.fixedDimension === 'y'
+	<div class="h-40">
+		<h4 class="mb-2.5 relative">
+			{parameters.fixedDimension === 'y'
+				? parameters.yChannel === SlicesOrModels.MODELS
 					? parameters.models[0]
-					: row
-				: undefined
-		)}
-		options={{
-			actions: { source: false, editor: false, compiled: false },
-			width: width,
-			height: 80,
-			scaleFactor: {
-				png: 3
-			},
-			renderer: 'svg',
-			theme: 'vox'
-		}}
-	/>
+					: slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
+				: row}
+		</h4>
+		<Vega
+			spec={generateSpec(
+				parameters,
+				parameters.fixedDimension === 'y'
+					? row
+					: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
+				range,
+				i === 0
+			)}
+			data={dataFilter(
+				data,
+				parameters.fixedDimension === 'y'
+					? row
+					: metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
+				parameters.colorChannel === SlicesOrModels.MODELS
+					? parameters.fixedDimension === 'y'
+						? slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
+						: row
+					: undefined,
+				parameters.colorChannel === SlicesOrModels.SLICES
+					? parameters.fixedDimension === 'y'
+						? parameters.models[0]
+						: row
+					: undefined
+			)}
+			options={{
+				actions: false,
+				width: width,
+				height: 80,
+				scaleFactor: {
+					png: 3
+				},
+				renderer: 'svg',
+				theme: 'vox'
+			}}
+		/>
+	</div>
 {/each}

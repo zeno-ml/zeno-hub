@@ -32,7 +32,7 @@
 			{chart}
 			data={JSON.parse(data)}
 			width={650}
-			height={chart.type == ChartType.RADAR ? 600 : 300}
+			height={chart.type == ChartType.RADAR ? 550 : 300}
 		/>
 	</div>
 {/await}
