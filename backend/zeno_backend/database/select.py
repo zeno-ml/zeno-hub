@@ -412,6 +412,24 @@ def user_id_by_api_key(api_key: str) -> int | None:
     return int(user_id[0][0]) if len(user_id) > 0 else None
 
 
+def user_name_by_api_key(api_key: str) -> str | None:
+    """Get the user name given an API key.
+
+    Args:
+        api_key (str): the API key to get the user name for.
+
+
+    Returns:
+        str | None: the user name of the user with the given API key.
+    """
+    db = Database()
+    api_key_hash = hash_api_key(api_key)
+    user_id = db.connect_execute_return(
+        "SELECT name FROM users WHERE api_key_hash = %s;", [api_key_hash]
+    )
+    return user_id[0][0] if len(user_id) > 0 else None
+
+
 def project_exists(owner_id: int, project_name: str) -> bool:
     """Check whether a project exists.
 
