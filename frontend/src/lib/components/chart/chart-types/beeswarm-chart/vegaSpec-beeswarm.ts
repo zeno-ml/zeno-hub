@@ -11,7 +11,7 @@ export default function generateSpec(
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description:
 			'A beeswarm chart example that uses a force-directed layout to group items by category.',
-		width: 600,
+		width: 800,
 		height: 100,
 		padding: { left: 5, right: 5, top: 0, bottom: 20 },
 		autosize: 'pad',

@@ -6,7 +6,7 @@
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
 	export let height = 400;
-	export let width = 1000;
+	export let width = 800;
 
 	let spec: VegaLiteSpec;
 

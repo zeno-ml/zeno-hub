@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
@@ -37,7 +38,9 @@
 
 	function updateChart(chart: Chart) {
 		if ($project && $project.editor && browser) {
-			ZenoService.updateChart($project.uuid, chart);
+			ZenoService.updateChart($project.uuid, chart).then(() => {
+				invalidate('app:chart');
+			});
 		}
 	}
 </script>
