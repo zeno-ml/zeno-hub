@@ -362,19 +362,25 @@ def report(name: str, user: User):
     )
 
 
-def report_element(report_id: int, element: ReportElement):
+def report_element(report_id: int, element: ReportElement) -> int | None:
     """Adding a report element to a Zeno Report.
 
     Args:
         report_id (int): the id of the report the element is added to.
         element (ReportElement): the element to be added to the report.
+        
+
+    Returns:
+        int | None: the id of the newly created report element.
     """
     db = Database()
-    db.connect_execute(
+    id = db.connect_execute_return(
         "INSERT INTO report_elements (report_id, type, data, chart_id, position)"
-        " VALUES (%s,%s,%s,%s,%s);",
+        " VALUES (%s,%s,%s,%s,%s) RETURNING id;",
         [report_id, element.type, element.data, element.chart_id, element.position],
     )
+    if len(id) > 0:
+        return id[0][0]
 
 
 def folder(project: str, name: str) -> int | None:

@@ -621,7 +621,13 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        insert.report_element(report_id, element)
+        id = insert.report_element(report_id, element)
+        if id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert report element",
+            )
+        return id
 
     @api_app.post(
         "/tag/{project}",
