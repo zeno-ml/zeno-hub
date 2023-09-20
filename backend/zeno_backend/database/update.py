@@ -196,26 +196,48 @@ def organization(organization: Organization):
         db.commit()
 
 
-def project(project: Project):
+def project(project_config: Project):
     """Update a project's configuration.
 
     Args:
-        project (Project): the configuration of the project.
+        project_config (Project): the configuration of the project.
     """
-    db = Database()
-    db.connect_execute(
-        "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, view = %s, "
-        "data_url = %s, samples_per_page = %s, public = %s WHERE uuid = %s;",
-        [
-            project.name,
-            project.calculate_histogram_metrics,
-            project.view,
-            project.data_url,
-            project.samples_per_page,
-            project.public,
-            project.uuid,
-        ],
-    )
+    with Database() as db:
+        db.execute(
+            "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, "
+            "view = %s, data_url = %s, samples_per_page = %s, public = %s "
+            "WHERE uuid = %s;",
+            [
+                project_config.name,
+                project_config.calculate_histogram_metrics,
+                project_config.view,
+                project_config.data_url,
+                project_config.samples_per_page,
+                project_config.public,
+                project_config.uuid,
+            ],
+        )
+        db.commit()
+
+
+def project_metrics(project_config: Project):
+    """Update a project's metrics.
+
+    Args:
+        project_config (Project): the configuration of the project.
+    """
+    with Database() as db:
+        db.execute(
+            "DELETE FROM metrics WHERE project_uuid = %s;",
+            [project_config.uuid],
+        )
+        for metric in project_config.metrics:
+            db.execute(
+                "INSERT INTO metrics (project_uuid, name, type, columns) VALUES "
+                "(%s, %s, %s, %s);",
+                [project_config.uuid, metric.name, metric.type, metric.columns],
+            )
+        db.commit()
 
 
 def report(report: Report):

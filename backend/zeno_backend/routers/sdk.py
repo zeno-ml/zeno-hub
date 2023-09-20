@@ -11,6 +11,7 @@ from fastapi import (
     Form,
     HTTPException,
     Request,
+    Response,
     UploadFile,
     status,
 )
@@ -18,7 +19,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
-from zeno_backend.database import insert, select
+from zeno_backend.database import insert, select, update
 
 
 class APIKeyBearer(HTTPBearer):
@@ -73,12 +74,15 @@ class APIKeyBearer(HTTPBearer):
 router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
 
 
-@router.post("/project")
-def create_project(project: Project, api_key=Depends(APIKeyBearer())):
+@router.post("/project", status_code=200)
+def create_project(
+    project: Project, response: Response, api_key=Depends(APIKeyBearer())
+):
     """Create a new project.
 
     Args:
-        project (Project): project object.
+        project (Project): Project object.
+        response (Response): response object.
         api_key (str, optional): API key.
     """
     user_id = select.user_id_by_api_key(api_key)
@@ -88,21 +92,29 @@ def create_project(project: Project, api_key=Depends(APIKeyBearer())):
             detail=("ERROR: Invalid API key."),
         )
 
-    if select.project_exists(user_id, project.name):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=("ERROR: Project already exists."),
+    user_name = select.user_name_by_api_key(api_key)
+    if select.project_exists(user_id, project.name) and user_name is not None:
+        project_uuid = select.project_uuid(user_name, project.name)
+        if project_uuid is not None:
+            project.uuid = project_uuid
+            update.project(project)
+            update.project_metrics(project)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=("ERROR: Project already exists but could not be updated."),
+            )
+    else:
+        project.uuid = str(uuid.uuid4())
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Project Created",
+                user_id="00000" + str(user_id),
+                event_properties={"project_uuid": project.uuid},
+            )
         )
-
-    project.uuid = str(uuid.uuid4())
-    AmplitudeHandler().track(
-        BaseEvent(
-            event_type="Project Created",
-            user_id="00000" + str(user_id),
-            event_properties={"project_uuid": project.uuid},
-        )
-    )
-    insert.project(project, user_id)
+        insert.project(project, user_id)
+        response.status_code = status.HTTP_201_CREATED
     return project.uuid
 
 
