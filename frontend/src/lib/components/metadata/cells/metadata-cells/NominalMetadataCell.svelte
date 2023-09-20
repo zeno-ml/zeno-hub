@@ -63,7 +63,7 @@
 <div on:click={setSelection} on:keydown={() => ({})}>
 	<VegaLite
 		bind:view
-		spec={nominalVegaSpec($metricRange, $project?.calculateHistogramMetrics ?? false)}
+		spec={nominalVegaSpec($metricRange, $project.calculateHistogramMetrics ?? false)}
 		data={{ table: histogram.map((h) => Object.assign({}, h)) }}
 		options={{
 			tooltip: true,

@@ -72,11 +72,11 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.addChart($project ? $project.uuid : '', {
+									ZenoService.addChart($project.uuid, {
 										id: 0,
 										name: 'Copy of ' + chart.name,
 										type: chart.type,
-										projectUuid: $project ? $project.uuid : '',
+										projectUuid: $project.uuid,
 										parameters: chart.parameters
 									}).then(() => invalidate('app:charts'));
 								}}

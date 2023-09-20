@@ -27,13 +27,11 @@
 	/** Save a generated slice to the slice drawer **/
 	function addSlice() {
 		slice.sliceName = newSliceName;
-		if ($project !== undefined) {
-			ZenoService.addSlice($project.uuid, slice).then((res) => {
-				slices.update((s) => [...s, { ...slice, id: res }]);
-				showSliceName = false;
-				created = true;
-			});
-		}
+		ZenoService.addSlice($project.uuid, slice).then((res) => {
+			slices.update((s) => [...s, { ...slice, id: res }]);
+			showSliceName = false;
+			created = true;
+		});
 	}
 
 	/** Remove a generated slice from the slice drawer **/

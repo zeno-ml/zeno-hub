@@ -71,17 +71,13 @@
 		}
 
 		try {
-			if ($project) {
-				results = await ZenoService.filterStringMetadata($project.uuid, {
-					column: col,
-					filterString: input,
-					operation: operation
-				});
-				return results;
-			}
+			results = await ZenoService.filterStringMetadata($project.uuid, {
+				column: col,
+				filterString: input,
+				operation: operation
+			});
 		} catch (e) {
 			results = [];
-			return results;
 		}
 		return results;
 	}

@@ -29,7 +29,7 @@
 
 	let sampleOptions = [
 		...new Set(
-			$project !== undefined && $project.samplesPerPage !== undefined
+			$project.samplesPerPage !== undefined
 				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
@@ -94,7 +94,7 @@
 
 <div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
 	{#await tablePromise then table}
-		{#if $project !== undefined && viewMap[$project.view] !== undefined}
+		{#if viewMap[$project.view] !== undefined}
 			{#each table as inst (inst['data_id'])}
 				<div class="mr-2 mt-2">
 					<svelte:component

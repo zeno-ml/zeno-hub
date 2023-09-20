@@ -35,7 +35,7 @@
 	let instanceHidden = false;
 	let sampleOptions = [
 		...new Set(
-			$project !== undefined && $project.samplesPerPage !== undefined
+			$project.samplesPerPage !== undefined
 				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)
@@ -125,7 +125,7 @@
 				{#if $editTag !== undefined}
 					<th class="p-3 font-semibold font-grey">Included</th>
 				{/if}
-				{#if $project !== undefined && viewMap[$project.view] !== undefined}
+				{#if viewMap[$project.view] !== undefined}
 					<th
 						class="p-3 font-semibold font-grey whitespace-nowrap"
 						on:click={() => (instanceHidden = !instanceHidden)}
@@ -166,7 +166,7 @@
 								<Checkbox bind:group={currentTagIds} value={String(tableContent['data_id'])} />
 							</td>
 						{/if}
-						{#if $project !== undefined && viewMap[$project.view] !== undefined}
+						{#if viewMap[$project.view] !== undefined}
 							<td class="p-3">
 								{#if instanceHidden}
 									<p class="text-center">...</p>

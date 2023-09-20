@@ -22,8 +22,8 @@
 	let selectedUser: User | undefined;
 	let selectedOrg: Organization | undefined;
 
-	let userRequest = $project ? ZenoService.getProjectUsers($project.uuid) : undefined;
-	let organizationRequest = $project ? ZenoService.getProjectOrgs($project.uuid) : undefined;
+	let userRequest = ZenoService.getProjectUsers($project.uuid);
+	let organizationRequest = ZenoService.getProjectOrgs($project.uuid);
 
 	$: invalidName = config.name.length === 0;
 	$: if (input) {
@@ -47,28 +47,18 @@
 	}
 
 	function addUser(e: CustomEvent) {
-		$project &&
-			ZenoService.addProjectUser($project.uuid, {
-				...e.detail,
-				admin: false
-			}).then(() => {
-				if ($project) {
-					userRequest = ZenoService.getProjectUsers($project.uuid);
-				}
-			});
+		ZenoService.addProjectUser($project.uuid, {
+			...e.detail,
+			admin: false
+		}).then(() => (userRequest = ZenoService.getProjectUsers($project.uuid)));
 		selectedUser = undefined;
 	}
 
 	function addOrganization(e: CustomEvent) {
-		$project &&
-			ZenoService.addProjectOrg($project.uuid, {
-				...e.detail,
-				admin: false
-			}).then(() => {
-				if ($project) {
-					organizationRequest = ZenoService.getProjectOrgs($project.uuid);
-				}
-			});
+		ZenoService.addProjectOrg($project.uuid, {
+			...e.detail,
+			admin: false
+		}).then(() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid)));
 		selectedOrg = undefined;
 	}
 </script>
@@ -135,15 +125,10 @@
 											<Checkbox
 												checked={member.admin}
 												on:click={() =>
-													$project &&
 													ZenoService.updateProjectUser($project.uuid, {
 														...member,
 														admin: !member.admin
-													}).then(() => {
-														if ($project) {
-															userRequest = ZenoService.getProjectUsers($project.uuid);
-														}
-													})}
+													}).then(() => (userRequest = ZenoService.getProjectUsers($project.uuid)))}
 												disabled={member.id === user.id}
 											/>
 										</td>
@@ -151,12 +136,9 @@
 											{#if member.id !== user.id}
 												<IconButton
 													on:click={() =>
-														$project &&
-														ZenoService.deleteProjectUser($project.uuid, member).then(() => {
-															if ($project) {
-																userRequest = ZenoService.getProjectUsers($project.uuid);
-															}
-														})}
+														ZenoService.deleteProjectUser($project.uuid, member).then(
+															() => (userRequest = ZenoService.getProjectUsers($project.uuid))
+														)}
 												>
 													<Icon tag="svg" viewBox="0 0 24 24">
 														<path fill="black" d={mdiClose} />
@@ -216,26 +198,20 @@
 											<Checkbox
 												checked={org.admin}
 												on:click={() =>
-													$project &&
 													ZenoService.updateProjectOrg($project.uuid, {
 														...org,
 														admin: !org.admin
-													}).then(() => {
-														if ($project) {
-															organizationRequest = ZenoService.getProjectOrgs($project.uuid);
-														}
-													})}
+													}).then(
+														() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid))
+													)}
 											/>
 										</td>
 										<td style="text-align: end;">
 											<IconButton
 												on:click={() =>
-													$project &&
-													ZenoService.deleteProjectOrg($project.uuid, org).then(() => {
-														if ($project) {
-															organizationRequest = ZenoService.getProjectOrgs($project.uuid);
-														}
-													})}
+													ZenoService.deleteProjectOrg($project.uuid, org).then(
+														() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid))
+													)}
 											>
 												<Icon tag="svg" viewBox="0 0 24 24">
 													<path fill="black" d={mdiClose} />
