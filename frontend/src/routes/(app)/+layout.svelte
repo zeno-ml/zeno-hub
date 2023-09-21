@@ -12,7 +12,7 @@
 		OpenAPI.BASE = `${getEndpoint()}/api`;
 		if (data.cognitoUser !== null) {
 			authToken.set(data.cognitoUser.accessToken);
-			amplitude.setUserId('00000' + data.cognitoUser.id);
+			amplitude.setUserId(data.cognitoUser.id);
 			OpenAPI.HEADERS = {
 				Authorization: 'Bearer ' + data.cognitoUser.accessToken
 			};
