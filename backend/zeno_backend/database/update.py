@@ -328,3 +328,32 @@ def report_element(element: ReportElement):
             element.id,
         ],
     )
+
+
+def report_user(report_id: int, user: User):
+    """Update a user's report access in the database.
+
+    Args:
+        report_id (int): the report for which to update the access.
+        user (User): the user for which to update the access.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE user_report SET editor = %s WHERE report_id = %s AND user_id = %s;",
+        [user.admin, report_id, user.id],
+    )
+
+
+def report_org(report_id: int, organization: Organization):
+    """Update a organization's report access in the database.
+
+    Args:
+        report_id (int): the report for which to update the access.
+        organization (Organization): the organization for which to update the access.
+    """
+    db = Database()
+    db.connect_execute(
+        "UPDATE organization_report SET editor = %s WHERE report_id = %s "
+        "AND organization_id = %s;",
+        [organization.admin, report_id, organization.id],
+    )

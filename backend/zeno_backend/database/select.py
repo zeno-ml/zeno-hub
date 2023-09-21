@@ -1430,6 +1430,29 @@ def project_users(project: str) -> list[User]:
     )
 
 
+def report_users(report_id: int) -> list[User]:
+    """Get all the users that have access to a report.
+
+    Args:
+        report_id (int): the report for which to get user access.
+
+    Returns:
+        list[User]: the list of users who can access the report.
+    """
+    db = Database()
+    report_users = db.connect_execute_return(
+        "SELECT u.id, u.name, ur.editor FROM users as u "
+        "JOIN user_report AS ur ON u.id = ur.user_id WHERE ur.report_id = %s",
+        [report_id],
+    )
+    return list(
+        map(
+            lambda user: User(id=user[0], name=user[1], admin=user[2]),
+            report_users,
+        )
+    )
+
+
 def project_orgs(project: str) -> list[Organization]:
     """Get all the organizations that have access to a project.
 
@@ -1437,7 +1460,7 @@ def project_orgs(project: str) -> list[Organization]:
         project (str): the project for which to get organization access.
 
     Returns:
-        list[User]: the list of organizations who can access the project.
+        list[Organization]: the list of organizations who can access the project.
     """
     db = Database()
     project_organizations = db.connect_execute_return(
@@ -1450,6 +1473,30 @@ def project_orgs(project: str) -> list[Organization]:
         map(
             lambda org: Organization(id=org[0], name=org[1], members=[], admin=org[2]),
             project_organizations,
+        )
+    )
+
+
+def report_orgs(report_id: int) -> list[Organization]:
+    """Get all the organizations that have access to a report.
+
+    Args:
+        report_id (int): the report for which to get organization access.
+
+    Returns:
+        list[Organization]: the list of organizations who can access the report.
+    """
+    db = Database()
+    report_organizations = db.connect_execute_return(
+        "SELECT o.id, o.name, orep.editor FROM organizations as o "
+        "JOIN organization_report AS orep ON o.id = orep.organization_id "
+        "WHERE orep.report_id = %s",
+        [report_id],
+    )
+    return list(
+        map(
+            lambda org: Organization(id=org[0], name=org[1], members=[], admin=org[2]),
+            report_organizations,
         )
     )
 
