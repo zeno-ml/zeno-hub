@@ -1,7 +1,8 @@
 import { dev } from '$app/environment';
 import { env as private_env } from '$env/dynamic/private';
 import { extractUserFromSession, getSession } from '$lib/auth/cognito';
-import { OpenAPI } from '$lib/zenoapi';
+import { getEndpoint } from '$lib/util/util';
+import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
@@ -52,6 +53,9 @@ export const actions: Actions = {
 				showReset: err.name === 'NotAuthorizedException'
 			});
 		}
+
+		OpenAPI.BASE = getEndpoint() + '/api';
+		await ZenoService.login(username);
 		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
 	}
 };
