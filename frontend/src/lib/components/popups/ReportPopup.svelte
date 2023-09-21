@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { project } from '$lib/stores';
-	import { ZenoService, type Organization, type Project, type User } from '$lib/zenoapi';
+	import { report } from '$lib/stores';
+	import { ZenoService, type Organization, type Report, type User } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
@@ -13,7 +13,7 @@
 	import { fade } from 'svelte/transition';
 	import Popup from './Popup.svelte';
 
-	export let config: Project;
+	export let reportConfig: Report;
 	export let user: User;
 
 	const dispatch = createEventDispatcher();
@@ -22,17 +22,17 @@
 	let selectedUser: User | undefined;
 	let selectedOrg: Organization | undefined;
 
-	let userRequest = ZenoService.getProjectUsers(config.uuid);
-	let organizationRequest = ZenoService.getProjectOrgs(config.uuid);
+	let userRequest = ZenoService.getReportUsers($report.id);
+	let organizationRequest = ZenoService.getReportOrgs($report.id);
 
-	$: invalidName = config.name.length === 0;
+	$: invalidName = reportConfig.name.length === 0;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function updateProject() {
-		ZenoService.updateProject(config).then(() => {
-			project.set(config);
+		ZenoService.updateReport(reportConfig).then(() => {
+			report.set(reportConfig);
 			dispatch('close');
 		});
 	}
@@ -47,18 +47,18 @@
 	}
 
 	function addUser(e: CustomEvent) {
-		ZenoService.addProjectUser($project.uuid, {
+		ZenoService.addReportUser($report.id, {
 			...e.detail,
 			admin: false
-		}).then(() => (userRequest = ZenoService.getProjectUsers($project.uuid)));
+		}).then(() => (userRequest = ZenoService.getReportUsers($report.id)));
 		selectedUser = undefined;
 	}
 
 	function addOrganization(e: CustomEvent) {
-		ZenoService.addProjectOrg($project.uuid, {
+		ZenoService.addReportOrg($report.id, {
 			...e.detail,
 			admin: false
-		}).then(() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid)));
+		}).then(() => (organizationRequest = ZenoService.getReportOrgs($report.id)));
 		selectedOrg = undefined;
 	}
 </script>
@@ -71,32 +71,20 @@
 		<div class="mb-12 flex">
 			<div class="flex flex-col mr-8">
 				<div>
-					<Textfield bind:value={config.name} label="Name" bind:this={input} />
-				</div>
-				<div>
-					<Textfield
-						bind:value={config.samplesPerPage}
-						label="Number of displayed items"
-						bind:this={input}
-						type="number"
-					/>
+					<Textfield bind:value={reportConfig.name} label="Name" bind:this={input} />
 				</div>
 			</div>
 			<div class="flex flex-col">
 				<div class="flex items-center">
 					<Checkbox
-						checked={config.calculateHistogramMetrics}
-						on:click={() => (config.calculateHistogramMetrics = !config.calculateHistogramMetrics)}
+						checked={reportConfig.public}
+						on:click={() => (reportConfig.public = !reportConfig.public)}
 					/>
-					<span>Calculate histogram metrics</span>
-				</div>
-				<div class="flex items-center">
-					<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
 					<span>Public visibility</span>
 				</div>
 			</div>
 		</div>
-		{#if !config.public && userRequest}
+		{#if !reportConfig.public && userRequest}
 			{#await userRequest then currentUsers}
 				<div class="mb-5 flex flex-col" transition:fade>
 					<h3 class="text-lg mb-2">Viewers</h3>
@@ -125,10 +113,10 @@
 											<Checkbox
 												checked={member.admin}
 												on:click={() =>
-													ZenoService.updateProjectUser($project.uuid, {
+													ZenoService.updateReportUser($report.id, {
 														...member,
 														admin: !member.admin
-													}).then(() => (userRequest = ZenoService.getProjectUsers($project.uuid)))}
+													}).then(() => (userRequest = ZenoService.getReportUsers($report.id)))}
 												disabled={member.id === user.id}
 											/>
 										</td>
@@ -136,8 +124,8 @@
 											{#if member.id !== user.id}
 												<IconButton
 													on:click={() =>
-														ZenoService.deleteProjectUser($project.uuid, member).then(
-															() => (userRequest = ZenoService.getProjectUsers($project.uuid))
+														ZenoService.deleteReportUser($report.id, member).then(
+															() => (userRequest = ZenoService.getReportUsers($report.id))
 														)}
 												>
 													<Icon tag="svg" viewBox="0 0 24 24">
@@ -173,7 +161,7 @@
 				</div>
 			{/await}
 		{/if}
-		{#if !config.public && organizationRequest}
+		{#if !reportConfig.public && organizationRequest}
 			{#await organizationRequest then currentOrgs}
 				<div class="mb-5 flex flex-col" transition:fade>
 					<h3 class="text-lg mb-2">Organizations</h3>
@@ -198,19 +186,19 @@
 											<Checkbox
 												checked={org.admin}
 												on:click={() =>
-													ZenoService.updateProjectOrg($project.uuid, {
+													ZenoService.updateReportOrg($report.id, {
 														...org,
 														admin: !org.admin
 													}).then(
-														() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid))
+														() => (organizationRequest = ZenoService.getReportOrgs($report.id))
 													)}
 											/>
 										</td>
 										<td style="text-align: end;">
 											<IconButton
 												on:click={() =>
-													ZenoService.deleteProjectOrg($project.uuid, org).then(
-														() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid))
+													ZenoService.deleteReportOrg($report.id, org).then(
+														() => (organizationRequest = ZenoService.getReportOrgs($report.id))
 													)}
 											>
 												<Icon tag="svg" viewBox="0 0 24 24">

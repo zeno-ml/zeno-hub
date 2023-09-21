@@ -166,3 +166,32 @@ def report_element(id: int):
     """
     db = Database()
     db.connect_execute("DELETE FROM report_elements WHERE id = %s;", [id])
+
+
+def report_user(report_id: int, user: User):
+    """Remove a user from a report.
+
+    Args:
+        report_id (int): the report id from which to remove the user.
+        user (User): the user to remove.
+    """
+    db = Database()
+    db.connect_execute(
+        "DELETE FROM user_report WHERE user_id = %s AND report_id = %s;",
+        [user.id, report_id],
+    )
+
+
+def report_org(report_id: int, organization: Organization):
+    """Remove an organization from a report.
+
+    Args:
+        report_id (int): the report id from which to remove the organization.
+        organization (Organization): the organization to remove.
+    """
+    db = Database()
+    db.connect_execute(
+        "DELETE FROM organization_report WHERE organization_id = %s "
+        "AND report_id = %s;",
+        [organization.id, report_id],
+    )

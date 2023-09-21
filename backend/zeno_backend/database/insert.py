@@ -549,3 +549,32 @@ def project_org(project: str, organization: Organization):
         "VALUES (%s,%s,%s)",
         [organization.id, project, organization.admin],
     )
+
+
+def report_user(report_id: int, user: User):
+    """Add a user to a report.
+
+    Args:
+        report_id (int): the report id to add the user to.
+        user (User): the user to add to the report.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO user_report (user_id, report_id, editor) VALUES (%s,%s,%s)",
+        [user.id, report_id, user.admin],
+    )
+
+
+def report_org(report_id: int, organization: Organization):
+    """Add a organization to a report.
+
+    Args:
+        report_id (int): the report id to add the organization to.
+        organization (Organization): the organization to add to the report.
+    """
+    db = Database()
+    db.connect_execute(
+        "INSERT INTO organization_report (organization_id, report_id, editor) "
+        "VALUES (%s,%s,%s)",
+        [organization.id, report_id, organization.admin],
+    )

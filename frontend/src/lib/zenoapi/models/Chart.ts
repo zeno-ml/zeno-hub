@@ -16,10 +16,10 @@ import type { XCParameters } from './XCParameters';
  * Attributes:
  * id (int): the id of the chart.
  * name (str): the name of the chart.
+ * project_uuid (str): the project uuid of the chart.
  * type (ChartType): the type of the chart.
  * parameters (XCParameters | TableParameters | BeeswarmParameters |
  * RadarParameters | HeatmapParameters): the parameters of the chart.
- * project_uuid (str | None): the project uuid of the chart.
  */
 export type Chart = {
 	id: number;

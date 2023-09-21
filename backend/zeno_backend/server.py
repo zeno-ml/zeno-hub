@@ -515,6 +515,15 @@ def get_server() -> FastAPI:
     def get_project_users(project: str):
         return select.project_users(project)
 
+    @api_app.get(
+        "/report-users/{report_id}",
+        response_model=list[User],
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    def get_report_users(report_id: int):
+        return select.report_users(report_id)
+
     @api_app.post(
         "/api-key/", response_model=str, tags=["zeno"], dependencies=[Depends(auth)]
     )
@@ -532,6 +541,15 @@ def get_server() -> FastAPI:
     )
     def get_project_orgs(project: str):
         return select.project_orgs(project)
+
+    @api_app.get(
+        "/report-organizations/{report_id}",
+        response_model=list[Organization],
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    def get_report_orgs(report_id: int):
+        return select.report_orgs(report_id)
 
     @api_app.post(
         "/string-filter/{project}",
@@ -653,23 +671,35 @@ def get_server() -> FastAPI:
             )
         return id
 
-    @api_app.post("/add-organization", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post("/organization", tags=["zeno"], dependencies=[Depends(auth)])
     def add_organization(user: User, organization: Organization):
         insert.organization(user, organization)
 
     @api_app.post(
-        "/add-project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_user(project: str, user: User):
         project_obj = select.project_from_uuid(project)
         if project_obj is not None and project_obj.owner_name != user.name:
             insert.project_user(project, user)
 
-    @api_app.post(
-        "/add-project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
+    @api_app.post("/project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_project_org(project: str, organization: Organization):
         insert.project_org(project, organization)
+
+    @api_app.post(
+        "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def add_report_user(report_id: int, user: User):
+        report_obj = select.report_from_id(report_id)
+        if report_obj is not None and report_obj.owner_name != user.name:
+            insert.report_user(report_id, user)
+
+    @api_app.post(
+        "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def add_report_org(report_id: int, organization: Organization):
+        insert.report_org(report_id, organization)
 
     ####################################################################### Update
     @api_app.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])
@@ -711,6 +741,16 @@ def get_server() -> FastAPI:
     )
     def update_project_org(project: str, organization: Organization):
         update.project_org(project, organization)
+
+    @api_app.patch(
+        "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def update_report_user(report_id: int, user: User):
+        update.report_user(report_id, user)
+
+    @api_app.patch("/report-org/{project}", tags=["zeno"], dependencies=[Depends(auth)])
+    def update_report_org(report_id: int, organization: Organization):
+        update.report_org(report_id, organization)
 
     @api_app.patch(
         "/report-element/{report_id}",
@@ -784,6 +824,18 @@ def get_server() -> FastAPI:
     @api_app.delete("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_report_element(id: int):
         delete.report_element(id)
+
+    @api_app.delete(
+        "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def delete_report_user(report_id: int, user: User):
+        delete.report_user(report_id, user)
+
+    @api_app.delete(
+        "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def delete_report_org(report_id: int, organization: Organization):
+        delete.report_org(report_id, organization)
 
     return app
 
