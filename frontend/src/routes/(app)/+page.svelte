@@ -79,54 +79,52 @@
 			</p>
 		{/if}
 	</div>
-	{#if $featureFlags['REPORTS']}
-		<div class="flex flex-col bg-white p-6 shadow-md rounded">
-			{#if data.user}
-				<div class="flex items-center mb-4">
-					<h1 class="text-xl mr-4">Your Reports</h1>
-					<button
-						class="border-solid m-1 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md p-1 pr-3 pl-1"
-						on:click={() => (showNewReport = true)}
-					>
-						<div class="flex items-center">
-							<Icon
-								class="mr-2"
-								style="outline:none;"
-								width="24px"
-								height="24px"
-								tag="svg"
-								viewBox="0 0 24 24"
-							>
-								<path fill="black" d={mdiPlus} />
-							</Icon>
-							New Report
-						</div>
-					</button>
-				</div>
-				<div class="flex flex-wrap items-start">
-					{#each ownReports as report}
-						<Report {report} deletable />
-					{/each}
-				</div>
-				{#if sharedReports.length > 0}
-					<h1 class="text-xl mt-3 mb-4">Shared Reports</h1>
-					<div class="flex flex-wrap items-start">
-						{#each sharedReports as report}
-							<Report {report} />
-						{/each}
+	<div class="flex flex-col bg-white p-6 shadow-md rounded">
+		{#if data.user}
+			<div class="flex items-center mb-4">
+				<h1 class="text-xl mr-4">Your Reports</h1>
+				<button
+					class="border-solid m-1 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md p-1 pr-3 pl-1"
+					on:click={() => (showNewReport = true)}
+				>
+					<div class="flex items-center">
+						<Icon
+							class="mr-2"
+							style="outline:none;"
+							width="24px"
+							height="24px"
+							tag="svg"
+							viewBox="0 0 24 24"
+						>
+							<path fill="black" d={mdiPlus} />
+						</Icon>
+						New Report
 					</div>
-				{/if}
-			{/if}
-			{#if publicReports.length > 0}
-				<h1 class="text-xl mt-3 mb-4">Public Reports</h1>
+				</button>
+			</div>
+			<div class="flex flex-wrap items-start">
+				{#each ownReports as report}
+					<Report {report} deletable />
+				{/each}
+			</div>
+			{#if sharedReports.length > 0}
+				<h1 class="text-xl mt-3 mb-4">Shared Reports</h1>
 				<div class="flex flex-wrap items-start">
-					{#each publicReports as report}
+					{#each sharedReports as report}
 						<Report {report} />
 					{/each}
 				</div>
 			{/if}
-		</div>
-	{/if}
+		{/if}
+		{#if publicReports.length > 0}
+			<h1 class="text-xl mt-3 mb-4">Public Reports</h1>
+			<div class="flex flex-wrap items-start">
+				{#each publicReports as report}
+					<Report {report} />
+				{/each}
+			</div>
+		{/if}
+	</div>
 </div>
 {#if showNewReport}
 	<Popup on:close>
