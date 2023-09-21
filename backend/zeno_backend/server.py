@@ -671,26 +671,24 @@ def get_server() -> FastAPI:
             )
         return id
 
-    @api_app.post("/add-organization", tags=["zeno"], dependencies=[Depends(auth)])
+    @api_app.post("/organization", tags=["zeno"], dependencies=[Depends(auth)])
     def add_organization(user: User, organization: Organization):
         insert.organization(user, organization)
 
     @api_app.post(
-        "/add-project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/project-user/{project}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_project_user(project: str, user: User):
         project_obj = select.project_from_uuid(project)
         if project_obj is not None and project_obj.owner_name != user.name:
             insert.project_user(project, user)
 
-    @api_app.post(
-        "/add-project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)]
-    )
+    @api_app.post("/project-org/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_project_org(project: str, organization: Organization):
         insert.project_org(project, organization)
 
     @api_app.post(
-        "/add-report-user/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_report_user(report_id: int, user: User):
         report_obj = select.report_from_id(report_id)
@@ -698,7 +696,7 @@ def get_server() -> FastAPI:
             insert.report_user(report_id, user)
 
     @api_app.post(
-        "/add-report-org/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
+        "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(auth)]
     )
     def add_report_org(report_id: int, organization: Organization):
         insert.report_org(report_id, organization)
