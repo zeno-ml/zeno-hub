@@ -10,4 +10,4 @@ RUN poetry install
 
 EXPOSE 80
 
-CMD exec poetry run uvicorn --timeout-keep-alive 75 zeno_backend.server:get_server --reload --host 0.0.0.0 --port 80
+CMD exec poetry run uvicorn zeno_backend.server:get_server --reload --host 0.0.0.0 --port 80 --timeout-keep-alive 75
