@@ -24,8 +24,8 @@ class AmplitudeHandler:
     def __init__(self):
         """Initialize the amplitude singleton."""
         if not hasattr(self, "initialized"):
-            if "AMPLITUDE_API_KEY" in os.environ:
-                self._client = Amplitude(os.environ["AMPLITUDE_API_KEY"])
+            if "PUBLIC_AMPLITUDE_API_KEY" in os.environ:
+                self._client = Amplitude(os.environ["PUBLIC_AMPLITUDE_API_KEY"])
             self.initialized = True
 
     def track(self, event: BaseEvent):
