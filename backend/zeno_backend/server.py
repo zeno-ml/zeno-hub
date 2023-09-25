@@ -261,6 +261,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
+        print(req.sort)
         if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         filter_sql = table_filter(

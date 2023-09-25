@@ -7,7 +7,7 @@ from zeno_backend.database.database import Database
 
 
 def mean(
-    project_uuid: str, metric: Metric, model: str, filter: sql.Composed | None
+    project_uuid: str, metric: Metric, model: str | None, filter: sql.Composed | None
 ) -> GroupMetric:
     """Calculate the mean of a metric for a given project.
 
@@ -37,7 +37,24 @@ def mean(
         )
 
         if len(column_output) == 0:
-            return GroupMetric(metric=None, size=0)
+            if filter is not None:
+                row_count = db.execute_return(
+                    sql.SQL("SELECT COUNT(*) AS n FROM {} WHERE ").format(
+                        sql.Identifier(project_uuid),
+                    )
+                    + filter
+                )
+            else:
+                row_count = db.execute_return(
+                    sql.SQL("SELECT COUNT(*) AS n FROM {}").format(
+                        sql.Identifier(project_uuid),
+                    )
+                )
+            if len(row_count) > 0:
+                return GroupMetric(metric=None, size=row_count[0][0])
+            else:
+                return GroupMetric(metric=None, size=0)
+
         column_id = column_output[0][0]
         if column_output[0][1] == MetadataType.BOOLEAN:
             column_id = sql.Identifier(column_id) + sql.SQL("::int")

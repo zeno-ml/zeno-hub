@@ -23,12 +23,12 @@
 			class="flex flex-wrap justify-between w-full items-center py-2.5 border-b border-grey-lighter"
 		>
 			<div class="flex">
-				<span class="text-grey-dark mr-3">
-					{$metric ? $metric.name + ':' : ''}
-				</span>
 				{#await currentResult then res}
 					{#if res !== undefined && res.length > 0}
 						{#if res[0].metric !== undefined && res[0].metric !== null}
+							<span class="text-grey-dark mr-3">
+								{$metric ? $metric.name + ':' : ''}
+							</span>
 							<span class="text-primary mr-3">
 								{res[0].metric.toFixed(2)}
 							</span>
