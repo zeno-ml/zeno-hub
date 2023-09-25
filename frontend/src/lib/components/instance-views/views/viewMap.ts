@@ -8,6 +8,7 @@ import ImageSegmentation from './views/ImageSegmentation.svelte';
 import OpenAiChat from './views/OpenAIChat.svelte';
 import TextClassification from './views/TextClassification.svelte';
 
+// MUST update /backend/zeno_backend/routers/sdk.py when adding new views
 export const viewMap: Record<string, ComponentType> = {
 	'audio-transcription': AudioTranscription,
 	chatbot: Chatbot,
