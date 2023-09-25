@@ -1,5 +1,6 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import asyncio
+import logging
 import os
 import shutil
 from pathlib import Path
@@ -45,6 +46,21 @@ from zeno_backend.processing.util import generate_diff_cols
 from .routers import sdk
 
 
+class EndpointFilter(logging.Filter):
+    """Filtering endpoints for logging."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Filter what endpoints are logged for the server.
+
+        Args:
+            record (logging.LogRecord): the log record for the application.
+
+        Returns:
+            bool: whether or not to log the endpoint.
+        """
+        return record.getMessage().find("/ping") == -1
+
+
 def get_server() -> FastAPI:
     """Provide the FastAPI server and specifies its inputs.
 
@@ -57,6 +73,8 @@ def get_server() -> FastAPI:
         FastAPI: FastAPI endpoint
     """
     app = FastAPI(title="Frontend API", separate_input_output_schemas=False)
+    # Filter out /endpoint
+    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
     # load env vars for cognito if available
     env_path = Path("../frontend/.env")
