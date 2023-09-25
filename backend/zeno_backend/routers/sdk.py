@@ -21,6 +21,17 @@ from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
 from zeno_backend.database import insert, select, update
 
+# MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
+VIEWS = [
+    "audio-transcription",
+    "chatbot",
+    "code-generation",
+    "image-classification",
+    "image-segmentation",
+    "openai-chat",
+    "text-classification",
+]
+
 
 class APIKeyBearer(HTTPBearer):
     """API key bearer authentication scheme."""
@@ -90,6 +101,15 @@ def create_project(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
+        )
+
+    if project.view not in VIEWS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "ERROR: Invalid view. Please reference https://zenoml.com/docs/views/"
+                + " for a list of valid views."
+            ),
         )
 
     user_name = select.user_name_by_api_key(api_key)
