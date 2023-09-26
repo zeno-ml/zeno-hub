@@ -13,6 +13,7 @@ from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import Report, ReportElement, ReportResponse
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
+from zeno_backend.classes.table import TableRequest
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database
@@ -1101,9 +1102,7 @@ def columns(project: str) -> list[ZenoColumn]:
 def table_data_paginated(
     project: str,
     filter_sql: sql.Composed | None,
-    offset: int,
-    limit: int,
-    sort_by: tuple[ZenoColumn | None, bool],
+    req: TableRequest,
 ) -> SQLTable:
     """Get a slice of the data saved in the project table.
 
@@ -1111,11 +1110,7 @@ def table_data_paginated(
         project (str): the project the user is currently working with.
         filter_sql (sql.Composed | None): filter to apply before fetching a slice of
             the data.
-        offset (int): where in the remaining data to start extracting the slice.
-        limit (int): maximum slice length to be extracted.
-        sort_by (tuple[ZenoColumn | None, bool]): column to sort by and whether to
-            sort in descending order. If the column is None, the data is sorted by
-            data_id.
+        req (TableRequest): the request for the given table slice.
 
     Raises:
         Exception: something failed while reading the data from the database.
@@ -1124,46 +1119,49 @@ def table_data_paginated(
         SQLTable: the resulting slice of the data as requested by the user.
     """
     with Database() as db:
+        if db.cur is None:
+            return SQLTable(table=[], columns=[])
         filter_results = None
         columns = []
-        if filter_sql is None:
-            if db.cur is not None:
-                db.cur.execute(
-                    sql.SQL(
-                        "SELECT * FROM {} ORDER BY {} {} LIMIT %s OFFSET %s;"
-                    ).format(
-                        sql.Identifier(f"{project}"),
-                        sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
-                        sql.SQL("DESC" if sort_by[1] else "ASC"),
-                    ),
-                    [
-                        limit,
-                        offset,
-                    ],
-                )
-                if db.cur.description is not None:
-                    columns = [desc[0] for desc in db.cur.description]
-                filter_results = db.cur.fetchall()
-        else:
-            if db.cur is not None:
-                db.cur.execute(
-                    sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
-                    + filter_sql
-                    + sql.SQL(" ORDER BY {} {} LIMIT {} OFFSET {};").format(
-                        sql.Identifier(sort_by[0].id if sort_by[0] else "data_id"),
-                        sql.SQL("DESC" if sort_by[1] else "ASC"),
-                        sql.Literal(limit),
-                        sql.Literal(offset),
-                    )
-                )
-                if db.cur.description is not None:
-                    columns = [desc[0] for desc in db.cur.description]
-                filter_results = db.cur.fetchall()
-        return (
-            SQLTable(table=filter_results, columns=columns)
-            if filter_results is not None
-            else SQLTable(table=[], columns=[])
+
+        diff_sql = sql.SQL("")
+        if req.diff_column_1 is not None and req.diff_column_2 is not None:
+            diff_sql = sql.SQL(", {} - {} AS diff").format(
+                sql.Identifier(req.diff_column_1.id),
+                sql.Identifier(req.diff_column_2.id),
+            )
+
+        filter = sql.SQL("")
+        if filter_sql is not None:
+            filter = sql.SQL("WHERE ") + filter_sql
+
+        order_sql = sql.SQL("")
+        if req.sort[0]:
+            sort = req.sort[0].id
+            if sort == "":
+                sort = "diff"
+
+            order_sql = sql.SQL("ORDER BY {} {}").format(
+                sql.Identifier(sort),
+                sql.SQL("DESC" if req.sort[1] else "ASC"),
+            )
+
+        db.cur.execute(
+            sql.SQL("SELECT * {} FROM {} {} {} LIMIT %s OFFSET %s;").format(
+                diff_sql,
+                sql.Identifier(f"{project}"),
+                filter,
+                order_sql,
+            ),
+            [
+                req.limit,
+                req.offset,
+            ],
         )
+        if db.cur.description is not None:
+            columns = [desc[0] for desc in db.cur.description]
+        filter_results = db.cur.fetchall()
+        return SQLTable(table=filter_results, columns=columns)
 
 
 def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:

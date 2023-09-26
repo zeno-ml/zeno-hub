@@ -88,15 +88,22 @@
 	// trigger this function when clicking column header to sort
 	function updateSort(model: string | undefined) {
 		if (model === undefined) return;
-		// when clicking different model columns, reset compareSort
-		if (sortModel !== model) {
-			compareSort.set([undefined, true]);
-			sortModel = model;
-		}
 
-		let compareColumnObj = $columns.filter(
-			(col) => col.name == $comparisonColumn?.name && col.model == $comparisonModel
-		)[0];
+		// when clicking different model columns, reset compareSort
+		sortModel = model;
+
+		// deep copy to not mutate object
+		let compareColumnObj = JSON.parse(
+			JSON.stringify(
+				$columns.filter(
+					(col) => col.name == $comparisonColumn?.name && col.model == $comparisonModel
+				)[0]
+			)
+		);
+
+		if (sortModel === '') {
+			compareColumnObj.id = '';
+		}
 
 		let compareSortString = JSON.stringify($compareSort[0]);
 		let newHeaderString = JSON.stringify(compareColumnObj);
@@ -124,6 +131,7 @@
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 			tablePromise = getFilteredTable(
+				$project.uuid,
 				$columns,
 				[$model, $comparisonModel],
 				$comparisonColumn,

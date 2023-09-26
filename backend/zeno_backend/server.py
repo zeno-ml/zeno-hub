@@ -1,11 +1,11 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import asyncio
+import json
 import logging
 import os
 import shutil
 from pathlib import Path
 
-import pandas as pd
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
@@ -41,7 +41,6 @@ from zeno_backend.processing.histogram_processing import (
 )
 from zeno_backend.processing.metrics.map import metric_map
 from zeno_backend.processing.slice_finder import slice_finder
-from zeno_backend.processing.util import generate_diff_cols
 
 from .routers import sdk
 
@@ -266,21 +265,21 @@ def get_server() -> FastAPI:
         filter_sql = table_filter(
             project_uuid, req.model, req.filter_predicates, req.data_ids
         )
-        sql_table = select.table_data_paginated(
-            project_uuid, filter_sql, req.offset, req.limit, req.sort
-        )
-        filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
 
-        # Prepend the DATA_URL to the data column if it exists
+        sql_table = select.table_data_paginated(project_uuid, filter_sql, req)
+
         project = select.project_from_uuid(project_uuid)
-        if project and project.data_url:
-            filt_df["data"] = project.data_url + filt_df["data"]
+        return_table = []
+        for row in sql_table.table:
+            return_row = {}
+            for i, col in enumerate(sql_table.columns):
+                if col == "data" and project and project.data_url:
+                    return_row[col] = project.data_url + row[i]
+                else:
+                    return_row[col] = row[i]
+            return_table.append(return_row)
 
-        if req.diff_column_1 and req.diff_column_2:
-            filt_df = generate_diff_cols(
-                filt_df, req.diff_column_1, req.diff_column_2, project_uuid
-            )
-        return filt_df.to_json(orient="records")
+        return json.dumps(return_table)
 
     @api_app.get(
         "/chart/{owner}/{project}/{chart_id}",
