@@ -15,6 +15,8 @@
 		const metric = metrics.find((m) => m.id === parameters.metric);
 		if (metric) {
 			spec = generateSpec(parameters, metric.name, height, width);
+		} else {
+			spec = generateSpec(parameters, 'slice size', height, width);
 		}
 	});
 </script>
