@@ -196,6 +196,9 @@ def dataset(
         )
     )
 
+    # To prevent upload errors, convert data column to string.
+    data_frame["data"] = data_frame["data"].astype(str)
+
     # Connect to the db engine using SQLAlchemy and write the data to a table.
     config = config_db()
     engine = create_engine(
