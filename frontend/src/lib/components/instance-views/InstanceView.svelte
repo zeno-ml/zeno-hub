@@ -39,12 +39,10 @@
 
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
-	$: if ($model) {
-		currentResult = getMetricsForSlicesAndTags(
-			$model ? getMetricKeys($model, $metric, $selectionPredicates) : [],
-			[...new Set([...secureTagIds, ...secureSelectionIds])]
-		);
-	}
+	$: currentResult = getMetricsForSlicesAndTags(
+		getMetricKeys($model, $metric, $selectionPredicates),
+		[...new Set([...secureTagIds, ...secureSelectionIds])]
+	);
 
 	$: modelAResult = compare
 		? getCompareResults($model, $metric, $selectionPredicates)
@@ -60,7 +58,7 @@
 	});
 
 	function getMetricKeys(
-		model: string,
+		model: string | undefined,
 		metric: Metric | undefined,
 		predicates?: FilterPredicateGroup
 	): MetricKey[] {
@@ -75,7 +73,7 @@
 						join: Join._
 					}
 				},
-				model: model,
+				model: model === undefined ? '' : model,
 				metric: metric ? metric.id : -1
 			}
 		];

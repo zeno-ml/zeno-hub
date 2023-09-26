@@ -5,8 +5,6 @@ from psycopg import sql
 from zeno_backend.classes.base import GroupMetric
 from zeno_backend.classes.metric import Metric
 from zeno_backend.database.database import Database
-from zeno_backend.processing.metrics.bleu import bleu
-from zeno_backend.processing.metrics.f1 import f1, precision, recall
 from zeno_backend.processing.metrics.mean import mean
 
 
@@ -69,19 +67,11 @@ def metric_map(
     Returns:
         GroupMetric: the metric result calculated on the data as specified.
     """
-    if metric is None or model is None:
+    if metric is None:
         return count(project, sql_filter)
 
     if metric.type == "mean":
         return mean(project, metric, model, sql_filter)
-    if metric.type == "bleu":
-        return bleu(project, metric, model, sql_filter)
-    if metric.type == "recall":
-        return recall(project, model, sql_filter)
-    if metric.type == "f1":
-        return f1(project, model, sql_filter)
-    if metric.type == "precision":
-        return precision(project, model, sql_filter)
     if metric.type == "count":
         return count(project, sql_filter, True)
 
