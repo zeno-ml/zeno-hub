@@ -43,6 +43,12 @@ def xyc_data(chart: Chart, project: str) -> str:
     )
 
     selected_slices = slices(project, chart.parameters.slices)
+    # order selected_slices by the order in which they appear in chart.parameters.slices
+    selected_slices = sorted(
+        selected_slices,
+        key=lambda slice: chart.parameters.slices.index(slice.id),
+    )
+    print(selected_slices)
     if -1 in chart.parameters.slices:
         selected_slices = selected_slices + [
             Slice(
