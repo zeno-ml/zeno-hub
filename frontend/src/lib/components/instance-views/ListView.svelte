@@ -80,6 +80,7 @@
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
 		tablePromise = getFilteredTable(
+			$project.uuid,
 			$columns,
 			$model ? [$model] : [],
 			undefined,

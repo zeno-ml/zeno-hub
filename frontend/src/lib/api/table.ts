@@ -1,10 +1,9 @@
-import { project } from '$lib/stores';
 import type { FilterPredicateGroup, ZenoColumn } from '$lib/zenoapi';
 import { ZenoService } from '$lib/zenoapi';
 import { ZenoColumnType } from '$lib/zenoapi/models/ZenoColumnType';
-import { get } from 'svelte/store';
 
 export async function getFilteredTable(
+	project_uuid: string,
 	completeColumns: ZenoColumn[],
 	filterModels: string[],
 	diffColumn: ZenoColumn | undefined,
@@ -23,24 +22,15 @@ export async function getFilteredTable(
 	);
 
 	// create diff columns for comparison view
-	let diffColumn1 = undefined;
+	const diffColumn1 = diffColumn;
 	let diffColumn2 = undefined;
-	if (diffColumn) {
-		diffColumn1 = Object.assign({}, diffColumn);
-		diffColumn2 = Object.assign({}, diffColumn);
-		const addModel =
-			[ZenoColumnType.FEATURE, ZenoColumnType.OUTPUT].includes(diffColumn.columnType) &&
-			diffColumn.model !== undefined &&
-			diffColumn.model !== null;
-		diffColumn1.model = addModel ? filterModels[0] : '';
-		diffColumn2.model = addModel ? filterModels[1] : '';
+	if (filterModels.length > 1 && diffColumn !== undefined) {
+		diffColumn2 = completeColumns.find(
+			(c) => c.name === diffColumn.name && c.model === filterModels[1]
+		);
 	}
 
-	const config = get(project);
-	if (!config) {
-		return Promise.reject('No project selected.');
-	}
-	const res = await ZenoService.getFilteredTable(config.uuid, {
+	const res = await ZenoService.getFilteredTable(project_uuid, {
 		columns: requestedColumns,
 		model: filterModels[0],
 		diffColumn1,
