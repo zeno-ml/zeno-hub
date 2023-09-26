@@ -13,6 +13,7 @@ export default function generateSpec(
 	const spec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		description: 'A simple bar chart with embedded data.',
+		random_id: Date.now(), // used to force re-rendering of the chart
 		autosize: 'pad',
 		width: width,
 		height: height,
