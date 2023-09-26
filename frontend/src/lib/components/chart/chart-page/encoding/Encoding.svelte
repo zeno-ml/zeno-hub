@@ -20,7 +20,7 @@
 </script>
 
 <div class="mb-20">
-	<h4 class="border-b-2 border-grey-light mb-2 pb-1">Chart Type</h4>
+	<h4 class="border-b-2 border-grey-light mb-2 pb-1">Encoding</h4>
 	<div id="flex flex-col">
 		<svelte:component this={encodingMap[chart.type]} bind:chart />
 	</div>
