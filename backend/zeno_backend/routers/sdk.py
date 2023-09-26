@@ -151,7 +151,8 @@ def upload_dataset(
 
     Args:
         project (str): the UUID of the project to add data to.
-        id_column (str): the name of the column containing the instance IDs.
+        id_column (str): the name of the column containing the instance IDs or URLs/URL
+            parts.
         label_column (str | None, optional): the name of the column containing the
             instance labels. Defaults to None.
         data_column (str | None, optional): the name of the column containing the
