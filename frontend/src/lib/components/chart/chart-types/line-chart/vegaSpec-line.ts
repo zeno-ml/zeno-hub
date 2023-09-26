@@ -13,6 +13,7 @@ export default function generateSpec(
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		description: 'A simple line chart with embedded data.',
+		random_id: Date.now(), // used to force re-rendering of the chart
 		width: width,
 		height: height,
 		padding: { top: 20 },

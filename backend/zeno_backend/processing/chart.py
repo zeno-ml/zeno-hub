@@ -44,15 +44,17 @@ def xyc_data(chart: Chart, project: str) -> str:
 
     selected_slices = slices(project, chart.parameters.slices)
     if -1 in chart.parameters.slices:
-        selected_slices = selected_slices + [
+        index = chart.parameters.slices.index(-1)
+        selected_slices.insert(
+            index,
             Slice(
                 id=-1,
                 slice_name="All instances",
                 filter_predicates=FilterPredicateGroup(
                     predicates=[], join=Join.OMITTED
                 ),
-            )
-        ]
+            ),
+        )
 
     selected_models = chart.parameters.models
     for current_slice in selected_slices:
