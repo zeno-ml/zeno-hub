@@ -12,20 +12,20 @@
 	{#await resolveDataPoint(entry)}
 		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 	{:then textData}
-		<p class="text-grey">
+		<p class="text-grey whitespace-pre-wrap">
 			<span class="font-semibold">input: </span>
 			{textData}
 		</p>
 	{/await}
 	{#if entry['label'] !== undefined}
-		<p class="mt-2 text-grey">
+		<p class="mt-2 text-grey whitespace-pre-wrap">
 			<span class="font-semibold">label: </span>
 			{entry['label']}
 		</p>
 	{/if}
 	{#if modelColumn && entry[modelColumn] !== undefined}
 		<hr class="mt-2 mb-2 text-grey-darker" />
-		<p class=" text-grey">
+		<p class=" text-grey whitespace-pre-wrap">
 			<span class="font-semibold">output: </span>
 			{entry[modelColumn]}
 		</p>
