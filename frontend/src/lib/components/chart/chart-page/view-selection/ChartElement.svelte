@@ -9,7 +9,7 @@
 	import TableIcon from './chart-icons/TableIcon.svelte';
 
 	export let chart: Chart;
-	export let updateChart: (chartType: ChartType) => void;
+	export let updateChartType: (chartType: ChartType) => void;
 	export let type: ChartType;
 
 	const iconMap: Record<string, ComponentType> = {
@@ -37,7 +37,7 @@
 		? 'bg-primary-light'
 		: ''}"
 	on:keydown={() => ({})}
-	on:click={() => updateChart(type)}
+	on:click={() => updateChartType(type)}
 >
 	<svelte:component this={iconMap[type]} />
 	<h4 class="mt-1">{titleMap[type]}</h4>
