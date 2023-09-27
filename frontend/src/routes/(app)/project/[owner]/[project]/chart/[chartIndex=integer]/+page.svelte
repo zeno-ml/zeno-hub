@@ -17,6 +17,7 @@
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined;
+	let unique = {};
 
 	$: chartData = data.chartData;
 	$: updateEditUrl(isChartEdit);
@@ -51,8 +52,16 @@
 			class="border-r border-r-grey-lighter h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]"
 		>
 			<EditHeader bind:isChartEdit bind:chart />
-			<ViewSelection bind:chart />
-			<Encoding bind:chart />
+			<ViewSelection bind:chart bind:unique />
+			<!--
+				This is a hack to force the component to rerender on chart type change as the selections otherwise don't update.
+				If svelecte ever resolves this issue, this hack can be removed and we can listen to events on svelecte.
+				https://github.com/mskocik/svelecte/issues/200.
+				A detailed description of this problem is in: https://github.com/zeno-ml/zeno-hub/pull/235.
+			-->
+			{#key unique}
+				<Encoding bind:chart />
+			{/key}
 		</div>
 	{:else}
 		<ViewHeader bind:isChartEdit />
