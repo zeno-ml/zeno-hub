@@ -85,7 +85,7 @@ class APIKeyBearer(HTTPBearer):
 router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
 
 
-@router.post("/project", status_code=200)
+@router.post("/project", status_code=200, response_model=Project)
 def create_project(
     project: Project, response: Response, api_key=Depends(APIKeyBearer())
 ):
@@ -102,6 +102,8 @@ def create_project(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
         )
+    owner_name = select.user_name_by_api_key(api_key)
+    project.owner_name = owner_name if owner_name is not None else ""
 
     if project.view not in VIEWS:
         raise HTTPException(
@@ -135,7 +137,7 @@ def create_project(
         )
         insert.project(project, user_id)
         response.status_code = status.HTTP_201_CREATED
-    return project.uuid
+    return project
 
 
 @router.post("/dataset/{project}")
