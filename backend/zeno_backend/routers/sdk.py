@@ -30,6 +30,7 @@ VIEWS = [
     "image-segmentation",
     "openai-chat",
     "text-classification",
+    "openai-chat-markdown",
 ]
 
 
