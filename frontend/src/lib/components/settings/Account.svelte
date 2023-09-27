@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
@@ -40,13 +41,15 @@
 		Note: You can only have one API key at a time. Generating a new key will overwrite your existing
 		key.
 	</p>
-	<Button variant="raised" class="mb-2" on:click={() => (showFeatureFlags = true)}>
-		Enable feature flags
-	</Button>
-	<p class="italic mb-4">
-		Note: Feature flags are saved as browser cookies. If you clear your cookies or switch browsers,
-		your settings will be lost.
-	</p>
+	{#if $page.url.origin !== 'https://hub.zenoml.com'}
+		<Button variant="raised" class="mb-2" on:click={() => (showFeatureFlags = true)}>
+			Configure feature flags
+		</Button>
+		<p class="italic mb-4">
+			Note: Feature flags are saved as browser cookies. If you clear your cookies or switch
+			browsers, your settings will be lost.
+		</p>
+	{/if}
 	<div class="flex">
 		{#if api_key}
 			<p class="mr-3">API Key:</p>
