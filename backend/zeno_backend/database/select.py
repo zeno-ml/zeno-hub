@@ -3,7 +3,7 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.base import ZenoColumn
+from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
@@ -1129,10 +1129,16 @@ def table_data_paginated(
 
         diff_sql = sql.SQL("")
         if req.diff_column_1 is not None and req.diff_column_2 is not None:
-            diff_sql = sql.SQL(", {} - {} AS diff").format(
-                sql.Identifier(req.diff_column_1.id),
-                sql.Identifier(req.diff_column_2.id),
-            )
+            if req.diff_column_1.data_type == MetadataType.CONTINUOUS:
+                diff_sql = sql.SQL(", {} - {} AS diff").format(
+                    sql.Identifier(req.diff_column_1.id),
+                    sql.Identifier(req.diff_column_2.id),
+                )
+            else:
+                diff_sql = sql.SQL(", {} = {} AS diff").format(
+                    sql.Identifier(req.diff_column_1.id),
+                    sql.Identifier(req.diff_column_2.id),
+                )
 
         filter = sql.SQL("")
         if filter_sql is not None:
