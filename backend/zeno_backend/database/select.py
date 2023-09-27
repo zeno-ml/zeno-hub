@@ -985,10 +985,12 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
         )
     else:
         slice_results = db.connect_execute_return(
-            "SELECT id, name, folder_id, filter "
-            "FROM slices "
-            "WHERE project_uuid = %s AND id = ANY(%s);",
+            "SELECT id, name, folder_id, filter, "
+            "array_position(%s::integer[],id) as ord FROM slices "
+            "WHERE project_uuid = %s AND id = ANY(%s) "
+            "ORDER BY ord;",
             [
+                ids,
                 project,
                 ids,
             ],
