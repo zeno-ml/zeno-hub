@@ -241,10 +241,10 @@
 							<td class="p-3 align-text-top">{modelValueAndDiff($comparisonModel, tableContent)}</td
 							>
 							<td class="p-3 align-text-top"
-								>{Number(tableContent['diff'])
+								>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
 									? Number(tableContent['diff']).toFixed(2)
-									: tableContent['diff']}</td
-							>
+									: tableContent['diff']}
+							</td>
 						{/if}
 					</tr>
 				{/each}
