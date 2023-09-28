@@ -13,7 +13,7 @@ export default {
 			},
 			background: '#ffffff',
 			yellowish: {
-				DEFAULT: '#f2f2ee',
+				DEFAULT: 'rgb(245 245 245)',
 				light: '#fbfbfa'
 			},
 			greenish: {

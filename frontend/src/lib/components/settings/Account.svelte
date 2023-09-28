@@ -30,17 +30,6 @@
 	<Textfield label="Email" value={email} disabled style="margin-right: 40px;" />
 </div>
 <div class="mt-5">
-	<Button
-		variant="raised"
-		class="mb-2"
-		on:click={() => ZenoService.createApiKey().then((key) => (api_key = key))}
-	>
-		Generate new API key
-	</Button>
-	<p class="italic mb-4">
-		Note: You can only have one API key at a time. Generating a new key will overwrite your existing
-		key.
-	</p>
 	{#if $page.url.origin !== 'https://hub.zenoml.com'}
 		<Button variant="raised" class="mb-2" on:click={() => (showFeatureFlags = true)}>
 			Configure feature flags
@@ -50,7 +39,18 @@
 			browsers, your settings will be lost.
 		</p>
 	{/if}
-	<div class="flex">
+	<Button
+		variant="raised"
+		class="mb-2"
+		on:click={() => ZenoService.createApiKey().then((key) => (api_key = key))}
+	>
+		Generate new API key
+	</Button>
+	<p class="italic mb-2">
+		Note: You can only have one API key at a time. Generating a new key will overwrite your existing
+		key.
+	</p>
+	<div class="flex mb-4">
 		{#if api_key}
 			<p class="mr-3">API Key:</p>
 			<h5 on:click={copyKey} on:keypress={copyKey} class="hover:text-primary cursor-pointer">
