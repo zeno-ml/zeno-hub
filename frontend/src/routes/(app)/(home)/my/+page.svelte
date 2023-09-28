@@ -9,11 +9,13 @@
 	import Button, { Icon } from '@smui/button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
+	import { Tooltip } from '@svelte-plugins/tooltips';
 
 	export let data;
 
 	let reportName = '';
 	let showNewReport = false;
+	let view = 'projects';
 
 	$: invalidName = data.reports.filter((rep) => rep.name === reportName).length > 0;
 
@@ -28,73 +30,88 @@
 		data.user === null ? [] : data.projects.filter((proj) => proj.ownerName !== data.user?.name);
 </script>
 
-<div class="pt-8 flex flex-col">
-	{#if ownProjects.length > 0}
-		<h1 class="text-xl mb-4">Your Projects</h1>
+<div class="p-4 mt-5 flex flex-col bg-white shadow">
+	<div class="flex mb-4 h-8 ml-2">
+		<Tooltip
+			content={'Projects are datasets and system outputs for evaluation'}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<button
+				class="text-xl mr-6 hover:text-primary
+			{view === 'projects' ? 'border-b-2 border-primary' : ''}"
+				on:click={() => (view = 'projects')}
+			>
+				Projects
+			</button>
+		</Tooltip>
+		<Tooltip
+			content={'Reports are interactive notebooks for sharing evaluation insights'}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<button
+				class="text-xl mr-4 hover:text-primary {view === 'reports'
+					? 'border-b-2 border-primary'
+					: ''}"
+				on:click={() => (view = 'reports')}
+			>
+				Reports
+			</button>
+		</Tooltip>
+		{#if view === 'reports'}
+			<button
+				class="border-solid m-1 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md items-center justify-center"
+				on:click={() => (showNewReport = true)}
+			>
+				<div class="flex items-center px-3">
+					<Icon
+						class="mr-2"
+						style="outline:none;"
+						width="24px"
+						height="24px"
+						tag="svg"
+						viewBox="0 0 24 24"
+					>
+						<path fill="black" d={mdiPlus} />
+					</Icon>
+					New Report
+				</div>
+			</button>
+		{/if}
+	</div>
+	{#if view === 'projects'}
 		<div class="flex flex-wrap items-start mb-6">
 			{#each ownProjects as project}
 				<Project {project} deletable />
 			{/each}
-		</div>
-	{:else}
-		<div class="mb-6">
-			<Banner>
-				Welcome to Zeno! You don't have any projects yet. Create one with the <a
-					href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a
-				>
-			</Banner>
-		</div>
-	{/if}
-	{#if sharedProjects.length > 0}
-		<h1 class="text-xl mt-3 mb-4">Shared Projects</h1>
-		<div class="flex flex-wrap items-start mb-6">
 			{#each sharedProjects as project}
 				<Project {project} />
 			{/each}
 		</div>
-	{/if}
-	<div class="flex items-center mb-4">
-		<h1 class="text-xl mr-4">Your Reports</h1>
-		<button
-			class="border-solid m-1 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md p-1 pr-3 pl-1"
-			on:click={() => (showNewReport = true)}
-		>
-			<div class="flex items-center">
-				<Icon
-					class="mr-2"
-					style="outline:none;"
-					width="24px"
-					height="24px"
-					tag="svg"
-					viewBox="0 0 24 24"
-				>
-					<path fill="black" d={mdiPlus} />
-				</Icon>
-				New Report
-			</div>
-		</button>
-	</div>
-	<div class="flex flex-wrap items-start mb-6">
-		{#if ownReports.length > 0}
+		{#if ownProjects.length === 0}
+			<Banner>
+				Welcome to <a href="https://zenoml.com">Zeno</a>! You don't have any projects yet. Create
+				one with the <a href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a>
+			</Banner>
+		{/if}
+	{:else if view === 'reports'}
+		<div class="flex flex-wrap items-start mb-6">
 			{#each ownReports as report}
 				<Report {report} deletable />
 			{/each}
-		{:else}
-			<Banner>
-				It seems like you have not created a report yet. Reports can be used to tell stories about
-				ML systems. Select "New Report" above to create one.
-			</Banner>
-		{/if}
-	</div>
-	{#if sharedReports.length > 0}
-		<h1 class="text-xl mt-3 mb-4">Shared Reports</h1>
-		<div class="flex flex-wrap items-start mb-6">
 			{#each sharedReports as report}
 				<Report {report} />
 			{/each}
 		</div>
+		{#if ownReports.length === 0}
+			<Banner>
+				You haven't created any reports yet. Use reports to tell stories about your AI systems.
+			</Banner>
+		{/if}
 	{/if}
 </div>
+
 {#if showNewReport}
 	<Popup on:close>
 		<Content style="display: flex; align-items: center;">
