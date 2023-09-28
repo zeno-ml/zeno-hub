@@ -7,8 +7,8 @@ export default function generateSpec(
 	height: number,
 	width: number
 ): VegaLiteSpec {
-	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
-	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
+	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'system' : 'slice';
+	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
 
 	const spec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',

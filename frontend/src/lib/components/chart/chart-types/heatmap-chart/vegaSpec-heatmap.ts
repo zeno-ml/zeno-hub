@@ -5,8 +5,8 @@ export default function generateSpec(
 	parameters: HeatmapParameters,
 	metricName: string
 ): VegaLiteSpec {
-	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'model' : 'slice';
-	const y_name = parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'model';
+	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'system' : 'slice';
+	const y_name = parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
 
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',

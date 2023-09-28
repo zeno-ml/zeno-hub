@@ -15,8 +15,8 @@
 	}
 
 	function refreshParams(e: CustomEvent, currentParam: Dimensions) {
-		let label = e.detail.label as 'models' | 'slices';
-		let paramExcluMap = { slices: SlicesOrModels.MODELS, models: SlicesOrModels.SLICES };
+		let label = e.detail.label as 'systems' | 'slices';
+		let paramExcluMap = { slices: SlicesOrModels.MODELS, systems: SlicesOrModels.SLICES };
 
 		if (currentParam === Dimensions.x) {
 			parameters.xChannel = e.detail.value;
@@ -66,7 +66,7 @@
 			value={parameters.xChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={xChanged}
@@ -94,7 +94,7 @@
 			value={parameters.colorChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={colorChaned}

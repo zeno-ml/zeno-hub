@@ -82,7 +82,7 @@ export default function generateSpec(
 			{
 				fill: 'color',
 				orient: 'none',
-				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
+				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
 				encode: {
 					legend: { update: { x: { value: 300 }, y: { value: -250 } } }
 				}

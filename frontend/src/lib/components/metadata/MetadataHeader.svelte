@@ -22,7 +22,7 @@
 	{#if $model !== undefined && $models.length > 0}
 		<div class="mr-2.5 flex flex-col w-1/2">
 			<span class="my-1 text-grey-dark w-fit">
-				{$page.url.href.includes('compare') ? 'Model A' : 'Model'}
+				{$page.url.href.includes('compare') ? 'System A' : 'System'}
 			</span>
 			<select
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
@@ -51,7 +51,7 @@
 	{/if}
 	{#if $page.url.href.includes('compare')}
 		<div class="flex flex-col w-1/2">
-			<span class="my-1 text-grey-dark">Model B</span>
+			<span class="my-1 text-grey-dark">System B</span>
 			<select
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$comparisonModel}

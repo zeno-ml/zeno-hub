@@ -51,7 +51,7 @@
 				use:tooltip={{
 					content: !$page.url.href.includes('compare')
 						? 'Find underperforming slices'
-						: 'Find slices with the largest output differences between models',
+						: 'Find slices with the largest output differences between systems',
 					position: 'left',
 					theme: 'zeno-tooltip',
 					maxWidth: '150'

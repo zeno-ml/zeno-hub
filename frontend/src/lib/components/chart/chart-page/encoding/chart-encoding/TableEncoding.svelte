@@ -122,7 +122,7 @@
 			value={parameters.xChannel}
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },
-				{ label: 'models', value: SlicesMetricsOrModels.MODELS },
+				{ label: 'systems', value: SlicesMetricsOrModels.MODELS },
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}
@@ -149,7 +149,7 @@
 			value={parameters.yChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={yChanged}
@@ -172,7 +172,7 @@
 			slot="component"
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },
-				{ label: 'models', value: SlicesMetricsOrModels.MODELS },
+				{ label: 'systems', value: SlicesMetricsOrModels.MODELS },
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}

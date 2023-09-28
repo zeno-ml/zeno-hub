@@ -23,7 +23,7 @@
 	{/if}
 	{#if entry[modelColumn]}
 		<hr />
-		<pre class="mt-2 mb-0">model prediction</pre>
+		<pre class="mt-2 mb-0">prediction</pre>
 		<HighlightAuto code={entry[modelColumn]} />
 	{/if}
 </div>
