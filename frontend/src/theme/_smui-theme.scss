@@ -22,7 +22,7 @@
 	--P2: #d2bae9;
 	--P3: #f7f1fb;
 	--P4: #f9f7fb;
-	--Y1: #f2f2ee;
+	--Y1: rgb(245 245 245);
 	--Y2: #fbfbfa;
 	--N1: #61988e;
 	--N2: #d0ebe6;
@@ -76,12 +76,12 @@ $mdc-typography-font-family: unquote('Open Sans, Roboto, sans-serif');
 	height: 20px;
 }
 
-a {
-	color: #40b3ff;
-}
-a:visited {
-	color: color.scale(#40b3ff, $lightness: -35%);
-}
+// a {
+// 	color: #40b3ff;
+// }
+// a:visited {
+// 	color: color.scale(#40b3ff, $lightness: -35%);
+// }
 
 .overflow-show {
 	overflow: visible;

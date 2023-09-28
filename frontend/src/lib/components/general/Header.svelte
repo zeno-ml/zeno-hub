@@ -47,7 +47,7 @@
 			<a href="/">
 				<img class="w-8 mt-5" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
 			</a>
-			{#if $page.url.href.includes('project')}
+			{#if $page.url.href.includes('project/')}
 				<div class="flex flex-col mt-3">
 					<HeaderIcon
 						pageName={'explore'}

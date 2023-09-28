@@ -8,10 +8,8 @@ export async function load({ depends }) {
 	OpenAPI.BASE = `${getEndpoint()}/api`;
 
 	const publicReports = await ZenoService.getPublicReports();
-	const publicProjects = await ZenoService.getPublicProjects();
 
 	return {
-		publicProjects: publicProjects,
 		publicReports: publicReports
 	};
 }
