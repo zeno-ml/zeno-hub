@@ -6,7 +6,6 @@
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
-		metric,
 		model,
 		project,
 		rowsPerPage,
@@ -16,11 +15,10 @@
 		tagIds
 	} from '$lib/stores';
 	import { Join, MetadataType, ZenoColumnType, type GroupMetric } from '$lib/zenoapi';
-	import { Label } from '@smui/button';
+	import { Icon, Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
-	import ComparisonViewTableHeader from './ComparisonViewTableHeader.svelte';
 	import { viewMap } from './views/viewMap';
 
 	export let viewOptions: Record<string, unknown> | undefined;
@@ -48,6 +46,7 @@
 	$: if (currentPage > lastPage) {
 		currentPage = lastPage;
 	}
+
 	$: modelAResult.then((r) => {
 		if (r !== undefined && r.length > 0) {
 			lastPage = Math.max(Math.ceil(r[0].size / $rowsPerPage) - 1, 0);
@@ -64,10 +63,10 @@
 	// when state changes update current table view
 	$: {
 		currentPage;
+		$model;
 		$comparisonModel;
 		$comparisonColumn;
 		$rowsPerPage;
-		$model;
 		$compareSort;
 		$selectionIds;
 		$selectionPredicates;
@@ -118,32 +117,40 @@
 	}
 
 	function updateTable() {
-		if (isNaN(start) || isNaN(end) || end <= start) return;
-		if ($model !== undefined && $comparisonModel !== undefined) {
-			let predicates = $selectionPredicates;
-			if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
-				predicates = {
-					join: Join._,
-					predicates: [predicates]
-				};
-			}
-			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			tablePromise = getFilteredTable(
-				$project.uuid,
-				$columns,
-				[$model, $comparisonModel],
-				$comparisonColumn,
-				start,
-				end - start,
-				$compareSort,
-				dataIds,
-				predicates
-			);
-			if (instanceContainer) {
-				instanceContainer.scrollTop = 0;
-			}
+		if (
+			isNaN(start) ||
+			isNaN(end) ||
+			end <= start ||
+			$model === undefined ||
+			$comparisonModel === undefined
+		)
+			return;
+
+		let predicates = $selectionPredicates;
+		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
+			predicates = {
+				join: Join._,
+				predicates: [predicates]
+			};
+		}
+
+		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
+		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
+		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		tablePromise = getFilteredTable(
+			$project.uuid,
+			$columns,
+			[$model, $comparisonModel],
+			$comparisonColumn,
+			start,
+			end - start,
+			$compareSort,
+			dataIds,
+			predicates
+		);
+
+		if (instanceContainer) {
+			instanceContainer.scrollTop = 0;
 		}
 	}
 
@@ -166,48 +173,53 @@
 		<thead
 			class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
 		>
-			<th class="p-3">
-				<div>A: {$model}</div>
-				<div>
-					<span class="font-normal text-sm mr-3.5 text-grey-dark">
-						{$metric ? $metric.name + ':' : ''}
-					</span>
-					<span class="font-normal mr-3.5 text-primary">
-						{#await modelAResult then res}
-							{#if res !== undefined && res.length > 0}
-								{#if res[0].metric !== undefined && res[0].metric !== null}
-									{res[0].metric.toFixed(2)}
-								{/if}
+			<th class="p-3 cursor-pointer hover:text-primary" on:click={() => updateSort($model)}>
+				<div class="flex">
+					<p>A: {$model}</p>
+					{#if sortModel === $model}
+						<Icon class="material-icons">
+							{#if $compareSort[0] && $compareSort[1]}
+								arrow_drop_up
+							{:else if $compareSort[0]}
+								arrow_drop_down
 							{/if}
-						{/await}
-					</span>
+						</Icon>
+					{/if}
 				</div>
 			</th>
-			<th class="p-3">
-				<div>B: {$comparisonModel}</div>
-				<div>
-					<span class="font-normal text-sm mr-3.5 text-grey-dark">
-						{$metric ? $metric.name + ':' : ''}
-					</span>
-					<span class="font-normal text-sm mr-3.5 text-primary">
-						{#await modelBResult then res}
-							{#if res !== undefined && res.length > 0}
-								{#if res[0].metric !== undefined && res[0].metric !== null}
-									{res[0].metric.toFixed(2)}
-								{/if}
+			<th
+				class="p-3 cursor-pointer hover:text-primary"
+				on:click={() => updateSort($comparisonModel)}
+			>
+				<div class="flex">
+					<p>B: {$comparisonModel}</p>
+					{#if sortModel === $comparisonModel}
+						<Icon class="material-icons">
+							{#if $compareSort[0] && $compareSort[1]}
+								arrow_drop_up
+							{:else if $compareSort[0]}
+								arrow_drop_down
 							{/if}
-						{/await}
-					</span>
+						</Icon>
+					{/if}
 				</div>
 			</th>
-			<th on:click={() => updateSort($model)} class="cursor-pointer p-3 min-w-[150px]">
-				<ComparisonViewTableHeader {sortModel} header={$model} />
-			</th>
-			<th on:click={() => updateSort($comparisonModel)} class="cursor-pointer p-3 min-w-[150px]">
-				<ComparisonViewTableHeader {sortModel} header={$comparisonModel} />
-			</th>
-			<th on:click={() => updateSort('')} class="cursor-pointer p-3 min-w-[150px]">
-				<ComparisonViewTableHeader {sortModel} header={''} />
+			<th class="p-3 cursor-pointer hover:text-primary" on:click={() => updateSort('')}>
+				<div class="flex">
+					<div>
+						<span class="whitespace-nowrap">Difference in</span>
+						<span class="text-grey-dark whitespace-nowrap">{$comparisonColumn?.name}</span>
+					</div>
+					{#if sortModel === ''}
+						<Icon class="material-icons">
+							{#if $compareSort[0] && $compareSort[1]}
+								arrow_drop_up
+							{:else if $compareSort[0]}
+								arrow_drop_down
+							{/if}
+						</Icon>
+					{/if}
+				</div>
 			</th>
 		</thead>
 		{#await tablePromise then table}
@@ -216,6 +228,10 @@
 					<tr>
 						{#if viewMap[$project.view] !== undefined}
 							<td class="p-3 align-baseline">
+								<p class="mb-2">
+									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+									{modelValueAndDiff($model, tableContent)}
+								</p>
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -226,6 +242,10 @@
 								</div>
 							</td>
 							<td class="p-3 align-baseline">
+								<p class="mb-2">
+									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+									{modelValueAndDiff($comparisonModel, tableContent)}
+								</p>
 								<div class="instance">
 									<svelte:component
 										this={viewMap[$project.view]}
@@ -237,9 +257,6 @@
 							</td>
 						{/if}
 						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td class="p-3 align-text-top">{modelValueAndDiff($model, tableContent)}</td>
-							<td class="p-3 align-text-top">{modelValueAndDiff($comparisonModel, tableContent)}</td
-							>
 							<td class="p-3 align-text-top"
 								>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
 									? Number(tableContent['diff']).toFixed(2)

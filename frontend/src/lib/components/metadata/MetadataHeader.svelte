@@ -63,19 +63,6 @@
 		</div>
 	{/if}
 </div>
-{#if $page.url.href.includes('compare') && $metric !== undefined && $metrics.length > 0}
-	<div class="flex flex-col w-full">
-		<span class="my-1 text-grey-dark">Metric</span>
-		<select
-			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
-			bind:value={$metric}
-		>
-			{#each $metrics as met}
-				<option value={met}>{met.name}</option>
-			{/each}
-		</select>
-	</div>
-{/if}
 
 {#if $page.url.href.includes('compare') && comparisonColumnOptions.length > 0}
 	<div class="mt-3 mb-3">
@@ -86,6 +73,20 @@
 		>
 			{#each comparisonColumnOptions as col (col.id)}
 				<option value={col}>{col.name}</option>
+			{/each}
+		</select>
+	</div>
+{/if}
+
+{#if $page.url.href.includes('compare') && $metric !== undefined && $metrics.length > 0}
+	<div class="flex flex-col w-full mt-3 mb-3">
+		<span class="my-1 text-grey-dark">Metric</span>
+		<select
+			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+			bind:value={$metric}
+		>
+			{#each $metrics as met}
+				<option value={met}>{met.name}</option>
 			{/each}
 		</select>
 	</div>
