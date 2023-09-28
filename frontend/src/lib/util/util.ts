@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { env } from '$env/dynamic/public';
 import {
 	Operation,
 	ZenoColumnType,
@@ -91,16 +90,6 @@ export function getMetricRange(res: HistogramBucket[][]): [number, number] {
 		return [Infinity, -Infinity];
 	}
 	return range;
-}
-
-export function getEndpoint() {
-	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://zeno-backend:8000') {
-		if (browser) {
-			return '/dockerzeno';
-		}
-		return 'http://zeno-backend:8000';
-	}
-	return env.PUBLIC_BACKEND_ENDPOINT;
 }
 
 export function getOperation(representation: string) {

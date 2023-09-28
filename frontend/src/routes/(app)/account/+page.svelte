@@ -2,7 +2,6 @@
 	import type { AuthUser } from '$lib/auth/types';
 	import Account from '$lib/components/settings/Account.svelte';
 	import OrganizationsTable from '$lib/components/settings/OrganizationsTable.svelte';
-	import { getEndpoint } from '$lib/util/util';
 	import { OpenAPI, type Organization, type User } from '$lib/zenoapi';
 
 	export let data;
@@ -11,7 +10,6 @@
 	$: cognitoUser = data.cognitoUser as AuthUser;
 	$: organizations = data.organizations as Organization[];
 
-	OpenAPI.BASE = `${getEndpoint()}/api`;
 	$: OpenAPI.HEADERS = {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};

@@ -1,5 +1,4 @@
 import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
@@ -14,8 +13,6 @@ export async function load({ cookies, url }) {
 	if (!cognitoUser.id || !cognitoUser.accessToken) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
-
-	OpenAPI.BASE = getEndpoint() + '/api';
 	OpenAPI.HEADERS = {
 		Authorization: 'Bearer ' + cognitoUser.accessToken
 	};

@@ -1,4 +1,3 @@
-import { env } from '$env/dynamic/public';
 import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
 import { ApiError, OpenAPI, ZenoService, type ReportResponse } from '$lib/zenoapi';
 import { error, redirect } from '@sveltejs/kit';
@@ -6,8 +5,6 @@ import { error, redirect } from '@sveltejs/kit';
 export const ssr = false;
 
 export async function load({ cookies, params, url }) {
-	OpenAPI.BASE = env.PUBLIC_BACKEND_ENDPOINT + '/api';
-
 	let cognitoUser = null;
 	const userCookie = cookies.get('loggedIn');
 	if (userCookie) {

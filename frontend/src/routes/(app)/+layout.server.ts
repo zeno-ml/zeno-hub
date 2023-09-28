@@ -1,11 +1,9 @@
 import type { AuthUser } from '$lib/auth/types.js';
 import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { getEndpoint } from '$lib/util/util';
 import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ cookies, url }) => {
-	OpenAPI.BASE = getEndpoint() + '/api';
 	const userCookie = cookies.get('loggedIn');
 
 	if (userCookie) {
