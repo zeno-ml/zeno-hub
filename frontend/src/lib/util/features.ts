@@ -1,3 +1,1 @@
-export const zenoFeatureFlags = {
-	WELCOME_TEXT: false
-};
+export const zenoFeatureFlags = {};

@@ -41,7 +41,7 @@
 {/if}
 <nav class="z-20">
 	<header
-		class="h-full w-12 flex bg-white justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+		class="h-full w-12 flex bg-yellowish-light justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
 	>
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
