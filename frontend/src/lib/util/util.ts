@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { getEndpoint } from '$lib/api/util';
 import {
 	Operation,
 	ZenoColumnType,
