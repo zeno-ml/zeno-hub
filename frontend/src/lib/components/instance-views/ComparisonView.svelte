@@ -156,7 +156,7 @@
 	}
 
 	function modelValueAndDiff(
-		model: string,
+		model: string | undefined,
 		tableContent: Record<string, string | number | boolean>
 	) {
 		const compareColumnObj = $columns.filter(
