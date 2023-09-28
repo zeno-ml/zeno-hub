@@ -141,7 +141,7 @@
 				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
 					content: $page.url.href.includes('compare')
-						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two models'
+						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two systems'
 						: 'Run the SliceLine algorithm to find slices of data with high or low metrics',
 					position: 'right',
 					theme: 'zeno-tooltip',
@@ -170,7 +170,7 @@
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: $page.url.href.includes('compare')
-							? 'The column on which to measure model disagreement'
+							? 'The column on which to measure system disagreement'
 							: 'The continuous column to compare slices across',
 						position: 'right',
 						theme: 'zeno-tooltip',
@@ -280,7 +280,7 @@
 					style="margin-top: 3px;"
 					use:tooltip={{
 						content: $page.url.href.includes('compare')
-							? 'Order by slice score, a combination of model difference and size'
+							? 'Order by slice score, a combination of system difference and size'
 							: 'Order by slice score, a combination of size and metric',
 						theme: 'zeno-tooltip',
 						position: 'left',
@@ -296,7 +296,7 @@
 				style="width: 120px; margin-right: 20px"
 				bind:value={orderByIdx}
 				options={$page.url.href.includes('compare')
-					? ['(model) A > B', '(model) B > A']
+					? ['(system) A > B', '(system) B > A']
 					: orderByOptions}
 				placeholder="Order By"
 			/>

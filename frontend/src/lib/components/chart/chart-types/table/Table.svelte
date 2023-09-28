@@ -87,11 +87,11 @@
 		<Head>
 			<Row>
 				<Cell
-					>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'models'} \ {parameters.xChannel ===
+					>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'} \ {parameters.xChannel ===
 					SlicesMetricsOrModels.SLICES
 						? 'slices'
 						: parameters.xChannel === SlicesMetricsOrModels.MODELS
-						? 'models'
+						? 'systems'
 						: 'metrics'}</Cell
 				>
 				{#each columns as column}

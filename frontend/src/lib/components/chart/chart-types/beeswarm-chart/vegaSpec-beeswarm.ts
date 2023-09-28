@@ -77,7 +77,7 @@ export default function generateSpec(
 			? [
 					{
 						type: 'symbol',
-						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'model',
+						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
 						fill: 'color'
 					}
 			  ]
@@ -109,9 +109,9 @@ export default function generateSpec(
 						zindex: { value: 1 },
 						tooltip: {
 							signal: `{'size': datum.size, '${xLabel}': format(datum.x_value, '.4f'), '${
-								parameters.yChannel === SlicesOrModels.MODELS ? 'model' : 'slice'
+								parameters.yChannel === SlicesOrModels.MODELS ? 'system' : 'slice'
 							}': datum.y_value, '${
-								parameters.colorChannel === SlicesOrModels.MODELS ? 'model' : 'slice'
+								parameters.colorChannel === SlicesOrModels.MODELS ? 'system' : 'slice'
 							}': datum.color_value}`
 						}
 					}

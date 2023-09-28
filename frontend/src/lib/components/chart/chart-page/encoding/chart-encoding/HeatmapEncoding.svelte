@@ -78,7 +78,7 @@
 			value={parameters.xChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={refreshX}
@@ -100,7 +100,7 @@
 			value={parameters.yChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={refreshY}

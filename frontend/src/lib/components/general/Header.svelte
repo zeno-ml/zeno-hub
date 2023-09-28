@@ -51,14 +51,14 @@
 				<div class="flex flex-col mt-3">
 					<HeaderIcon
 						pageName={'explore'}
-						tooltipContent={'Explore your data and model outputs'}
+						tooltipContent={'Explore your data and system outputs'}
 						icon={mdiCompassOutline}
 						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
 					/>
 					{#if $models.length > 1}
 						<HeaderIcon
 							pageName={'compare'}
-							tooltipContent={'Qualitatively compare model outputs'}
+							tooltipContent={'Qualitatively compare system outputs'}
 							icon={mdiCompare}
 							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
 						/>

@@ -117,7 +117,7 @@
 			value={parameters.axisChannel}
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },
-				{ label: 'models', value: SlicesMetricsOrModels.MODELS },
+				{ label: 'systems', value: SlicesMetricsOrModels.MODELS },
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}
@@ -144,7 +144,7 @@
 			value={parameters.layerChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
-				{ label: 'models', value: SlicesOrModels.MODELS }
+				{ label: 'systems', value: SlicesOrModels.MODELS }
 			]}
 			searchable={false}
 			on:change={refreshLayerParams}
@@ -166,7 +166,7 @@
 			value={parameters.fixedChannel}
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },
-				{ label: 'models', value: SlicesMetricsOrModels.MODELS },
+				{ label: 'systems', value: SlicesMetricsOrModels.MODELS },
 				{ label: 'metrics', value: SlicesMetricsOrModels.METRICS }
 			]}
 			searchable={false}
