@@ -6,6 +6,7 @@
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
+		metric,
 		model,
 		project,
 		rowsPerPage,
@@ -186,6 +187,20 @@
 						</Icon>
 					{/if}
 				</div>
+				<div>
+					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+						{$metric ? $metric.name + ':' : ''}
+					</span>
+					<span class="font-normal mr-3.5 text-primary">
+						{#await modelAResult then res}
+							{#if res !== undefined && res.length > 0}
+								{#if res[0].metric !== undefined && res[0].metric !== null}
+									{res[0].metric.toFixed(2)}
+								{/if}
+							{/if}
+						{/await}
+					</span>
+				</div>
 			</th>
 			<th
 				class="p-3 cursor-pointer hover:text-primary"
@@ -202,6 +217,20 @@
 							{/if}
 						</Icon>
 					{/if}
+				</div>
+				<div>
+					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+						{$metric ? $metric.name + ':' : ''}
+					</span>
+					<span class="font-normal mr-3.5 text-primary">
+						{#await modelBResult then res}
+							{#if res !== undefined && res.length > 0}
+								{#if res[0].metric !== undefined && res[0].metric !== null}
+									{res[0].metric.toFixed(2)}
+								{/if}
+							{/if}
+						{/await}
+					</span>
 				</div>
 			</th>
 			<th class="p-3 cursor-pointer hover:text-primary" on:click={() => updateSort('')}>

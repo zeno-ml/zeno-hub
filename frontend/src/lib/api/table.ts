@@ -22,9 +22,12 @@ export async function getFilteredTable(
 	);
 
 	// create diff columns for comparison view
-	const diffColumn1 = diffColumn;
+	let diffColumn1 = undefined;
 	let diffColumn2 = undefined;
 	if (filterModels.length > 1 && diffColumn !== undefined) {
+		diffColumn1 = completeColumns.find(
+			(c) => c.name === diffColumn.name && c.model === filterModels[0]
+		);
 		diffColumn2 = completeColumns.find(
 			(c) => c.name === diffColumn.name && c.model === filterModels[1]
 		);
