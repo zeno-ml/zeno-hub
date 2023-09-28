@@ -12,7 +12,8 @@ CREATE TABLE projects (
     data_url text,
     calculate_histogram_metrics boolean NOT NULL DEFAULT false,
     samples_per_page integer NOT NULL DEFAULT 10,
-    public boolean NOT NULL DEFAULT false
+    public boolean NOT NULL DEFAULT false,
+    description text NOT NULL DEFAULT ''
 );
 
 CREATE TABLE charts (
@@ -27,7 +28,8 @@ CREATE TABLE reports (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL,
     owner_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    public boolean NOT NULL DEFAULT false
+    public boolean NOT NULL DEFAULT false,
+    description text NOT NULL DEFAULT ''
 );
 
 CREATE TABLE report_elements (

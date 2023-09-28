@@ -22,6 +22,7 @@ class Project(CamelModel):
             Default True.
         samples_per_page (int): number of datapoints to show per page. Default 10.
         public (bool): whether the task is public. Default False.
+        description (str): description of the project. Default "".
     """
 
     uuid: str
@@ -34,6 +35,7 @@ class Project(CamelModel):
     calculate_histogram_metrics: bool = True
     samples_per_page: int = 10
     public: bool = False
+    description: str = ""
 
 
 class ProjectStats(CamelModel):

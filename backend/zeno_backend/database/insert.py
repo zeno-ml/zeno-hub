@@ -62,8 +62,8 @@ def project(project_config: Project, owner_id: int):
     with Database() as db:
         db.execute(
             "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
-            + "calculate_histogram_metrics, samples_per_page, public) "
-            + "VALUES (%s,%s,%s,%s,%s,%s,%s,%s);",
+            + "calculate_histogram_metrics, samples_per_page, public, description) "
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);",
             [
                 project_config.uuid,
                 project_config.name,
@@ -73,6 +73,7 @@ def project(project_config: Project, owner_id: int):
                 project_config.calculate_histogram_metrics,
                 project_config.samples_per_page,
                 project_config.public,
+                project_config.description,
             ],
         )
         db.execute(

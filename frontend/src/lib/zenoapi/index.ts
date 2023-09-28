@@ -38,6 +38,7 @@ export type { Report } from './models/Report';
 export type { ReportElement } from './models/ReportElement';
 export { ReportElementType } from './models/ReportElementType';
 export type { ReportResponse } from './models/ReportResponse';
+export type { ReportStats } from './models/ReportStats';
 export type { Slice } from './models/Slice';
 export type { SliceFinderRequest } from './models/SliceFinderRequest';
 export type { SliceFinderReturn } from './models/SliceFinderReturn';
