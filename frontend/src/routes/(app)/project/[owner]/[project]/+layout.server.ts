@@ -1,5 +1,5 @@
 import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { getEndpoint, type URLParams } from '$lib/util/util';
+import type { URLParams } from '$lib/util/util';
 import {
 	ApiError,
 	OpenAPI,
@@ -14,8 +14,6 @@ import { error, redirect } from '@sveltejs/kit';
 export const ssr = false;
 
 export async function load({ cookies, params, url }) {
-	OpenAPI.BASE = getEndpoint() + '/api';
-
 	let cognitoUser = null;
 	const userCookie = cookies.get('loggedIn');
 	if (userCookie) {

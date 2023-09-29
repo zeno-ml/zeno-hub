@@ -1,11 +1,8 @@
-import { getEndpoint } from '$lib/util/util';
-import { OpenAPI, ZenoService, type Chart } from '$lib/zenoapi/index';
+import { ZenoService, type Chart } from '$lib/zenoapi/index';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, depends }) {
 	depends('app:charts');
-
-	OpenAPI.BASE = getEndpoint() + '/api';
 
 	let charts: Chart[];
 	try {

@@ -26,52 +26,52 @@
 	on:blur={() => (hovering = false)}
 	class="border-solid mr-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-80 h-60"
 >
-	<div class="flex flex-col w-full">
-		<div class="flex justify-between items-center">
-			<p class="text-black text-lg mr-2">{report.name}</p>
-			<div
-				class="w-9 h-9 relative"
-				use:clickOutside={() => {
-					showOptions = false;
-				}}
-			>
-				{#if hovering && deletable}
-					<IconButton
-						size="button"
-						style="padding: 0px"
-						on:click={(e) => {
-							e.stopPropagation();
-							showOptions = !showOptions;
-						}}
-					>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path fill="black" d={mdiDotsHorizontal} />
-						</Icon>
-					</IconButton>
-				{/if}
-				{#if showOptions}
-					<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
-						<Paper style="padding: 3px 0px;" elevation={7}>
-							<Content>
-								<button
-									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = false;
-										ZenoService.deleteReport(report.id).then(() => invalidate('app:reports'));
-									}}
-								>
-									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span class="text-xs">Remove</span>
-								</button>
-							</Content>
-						</Paper>
-					</div>
-				{/if}
-			</div>
+	<div class="flex justify-between w-full">
+		<div class={deletable ? 'mr-5' : ''}>
+			<p class="text-black text-lg text-left">{report.name}</p>
+			<p class="mr-2 text-base truncate text-left">{report.ownerName}</p>
+		</div>
+		<div
+			class="w-9 h-9 relative"
+			use:clickOutside={() => {
+				showOptions = false;
+			}}
+		>
+			{#if hovering && deletable}
+				<IconButton
+					size="button"
+					style="padding: 0px"
+					on:click={(e) => {
+						e.stopPropagation();
+						showOptions = !showOptions;
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						<path fill="black" d={mdiDotsHorizontal} />
+					</Icon>
+				</IconButton>
+			{/if}
+			{#if showOptions}
+				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+					<Paper style="padding: 3px 0px;" elevation={7}>
+						<Content>
+							<button
+								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = false;
+									ZenoService.deleteReport(report.id).then(() => invalidate('app:reports'));
+								}}
+							>
+								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+								<span class="text-xs">Remove</span>
+							</button>
+						</Content>
+					</Paper>
+				</div>
+			{/if}
 		</div>
 	</div>
-	<p class="mr-2 text-base truncate flex-shrink-0">{report.ownerName}</p>
 	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
 		{report.description}
 	</p>

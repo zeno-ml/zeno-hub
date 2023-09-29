@@ -13,7 +13,7 @@
 </script>
 
 <div class="flex flex-col w-full bg-yellowish">
-	<div class="flex flex-col bg-white p-6 m-4 shadow-md rounded">
+	<div class="flex flex-col bg-white p-6 m-4 shadow rounded">
 		<div class="flex align-center mb-7">
 			<h3 class="text-xl mr-5">Charts</h3>
 			{#if $project.editor}

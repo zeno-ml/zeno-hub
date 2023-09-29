@@ -2,14 +2,12 @@
 	import { navigating } from '$app/stores';
 	import Header from '$lib/components/general/Header.svelte';
 	import { authToken } from '$lib/stores';
-	import { getEndpoint } from '$lib/util/util';
 	import { OpenAPI } from '$lib/zenoapi/index';
 	import * as amplitude from '@amplitude/analytics-browser';
 
 	export let data;
 
 	$: {
-		OpenAPI.BASE = `${getEndpoint()}/api`;
 		if (data.cognitoUser !== null) {
 			authToken.set(data.cognitoUser.accessToken);
 			amplitude.setUserId(data.cognitoUser.id);

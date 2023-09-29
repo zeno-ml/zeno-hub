@@ -115,3 +115,15 @@ CREATE TABLE organization_report (
     report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
     editor boolean NOT NULL DEFAULT false
 );
+
+CREATE TABLE report_like (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE project_like (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -10,7 +10,7 @@
 	--P2: #d2bae9;
 	--P3: #f7f1fb;
 	--P4: #f9f7fb;
-	--Y1: #f2f2ee;
+	--Y1: rgb(245 245 245);
 	--Y2: #fbfbfa;
 	--N1: #61988e;
 	--N2: #d0ebe6;
@@ -56,12 +56,6 @@
 	padding-left: 10px;
 	padding-right: 10px;
 	height: 20px;
-}
-a {
-	color: #40b3ff;
-}
-a:visited {
-	color: #007dcf;
 }
 .overflow-show {
 	overflow: visible;
@@ -110,9 +104,10 @@ body {
 	cursor: pointer;
 }
 .tooltip.zeno-tooltip {
-	--tooltip-background-color: var(--P3);
+	--tooltip-background-color: var(--Y2);
 	--tooltip-color: var(--G1);
 	--tooltip-font-family: 'Open Sans', 'Roboto', sans-serif;
+	--tooltip-box-shadow: 2px 2px 2px 2px rgb(0 0 0 / 0.1);
 }
 .mdc-text-field--outlined .mdc-notched-outline--notched .mdc-notched-outline__notch {
 	border-left: 0;
