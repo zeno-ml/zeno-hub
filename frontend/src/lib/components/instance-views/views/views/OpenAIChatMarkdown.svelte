@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Markdown from '$lib/components/general/Markdown.svelte';
 	import { resolveDataPoint } from '$lib/util/util';
 	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import purify from 'isomorphic-dompurify';
@@ -63,8 +64,9 @@
 		{#if entry['label']}
 			<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
 				<span class="font-medium">Expected:</span>
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				<span>{@html renderedLabel}</span>
+				<span>
+					<Markdown renderedText={renderedLabel} />
+				</span>
 			</div>
 		{/if}
 	</div>

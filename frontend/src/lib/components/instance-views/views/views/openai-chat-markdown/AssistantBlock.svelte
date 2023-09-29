@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Markdown from '$lib/components/general/Markdown.svelte';
 	import purify from 'isomorphic-dompurify';
 	import { parse } from 'marked';
 
@@ -25,7 +26,6 @@
 		after:content-[''] after:-z-[1] after:h-6 after:bottom-0 after:absolute after:rounded-br-xl after:bg-background after:w-2.5 after:-left-2.5
 		{output ? 'border border-primary before:bg-primary' : 'border border-grey-darker'}"
 	>
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html renderedInput}
+		<Markdown renderedText={renderedInput} />
 	</p>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Markdown from '$lib/components/general/Markdown.svelte';
 	import purify from 'isomorphic-dompurify';
 	import { parse } from 'marked';
 
@@ -13,8 +14,7 @@
 		before:content-[''] before:-z-[1] before:h-6 before:bottom-0 before:absolute before:rounded-bl-2xl before:bg-grey-darker before:w-5 before:-right-2.5
 		after:content-[''] after:-z-[1] after:h-6 after:bottom-0 after:absolute after:rounded-bl-xl after:bg-background after:w-2.5 after:-right-2.5"
 	>
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html renderedInput}
+		<Markdown renderedText={renderedInput} />
 	</p>
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
