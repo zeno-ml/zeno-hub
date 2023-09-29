@@ -1,0 +1,73 @@
+<script lang="ts">
+	import Markdown from '$lib/components/general/Markdown.svelte';
+	import { resolveDataPoint } from '$lib/util/util';
+	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
+	import purify from 'isomorphic-dompurify';
+	import { parse } from 'marked';
+	import AssistantBlock from './openai-chat-markdown/AssistantBlock.svelte';
+	import SystemBlock from './openai-chat-markdown/SystemBlock.svelte';
+	import UserBlock from './openai-chat-markdown/UserBlock.svelte';
+
+	export let entry: Record<string, number | string | boolean | { role: string; content: string }[]>;
+	export let modelColumn: string;
+
+	let showall = false;
+	let renderedLabel = '';
+
+	$: fetchJSON = (async () => {
+		const response = await resolveDataPoint(entry);
+		const jsonResponse = JSON.parse(response as string);
+		showall = jsonResponse.length <= 5;
+		return jsonResponse;
+	})();
+	$: if (entry['label']) {
+		renderedLabel = purify.sanitize(parse(entry['label'] as string));
+	}
+
+	function entryString(
+		value: number | string | boolean | { role: string; content: string }[]
+	): string {
+		return `${value}`;
+	}
+</script>
+
+{#await fetchJSON}
+	<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
+{:then data}
+	{@const entries = showall ? data : data.slice(-4)}
+	<div class="flex flex-col border border-grey-light rounded p-2.5 m-1 w-[32rem]">
+		{#if !showall}
+			<button
+				class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
+				on:click={() => (showall = true)}
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
+					<path d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
+				</svg>
+				<span class="pr-1">Show All</span>
+			</button>
+		{/if}
+		{#if data}
+			{#each entries as item}
+				{#if item['role'] === 'system'}
+					<SystemBlock input={item['content']} />
+				{:else if item['role'] === 'assistant'}
+					<AssistantBlock input={item['content']} />
+				{:else if item['role'] === 'user'}
+					<UserBlock input={item['content']} />
+				{/if}
+			{/each}
+		{/if}
+		{#if entry[modelColumn]}
+			<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
+		{/if}
+		{#if entry['label']}
+			<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
+				<span class="font-medium">Expected:</span>
+				<span>
+					<Markdown renderedText={renderedLabel} />
+				</span>
+			</div>
+		{/if}
+	</div>
+{/await}
