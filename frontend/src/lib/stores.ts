@@ -111,3 +111,6 @@ export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 
 // Store the current state of feature flags
 export const featureFlags: Writable<Record<string, boolean>> = writable({});
+
+// Whether the new report popup should be displayed on the reports page
+export const showNewReport = writable(false);
