@@ -1203,18 +1203,20 @@ def table_data_paginated(
                 sql.SQL("DESC" if req.sort[1] else "ASC"),
             )
 
-        db.cur.execute(
-            sql.SQL("SELECT * {} FROM {} {} {} LIMIT %s OFFSET %s;").format(
+        final_statement = sql.SQL(" ").join(
+            [
+                sql.SQL("SELECT *"),
                 diff_sql,
-                sql.Identifier(f"{project}"),
+                sql.SQL("FROM {}").format(sql.Identifier(project)),
                 filter,
                 order_sql,
-            ),
-            [
-                req.limit,
-                req.offset,
-            ],
+                sql.SQL("LIMIT {} OFFSET {};").format(
+                    sql.Literal(req.limit), sql.Literal(req.offset)
+                ),
+            ]
         )
+        db.cur.execute(final_statement)
+
         if db.cur.description is not None:
             columns = [desc[0] for desc in db.cur.description]
         filter_results = db.cur.fetchall()
