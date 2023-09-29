@@ -10,7 +10,7 @@ Before starting local development, you need a `.env` file.
 You can take inspiration for this from the `.env.example` file in this folder.
 Once you have this set up, you can run `yarn` or `npm install` to install required npm packages and then `yarn dev` or `npm run dev` to run the frontend in dev mode.
 
-When you add a new route to the backend, run `npm run generate-api` to update the functions in the `ZenoService` object. **You must add back the BASE parameter in `zenapi/core/OpenAPI.ts` with the following: `BASE: getEndpoint() + '/api',`**
+When you add a new route to the backend, run `npm run generate-api` to update the functions in the `ZenoService` object.
 
 ### Static Analysis Tools
 
