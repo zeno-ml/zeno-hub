@@ -13,7 +13,8 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"smui-theme": "smui-theme compile static/smui.css -i src/theme",
-		"generate-api": "npx openapi-typescript-codegen --input http://127.0.0.1:8000/api/openapi.json --output ./src/lib/zenoapi --client fetch; npx prettier -w ./src/lib/zenoapi"
+		"generate-api": "npx openapi-typescript-codegen --input http://127.0.0.1:8000/api/openapi.json --output ./src/lib/zenoapi --client fetch; npx prettier -w ./src/lib/zenoapi && npm run copy-openapi",
+		"copy-openapi": "shx cp ./OpenAPI_back.txt ./src/lib/zenoapi/core/OpenAPI.ts"
 	},
 	"devDependencies": {
 		"@formkit/auto-animate": "^1.0.0-pre-alpha.3",
@@ -52,6 +53,7 @@
 		"postcss": "^8.4.29",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
+		"shx": "^0.3.4",
 		"simple-svelte-autocomplete": "^2.5.2",
 		"smui-theme": "^7.0.0-beta.8",
 		"svelecte": "^3.16.4",
