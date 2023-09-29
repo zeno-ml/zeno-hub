@@ -21,7 +21,7 @@
 		reports={ownReports}
 	/>
 {/if}
-<div class="flex flex-wrap items-start mb-6">
+<div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
 	{#each ownReports as report}
 		<Report {report} deletable />
 	{/each}

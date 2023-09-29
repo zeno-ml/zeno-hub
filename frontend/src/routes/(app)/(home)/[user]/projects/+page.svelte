@@ -10,7 +10,7 @@
 		data.user === null ? [] : data.projects.filter((proj) => proj.ownerName !== data.user?.name);
 </script>
 
-<div class="flex flex-wrap items-start mb-6">
+<div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
 	{#each ownProjects as project}
 		<Project {project} deletable />
 	{/each}

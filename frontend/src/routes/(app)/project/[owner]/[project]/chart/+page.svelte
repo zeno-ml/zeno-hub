@@ -13,12 +13,11 @@
 	$: charts.set(data.charts);
 </script>
 
-<div class="flex flex-col w-full p-6">
-	<div class="flex align-center">
-		<h3 class="text-xl">Charts</h3>
+<div class="flex flex-col w-full p-8 pt-5">
+	<div class="flex items-center h-12 mb-1">
+		<h3 class="text-2xl mr-4">Charts</h3>
 		{#if $project.editor}
 			<Button
-				class="ml-auto"
 				on:click={() => {
 					ZenoService.addChart(
 						$project.uuid,
@@ -35,7 +34,7 @@
 			</Button>
 		{/if}
 	</div>
-	<div class="w-full mb-4 h-1 bg-grey-light rounded-full" />
+	<div class="w-full mb-6 h-0.5 bg-grey-light rounded-full" />
 	<div class="flex flex-wrap overflow-y-auto">
 		{#each $charts.sort((a, b) => a.id - b.id) as chart}
 			<ChartHomeBlock {chart} />

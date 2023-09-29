@@ -10,7 +10,7 @@
 		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
 </script>
 
-<div class="flex flex-col w-full h-full p-6 pt-5 bg-white">
+<div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
@@ -28,14 +28,14 @@
 			</Tooltip>
 		</div>
 	{:else}
-		<Banner
-			>Welcome to <a class="text-primary font-medium" href="https://zenoml.com">Zeno</a>!
+		<Banner>
+			Welcome to <a class="text-primary font-medium" href="https://zenoml.com">Zeno</a>!
 			<a class="text-primary font-medium" href="/login">Sign in </a>
 			or <a class="text-primary font-medium" href="/signup">sign up</a> to create and see your projects
-			and reports.</Banner
-		>
+			and reports.
+		</Banner>
 	{/if}
-	<div class="mt-8 flex flex-col">
+	<div class="mt-6 flex flex-col h-full">
 		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>

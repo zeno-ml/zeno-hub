@@ -11,7 +11,7 @@
 	let view = $page.route.id?.split('/').reverse()[0];
 </script>
 
-<div class="flex ml-2 items-center h-8">
+<div class="flex ml-2 items-center h-10">
 	<Tooltip
 		content={'Projects are datasets and system outputs for evaluation'}
 		theme={'zeno-tooltip'}
@@ -39,7 +39,7 @@
 		</a>
 	</Tooltip>
 	{#if view === 'reports' && user}
-		<Button class="ml-auto" on:click={() => showNewReport.set(true)}>
+		<Button on:click={() => showNewReport.set(true)}>
 			<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
 				<path d={mdiPlus} />
 			</Icon>
@@ -47,4 +47,4 @@
 		</Button>
 	{/if}
 </div>
-<div class="w-full mb-4 h-1 bg-grey-light rounded-full" />
+<div class="w-full mb-4 mt-2 h-0.5 bg-grey-light rounded-full" />
