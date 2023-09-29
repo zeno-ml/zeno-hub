@@ -205,8 +205,8 @@ def project(project_config: Project):
     with Database() as db:
         db.execute(
             "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, "
-            "view = %s, data_url = %s, samples_per_page = %s, public = %s "
-            "WHERE uuid = %s;",
+            "view = %s, data_url = %s, samples_per_page = %s, public = %s, "
+            "description = %s WHERE uuid = %s;",
             [
                 project_config.name,
                 project_config.calculate_histogram_metrics,
@@ -214,6 +214,7 @@ def project(project_config: Project):
                 project_config.data_url,
                 project_config.samples_per_page,
                 project_config.public,
+                project_config.description,
                 project_config.uuid,
             ],
         )
@@ -251,13 +252,9 @@ def report(report: Report):
         return
     db = Database()
     db.connect_execute(
-        "UPDATE reports SET name = %s, owner_id = %s, public = %s WHERE id = %s;",
-        [
-            report.name,
-            owner_id.id,
-            report.public,
-            report.id,
-        ],
+        "UPDATE reports SET name = %s, owner_id = %s, public = %s, description = %s "
+        "WHERE id = %s;",
+        [report.name, owner_id.id, report.public, report.description, report.id],
     )
 
 

@@ -20,6 +20,7 @@ import type { Metric } from './Metric';
  * Default True.
  * samples_per_page (int): number of datapoints to show per page. Default 10.
  * public (bool): whether the task is public. Default False.
+ * description (str): description of the project. Default "".
  */
 export type Project = {
 	uuid: string;
@@ -32,4 +33,5 @@ export type Project = {
 	calculateHistogramMetrics?: boolean;
 	samplesPerPage?: number;
 	public?: boolean;
+	description?: string;
 };

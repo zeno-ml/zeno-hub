@@ -26,7 +26,12 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
-from zeno_backend.classes.report import Report, ReportElement, ReportResponse
+from zeno_backend.classes.report import (
+    Report,
+    ReportElement,
+    ReportResponse,
+    ReportStats,
+)
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
 from zeno_backend.classes.table import TableRequest
@@ -149,6 +154,16 @@ def get_server() -> FastAPI:
         if not util.project_access_valid(project, request):
             return Response(status_code=401)
         return select.project_stats(project)
+
+    @api_app.get(
+        "/report-stats/{report_id}",
+        response_model=ReportStats,
+        tags=["zeno"],
+    )
+    def get_report_stats(report_id: int, request: Request):
+        if not util.report_access_valid(report_id, request):
+            return Response(status_code=401)
+        return select.report_stats(report_id)
 
     @api_app.get(
         "/models/{project}",

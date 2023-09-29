@@ -13,6 +13,7 @@
  * linked_projects (list[str]): all projects that can be used with the report.
  * editor (bool): whether the current user can edit the report.
  * public (bool): whether the report is publically visible.
+ * description (str): description of the report. Default "".
  */
 export type Report = {
 	id: number;
@@ -21,4 +22,5 @@ export type Report = {
 	linkedProjects: Array<string>;
 	editor: boolean;
 	public?: boolean;
+	description?: string;
 };

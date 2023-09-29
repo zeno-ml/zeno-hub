@@ -30,7 +30,7 @@
 		input.getElement().focus();
 	}
 
-	function updateProject() {
+	function updateReport() {
 		ZenoService.updateReport(reportConfig).then(() => {
 			report.set(reportConfig);
 			dispatch('close');
@@ -42,7 +42,7 @@
 			dispatch('close');
 		}
 		if (e.key === 'Enter') {
-			updateProject();
+			updateReport();
 		}
 	}
 
@@ -66,23 +66,31 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
-		<h2 class="text-xl mb-4">Project Administration</h2>
+		<h2 class="text-xl mb-4">Report Administration</h2>
 		<h3 class="text-lg">Settings</h3>
-		<div class="mb-12 flex">
-			<div class="flex flex-col mr-8">
-				<div>
-					<Textfield bind:value={reportConfig.name} label="Name" bind:this={input} />
+		<div class="mb-12 flex flex-col">
+			<div class="flex mb-6">
+				<div class="flex flex-col mr-8">
+					<div>
+						<Textfield bind:value={reportConfig.name} label="Name" bind:this={input} />
+					</div>
+				</div>
+				<div class="flex flex-col">
+					<div class="flex items-center">
+						<Checkbox
+							checked={reportConfig.public}
+							on:click={() => (reportConfig.public = !reportConfig.public)}
+						/>
+						<span>Public visibility</span>
+					</div>
 				</div>
 			</div>
-			<div class="flex flex-col">
-				<div class="flex items-center">
-					<Checkbox
-						checked={reportConfig.public}
-						on:click={() => (reportConfig.public = !reportConfig.public)}
-					/>
-					<span>Public visibility</span>
-				</div>
-			</div>
+			<Textfield
+				textarea
+				bind:value={reportConfig.description}
+				label="Description"
+				style="width: 100%"
+			/>
 		</div>
 		{#if !reportConfig.public && userRequest}
 			{#await userRequest then currentUsers}
@@ -237,7 +245,7 @@
 				style="margin-left: 5px;"
 				variant="outlined"
 				disabled={invalidName}
-				on:click={() => updateProject()}>{'Update'}</Button
+				on:click={() => updateReport()}>{'Update'}</Button
 			>
 		</div>
 	</Content>

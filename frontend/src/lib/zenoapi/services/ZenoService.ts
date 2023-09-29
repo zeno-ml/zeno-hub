@@ -20,6 +20,7 @@ import type { ProjectStats } from '../models/ProjectStats';
 import type { Report } from '../models/Report';
 import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
+import type { ReportStats } from '../models/ReportStats';
 import type { Slice } from '../models/Slice';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
@@ -44,10 +45,10 @@ export class ZenoService {
 	 * response (Response): response object.
 	 * api_key (str, optional): API key.
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static createProject(requestBody: Project): CancelablePromise<any> {
+	public static createProject(requestBody: Project): CancelablePromise<Project> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/project',
@@ -65,7 +66,8 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project (str): the UUID of the project to add data to.
-	 * id_column (str): the name of the column containing the instance IDs.
+	 * id_column (str): the name of the column containing the instance IDs or URLs/URL
+	 * parts.
 	 * label_column (str | None, optional): the name of the column containing the
 	 * instance labels. Defaults to None.
 	 * data_column (str | None, optional): the name of the column containing the
@@ -188,6 +190,25 @@ export class ZenoService {
 			url: '/project-stats/{project}',
 			path: {
 				project: project
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Report Stats
+	 * @param reportId
+	 * @returns ReportStats Successful Response
+	 * @throws ApiError
+	 */
+	public static getReportStats(reportId: number): CancelablePromise<ReportStats> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/report-stats/{report_id}',
+			path: {
+				report_id: reportId
 			},
 			errors: {
 				422: `Validation Error`

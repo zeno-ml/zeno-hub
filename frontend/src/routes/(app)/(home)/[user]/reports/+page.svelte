@@ -23,7 +23,7 @@
 </script>
 
 <button
-	class="border-solid m-1 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md items-center justify-center w-44 p-1 pr-3 pl-1"
+	class="border-solid m-1 ml-0 mb-2 rounded-sm border-grey-light border shadow-sm flex flex-col hover:shadow-md items-center justify-center w-44 p-1 pr-3 pl-1"
 	on:click={() => (showNewReport = true)}
 >
 	<div class="flex items-center px-3">

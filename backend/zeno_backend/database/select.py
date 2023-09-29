@@ -10,7 +10,12 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
-from zeno_backend.classes.report import Report, ReportElement, ReportResponse
+from zeno_backend.classes.report import (
+    Report,
+    ReportElement,
+    ReportResponse,
+    ReportStats,
+)
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.table import TableRequest
@@ -50,7 +55,7 @@ def projects(user: User) -> list[Project]:
     with Database() as db:
         own_projects_result = db.execute_return(
             "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
-            "samples_per_page, public FROM projects WHERE owner_id = %s;",
+            "samples_per_page, public, description FROM projects WHERE owner_id = %s;",
             [user.id],
         )
         own_projects = list(
@@ -65,6 +70,7 @@ def projects(user: User) -> list[Project]:
                     samples_per_page=project[5],
                     editor=True,
                     public=project[6],
+                    description=project[7],
                 ),
                 own_projects_result,
             )
@@ -72,9 +78,9 @@ def projects(user: User) -> list[Project]:
 
         user_projects_result = db.execute_return(
             "SELECT p.uuid, p.name, p.owner_id, p.view, p.data_url, "
-            "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public "
-            "FROM projects AS p JOIN user_project AS up ON p.uuid = up.project_uuid "
-            "WHERE up.user_id = %s;",
+            "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public, "
+            "p.description FROM projects AS p JOIN user_project AS up "
+            "ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
             [user.id],
         )
         user_projects = []
@@ -95,14 +101,15 @@ def projects(user: User) -> list[Project]:
                         samples_per_page=res[6],
                         editor=res[7],
                         public=res[8],
+                        description=res[9],
                     )
                 )
 
         project_org_result = db.execute_return(
             "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
-            " p.data_url, p.samples_per_page, op.editor, p.public FROM projects AS p "
-            "JOIN (SELECT op.project_uuid, uo.organization_id, editor "
-            "FROM user_organization as uo JOIN organization_project as op"
+            " p.data_url, p.samples_per_page, op.editor, p.public, p.description "
+            "FROM projects AS p JOIN (SELECT op.project_uuid, uo.organization_id, "
+            "editor FROM user_organization as uo JOIN organization_project as op"
             " ON uo.organization_id = op.organization_id "
             "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
             [user.id],
@@ -125,6 +132,7 @@ def projects(user: User) -> list[Project]:
                         samples_per_page=res[6],
                         editor=res[7],
                         public=res[8],
+                        description=res[9],
                     )
                 )
         org_projects = list(
@@ -146,7 +154,7 @@ def public_projects() -> list[Project]:
     with Database() as db:
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
-            "samples_per_page FROM projects WHERE public IS TRUE;",
+            "samples_per_page, description FROM projects WHERE public IS TRUE;",
         )
         projects = []
         for res in project_result:
@@ -166,6 +174,7 @@ def public_projects() -> list[Project]:
                         samples_per_page=res[6],
                         editor=False,
                         public=True,
+                        description=res[7],
                     )
                 )
         return projects
@@ -182,7 +191,7 @@ def reports(user: User) -> list[Report]:
     """
     with Database() as db:
         own_reports_result = db.execute_return(
-            "SELECT id, name, public FROM reports WHERE owner_id = %s;",
+            "SELECT id, name, public, description FROM reports WHERE owner_id = %s;",
             [user.id],
         )
         own_reports = []
@@ -202,11 +211,12 @@ def reports(user: User) -> list[Report]:
                         else list(map(lambda linked: str(linked[0]), linked_projects)),
                         editor=True,
                         public=report[2],
+                        description=report[3],
                     )
                 )
 
         user_reports_result = db.execute_return(
-            "SELECT r.id, r.name, r.owner_id, ur.editor, r.public "
+            "SELECT r.id, r.name, r.owner_id, ur.editor, r.public, r.description "
             "FROM reports AS r JOIN user_report AS ur ON r.id = ur.report_id "
             "WHERE ur.user_id = %s;",
             [user.id],
@@ -235,13 +245,14 @@ def reports(user: User) -> list[Report]:
                             ),
                             editor=res[4],
                             public=res[5],
+                            description=res[6],
                         )
                     )
 
         report_org_result = db.execute_return(
-            "SELECT r.id, r.name, r.owner_id, op.editor, r.public FROM reports AS r "
-            "JOIN (SELECT op.report_id, uo.organization_id, op.editor "
-            "FROM user_organization as uo JOIN organization_report as op"
+            "SELECT r.id, r.name, r.owner_id, op.editor, r.public, r.description "
+            "FROM reports AS r JOIN (SELECT op.report_id, uo.organization_id, "
+            "op.editor FROM user_organization as uo JOIN organization_report as op"
             " ON uo.organization_id = op.organization_id "
             "WHERE user_id = %s) AS op ON r.id = op.report_id;",
             [user.id],
@@ -270,6 +281,7 @@ def reports(user: User) -> list[Report]:
                             ),
                             editor=res[4],
                             public=res[5],
+                            description=res[6],
                         )
                     )
         org_reports = list(
@@ -290,7 +302,7 @@ def public_reports() -> list[Report]:
     """
     with Database() as db:
         report_result = db.execute_return(
-            "SELECT id, name, owner_id FROM reports WHERE public IS TRUE;",
+            "SELECT id, name, owner_id, description FROM reports WHERE public IS TRUE;",
         )
         reports = []
         if report_result is not None:
@@ -316,6 +328,7 @@ def public_reports() -> list[Report]:
                             ),
                             editor=False,
                             public=True,
+                            description=res[3],
                         )
                     )
         return reports
@@ -480,7 +493,7 @@ def report(
             owner_id = owner_id[0][0]
 
         report_result = db.execute_return(
-            "SELECT id, name, owner_id, public FROM reports "
+            "SELECT id, name, owner_id, public, description FROM reports "
             "WHERE name = %s AND owner_id = %s;",
             [report_name, owner_id],
         )
@@ -537,6 +550,7 @@ def report(
                 else list(map(lambda linked: str(linked[0]), linked_projects)),
                 editor=editor,
                 public=bool(report_result[0][3]),
+                description=str(report_result[0][4]),
             ),
             report_elements=list(
                 map(
@@ -599,8 +613,8 @@ def project_from_uuid(project_uuid: str) -> Project | None:
     """
     with Database() as db:
         project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, "
-            "data_url, calculate_histogram_metrics, samples_per_page, public "
+            "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
+            "samples_per_page, public, description "
             "FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
@@ -623,6 +637,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 if isinstance(project_result[6], int)
                 else 10,
                 public=bool(project_result[7]),
+                description=str(project_result[8]),
             )
 
 
@@ -637,7 +652,8 @@ def report_from_id(report_id: int) -> Report | None:
     """
     with Database() as db:
         report_result = db.execute_return(
-            "SELECT id, name, owner_id, public FROM reports WHERE id = %s;",
+            "SELECT id, name, owner_id, public, description "
+            "FROM reports WHERE id = %s;",
             [report_id],
         )
         if len(report_result) == 0:
@@ -663,6 +679,7 @@ def report_from_id(report_id: int) -> Report | None:
                 else list(map(lambda linked: str(linked[0]), linked_projects)),
                 editor=False,
                 public=bool(report_result[3]),
+                description=str(report_result[4]),
             )
 
 
@@ -851,6 +868,37 @@ def project_stats(project: str) -> ProjectStats | None:
                 num_models=num_models[0][0] if isinstance(num_models[0][0], int) else 0,
             )
             if len(num_charts) > 0 and len(num_instances) > 0 and len(num_models) > 0
+            else None
+        )
+
+
+def report_stats(report_id: int) -> ReportStats | None:
+    """Get statistics for a specified report.
+
+    Args:
+        report_id (int): id of the report to get statistics for.
+
+    Returns:
+        ReportStats | None: statistics of the specified report.
+    """
+    with Database() as db:
+        num_projects = db.execute_return(
+            "SELECT COUNT(*) FROM report_project WHERE report_id = %s;",
+            [report_id],
+        )
+        num_elements = db.execute_return(
+            "SELECT COUNT(*) FROM report_elements " "WHERE report_id = %s;", [report_id]
+        )
+        return (
+            ReportStats(
+                num_projects=num_projects[0][0]
+                if isinstance(num_projects[0][0], int)
+                else 0,
+                num_elements=num_elements[0][0]
+                if isinstance(num_elements[0][0], int)
+                else 0,
+            )
+            if len(num_projects) > 0 and len(num_elements) > 0
             else None
         )
 

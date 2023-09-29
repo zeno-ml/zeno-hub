@@ -26,6 +26,7 @@ class Report(CamelModel):
         linked_projects (list[str]): all projects that can be used with the report.
         editor (bool): whether the current user can edit the report.
         public (bool): whether the report is publically visible.
+        description (str): description of the report. Default "".
     """
 
     id: int
@@ -34,6 +35,7 @@ class Report(CamelModel):
     linked_projects: list[str]
     editor: bool
     public: bool = False
+    description: str = ""
 
 
 class ReportElement(CamelModel):
@@ -62,3 +64,15 @@ class ReportResponse(CamelModel):
 
     report: Report
     report_elements: list[ReportElement]
+
+
+class ReportStats(CamelModel):
+    """Statistical numbers of a Zeno report.
+
+    Attributes:
+        num_projects (int): number of projects that are linked to the report.
+        num_elements (int): number of elements in the report.
+    """
+
+    num_projects: int
+    num_elements: int
