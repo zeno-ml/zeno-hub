@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Markdown from '$lib/components/general/Markdown.svelte';
 	import { resolveDataPoint } from '$lib/util/util';
+	import { mdiChevronUp } from '@mdi/js';
 	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import purify from 'isomorphic-dompurify';
 	import { parse } from 'marked';
@@ -42,7 +43,7 @@
 				on:click={() => (showall = true)}
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
-					<path d="m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z" />
+					<path d={mdiChevronUp} />
 				</svg>
 				<span class="pr-1">Show All</span>
 			</button>
