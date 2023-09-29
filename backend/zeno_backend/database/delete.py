@@ -195,3 +195,33 @@ def report_org(report_id: int, organization: Organization):
         "AND report_id = %s;",
         [organization.id, report_id],
     )
+
+
+def system(project_uuid: str, system_name: str):
+    """Delete a system from a project.
+
+    Args:
+        project_uuid (str): id of the project to delete a system from.
+        system_name (str): name of the system to be deleted.
+    """
+    with Database() as db:
+        columns = db.execute_return(
+            sql.SQL("SELECT column_id FROM {} WHERE model = %s;").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+            [system_name],
+        )
+        for column in columns:
+            db.execute(
+                sql.SQL("ALTER TABLE {} DROP COLUMN {};").format(
+                    sql.Identifier(project_uuid),
+                    sql.Identifier(column[0]),
+                )
+            )
+            db.execute(
+                sql.SQL("DELETE FROM {} WHERE column_id = %s;").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
+                ),
+                [column[0]],
+            )
+        db.commit()

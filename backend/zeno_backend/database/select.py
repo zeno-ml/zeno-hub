@@ -1602,3 +1602,31 @@ def filtered_short_string_column_values(
         short_ret.append(loc_str)
 
     return short_ret
+
+
+def system_exists(project_uuid: str, system_name: str) -> bool:
+    """Check whether a system exists for a project.
+
+    Args:
+        project_uuid (str): ID of the project.
+        system_name (str): name of the system.
+
+
+    Returns:
+        bool: whether the system exists.
+
+
+    Raises:
+        Exception: something went wrong while checking whether the system exists.
+    """
+    db = Database()
+    exists = db.connect_execute_return(
+        sql.SQL("SELECT EXISTS(SELECT 1 FROM {} " "WHERE model = %s);").format(
+            sql.Identifier(f"{project_uuid}_column_map")
+        ),
+        [system_name],
+    )
+    if len(exists) > 0:
+        return bool(exists[0][0])
+    else:
+        raise Exception("Error while checking whether system exists.")

@@ -19,7 +19,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
-from zeno_backend.database import insert, select, update
+from zeno_backend.database import delete, insert, select, update
 
 # MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
 VIEWS = [
@@ -221,6 +221,10 @@ def upload_system(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Unable to read system data: " + str(e)),
         ) from e
+
+    # If a system with the same name already exists for the project, delete it.
+    if select.system_exists(project, system_name):
+        delete.system(project, system_name)
 
     try:
         insert.system(project, system_df, system_name, output_column, id_column)
