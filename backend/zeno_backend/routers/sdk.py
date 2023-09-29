@@ -28,9 +28,10 @@ VIEWS = [
     "code-generation",
     "image-classification",
     "image-segmentation",
-    "openai-chat",
-    "text-classification",
     "openai-chat-markdown",
+    "openai-chat",
+    "space-separated-values",
+    "text-classification",
 ]
 
 
