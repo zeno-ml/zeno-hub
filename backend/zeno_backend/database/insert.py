@@ -92,13 +92,6 @@ def project(project_config: Project, owner_id: int):
                 "data_type TEXT NOT NULL);"
             ).format(sql.Identifier(f"{project_config.uuid}_column_map"))
         )
-        db.execute(
-            sql.SQL(
-                "INSERT INTO {} (column_id, name, type, data_type) "
-                "VALUES (%s,%s,%s,%s);"
-            ).format(sql.Identifier(f"{project_config.uuid}_column_map")),
-            ["data_id", "data_id", ZenoColumnType.DATA, MetadataType.NOMINAL],
-        )
 
         # Add metrics to the metrics table.
         for metric in project_config.metrics:
@@ -108,18 +101,6 @@ def project(project_config: Project, owner_id: int):
                 [project_config.uuid, metric.name, metric.type, metric.columns],
             )
 
-        # Create table to hold information about tags and associated datapoints.
-        # db.execute(
-        #     sql.SQL(
-        #         "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
-        #         "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
-        #         "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
-        #         "ON DELETE CASCADE ON UPDATE CASCADE);"
-        #     ).format(
-        #         sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
-        #         sql.Identifier(project_config.uuid),
-        #     )
-        # )
         db.commit()
 
 
@@ -145,7 +126,6 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
         )
         db.commit()
 
-    # Get column objects from the dataframe.
     columns: list[ZenoColumn] = []
     for col in dataset_schema.columns:
         column_type = ZenoColumnType.FEATURE
@@ -155,8 +135,6 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
             column_type = ZenoColumnType.LABEL
         elif col == dataset_schema.data_column:
             column_type = ZenoColumnType.DATA
-        elif col == dataset_schema.url_column:
-            column_type = ZenoColumnType.DATA_URL
 
         columns.append(
             ZenoColumn(
@@ -199,10 +177,25 @@ async def dataset(project_uuid: str, batch: RecordBatch):
     pg_schema = encoder.schema()
     cols = sql.SQL(",").join(
         [
-            sql.Identifier(col_name) + sql.SQL(" ") + sql.SQL(col.data_type.ddl())
+            sql.Identifier(col_name)
+            + sql.SQL(" ")
+            + sql.SQL("{}").format(col.data_type.ddl())
             for col_name, col in pg_schema.columns
         ]
     )
+    # TODO: create tags table
+    # Create table to hold information about tags and associated datapoints.
+    # db.execute(
+    #     sql.SQL(
+    #         "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+    #         "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
+    #         "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
+    #         "ON DELETE CASCADE ON UPDATE CASCADE);"
+    #     ).format(
+    #         sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
+    #         sql.Identifier(project_config.uuid),
+    #     )
+    # )
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cursor:

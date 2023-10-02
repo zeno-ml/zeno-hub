@@ -36,6 +36,9 @@ VIEWS = [
     "text-classification",
 ]
 
+# Bump only for breaking changes
+MIN_CLIENT_VERSION = "0.1.7"
+
 
 class APIKeyBearer(HTTPBearer):
     """API key bearer authentication scheme."""
@@ -227,3 +230,9 @@ def upload_system(
             event_properties={"project_uuid": project},
         )
     )
+
+
+@router.get("/min-client-version")
+def min_client_version():
+    """Get the minimum client version required to use the server."""
+    return MIN_CLIENT_VERSION

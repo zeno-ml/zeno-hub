@@ -7,6 +7,7 @@ import type { Body_upload_dataset } from '../models/Body_upload_dataset';
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Chart } from '../models/Chart';
 import type { ChartResponse } from '../models/ChartResponse';
+import type { DatasetSchema } from '../models/DatasetSchema';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -61,33 +62,39 @@ export class ZenoService {
 	}
 
 	/**
+	 * Upload Dataset Schema
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static uploadDatasetSchema(requestBody: DatasetSchema): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/dataset-schema',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Upload Dataset
-	 * Upload a dataset to a Zeno project.
-	 *
-	 * Args:
-	 * project (str): the UUID of the project to add data to.
-	 * id_column (str): the name of the column containing the instance IDs or URLs/URL
-	 * parts.
-	 * label_column (str | None, optional): the name of the column containing the
-	 * instance labels. Defaults to None.
-	 * data_column (str | None, optional): the name of the column containing the
-	 * raw data. Only works for small text data. Defaults to None.
-	 * file (UploadFile): the dataset to upload.
-	 * api_key (str, optional): API key.
-	 * @param project
+	 * @param projectUuid
 	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
 	public static uploadDataset(
-		project: string,
+		projectUuid: string,
 		formData: Body_upload_dataset
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/dataset/{project}',
+			url: '/dataset/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			formData: formData,
 			mediaType: 'multipart/form-data',

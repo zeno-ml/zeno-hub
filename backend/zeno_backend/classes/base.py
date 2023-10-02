@@ -29,7 +29,6 @@ class ZenoColumnType(str, Enum):
     Attributes:
         ID: unique identifier.
         DATA: raw input data instance.
-        DATA_URL: link to input data instance.
         LABEL: ground truth label.
         OUTPUT: model output.
         FEATURE: metadata feature for data instance.
@@ -38,7 +37,6 @@ class ZenoColumnType(str, Enum):
 
     ID = "ID"
     DATA = "DATA"
-    DATA_URL = "DATA_URL"
     LABEL = "LABEL"
     OUTPUT = "OUTPUT"
     FEATURE = "FEATURE"
