@@ -3,6 +3,7 @@ import io
 import uuid
 
 import pandas as pd
+import pyarrow as pa
 from amplitude import BaseEvent
 from fastapi import (
     APIRouter,
@@ -19,6 +20,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
+from zeno_backend.classes.sdk import DatasetSchema
 from zeno_backend.database import delete, insert, select, update
 
 # MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
@@ -142,51 +144,33 @@ def create_project(
     return project
 
 
-@router.post("/dataset/{project}")
-def upload_dataset(
-    project: str,
-    id_column: str = Form(...),
-    label_column: str = Form(None),
-    data_column: str = Form(None),
-    file: UploadFile = File(...),
-    api_key=Depends(APIKeyBearer()),
-):
-    """Upload a dataset to a Zeno project.
-
-    Args:
-        project (str): the UUID of the project to add data to.
-        id_column (str): the name of the column containing the instance IDs or URLs/URL
-            parts.
-        label_column (str | None, optional): the name of the column containing the
-            instance labels. Defaults to None.
-        data_column (str | None, optional): the name of the column containing the
-            raw data. Only works for small text data. Defaults to None.
-        file (UploadFile): the dataset to upload.
-        api_key (str, optional): API key.
-    """
+@router.post("/dataset-schema")
+def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())):
     user_id = select.user_id_by_api_key(api_key)
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
         )
+    return insert.dataset_schema(schema)
 
-    try:
-        bytes = file.file.read()
-        dataset_df = pd.read_feather(io.BytesIO(bytes))
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=("ERROR: Unable to read dataset: " + str(e)),
-        ) from e
 
-    try:
-        insert.dataset(project, dataset_df, id_column, label_column, data_column)
-    except Exception as e:
+@router.post("/dataset/{project_uuid}")
+async def upload_dataset(
+    project_uuid: str,
+    file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
+):
+    user_id = select.user_id_by_api_key(api_key)
+    if user_id is None:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=("ERROR: Unable to create dataset table: " + str(e)),
-        ) from e
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("ERROR: Invalid API key."),
+        )
+    contents = await file.read()
+    reader = pa.ipc.RecordBatchFileReader(contents)
+    batch = reader.get_batch(0)
+    await insert.dataset(project_uuid, batch)
 
 
 @router.post("/system/{project}")

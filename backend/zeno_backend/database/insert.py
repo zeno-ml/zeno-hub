@@ -4,7 +4,9 @@ import secrets
 import uuid
 
 import pandas as pd
+from pgpq import ArrowToPostgresBinaryEncoder
 from psycopg import sql
+from pyarrow import RecordBatch
 from sqlalchemy import create_engine
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
@@ -12,10 +14,11 @@ from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import ReportElement
+from zeno_backend.classes.sdk import DatasetSchema
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import Database
+from zeno_backend.database.database import Database, db_pool
 from zeno_backend.database.database import config as config_db
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 
@@ -81,12 +84,6 @@ def project(project_config: Project, owner_id: int):
             "VALUES (%s,%s,%s)",
             [owner_id, project_config.uuid, True],
         )
-        # Create table to hold project data.
-        db.execute(
-            sql.SQL(
-                "CREATE TABLE {}(data_id TEXT NOT NULL PRIMARY KEY, data TEXT);"
-            ).format(sql.Identifier(project_config.uuid))
-        )
         # Create table to hold information about the columns in the project data.
         db.execute(
             sql.SQL(
@@ -112,119 +109,127 @@ def project(project_config: Project, owner_id: int):
             )
 
         # Create table to hold information about tags and associated datapoints.
-        db.execute(
-            sql.SQL(
-                "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
-                "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
-                "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
-                "ON DELETE CASCADE ON UPDATE CASCADE);"
-            ).format(
-                sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
-                sql.Identifier(project_config.uuid),
-            )
-        )
+        # db.execute(
+        #     sql.SQL(
+        #         "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+        #         "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
+        #         "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
+        #         "ON DELETE CASCADE ON UPDATE CASCADE);"
+        #     ).format(
+        #         sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
+        #         sql.Identifier(project_config.uuid),
+        #     )
+        # )
         db.commit()
 
 
-def dataset(
-    project: str,
-    data_frame: pd.DataFrame,
-    id_column: str,
-    label_column: str,
-    data_column: str,
-):
-    """Adds a dataset to an existing project.
+def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
+    """Adding a dataset schema column_map to an existing project.
 
     Args:
-        project (str): project the user is currently working with.
-        data_frame (pd.DataFrame): dataset to be added.
-        id_column (str): name of the column containing the instance IDs.
-        label_column (str): name of the column containing the instance labels.
-        data_column (str): name of the column containing the raw data.
+        dataset_schema (DatasetSchema): the dataset schema to be added.
+
+    Returns:
+        list[str]: the ids of the columns in the dataset schema.
     """
     with Database() as db:
-        # Drop the primary table and column_map since they will be recreated.
         db.execute(
-            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(sql.Identifier(project))
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                sql.Identifier(dataset_schema.project_uuid)
+            )
         )
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
-                sql.Identifier(f"{project}_column_map")
+                sql.Identifier(f"{dataset_schema.project_uuid}_column_map")
             )
         )
         db.commit()
 
     # Get column objects from the dataframe.
     columns: list[ZenoColumn] = []
-    for col in data_frame.columns:
-        if col == id_column or col == label_column or col == data_column:
-            continue
+    for col in dataset_schema.columns:
+        column_type = ZenoColumnType.FEATURE
+        if col == dataset_schema.id_column:
+            column_type = ZenoColumnType.ID
+        elif col == dataset_schema.label_column:
+            column_type = ZenoColumnType.LABEL
+        elif col == dataset_schema.data_column:
+            column_type = ZenoColumnType.DATA
+        elif col == dataset_schema.url_column:
+            column_type = ZenoColumnType.DATA_URL
+
         columns.append(
             ZenoColumn(
                 id=str(uuid.uuid4()),
                 name=col,
-                column_type=ZenoColumnType.FEATURE,
-                data_type=resolve_metadata_type(data_frame, col),
+                column_type=column_type,
+                data_type=MetadataType.OTHER,
             )
         )
 
-    # Create a renaming scheme for the DataFrame columns
-    column_rename = {
-        id_column: "data_id",
-        label_column: "label",
-        data_column: "data",
-    }
-    for col in columns:
-        column_rename[col.name] = col.id
-    data_frame = data_frame.rename(columns=column_rename)
-    data_frame = data_frame.set_index("data_id")
-
-    # Add the data_id and label columns to the ones to be added to the column_map.
-    columns.append(
-        ZenoColumn(
-            id="data_id",
-            name="data_id",
-            column_type=ZenoColumnType.DATA,
-            data_type=MetadataType.NOMINAL,
-        )
-    )
-    columns.append(
-        ZenoColumn(
-            id="label",
-            name="label",
-            column_type=ZenoColumnType.LABEL,
-            data_type=MetadataType.NOMINAL,
-        )
-    )
-
-    # To prevent upload errors, convert data column to string.
-    data_frame["data"] = data_frame["data"].astype(str)
-
-    # Connect to the db engine using SQLAlchemy and write the data to a table.
-    config = config_db()
-    engine = create_engine(
-        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
-    )
-    data_frame.to_sql(project, con=engine, if_exists="replace", index=True)
-
-    # Add columns to column_map
     with Database() as db:
         db.execute(
             sql.SQL(
                 "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
                 "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
                 "data_type TEXT NOT NULL);"
-            ).format(sql.Identifier(f"{project}_column_map"))
+            ).format(sql.Identifier(f"{dataset_schema.project_uuid}_column_map"))
         )
         for column in columns:
             db.execute(
                 sql.SQL(
                     "INSERT INTO {} (column_id, name, type, data_type) "
                     "VALUES (%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
+                ).format(sql.Identifier(f"{dataset_schema.project_uuid}_column_map")),
                 [column.id, column.name, column.column_type, column.data_type],
             )
         db.commit()
+
+    return [c.id for c in columns]
+
+
+async def dataset(project_uuid: str, batch: RecordBatch):
+    """Adds a dataset to an existing project.
+
+    Args:
+        project_uuid (str): project the user is currently working with.
+        batch (RecordBatch): dataset to be added.
+    """
+    encoder = ArrowToPostgresBinaryEncoder(batch.schema)
+    pg_schema = encoder.schema()
+    cols = sql.SQL(",").join(
+        [
+            sql.Identifier(col_name) + sql.SQL(" ") + sql.SQL(col.data_type.ddl())
+            for col_name, col in pg_schema.columns
+        ]
+    )
+
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cursor:
+            await cursor.execute(
+                sql.SQL("CREATE TABLE IF NOT EXISTS {} (").format(
+                    sql.Identifier(project_uuid)
+                )
+                + cols
+                + sql.SQL(")")
+            )
+
+            await cursor.execute("DROP TABLE IF EXISTS temp_data")
+            await cursor.execute(
+                sql.SQL("CREATE TABLE temp_data (") + cols + sql.SQL(")")
+            )
+            async with cursor.copy(
+                "COPY temp_data FROM STDIN WITH (FORMAT BINARY)"
+            ) as copy:
+                await copy.write(encoder.write_header())
+                await copy.write(encoder.write_batch(batch))
+                await copy.write(encoder.finish())
+            await cursor.execute(
+                sql.SQL("INSERT INTO {} SELECT * FROM temp_data").format(
+                    sql.Identifier(project_uuid)
+                )
+            )
+        await conn.commit()
 
 
 def system(
