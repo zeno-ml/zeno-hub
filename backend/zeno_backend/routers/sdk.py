@@ -34,7 +34,7 @@ VIEWS = [
 ]
 
 # Bump only for breaking changes
-MIN_CLIENT_VERSION = "0.1.7"
+MIN_CLIENT_VERSION = "0.1.8"
 
 
 class APIKeyBearer(HTTPBearer):
