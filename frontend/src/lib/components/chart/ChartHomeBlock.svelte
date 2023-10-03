@@ -69,7 +69,7 @@
 				</Icon>
 			</IconButton>
 			{#if showOptions}
-				<div
+				<button
 					class="z-10 absolute ml-5"
 					use:clickOutside={() => (showOptions = !showOptions)}
 					on:click={(e) => e.stopPropagation()}
@@ -81,7 +81,7 @@
 				>
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
-							<div
+							<button
 								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
 								on:keydown={() => ({})}
 								on:click={(e) => {
@@ -100,8 +100,8 @@
 							>
 								<Icon style="font-size: 20px;" class="material-icons">content_copy</Icon>&nbsp;
 								<span class="text-sm">Make a copy</span>
-							</div>
-							<div
+							</button>
+							<button
 								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
 								on:keydown={() => ({})}
 								on:click={(e) => {
@@ -112,10 +112,10 @@
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;
 								<span class="text-sm">Delete</span>
-							</div>
+							</button>
 						</Content>
 					</Paper>
-				</div>
+				</button>
 			{/if}
 		</div>
 	</div>

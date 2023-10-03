@@ -1,5 +1,7 @@
 """Utility functions for database operations."""
 import hashlib
+import json
+from pathlib import Path
 
 import pyarrow as pa
 from pyarrow import DataType
@@ -41,3 +43,24 @@ def hash_api_key(api_key: str) -> str:
     hasher.update(api_key.encode("utf-8"))
 
     return hasher.hexdigest()
+
+
+def match_instance_view(view: str) -> str:
+    """Get the according view specification for an instance view.
+
+    Args:
+        view (str): the view of the project.
+
+    Returns:
+        str: the view specification for the project.
+    """
+    if view.startswith("{"):
+        return view
+    views = map(
+        lambda x: x.stem, list(Path("zeno_backend/instance_views").glob("*.json"))
+    )
+    if view in views:
+        return json.dumps(
+            json.load(Path(f"zeno_backend/instance_views/{view}.json").open("r"))
+        )
+    return json.dumps({"data": "text"})

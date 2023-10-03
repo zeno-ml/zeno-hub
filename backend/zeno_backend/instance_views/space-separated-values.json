@@ -1,0 +1,15 @@
+{
+  "data": { "type": "separated-values", "header": "Data", "separator": " " },
+  "label": {
+    "type": "separated-values",
+    "header": "Label",
+    "highlight": true,
+    "separator": " "
+  },
+  "output": {
+    "type": "separated-values",
+    "header": "Output",
+    "separator": " "
+  },
+  "displayType": "table"
+}

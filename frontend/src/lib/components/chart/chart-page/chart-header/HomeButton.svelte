@@ -2,9 +2,10 @@
 	import { page } from '$app/stores';
 	import { mdiArrowCollapseLeft } from '@mdi/js';
 	import { SmuiElement } from '@smui/common';
-	import { noop } from 'svelte/internal';
 
-	export let updateChart: () => void = noop;
+	export let updateChart: () => void = () => {
+		// Do nothing
+	};
 
 	let isHover = false;
 </script>

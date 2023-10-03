@@ -28,7 +28,7 @@ from zeno_backend.classes.table import (
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database, db_pool
-from zeno_backend.database.util import hash_api_key
+from zeno_backend.database.util import hash_api_key, match_instance_view
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
 
@@ -72,7 +72,7 @@ def projects(user: User) -> list[Project]:
                     uuid=project[0],
                     name=project[1],
                     owner_name=user.name,
-                    view=project[2],
+                    view=match_instance_view(project[2]),
                     samples_per_page=project[3],
                     editor=True,
                     public=project[4],
@@ -101,7 +101,7 @@ def projects(user: User) -> list[Project]:
                         uuid=res[0],
                         name=res[1],
                         owner_name=str(owner_name),
-                        view=res[3],
+                        view=match_instance_view(res[3]),
                         samples_per_page=res[4],
                         editor=res[5],
                         public=res[6],
@@ -130,7 +130,7 @@ def projects(user: User) -> list[Project]:
                         uuid=res[0],
                         name=res[1],
                         owner_name=str(owner_name),
-                        view=res[3],
+                        view=match_instance_view(res[3]),
                         samples_per_page=res[4],
                         editor=res[5],
                         public=res[6],
@@ -170,7 +170,7 @@ def public_projects() -> list[Project]:
                         uuid=res[0],
                         name=res[1],
                         owner_name=str(owner_name),
-                        view=res[3],
+                        view=match_instance_view(res[3]),
                         samples_per_page=res[4],
                         editor=False,
                         public=True,
@@ -683,7 +683,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 uuid=str(project_result[0]),
                 name=str(project_result[1]),
                 owner_name=str(owner_result[0][0]),
-                view=str(project_result[3]),
+                view=match_instance_view(str(project_result[3])),
                 editor=False,
                 samples_per_page=project_result[4]
                 if isinstance(project_result[4], int)

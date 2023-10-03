@@ -177,7 +177,7 @@
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
 							{#if $editTag === undefined}
-								<div
+								<button
 									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
 									on:keydown={() => ({})}
 									on:click={(e) => {
@@ -188,9 +188,9 @@
 								>
 									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
 									<span class="text-xs">Edit</span>
-								</div>
+								</button>
 							{/if}
-							<div
+							<button
 								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
 								on:keydown={() => ({})}
 								on:click={(e) => {
@@ -201,7 +201,7 @@
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
 								<span class="text-xs">Remove</span>
-							</div>
+							</button>
 						</Content>
 					</Paper>
 				</div>

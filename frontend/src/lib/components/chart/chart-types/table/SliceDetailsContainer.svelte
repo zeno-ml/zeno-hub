@@ -10,6 +10,7 @@
 {#if sli !== undefined}
 	<div
 		class="text-primary cursor-default"
+		role="tooltip"
 		on:mouseover={() => (showTooltip = true)}
 		on:mouseout={() => (showTooltip = false)}
 		on:focus={() => (showTooltip = true)}

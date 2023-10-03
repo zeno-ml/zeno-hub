@@ -55,9 +55,9 @@
 	<div class="flex mb-4">
 		{#if api_key}
 			<p class="mr-3">API Key:</p>
-			<h5 on:click={copyKey} on:keypress={copyKey} class="hover:text-primary cursor-pointer">
+			<button on:click={copyKey} on:keypress={copyKey} class="hover:text-primary cursor-pointer">
 				{api_key}
-			</h5>
+			</button>
 			{#if copied}
 				<p out:fade={{ delay: 250, duration: 300 }} class="ml-3 text-greenish">
 					Copied API key to clipboard!

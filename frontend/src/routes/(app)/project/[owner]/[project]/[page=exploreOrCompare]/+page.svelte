@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Banner from '$lib/components/general/Banner.svelte';
-	import InstanceView from '$lib/components/instance-views/InstanceView.svelte';
+	import Instances from '$lib/components/instances/Instances.svelte';
 	import MetadataPanel from '$lib/components/metadata/MetadataPanel.svelte';
 	import Button from '@smui/button';
 
@@ -34,6 +34,6 @@
 {:else}
 	<MetadataPanel compare={data.compare} />
 	<div class="mx-5 flex flex-col flex-grow w-1">
-		<InstanceView compare={data.compare} />
+		<Instances compare={data.compare} />
 	</div>
 {/if}

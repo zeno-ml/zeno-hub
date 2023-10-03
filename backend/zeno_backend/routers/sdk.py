@@ -20,20 +20,6 @@ from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
 from zeno_backend.database import delete, insert, select, update
 
-# MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
-VIEWS = [
-    "audio-transcription",
-    "chatbot",
-    "code-generation",
-    "image-classification",
-    "image-segmentation",
-    "openai-chat-markdown",
-    "openai-chat",
-    "space-separated-values",
-    "text-classification",
-    "rag",
-]
-
 # Bump only for breaking changes
 MIN_CLIENT_VERSION = "0.1.9"
 
@@ -118,15 +104,6 @@ def create_project(
             detail=(
                 "ERROR: Invalid API key. Double check your API key or generate"
                 + " a new one at https://hub.zenoml.com/account."
-            ),
-        )
-
-    if project.view not in VIEWS:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "ERROR: Invalid view. Please reference https://zenoml.com/docs/views/"
-                + " for a list of valid views."
             ),
         )
 

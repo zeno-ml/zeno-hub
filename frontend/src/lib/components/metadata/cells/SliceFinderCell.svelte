@@ -89,7 +89,11 @@
 		{/if}
 	</div>
 	{#if showSliceName}
-		<div id="right-8 absolute" use:clickOutside={() => (showSliceName = false)} on:keydown={submit}>
+		<button
+			id="right-8 absolute"
+			use:clickOutside={() => (showSliceName = false)}
+			on:keydown={submit}
+		>
 			<Paper elevation={7}>
 				<Content style="display:flex; flex-direction:column">
 					<Textfield bind:value={newSliceName} label="Slice Name" bind:this={input} />
@@ -112,6 +116,6 @@
 					</div>
 				</Content>
 			</Paper>
-		</div>
+		</button>
 	{/if}
 </div>

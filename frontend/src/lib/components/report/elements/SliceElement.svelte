@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { viewMap } from '$lib/components/instance-views/views/viewMap';
 	import type { URLParams } from '$lib/util/util';
 	import type {
 		ReportElement,
@@ -12,6 +11,7 @@
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/';
+	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
@@ -19,7 +19,7 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 	let sliceElementSpec: SliceElementSpec | undefined;
 	let sliceElementOptions: SliceElementOptions | undefined;
-	let table: Record<string, unknown>[] | undefined = [];
+	let table: Record<string, string | number | boolean>[] | undefined = [];
 	let page = 0;
 
 	$: updateSliceElementSpec(element.data as string);
@@ -97,16 +97,15 @@
 				</div>
 			</button>
 			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
-				{#if viewMap[sliceElementOptions.project.view] !== undefined && sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
+				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0">
-							<svelte:component
-								this={viewMap[sliceElementOptions.project.view]}
-								options={{}}
-								entry={inst}
+							<InstanceView
+								view={sliceElementOptions.project.view}
 								dataColumn={sliceElementOptions.dataColumn}
 								modelColumn={sliceElementOptions.modelColumn}
 								labelColumn={sliceElementOptions.labelColumn}
+								entry={inst}
 							/>
 						</div>
 					{/each}

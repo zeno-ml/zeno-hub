@@ -8,7 +8,6 @@ import {
 	type CognitoUserSession,
 	type ISignUpResult
 } from 'amazon-cognito-identity-js';
-import { noop } from 'svelte/internal';
 import type { AuthUser } from './types';
 
 export type CognitoUserSessionType = CognitoUserSession;
@@ -51,7 +50,9 @@ export function verify(Username: string, code: string) {
 
 export const resendCode = (Username: string) => {
 	const user = new CognitoUser({ Username, Pool: getPool() });
-	user.resendConfirmationCode(noop);
+	user.resendConfirmationCode(() => {
+		// Do nothing
+	});
 };
 
 /**
@@ -116,7 +117,14 @@ export async function resetPassword(
 
 export async function sendPasswordResetCode(username: string) {
 	const user = new CognitoUser({ Username: username, Pool: getPool() });
-	user.forgotPassword({ onSuccess: noop, onFailure: noop });
+	user.forgotPassword({
+		onSuccess: () => {
+			// Do nothing
+		},
+		onFailure: () => {
+			// Do nothing
+		}
+	});
 }
 
 export const extractUserFromSession = (session: CognitoUserSessionType): AuthUser => {

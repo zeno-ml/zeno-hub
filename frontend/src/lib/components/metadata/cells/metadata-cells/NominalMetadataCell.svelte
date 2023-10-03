@@ -60,7 +60,7 @@
 	}
 </script>
 
-<div on:click={setSelection} on:keydown={() => ({})}>
+<button on:click={setSelection} on:keydown={() => ({})}>
 	<VegaLite
 		bind:view
 		spec={nominalVegaSpec($metricRange)}
@@ -72,4 +72,4 @@
 			renderer: 'svg'
 		}}
 	/>
-</div>
+</button>

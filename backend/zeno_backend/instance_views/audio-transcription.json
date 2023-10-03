@@ -1,0 +1,5 @@
+{
+  "data": { "type": "audio" },
+  "label": { "type": "text" },
+  "output": { "type": "text" }
+}

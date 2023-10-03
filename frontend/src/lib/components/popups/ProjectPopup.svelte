@@ -28,15 +28,10 @@
 	zenoClient.getUsers().then((r) => (allUsers = r));
 	zenoClient.getProjectUsers($project.uuid).then((r) => (projectUsers = r));
 	let projectOrganizations: Organization[] = [];
-	let allOrganizations: Organization[] = [];
 	zenoClient.getProjectOrgs($project.uuid).then((r) => (projectOrganizations = r));
-	zenoClient.getOrganizationNames().then((r) => (allOrganizations = r));
 
 	$: availableUsers = allUsers.filter(
 		(u) => u.id !== user.id && !projectUsers.some((member) => member.id === u.id)
-	);
-	$: availableOrgs = allOrganizations.filter(
-		(currentOrg) => !projectOrganizations.some((org) => org.id === currentOrg.id)
 	);
 
 	$: invalidName = config.name.length === 0 || config.name.match(/[/]/g) !== null;
