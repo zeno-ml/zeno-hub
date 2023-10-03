@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
-	import { ZenoService, type Project } from '$lib/zenoapi';
+	import { ZenoService, type Project, type User } from '$lib/zenoapi';
 	import {
 		mdiChartBar,
 		mdiDotsHorizontal,
@@ -16,13 +16,16 @@
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
+	import CopyProjectPopup from '../popups/CopyProjectPopup.svelte';
 	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
 	export let deletable = false;
+	export let user: User | null = null;
 
 	let showOptions = false;
 	let hovering = false;
+	let showCopy = false;
 
 	function getProjectIcon() {
 		if (project.view.includes('image')) return mdiImage;
@@ -31,6 +34,9 @@
 	}
 </script>
 
+{#if showCopy && user !== null}
+	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
+{/if}
 <button
 	on:click={() => goto(`/project/${project.ownerName}/${project.name}`)}
 	on:mouseover={() => (hovering = true)}
@@ -48,7 +54,7 @@
 					showOptions = false;
 				}}
 			>
-				{#if hovering && deletable}
+				{#if hovering && user !== null}
 					<IconButton
 						size="button"
 						style="padding: 0px"
@@ -71,12 +77,28 @@
 									on:click={(e) => {
 										e.stopPropagation();
 										showOptions = false;
-										ZenoService.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+										showCopy = true;
 									}}
 								>
-									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span class="text-xs">Remove</span>
+									<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
+									<span class="text-xs">Copy</span>
 								</button>
+								{#if deletable}
+									<button
+										class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+										on:click={(e) => {
+											e.stopPropagation();
+											showOptions = false;
+											ZenoService.deleteProject(project.uuid).then(() =>
+												invalidate('app:projects')
+											);
+										}}
+									>
+										<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon
+										>&nbsp;
+										<span class="text-xs">Remove</span>
+									</button>
+								{/if}
 							</Content>
 						</Paper>
 					</div>

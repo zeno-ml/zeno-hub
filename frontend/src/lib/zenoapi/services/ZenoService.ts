@@ -16,6 +16,7 @@ import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
+import type { ProjectCopy } from '../models/ProjectCopy';
 import type { ProjectState } from '../models/ProjectState';
 import type { ProjectStats } from '../models/ProjectStats';
 import type { Report } from '../models/Report';
@@ -1417,6 +1418,28 @@ export class ZenoService {
 			url: '/report-org/{report_id}',
 			path: {
 				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Copy Project
+	 * @param projectUuid
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static copyProject(projectUuid: string, requestBody: ProjectCopy): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/copy-project/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',

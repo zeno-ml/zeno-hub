@@ -12,6 +12,7 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cloudauth.cognito import Cognito
 
+import zeno_backend.database.copy as copy
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
@@ -25,7 +26,12 @@ from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
-from zeno_backend.classes.project import Project, ProjectState, ProjectStats
+from zeno_backend.classes.project import (
+    Project,
+    ProjectCopy,
+    ProjectState,
+    ProjectStats,
+)
 from zeno_backend.classes.report import (
     Report,
     ReportElement,
@@ -732,6 +738,17 @@ def get_server() -> FastAPI:
     )
     def add_report_org(report_id: int, organization: Organization):
         insert.report_org(report_id, organization)
+
+    @api_app.post(
+        "/copy-project/{project_uuid}", tags=["zeno"], dependencies=[Depends(auth)]
+    )
+    def copy_project(
+        project_uuid: str, copy_spec: ProjectCopy, current_user=Depends(auth.claim())
+    ):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        copy.project_copy(project_uuid, copy_spec, user)
 
     ####################################################################### Update
     @api_app.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])

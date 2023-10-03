@@ -42,7 +42,7 @@
 			dispatch('close');
 		}
 		if (e.key === 'Enter') {
-			updateProject();
+			if (!invalidName) updateProject();
 		}
 	}
 
@@ -264,6 +264,6 @@
 					on:click={() => updateProject()}>{'Update'}</Button
 				>
 			</div>
-		</div></Content
-	>
+		</div>
+	</Content>
 </Popup>

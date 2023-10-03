@@ -12,10 +12,10 @@
 
 <div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
 	{#each ownProjects as project}
-		<Project {project} deletable />
+		<Project {project} deletable user={data.user} />
 	{/each}
 	{#each sharedProjects as project}
-		<Project {project} />
+		<Project {project} user={data.user} />
 	{/each}
 </div>
 {#if ownProjects.length === 0}
