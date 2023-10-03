@@ -297,13 +297,12 @@ def system_schema(system_schema: SystemSchema) -> list[str]:
             )
             if id_col is None or len(id_col) == 0:
                 raise Exception("ERROR: No ID column found.")
-            column_type = ZenoColumnType.ID
 
             columns.append(
                 ZenoColumn(
                     id=id_col[0][0],
                     name="",
-                    column_type=column_type,
+                    column_type=ZenoColumnType.ID,
                     data_type=MetadataType.OTHER,
                     model=system_schema.system_name,
                 )

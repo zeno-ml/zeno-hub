@@ -52,6 +52,8 @@ function columnTypeOrder(colType: ZenoColumnType) {
 			return 2;
 		case ZenoColumnType.EMBEDDING:
 			return 2;
+		case ZenoColumnType.ID:
+			return 2;
 	}
 }
 

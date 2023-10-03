@@ -10,6 +10,7 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
+	import { columnSort } from '$lib/util/util';
 	import {
 		MetadataType,
 		ZenoColumnType,
@@ -62,7 +63,6 @@
 				: (d.dataType === MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
 						completeColumns.includes(d);
 		})
-
 		.sort(columnSort);
 	let metricColumn: ZenoColumn | undefined =
 		metricColumns.length > 0 ? metricColumns[0] : undefined;
