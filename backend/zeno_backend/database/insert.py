@@ -358,6 +358,15 @@ async def system_tables(
     schema: Schema,
     pg_schema,
 ):
+    """Create the database tables for a new system if they dont exist.
+
+    Args:
+        project_uuid (str): project the user is currently working with.
+        system_name (str): name of the system that produced the output.
+        cursor (AsyncCursor): cursor to execute queries with.
+        schema (Schema): schema of the dataset to be added.
+        pg_schema (PostgresqlSchema): generated schema for arrow conversion.
+    """
     # Check if the model column exists in project table
     await cursor.execute(
         sql.SQL("SELECT * FROM {} WHERE type = 'OUTPUT' AND model = %s;").format(
@@ -380,7 +389,6 @@ async def system_tables(
         )
 
     for name, col in pg_schema.columns:
-        # add column to project table
         await cursor.execute(
             sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} ").format(
                 sql.Identifier(project_uuid),
@@ -388,8 +396,6 @@ async def system_tables(
             )
             + sql.SQL(col.data_type.ddl())
         )
-
-    return []
 
 
 async def system(
@@ -400,7 +406,7 @@ async def system(
     """Adds a system to an existing project.
 
     Args:
-        project (str): project the user is currently working with.
+        project_uuid (str): project the user is currently working with.
         system_name (str): name of the system that produced the output.
         batch (RecordBatch): system output to be added.
     """

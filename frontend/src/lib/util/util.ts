@@ -55,22 +55,6 @@ function columnTypeOrder(colType: ZenoColumnType) {
 	}
 }
 
-export function columnSort(col1: ZenoColumn, col2: ZenoColumn) {
-	if (columnTypeOrder(col1.columnType) > columnTypeOrder(col2.columnType)) {
-		return 1;
-	} else if (columnTypeOrder(col1.columnType) < columnTypeOrder(col2.columnType)) {
-		return -1;
-	}
-
-	if (col1.name < col2.name) {
-		return -1;
-	} else if (col1.name > col2.name) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
 /** Calculate the metric range for coloring histograms */
 export function getMetricRange(res: HistogramBucket[][]): [number, number] {
 	const range: [number, number] = [Infinity, -Infinity];
