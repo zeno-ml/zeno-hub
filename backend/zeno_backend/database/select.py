@@ -443,6 +443,22 @@ def user_name_by_api_key(api_key: str) -> str | None:
     )
     return user_id[0][0] if len(user_id) > 0 else None
 
+def project_exists_by_uuid(project_uuid: str) -> bool:
+    """Check whether a project exists.
+    
+    Args:
+        project_uuid (str): the UUID of the project.
+        
+    Returns:
+        bool: whether the project exists.
+    """
+    db = Database()
+    exists = db.connect_execute_return(
+        "SELECT * FROM projects WHERE uuid = %s;", [project_uuid]
+    )
+    if len(exists) > 0:
+        return True
+    return False
 
 def project_exists(owner_id: int, project_name: str) -> bool:
     """Check whether a project exists.

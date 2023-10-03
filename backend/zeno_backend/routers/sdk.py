@@ -158,6 +158,11 @@ def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
         )
+    if not select.project_exists_by_uuid(schema.project_uuid):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=("ERROR: Project does not exist."),
+        )
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Dataset Uploaded",
@@ -187,6 +192,11 @@ async def upload_dataset(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
         )
+    if not select.project_exists_by_uuid(project_uuid):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=("ERROR: Project does not exist."),
+        )
 
     contents = await file.read()
     reader = pa.ipc.RecordBatchFileReader(contents)
@@ -215,6 +225,11 @@ def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
+        )
+    if not select.project_exists_by_uuid(schema.project_uuid):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=("ERROR: Project does not exist."),
         )
 
     AmplitudeHandler().track(
@@ -248,6 +263,11 @@ async def upload_system(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
+        )
+    if not select.project_exists_by_uuid(project_uuid):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=("ERROR: Project does not exist."),
         )
 
     contents = await file.read()
