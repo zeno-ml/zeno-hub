@@ -111,18 +111,20 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
     Returns:
         list[str]: the ids of the columns in the dataset schema.
     """
-    # Drop tables if existing dataset exists.
+    # Drop project tables if existing dataset exists.
     with Database() as db:
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(dataset_schema.project_uuid)
             )
         )
+        # Clear all existing rows in column_map.
         db.execute(
-            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+            sql.SQL("DELETE FROM {};").format(
                 sql.Identifier(f"{dataset_schema.project_uuid}_column_map")
             )
         )
+        # This has to be created again since it has a foreign key constraint.
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{dataset_schema.project_uuid}_tags_datapoints")
@@ -151,13 +153,6 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
 
     # Create and populate column_map table.
     with Database() as db:
-        db.execute(
-            sql.SQL(
-                "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
-                "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
-                "data_type TEXT NOT NULL);"
-            ).format(sql.Identifier(f"{dataset_schema.project_uuid}_column_map"))
-        )
         for column in columns:
             db.execute(
                 sql.SQL(
@@ -367,9 +362,9 @@ async def system_tables(
         schema (Schema): schema of the dataset to be added.
         pg_schema (PostgresqlSchema): generated schema for arrow conversion.
     """
-    # Check if the model column exists in project table
+    # Check if there are rows in column_map for this system
     await cursor.execute(
-        sql.SQL("SELECT * FROM {} WHERE type = 'OUTPUT' AND model = %s;").format(
+        sql.SQL("SELECT * FROM {} WHERE model = %s;").format(
             sql.Identifier(f"{project_uuid}_column_map")
         ),
         (system_name,),

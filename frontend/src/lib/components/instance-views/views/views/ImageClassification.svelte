@@ -7,7 +7,7 @@
 
 <div class="w-min p-2 border border-grey-lighter" style:background-color="white">
 	<img
-		src={entry[dataColumn] + ''}
+		src={`${entry[dataColumn]}`}
 		style:max-width="200px"
 		alt="Image thumbnail for instance {entry[dataColumn]}"
 	/>

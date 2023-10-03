@@ -54,13 +54,16 @@
 		modelFeatureColumns.length > 0 ? modelFeatureColumns : [searchColumnOptions[0]];
 
 	// Column to use as the metric to compare slices.
-	let metricColumns = $columns.filter((d) => {
-		return $page.url.href.includes('compare')
-			? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.FEATURE) &&
-					d.model === $model
-			: (d.dataType === MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
-					completeColumns.includes(d);
-	});
+	let metricColumns = $columns
+		.filter((d) => {
+			return $page.url.href.includes('compare')
+				? (d.columnType === ZenoColumnType.OUTPUT || d.columnType === ZenoColumnType.FEATURE) &&
+						d.model === $model
+				: (d.dataType === MetadataType.CONTINUOUS || d.dataType === MetadataType.BOOLEAN) &&
+						completeColumns.includes(d);
+		})
+
+		.sort(columnSort);
 	let metricColumn: ZenoColumn | undefined =
 		metricColumns.length > 0 ? metricColumns[0] : undefined;
 	let compareColumn: ZenoColumn | undefined = undefined;

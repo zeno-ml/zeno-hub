@@ -444,7 +444,7 @@ def user_name_by_api_key(api_key: str) -> str | None:
     return user_id[0][0] if len(user_id) > 0 else None
 
 
-def project_exists_by_uuid(project_uuid: str) -> bool:
+def project_uuid_exists(project_uuid: str) -> bool:
     """Check whether a project exists.
 
     Args:

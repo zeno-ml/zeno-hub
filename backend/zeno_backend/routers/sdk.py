@@ -66,11 +66,21 @@ class APIKeyBearer(HTTPBearer):
                 )
             if not self.verify_api_key(credentials.credentials):
                 raise HTTPException(
-                    status_code=403, detail="Invalid token or expired token."
+                    status_code=403,
+                    detail=(
+                        "ERROR: Invalid API key. Double check your API key or generate"
+                        + " a new one at https://hub.zenoml.com/account."
+                    ),
                 )
             return credentials.credentials
         else:
-            raise HTTPException(status_code=403, detail="Invalid authorization code.")
+            raise HTTPException(
+                status_code=403,
+                detail=(
+                    "ERROR: Invalid API key. Double check your API key or generate"
+                    + " a new one at https://hub.zenoml.com/account."
+                ),
+            )
 
     def verify_api_key(self, api_key: str) -> bool:
         """Verify that the API key is valid.
@@ -104,7 +114,10 @@ def create_project(
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
+            detail=(
+                "ERROR: Invalid API key. Double check your API key or generate"
+                + " a new one at https://hub.zenoml.com/account."
+            ),
         )
     owner_name = select.user_name_by_api_key(api_key)
     project.owner_name = owner_name if owner_name is not None else ""
@@ -156,13 +169,17 @@ def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
+            detail=(
+                "ERROR: Invalid API key. Double check your API key or generate"
+                + " a new one at https://hub.zenoml.com/account."
+            ),
         )
-    if not select.project_exists_by_uuid(schema.project_uuid):
+    if not select.project_uuid_exists(schema.project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
         )
+    res = insert.dataset_schema(schema)
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Dataset Uploaded",
@@ -170,7 +187,7 @@ def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())
             event_properties={"project_uuid": schema.project_uuid},
         )
     )
-    return insert.dataset_schema(schema)
+    return res
 
 
 @router.post("/dataset/{project_uuid}")
@@ -190,9 +207,12 @@ async def upload_dataset(
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
+            detail=(
+                "ERROR: Invalid API key. Double check your API key or generate"
+                + " a new one at https://hub.zenoml.com/account."
+            ),
         )
-    if not select.project_exists_by_uuid(project_uuid):
+    if not select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
@@ -224,13 +244,18 @@ def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
+            detail=(
+                "ERROR: Invalid API key. Double check your API key or generate"
+                + " a new one at https://hub.zenoml.com/account."
+            ),
         )
-    if not select.project_exists_by_uuid(schema.project_uuid):
+    if not select.project_uuid_exists(schema.project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
         )
+
+    res = insert.system_schema(schema)
 
     AmplitudeHandler().track(
         BaseEvent(
@@ -240,7 +265,7 @@ def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
         )
     )
 
-    return insert.system_schema(schema)
+    return res
 
 
 @router.post("/system/{project_uuid}/{system_name}")
@@ -262,9 +287,12 @@ async def upload_system(
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
+            detail=(
+                "ERROR: Invalid API key. Double check your API key or generate"
+                + " a new one at https://hub.zenoml.com/account."
+            ),
         )
-    if not select.project_exists_by_uuid(project_uuid):
+    if not select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),

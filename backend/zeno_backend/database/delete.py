@@ -198,7 +198,7 @@ def report_org(report_id: int, organization: Organization):
 
 
 def dataset(project_uuid: str):
-    """Delete a dataset from a project.
+    """Delete dataset table and clear column_map for a project.
 
     Args:
         project_uuid (str): id of the project to delete a dataset from.
@@ -207,6 +207,11 @@ def dataset(project_uuid: str):
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(project_uuid)
+            )
+        )
+        db.execute(
+            sql.SQL("DELETE FROM {};").format(
+                sql.Identifier(f"{project_uuid}_column_map")
             )
         )
         db.commit()
