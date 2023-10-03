@@ -1,31 +1,28 @@
 """Utility functions for database operations."""
 import hashlib
 
-import pandas as pd
+import pyarrow as pa
+from pyarrow import DataType
 
 from zeno_backend.classes.base import MetadataType
 
 
-def resolve_metadata_type(data_frame: pd.DataFrame, column: str) -> MetadataType:
-    """Get the MetadataType of a dataframe column.
+def resolve_metadata_type(d: DataType) -> MetadataType:
+    """Get the Zeno MetadataType of a PyArrow type.
 
     Args:
-        data_frame (pd.DataFrame): dataframe that contains the column.
-        column (str): column for which to determine the type.
+        d (DataType): PyArrow datatype.
 
     Returns:
-        MetadataType: MetadataType of the dataframe column.
+        MetadataType: MetadataType of the column.
     """
-    dtype = data_frame[column].dtype
-    if pd.api.types.is_any_real_numeric_dtype(dtype):
-        if data_frame[column].nunique() < 20:
-            return MetadataType.NOMINAL
+    if pa.types.is_integer(d) or pa.types.is_floating(d) or pa.types.is_decimal(d):
         return MetadataType.CONTINUOUS
-    elif pd.api.types.is_bool_dtype(dtype):
+    elif pa.types.is_boolean(d):
         return MetadataType.BOOLEAN
-    elif pd.api.types.is_datetime64_any_dtype(dtype):
+    elif pa.types.is_temporal(d):
         return MetadataType.DATETIME
-    elif pd.api.types.is_string_dtype(dtype):
+    elif pa.types.is_string(d):
         return MetadataType.NOMINAL
     return MetadataType.OTHER
 

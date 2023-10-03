@@ -1,15 +1,12 @@
 """FastAPI server endpoints for the Zeno SDK."""
-import io
 import uuid
 
-import pandas as pd
 import pyarrow as pa
 from amplitude import BaseEvent
 from fastapi import (
     APIRouter,
     Depends,
     File,
-    Form,
     HTTPException,
     Request,
     Response,
@@ -20,7 +17,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
-from zeno_backend.classes.sdk import DatasetSchema
+from zeno_backend.classes.sdk import DatasetSchema, SystemSchema
 from zeno_backend.database import delete, insert, select, update
 
 # MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
@@ -149,12 +146,25 @@ def create_project(
 
 @router.post("/dataset-schema")
 def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())):
+    """Upload a dataset schema to the database. Called before uploading data.
+
+    Args:
+        schema (DatasetSchema): the dataset schema to upload.
+        api_key (str, optional): API key.
+    """
     user_id = select.user_id_by_api_key(api_key)
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("ERROR: Invalid API key."),
         )
+    AmplitudeHandler().track(
+        BaseEvent(
+            event_type="Dataset Uploaded",
+            user_id="00000" + str(user_id),
+            event_properties={"project_uuid": schema.project_uuid},
+        )
+    )
     return insert.dataset_schema(schema)
 
 
@@ -164,35 +174,11 @@ async def upload_dataset(
     file: UploadFile = File(...),
     api_key=Depends(APIKeyBearer()),
 ):
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=("ERROR: Invalid API key."),
-        )
-    contents = await file.read()
-    reader = pa.ipc.RecordBatchFileReader(contents)
-    batch = reader.get_batch(0)
-    await insert.dataset(project_uuid, batch)
-
-
-@router.post("/system/{project}")
-def upload_system(
-    project: str,
-    system_name: str = Form(...),
-    output_column: str = Form(...),
-    id_column: str = Form(...),
-    file: UploadFile = File(...),
-    api_key=Depends(APIKeyBearer()),
-):
-    """Upload a system to a Zeno project.
+    """Upload a dataset to a Zeno project.
 
     Args:
-        project (str): the UUID of the project to add data to.
-        system_name (str): the name of the system to upload.
-        output_column (str): the name of the column containing the system output.
-        id_column (str): the name of the column containing the instance IDs.
-        file (UploadFile): the dataset to upload.
+        project_uuid (str): the UUID of the project to add data to.
+        file (UploadFile): the dataset to upload. Serialized Arrow RecordBatch.
         api_key (str, optional): API key.
     """
     user_id = select.user_id_by_api_key(api_key)
@@ -202,34 +188,80 @@ def upload_system(
             detail=("ERROR: Invalid API key."),
         )
 
+    contents = await file.read()
+    reader = pa.ipc.RecordBatchFileReader(contents)
+    batch = reader.get_batch(0)
     try:
-        bytes = file.file.read()
-        system_df = pd.read_feather(io.BytesIO(bytes))
+        await insert.dataset(project_uuid, batch)
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=("ERROR: Unable to read system data: " + str(e)),
-        ) from e
-
-    # If a system with the same name already exists for the project, delete it.
-    if select.system_exists(project, system_name):
-        delete.system(project, system_name)
-
-    try:
-        insert.system(project, system_df, system_name, output_column, id_column)
-    except Exception as e:
+        # If one of the batches fails, delete the entire dataset.
+        delete.dataset(project_uuid)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=("ERROR: Unable to create system table: " + str(e)),
-        ) from e
+            detail=("ERROR: Unable to create dataset table." + str(e)),
+        )
+
+
+@router.post("/system-schema")
+def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
+    """Upload a dataset schema to the database. Called before uploading system.
+
+    Args:
+        schema (DatasetSchema): the dataset schema to upload.
+        api_key (str, optional): API key.
+    """
+    user_id = select.user_id_by_api_key(api_key)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("ERROR: Invalid API key."),
+        )
 
     AmplitudeHandler().track(
         BaseEvent(
             event_type="System Uploaded",
             user_id="00000" + str(user_id),
-            event_properties={"project_uuid": project},
+            event_properties={"project_uuid": schema.project_uuid},
         )
     )
+
+    return insert.system_schema(schema)
+
+
+@router.post("/system/{project_uuid}/{system_name}")
+async def upload_system(
+    project_uuid: str,
+    system_name: str,
+    file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
+):
+    """Upload a system to a Zeno project.
+
+    Args:
+        project_uuid (str): the UUID of the project to add the system to.
+        system_name (str): the name of the system.
+        file (UploadFile): the system to upload. Serialized Arrow RecordBatch.
+        api_key (str, optional): API key.
+    """
+    user_id = select.user_id_by_api_key(api_key)
+    if user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("ERROR: Invalid API key."),
+        )
+
+    contents = await file.read()
+    reader = pa.ipc.RecordBatchFileReader(contents)
+    batch = reader.get_batch(0)
+    try:
+        await insert.system(project_uuid, system_name, batch)
+    except Exception as e:
+        # If one of the batches fails, delete the entire system.
+        delete.system(project_uuid, system_name)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=("ERROR: Unable to upload system: " + str(e)),
+        )
 
 
 @router.get("/min-client-version")

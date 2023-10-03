@@ -3,23 +3,21 @@ import json
 import secrets
 import uuid
 
-import pandas as pd
 from pgpq import ArrowToPostgresBinaryEncoder
-from psycopg import sql
-from pyarrow import RecordBatch
-from sqlalchemy import create_engine
+from psycopg import AsyncCursor, sql
+from pyarrow import RecordBatch, Schema
 
+import zeno_backend.database.delete as delete
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import ReportElement
-from zeno_backend.classes.sdk import DatasetSchema
+from zeno_backend.classes.sdk import DatasetSchema, SystemSchema
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database, db_pool
-from zeno_backend.database.database import config as config_db
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 
 
@@ -113,6 +111,7 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
     Returns:
         list[str]: the ids of the columns in the dataset schema.
     """
+    # Drop tables if existing dataset exists.
     with Database() as db:
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
@@ -122,6 +121,11 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
         db.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{dataset_schema.project_uuid}_column_map")
+            )
+        )
+        db.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                sql.Identifier(f"{dataset_schema.project_uuid}_tags_datapoints")
             )
         )
         db.commit()
@@ -145,6 +149,7 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
             )
         )
 
+    # Create and populate column_map table.
     with Database() as db:
         db.execute(
             sql.SQL(
@@ -166,6 +171,78 @@ def dataset_schema(dataset_schema: DatasetSchema) -> list[str]:
     return [c.id for c in columns]
 
 
+async def database_tables(
+    project_uuid: str, cursor: AsyncCursor, cols: sql.Composed, schema: Schema
+):
+    """Create the database tables for a new project if they dont exist.
+
+    Args:
+        project_uuid (str): project the user is currently working with.
+        cursor (AsyncCursor): cursor to execute queries with.
+        cols (sql.Composed): columns of the table to be created.
+        schema (Schema): schema of the dataset to be added.
+
+    Raises:
+        Exception: no ID column found.
+    """
+    await cursor.execute(
+        sql.SQL("SELECT EXISTS (SELECT FROM pg_tables WHERE tablename  = %s);"),
+        (project_uuid,),
+    )
+    exists = await cursor.fetchone()
+    if exists is not None and exists[0]:
+        return
+
+    # Update types in column_map
+    for col in schema:
+        data_type = resolve_metadata_type(col.type)
+        await cursor.execute(
+            sql.SQL("UPDATE {} SET data_type = %s WHERE column_id = %s;").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+            [data_type, col.name],
+        )
+
+    await cursor.execute(
+        sql.SQL("CREATE TABLE IF NOT EXISTS {} (").format(sql.Identifier(project_uuid))
+        + cols
+        + sql.SQL(")")
+    )
+
+    # Get ID column name
+    await cursor.execute(
+        sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+            sql.Identifier(f"{project_uuid}_column_map")
+        )
+    )
+    col_id = await cursor.fetchone()
+    if col_id is None:
+        raise Exception("ERROR: No ID column found.")
+    col_id = col_id[0]
+
+    # Make ID column primary key.
+    await cursor.execute(
+        sql.SQL("ALTER TABLE {} ADD PRIMARY KEY ({});").format(
+            sql.Identifier(project_uuid),
+            sql.Identifier(col_id),
+        )
+    )
+
+    # Create table to hold information about tags and associated datapoints.
+    await cursor.execute(
+        sql.SQL(
+            "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
+            "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
+            "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}({}) "
+            "ON DELETE CASCADE ON UPDATE CASCADE);"
+        ).format(
+            sql.Identifier(f"{project_uuid}_tags_datapoints"),
+            sql.Identifier(project_uuid),
+            sql.Identifier(col_id),
+        )
+    )
+
+
 async def dataset(project_uuid: str, batch: RecordBatch):
     """Adds a dataset to an existing project.
 
@@ -177,35 +254,14 @@ async def dataset(project_uuid: str, batch: RecordBatch):
     pg_schema = encoder.schema()
     cols = sql.SQL(",").join(
         [
-            sql.Identifier(col_name)
-            + sql.SQL(" ")
-            + sql.SQL("{}").format(col.data_type.ddl())
+            sql.Identifier(col_name) + sql.SQL(" ") + sql.SQL(col.data_type.ddl())
             for col_name, col in pg_schema.columns
         ]
     )
-    # TODO: create tags table
-    # Create table to hold information about tags and associated datapoints.
-    # db.execute(
-    #     sql.SQL(
-    #         "CREATE TABLE {}(id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY, "
-    #         "tag_id integer NOT NULL REFERENCES tags(id) ON DELETE CASCADE "
-    #         "ON UPDATE CASCADE, data_id text NOT NULL REFERENCES {}(data_id) "
-    #         "ON DELETE CASCADE ON UPDATE CASCADE);"
-    #     ).format(
-    #         sql.Identifier(f"{project_config.uuid}_tags_datapoints"),
-    #         sql.Identifier(project_config.uuid),
-    #     )
-    # )
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cursor:
-            await cursor.execute(
-                sql.SQL("CREATE TABLE IF NOT EXISTS {} (").format(
-                    sql.Identifier(project_uuid)
-                )
-                + cols
-                + sql.SQL(")")
-            )
+            await database_tables(project_uuid, cursor, cols, batch.schema)
 
             await cursor.execute("DROP TABLE IF EXISTS temp_data")
             await cursor.execute(
@@ -225,129 +281,183 @@ async def dataset(project_uuid: str, batch: RecordBatch):
         await conn.commit()
 
 
-def system(
-    project: str,
-    data_frame: pd.DataFrame,
+def system_schema(system_schema: SystemSchema) -> list[str]:
+    """Adding a system schema column_map to an existing project.
+
+    Args:
+        system_schema (SystemSchema): the system schema to be added.
+    """
+    delete.system(system_schema.project_uuid, system_schema.system_name)
+
+    # add columns to column_map
+    columns: list[ZenoColumn] = []
+    for col in system_schema.columns:
+        if col == system_schema.id_column:
+            # get id column id
+            db = Database()
+            id_col = db.connect_execute_return(
+                sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                    sql.Identifier(f"{system_schema.project_uuid}_column_map")
+                )
+            )
+            if id_col is None or len(id_col) == 0:
+                raise Exception("ERROR: No ID column found.")
+            column_type = ZenoColumnType.ID
+
+            columns.append(
+                ZenoColumn(
+                    id=id_col[0][0],
+                    name="",
+                    column_type=column_type,
+                    data_type=MetadataType.OTHER,
+                    model=system_schema.system_name,
+                )
+            )
+            continue
+        elif col == system_schema.output_column:
+            column_type = ZenoColumnType.OUTPUT
+        else:
+            column_type = ZenoColumnType.FEATURE
+
+        columns.append(
+            ZenoColumn(
+                id=str(uuid.uuid4()),
+                name=col,
+                column_type=column_type,
+                data_type=MetadataType.OTHER,
+                model=system_schema.system_name,
+            )
+        )
+
+    with Database() as db:
+        for column in columns:
+            if column.column_type == ZenoColumnType.ID:
+                continue
+            db.execute(
+                sql.SQL(
+                    "INSERT INTO {} (column_id, name, type, data_type, model) "
+                    "VALUES (%s,%s,%s,%s,%s);"
+                ).format(sql.Identifier(f"{system_schema.project_uuid}_column_map")),
+                [
+                    column.id,
+                    column.name,
+                    column.column_type,
+                    column.data_type,
+                    column.model,
+                ],
+            )
+        db.commit()
+
+        return [c.id for c in columns]
+
+
+async def system_tables(
+    project_uuid: str,
     system_name: str,
-    output_column: str,
-    id_column: str,
+    cursor: AsyncCursor,
+    schema: Schema,
+    pg_schema,
+):
+    # Check if the model column exists in project table
+    await cursor.execute(
+        sql.SQL("SELECT * FROM {} WHERE type = 'OUTPUT' AND model = %s;").format(
+            sql.Identifier(f"{project_uuid}_column_map")
+        ),
+        (system_name,),
+    )
+    exists = await cursor.fetchone()
+    if exists is None or len(exists) == 0:
+        return
+
+    # Update types in column_map
+    for col in schema:
+        data_type = resolve_metadata_type(col.type)
+        await cursor.execute(
+            sql.SQL("UPDATE {} SET data_type = %s WHERE column_id = %s;").format(
+                sql.Identifier(f"{project_uuid}_column_map")
+            ),
+            [data_type, col.name],
+        )
+
+    for name, col in pg_schema.columns:
+        # add column to project table
+        await cursor.execute(
+            sql.SQL("ALTER TABLE {} ADD COLUMN IF NOT EXISTS {} ").format(
+                sql.Identifier(project_uuid),
+                sql.Identifier(name),
+            )
+            + sql.SQL(col.data_type.ddl())
+        )
+
+    return []
+
+
+async def system(
+    project_uuid: str,
+    system_name: str,
+    batch: RecordBatch,
 ):
     """Adds a system to an existing project.
 
     Args:
         project (str): project the user is currently working with.
-        data_frame (pd.DataFrame): system data to be added.
         system_name (str): name of the system that produced the output.
-        output_column (str): name of the column containing the system output.
-        id_column (str): name of the column containing the instance IDs.
+        batch (RecordBatch): system output to be added.
     """
-    # Add all non-id and non-output columns to the column list.
-    columns: list[ZenoColumn] = []
-    for col in data_frame.columns:
-        if col == id_column or col == output_column:
-            continue
-        columns.append(
-            ZenoColumn(
-                id=str(uuid.uuid4()),
-                name=col,
-                column_type=ZenoColumnType.FEATURE,
-                data_type=resolve_metadata_type(data_frame, col),
-                model=system_name,
-            )
-        )
-
-    # Get column objects from the dataframe.
-    output_col_object: ZenoColumn = ZenoColumn(
-        id=str(uuid.uuid4()),
-        name="output",
-        column_type=ZenoColumnType.OUTPUT,
-        data_type=MetadataType.NOMINAL,
-        model=system_name,
+    encoder = ArrowToPostgresBinaryEncoder(batch.schema)
+    pg_schema = encoder.schema()
+    cols = sql.SQL(",").join(
+        [
+            sql.Identifier(col_name) + sql.SQL(" ") + sql.SQL(col.data_type.ddl())
+            for col_name, col in pg_schema.columns
+        ]
     )
-    # Create a renaming scheme for the DataFrame columns
-    column_rename = {
-        id_column: "data_id",
-        output_column: output_col_object.id,
-    }
-    for col in columns:
-        column_rename[col.name] = col.id
-    data_frame = data_frame.rename(columns=column_rename)
-    data_frame = data_frame.set_index("data_id")
 
-    # Connect to the db engine using SQLAlchemy and write the data to a table.
-    db = Database()
-    config = config_db()
-    engine = create_engine(
-        f"postgresql+psycopg://{config['user']}:{config['password']}@{config['host']}/{config['dbname']}"
-    )
-    data_frame.to_sql("tmp", con=engine, if_exists="replace", index=True)
-    columns.append(output_col_object)
-
-    with Database() as db:
-        # Check whether the system has the same columns as existing systems.
-        system_columns = db.execute_return(
-            sql.SQL("SELECT column_id, name FROM {} WHERE model IS NOT NULL;").format(
-                sql.Identifier(f"{project}_column_map")
-            )
-        )
-        system_column_names = list(set(map(lambda x: x[1], system_columns)))
-        if len(system_column_names) > 0 and (
-            len(columns) != len(system_column_names)
-            or not all(map(lambda x: x.name in system_column_names, columns))
-        ):
-            raise Exception(
-                "ERROR: The system you are trying to add does not have the same "
-                "columns as existing systems."
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cursor:
+            await system_tables(
+                project_uuid, system_name, cursor, batch.schema, pg_schema
             )
 
-        # Check whether there are values for all data points.
-        num_matches = db.execute_return(
-            sql.SQL(
-                "SELECT COUNT(*) FROM tmp JOIN {} ON tmp.data_id = {}.data_id;"
-            ).format(sql.Identifier(project), sql.Identifier(project))
-        )
-        if num_matches[0][0] != len(data_frame.index):
-            raise Exception(
-                "ERROR: The system you are trying to add does not have values "
-                "for all data points."
+            await cursor.execute("DROP TABLE IF EXISTS temp_data")
+            await cursor.execute(
+                sql.SQL("CREATE TABLE temp_data (") + cols + sql.SQL(")")
             )
+            async with cursor.copy(
+                "COPY temp_data FROM STDIN WITH (FORMAT BINARY)"
+            ) as copy:
+                await copy.write(encoder.write_header())
+                await copy.write(encoder.write_batch(batch))
+                await copy.write(encoder.finish())
 
-        for col in columns:
-            data_type = db.execute_return(
-                sql.SQL(
-                    "SELECT data_type FROM information_schema.columns WHERE "
-                    "table_schema = 'public' AND table_name = 'tmp' AND "
-                    "column_name = {};"
-                ).format(sql.Literal(col.id))
-            )
-
-            db.execute(
-                sql.SQL("ALTER TABLE {} ADD {} ").format(
-                    sql.Identifier(project),
-                    sql.Identifier(col.id),
-                )
-                + sql.SQL(data_type[0][0] + ";"),
-            )
-            db.execute(
-                sql.SQL(
-                    "UPDATE {} SET {} = (SELECT {} FROM tmp "
-                    "WHERE tmp.data_id = {}.data_id)"
-                ).format(
-                    sql.Identifier(project),
-                    sql.Identifier(col.id),
-                    sql.Identifier(col.id),
-                    sql.Identifier(project),
+            await cursor.execute(
+                sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
                 )
             )
-            db.execute(
-                sql.SQL(
-                    "INSERT INTO {} (column_id, name, type, data_type, model) "
-                    "VALUES (%s,%s,%s,%s,%s);"
-                ).format(sql.Identifier(f"{project}_column_map")),
-                [col.id, col.name, col.column_type, col.data_type, col.model],
+            col_id = await cursor.fetchone()
+            if col_id is None:
+                raise Exception("ERROR: No ID column found.")
+            col_id = col_id[0]
+
+            await cursor.execute(
+                sql.SQL("UPDATE {} AS e SET ").format(sql.Identifier(project_uuid))
+                + sql.SQL(",").join(
+                    [
+                        sql.SQL("{} = COALESCE({}, {})").format(
+                            sql.Identifier(col_name),
+                            sql.Identifier("t", col_name),
+                            sql.Identifier("e", col_name),
+                        )
+                        for col_name, col in pg_schema.columns
+                    ]
+                )
+                + sql.SQL(" FROM temp_data AS t WHERE {} = {}").format(
+                    sql.Identifier("t", col_id),
+                    sql.Identifier("e", col_id),
+                )
             )
-        db.execute("DROP TABLE tmp;")
-        db.commit()
+        await conn.commit()
 
 
 def report(name: str, user: User):

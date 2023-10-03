@@ -67,6 +67,12 @@
 </script>
 
 {#if !$page.url.href.includes('compare')}
+	{#each $columns.filter((m) => m.columnType === ZenoColumnType.DATA) as col (col.id)}
+		{@const hist = metadataHistograms.get(col.id)}
+		{#if hist}
+			<MetadataCell {col} histogram={hist} />
+		{/if}
+	{/each}
 	{#each $columns.filter((m) => m.columnType === ZenoColumnType.LABEL) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
 		{#if hist}

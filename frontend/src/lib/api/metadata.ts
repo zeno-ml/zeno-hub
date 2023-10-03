@@ -8,7 +8,6 @@ import { metricRange, requestingHistogramCounts } from '$lib/stores';
 import { getMetricRange } from '$lib/util/util';
 import {
 	CancelablePromise,
-	ZenoColumnType,
 	ZenoService,
 	type FilterPredicateGroup,
 	type HistogramBucket,
@@ -33,9 +32,7 @@ export async function getHistograms(
 	if (!project_uuid) {
 		return new Map();
 	}
-	const requestedHistograms = completeColumns.filter(
-		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
-	);
+	const requestedHistograms = completeColumns.filter((c) => c.model === null || c.model === model);
 
 	requestingHistogramCounts.set(true);
 	const res = await ZenoService.getHistogramBuckets(project_uuid, requestedHistograms);

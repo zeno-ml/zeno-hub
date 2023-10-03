@@ -8,10 +8,12 @@
 
 	export let entry: Record<string, number | string | boolean | { role: string; content: string }[]>;
 	export let modelColumn: string;
+	export let dataColumn: string;
+	export let labelColumn: string;
 
 	$: showall = false;
 	$: fetchJSON = (async () => {
-		const response = await resolveDataPoint(entry);
+		const response = await resolveDataPoint(entry[dataColumn]);
 		const resp = await (response as Response).json();
 		showall = resp.length <= 5;
 		return resp;
@@ -54,10 +56,10 @@
 		{#if entry[modelColumn]}
 			<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
 		{/if}
-		{#if entry['label']}
+		{#if entry[labelColumn]}
 			<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
 				<span class="font-medium">Expected:</span>
-				<span>{entry['label']}</span>
+				<span>{entry[labelColumn]}</span>
 			</div>
 		{/if}
 	</div>

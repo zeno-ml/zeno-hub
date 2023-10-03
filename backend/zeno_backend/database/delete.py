@@ -197,6 +197,21 @@ def report_org(report_id: int, organization: Organization):
     )
 
 
+def dataset(project_uuid: str):
+    """Delete a dataset from a project.
+
+    Args:
+        project_uuid (str): id of the project to delete a dataset from.
+    """
+    with Database() as db:
+        db.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                sql.Identifier(project_uuid)
+            )
+        )
+        db.commit()
+
+
 def system(project_uuid: str, system_name: str):
     """Delete a system from a project.
 
@@ -213,7 +228,7 @@ def system(project_uuid: str, system_name: str):
         )
         for column in columns:
             db.execute(
-                sql.SQL("ALTER TABLE {} DROP COLUMN {};").format(
+                sql.SQL("ALTER TABLE {} DROP COLUMN IF EXISTS {};").format(
                     sql.Identifier(project_uuid),
                     sql.Identifier(column[0]),
                 )

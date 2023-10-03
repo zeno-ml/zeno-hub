@@ -4,12 +4,13 @@
 
 	// Objects with keys corresponding to the following props.
 	export let entry: Record<string, string | number | boolean>;
-	// Key for model outputs.
+	export let dataColumn: string;
+	export let labelColumn: string;
 	export let modelColumn: string;
 </script>
 
 <div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded break-words">
-	{#await resolveDataPoint(entry)}
+	{#await resolveDataPoint(entry[dataColumn])}
 		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 	{:then textData}
 		<p class="text-grey whitespace-pre-wrap">
@@ -17,10 +18,10 @@
 			{textData}
 		</p>
 	{/await}
-	{#if entry['label'] !== undefined}
+	{#if entry[labelColumn] !== undefined}
 		<p class="mt-2 text-grey whitespace-pre-wrap">
 			<span class="font-semibold">label: </span>
-			{entry['label']}
+			{entry[labelColumn]}
 		</p>
 	{/if}
 	{#if modelColumn && entry[modelColumn] !== undefined}

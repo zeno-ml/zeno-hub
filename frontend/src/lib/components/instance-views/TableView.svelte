@@ -45,6 +45,10 @@
 		currentTagIds = $editTag.dataIds;
 	}
 
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
+	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
+
 	$: columnHeader = $columns.filter(
 		(c) =>
 			(c.model === undefined || c.model === null || c.model === $model) &&
@@ -138,7 +142,7 @@
 					</th>
 				{/if}
 				{#each columnHeader as header}
-					{#if header.name !== 'data_id'}
+					{#if header.id !== idColumn}
 						<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
 							<div class="flex">
 								{header.name}
@@ -160,42 +164,46 @@
 		</thead>
 		<tbody>
 			{#await tablePromise then table}
-				{#each table as tableContent (tableContent['data_id'])}
-					<tr class="border-b border-grey-lighter">
-						{#if $editTag !== undefined}
-							<td class="p-3">
-								<Checkbox bind:group={currentTagIds} value={String(tableContent['data_id'])} />
-							</td>
-						{/if}
-						{#if viewMap[$project.view] !== undefined}
-							<td class="p-3">
-								{#if instanceHidden}
-									<p class="text-center">...</p>
-								{:else}
-									<div class="instance">
-										<svelte:component
-											this={viewMap[$project.view]}
-											options={viewOptions}
-											entry={tableContent}
-											modelColumn={modelColumn?.id}
-										/>
-									</div>
-								{/if}
-							</td>
-						{/if}
-						{#each columnHeader as header}
-							{#if header.dataType === MetadataType.CONTINUOUS}
-								<td class="p-3 border border-grey-lighter align-top">
-									{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
-								</td>
-							{:else}
-								<td class="p-3 border border-grey-lighter align-top">
-									{tableContent[header.id]}
+				{#if idColumn}
+					{#each table as tableContent (tableContent[idColumn])}
+						<tr class="border-b border-grey-lighter">
+							{#if $editTag !== undefined}
+								<td class="p-3">
+									<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
 								</td>
 							{/if}
-						{/each}
-					</tr>
-				{/each}
+							{#if viewMap[$project.view] !== undefined}
+								<td class="p-3">
+									{#if instanceHidden}
+										<p class="text-center">...</p>
+									{:else}
+										<div class="instance">
+											<svelte:component
+												this={viewMap[$project.view]}
+												options={viewOptions}
+												entry={tableContent}
+												{dataColumn}
+												modelColumn={modelColumn?.id}
+												{labelColumn}
+											/>
+										</div>
+									{/if}
+								</td>
+							{/if}
+							{#each columnHeader as header}
+								{#if header.dataType === MetadataType.CONTINUOUS}
+									<td class="p-3 border border-grey-lighter align-top">
+										{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
+									</td>
+								{:else}
+									<td class="p-3 border border-grey-lighter align-top">
+										{tableContent[header.id]}
+									</td>
+								{/if}
+							{/each}
+						</tr>
+					{/each}
+				{/if}
 			{:catch e}
 				<p>error loading data: {e}</p>
 			{/await}

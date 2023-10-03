@@ -63,6 +63,11 @@ export class ZenoService {
 
 	/**
 	 * Upload Dataset Schema
+	 * Upload a dataset schema to the database. Called right before uploading data.
+	 *
+	 * Args:
+	 * schema (DatasetSchema): the dataset schema to upload.
+	 * api_key (str, optional): API key.
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
@@ -81,6 +86,12 @@ export class ZenoService {
 
 	/**
 	 * Upload Dataset
+	 * Upload a dataset to a Zeno project.
+	 *
+	 * Args:
+	 * project_uuid (str): the UUID of the project to add data to.
+	 * file (UploadFile): the dataset to upload.
+	 * api_key (str, optional): API key.
 	 * @param projectUuid
 	 * @param formData
 	 * @returns any Successful Response
@@ -135,6 +146,19 @@ export class ZenoService {
 			errors: {
 				422: `Validation Error`
 			}
+		});
+	}
+
+	/**
+	 * Min Client Version
+	 * Get the minimum client version required to use the server.
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static minClientVersion(): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'GET',
+			url: '/min-client-version'
 		});
 	}
 

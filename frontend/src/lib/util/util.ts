@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { getEndpoint } from '$lib/api/util';
 import {
 	Operation,
 	ZenoColumnType,
@@ -10,14 +9,12 @@ import {
 } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 import {
-	authToken,
 	compareSort,
 	comparisonColumn,
 	comparisonModel,
 	metric,
 	metricRange,
 	model,
-	project,
 	selections
 } from '../stores';
 
@@ -150,23 +147,13 @@ export function shortenNumber(num: number, digits: number) {
 	return item ? (num / item.value).toFixed(digits).replace(rx, '$1') + item.symbol : '0';
 }
 
-export async function resolveDataPoint(entry: Record<string, unknown>): Promise<Response | string> {
-	if (entry['data'] !== null && entry['data'] !== undefined) {
-		return entry['data'] as string;
+export async function resolveDataPoint(entry: unknown): Promise<Response | string> {
+	if (entry === null || entry === undefined) return '';
+	const entry_str = entry as string;
+	if (isValidHttpUrl(entry_str)) {
+		return await fetch(entry_str);
 	}
-	if (isValidHttpUrl(get(project)?.dataUrl ?? '' + entry['data_id'])) {
-		return await fetch(get(project)?.dataUrl ?? '' + entry['data_id']);
-	}
-	return await fetch(
-		`${getEndpoint()}/api/data/${get(project)?.uuid}?data_id=${encodeURIComponent(
-			entry['data_id'] as string
-		)}`,
-		{
-			headers: {
-				Authorization: 'Bearer ' + get(authToken)
-			}
-		}
-	);
+	return entry_str;
 }
 
 function isValidHttpUrl(string: string) {
