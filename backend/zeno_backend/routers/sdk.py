@@ -7,6 +7,7 @@ from fastapi import (
     APIRouter,
     Depends,
     File,
+    Form,
     HTTPException,
     Request,
     Response,
@@ -17,7 +18,6 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
-from zeno_backend.classes.sdk import DatasetSchema, SystemSchema
 from zeno_backend.database import delete, insert, select, update
 
 # MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
@@ -158,11 +158,22 @@ def create_project(
 
 
 @router.post("/dataset-schema")
-def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())):
+async def upload_dataset_schema(
+    project_uuid=Form(...),
+    id_column=Form(...),
+    data_column=Form(...),
+    label_column=Form(...),
+    file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
+):
     """Upload a dataset schema to the database. Called before uploading data.
 
     Args:
-        schema (DatasetSchema): the dataset schema to upload.
+        project_uuid (str): the UUID of the project to add data to.
+        id_column (str): the name of the column containing the ID.
+        data_column (str): the name of the column containing the data.
+        label_column (str): the name of the column containing the label.
+        file (DatasetSchema): the dataset schema to upload.
         api_key (str, optional): API key.
     """
     user_id = select.user_id_by_api_key(api_key)
@@ -174,19 +185,27 @@ def upload_dataset_schema(schema: DatasetSchema, api_key=Depends(APIKeyBearer())
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(schema.project_uuid):
+    if not select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
         )
-    res = insert.dataset_schema(schema)
+
+    contents = await file.read()
+    schema = pa.ipc.read_schema(pa.py_buffer(contents))
+
+    res = await insert.dataset_schema(
+        project_uuid, id_column, data_column, label_column, schema
+    )
+
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Dataset Uploaded",
             user_id="00000" + str(user_id),
-            event_properties={"project_uuid": schema.project_uuid},
+            event_properties={"project_uuid": project_uuid},
         )
     )
+
     return res
 
 
@@ -221,11 +240,12 @@ async def upload_dataset(
     contents = await file.read()
     reader = pa.ipc.RecordBatchFileReader(contents)
     batch = reader.get_batch(0)
+
     try:
         await insert.dataset(project_uuid, batch)
     except Exception as e:
         # If one of the batches fails, delete the entire dataset.
-        delete.dataset(project_uuid)
+        await delete.dataset(project_uuid)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=("ERROR: Unable to create dataset table." + str(e)),
@@ -233,11 +253,22 @@ async def upload_dataset(
 
 
 @router.post("/system-schema")
-def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
+async def upload_system_schema(
+    project_uuid=Form(...),
+    system_name=Form(...),
+    id_column=Form(...),
+    output_column=Form(...),
+    file: UploadFile = File(...),
+    api_key=Depends(APIKeyBearer()),
+):
     """Upload a dataset schema to the database. Called before uploading system.
 
     Args:
-        schema (DatasetSchema): the dataset schema to upload.
+        project_uuid (str): the UUID of the project to add data to.
+        system_name (str): the name of the system.
+        id_column (str): the name of the column containing the ID.
+        output_column (str): the name of the column containing the output.
+        file (Schema): the system PyArrow schema to upload.
         api_key (str, optional): API key.
     """
     user_id = select.user_id_by_api_key(api_key)
@@ -249,19 +280,24 @@ def upload_system_schema(schema: SystemSchema, api_key=Depends(APIKeyBearer())):
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(schema.project_uuid):
+    if not select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
         )
 
-    res = insert.system_schema(schema)
+    contents = await file.read()
+    schema = pa.ipc.read_schema(pa.py_buffer(contents))
+
+    res = await insert.system_schema(
+        project_uuid, system_name, id_column, output_column, schema
+    )
 
     AmplitudeHandler().track(
         BaseEvent(
             event_type="System Uploaded",
             user_id="00000" + str(user_id),
-            event_properties={"project_uuid": schema.project_uuid},
+            event_properties={"project_uuid": project_uuid},
         )
     )
 
@@ -301,11 +337,12 @@ async def upload_system(
     contents = await file.read()
     reader = pa.ipc.RecordBatchFileReader(contents)
     batch = reader.get_batch(0)
+
     try:
-        await insert.system(project_uuid, system_name, batch)
+        await insert.system(project_uuid, batch)
     except Exception as e:
         # If one of the batches fails, delete the entire system.
-        delete.system(project_uuid, system_name)
+        await delete.system(project_uuid, system_name)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=("ERROR: Unable to upload system: " + str(e)),
