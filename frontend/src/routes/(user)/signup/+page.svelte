@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Button from '@smui/button/src/Button.svelte';
+	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import Textfield from '@smui/textfield';
 
 	export let form;
+
+	let agreed = false;
 </script>
 
 <svelte:head>
@@ -48,7 +51,17 @@
 			label="Repeat password"
 			class="w-56 mb-3"
 		/>
-		<Button type="submit" variant="raised" class="mt-5">Sign Up</Button>
+		<div class="mt-4 flex items-center">
+			<Checkbox bind:checked={agreed} />
+			<span
+				>By signing up you agree to our <a
+					href="/tos"
+					target="_blank"
+					class="text-primary visited:text-primary hover:underline">Terms of Service</a
+				>.</span
+			>
+		</div>
+		<Button type="submit" variant="raised" class="mt-5" disabled={!agreed}>Sign Up</Button>
 		<p class="mt-5">
 			Already have an account? <a href="/">Log in now!</a>
 		</p>
