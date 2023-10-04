@@ -41,7 +41,6 @@ from zeno_backend.processing.chart import chart_data
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import (
     HistogramRequest,
-    histogram_bucket,
     histogram_metric_and_count,
 )
 from zeno_backend.processing.metrics.map import metric_map
@@ -494,20 +493,7 @@ def get_server() -> FastAPI:
         return return_metrics
 
     @api_app.post(
-        "/histograms/{project}",
-        response_model=list[list[HistogramBucket]],
-        tags=["zeno"],
-    )
-    async def get_histogram_buckets(
-        req: list[ZenoColumn], project: str, request: Request
-    ):
-        if not util.project_access_valid(project, request):
-            return Response(status_code=401)
-
-        return await asyncio.gather(*[histogram_bucket(project, col) for col in req])
-
-    @api_app.post(
-        "/histogram-counts/{project_uuid}",
+        "/histograms/{project_uuid}",
         response_model=list[list[HistogramBucket]],
         tags=["zeno"],
     )
@@ -525,18 +511,25 @@ def get_server() -> FastAPI:
             project_uuid, req.model, req.filter_predicates, req.data_ids
         )
 
-        return await asyncio.gather(
+        # get buckets or generate if not exist.
+        histograms = await select.histogram_buckets(project_uuid, req.columns)
+        if histograms is None:
+            return []
+
+        res = await asyncio.gather(
             *[
                 histogram_metric_and_count(
                     req,
-                    r,
+                    col,
+                    histograms[col.id],
                     project_uuid,
                     filter_sql,
                     project_obj.calculate_histogram_metrics,
                 )
-                for r in req.column_requests
+                for col in req.columns
             ]
         )
+        return res
 
     @api_app.get(
         "/project-users/{project}",

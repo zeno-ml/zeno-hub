@@ -4,10 +4,11 @@
 /* eslint-disable */
 import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Body_upload_dataset } from '../models/Body_upload_dataset';
+import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_schema';
 import type { Body_upload_system } from '../models/Body_upload_system';
+import type { Body_upload_system_schema } from '../models/Body_upload_system_schema';
 import type { Chart } from '../models/Chart';
 import type { ChartResponse } from '../models/ChartResponse';
-import type { DatasetSchema } from '../models/DatasetSchema';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -63,21 +64,25 @@ export class ZenoService {
 
 	/**
 	 * Upload Dataset Schema
-	 * Upload a dataset schema to the database. Called right before uploading data.
+	 * Upload a dataset schema to the database. Called before uploading data.
 	 *
 	 * Args:
-	 * schema (DatasetSchema): the dataset schema to upload.
+	 * project_uuid (str): the UUID of the project to add data to.
+	 * id_column (str): the name of the column containing the ID.
+	 * data_column (str): the name of the column containing the data.
+	 * label_column (str): the name of the column containing the label.
+	 * file (DatasetSchema): the dataset schema to upload.
 	 * api_key (str, optional): API key.
-	 * @param requestBody
+	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadDatasetSchema(requestBody: DatasetSchema): CancelablePromise<any> {
+	public static uploadDatasetSchema(formData: Body_upload_dataset_schema): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/dataset-schema',
-			body: requestBody,
-			mediaType: 'application/json',
+			formData: formData,
+			mediaType: 'multipart/form-data',
 			errors: {
 				422: `Validation Error`
 			}
@@ -90,7 +95,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): the UUID of the project to add data to.
-	 * file (UploadFile): the dataset to upload.
+	 * file (UploadFile): the dataset to upload. Serialized Arrow RecordBatch.
 	 * api_key (str, optional): API key.
 	 * @param projectUuid
 	 * @param formData
@@ -116,30 +121,58 @@ export class ZenoService {
 	}
 
 	/**
+	 * Upload System Schema
+	 * Upload a dataset schema to the database. Called before uploading system.
+	 *
+	 * Args:
+	 * project_uuid (str): the UUID of the project to add data to.
+	 * system_name (str): the name of the system.
+	 * id_column (str): the name of the column containing the ID.
+	 * output_column (str): the name of the column containing the output.
+	 * file (Schema): the system PyArrow schema to upload.
+	 * api_key (str, optional): API key.
+	 * @param formData
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public static uploadSystemSchema(formData: Body_upload_system_schema): CancelablePromise<any> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/system-schema',
+			formData: formData,
+			mediaType: 'multipart/form-data',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Upload System
 	 * Upload a system to a Zeno project.
 	 *
 	 * Args:
-	 * project (str): the UUID of the project to add data to.
-	 * system_name (str): the name of the system to upload.
-	 * output_column (str): the name of the column containing the system output.
-	 * id_column (str): the name of the column containing the instance IDs.
-	 * file (UploadFile): the dataset to upload.
+	 * project_uuid (str): the UUID of the project to add the system to.
+	 * system_name (str): the name of the system.
+	 * file (UploadFile): the system to upload. Serialized Arrow RecordBatch.
 	 * api_key (str, optional): API key.
-	 * @param project
+	 * @param projectUuid
+	 * @param systemName
 	 * @param formData
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
 	public static uploadSystem(
-		project: string,
+		projectUuid: string,
+		systemName: string,
 		formData: Body_upload_system
 	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/system/{project}',
+			url: '/system/{project_uuid}/{system_name}',
 			path: {
-				project: project
+				project_uuid: projectUuid,
+				system_name: systemName
 			},
 			formData: formData,
 			mediaType: 'multipart/form-data',
@@ -718,31 +751,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Histogram Buckets
-	 * @param project
-	 * @param requestBody
-	 * @returns HistogramBucket Successful Response
-	 * @throws ApiError
-	 */
-	public static getHistogramBuckets(
-		project: string,
-		requestBody: Array<ZenoColumn>
-	): CancelablePromise<Array<Array<HistogramBucket>>> {
-		return __request(OpenAPI, {
-			method: 'POST',
-			url: '/histograms/{project}',
-			path: {
-				project: project
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Calculate Histograms
 	 * @param projectUuid
 	 * @param requestBody
@@ -755,7 +763,7 @@ export class ZenoService {
 	): CancelablePromise<Array<Array<HistogramBucket>>> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/histogram-counts/{project_uuid}',
+			url: '/histograms/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
 			},

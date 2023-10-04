@@ -86,7 +86,7 @@ def project(project_config: Project, owner_id: int):
             sql.SQL(
                 "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
                 "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
-                "data_type TEXT NOT NULL);"
+                "data_type TEXT NOT NULL, histogram JSONB);"
             ).format(sql.Identifier(f"{project_config.uuid}_column_map"))
         )
 
