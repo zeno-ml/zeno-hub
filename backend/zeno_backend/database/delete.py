@@ -6,7 +6,7 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import Database
+from zeno_backend.database.database import Database, db_pool
 
 
 def project(project: str):
@@ -197,31 +197,59 @@ def report_org(report_id: int, organization: Organization):
     )
 
 
-def system(project_uuid: str, system_name: str):
+async def dataset(project_uuid: str):
+    """Delete dataset table and clear column_map for a project.
+
+    Args:
+        project_uuid (str): id of the project to delete a dataset from.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("DELETE FROM {};").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
+                )
+            )
+            await cur.execute(
+                sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                    sql.Identifier(project_uuid)
+                )
+            )
+            await cur.execute(
+                sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                    sql.Identifier(f"{project_uuid}_tags_datapoints")
+                )
+            )
+            await conn.commit()
+
+
+async def system(project_uuid: str, system_name: str):
     """Delete a system from a project.
 
     Args:
         project_uuid (str): id of the project to delete a system from.
         system_name (str): name of the system to be deleted.
     """
-    with Database() as db:
-        columns = db.execute_return(
-            sql.SQL("SELECT column_id FROM {} WHERE model = %s;").format(
-                sql.Identifier(f"{project_uuid}_column_map")
-            ),
-            [system_name],
-        )
-        for column in columns:
-            db.execute(
-                sql.SQL("ALTER TABLE {} DROP COLUMN {};").format(
-                    sql.Identifier(project_uuid),
-                    sql.Identifier(column[0]),
-                )
-            )
-            db.execute(
-                sql.SQL("DELETE FROM {} WHERE column_id = %s;").format(
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT column_id FROM {} WHERE model = %s;").format(
                     sql.Identifier(f"{project_uuid}_column_map")
                 ),
-                [column[0]],
+                [system_name],
             )
-        db.commit()
+            columns = await cur.fetchall()
+            for column in columns:
+                await cur.execute(
+                    sql.SQL("ALTER TABLE {} DROP COLUMN IF EXISTS {};").format(
+                        sql.Identifier(project_uuid),
+                        sql.Identifier(column[0]),
+                    )
+                )
+                await cur.execute(
+                    sql.SQL("DELETE FROM {} WHERE column_id = %s;").format(
+                        sql.Identifier(f"{project_uuid}_column_map")
+                    ),
+                    [column[0]],
+                )
+            await conn.commit()

@@ -34,7 +34,12 @@ export async function getHistograms(
 		return new Map();
 	}
 	const requestedHistograms = completeColumns.filter(
-		(c) => (c.model === null || c.model === model) && c.columnType !== ZenoColumnType.DATA
+		(c) =>
+			(c.model === null || c.model === model) &&
+			(c.columnType === ZenoColumnType.DATA ||
+				c.columnType === ZenoColumnType.FEATURE ||
+				c.columnType === ZenoColumnType.LABEL ||
+				c.columnType === ZenoColumnType.OUTPUT)
 	);
 
 	requestingHistogramCounts.set(true);

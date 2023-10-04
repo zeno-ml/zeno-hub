@@ -35,6 +35,10 @@
 		)
 	].sort((a, b) => a - b);
 
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
+	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
+
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;
 	$: lastPage = Math.max(Math.ceil(numberOfInstances / $rowsPerPage) - 1, 0);
@@ -95,14 +99,16 @@
 
 <div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
 	{#await tablePromise then table}
-		{#if viewMap[$project.view] !== undefined}
-			{#each table as inst (inst['data_id'])}
+		{#if viewMap[$project.view] !== undefined && idColumn !== undefined}
+			{#each table as inst (inst[idColumn])}
 				<div class="mr-2 mt-2">
 					<svelte:component
 						this={viewMap[$project.view]}
 						options={viewOptions}
 						entry={inst}
+						{dataColumn}
 						modelColumn={modelColumn?.id}
+						{labelColumn}
 					/>
 				</div>
 			{/each}

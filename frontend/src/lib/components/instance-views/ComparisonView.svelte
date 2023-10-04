@@ -42,6 +42,10 @@
 		)
 	].sort((a, b) => a - b);
 
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
+	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
+
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;
 	$: if (currentPage > lastPage) {
@@ -252,49 +256,55 @@
 			</th>
 		</thead>
 		{#await tablePromise then table}
-			<tbody>
-				{#each table as tableContent}
-					<tr>
-						{#if viewMap[$project.view] !== undefined}
-							<td class="p-3 align-baseline">
-								<p class="mb-2">
-									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-									{modelValueAndDiff($model, tableContent)}
-								</p>
-								<div class="instance">
-									<svelte:component
-										this={viewMap[$project.view]}
-										options={viewOptions}
-										entry={tableContent}
-										modelColumn={modelAColumn?.id}
-									/>
-								</div>
-							</td>
-							<td class="p-3 align-baseline">
-								<p class="mb-2">
-									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-									{modelValueAndDiff($comparisonModel, tableContent)}
-								</p>
-								<div class="instance">
-									<svelte:component
-										this={viewMap[$project.view]}
-										options={viewOptions}
-										entry={tableContent}
-										modelColumn={modelBColumn?.id}
-									/>
-								</div>
-							</td>
-						{/if}
-						{#if $model !== undefined && $comparisonModel !== undefined}
-							<td class="p-3 align-text-top"
-								>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
-									? Number(tableContent['diff']).toFixed(2)
-									: tableContent['diff']}
-							</td>
-						{/if}
-					</tr>
-				{/each}
-			</tbody>
+			{#if idColumn}
+				<tbody>
+					{#each table as tableContent (tableContent[idColumn])}
+						<tr>
+							{#if viewMap[$project.view] !== undefined}
+								<td class="p-3 align-baseline">
+									<p class="mb-2">
+										<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+										{modelValueAndDiff($model, tableContent)}
+									</p>
+									<div class="instance">
+										<svelte:component
+											this={viewMap[$project.view]}
+											options={viewOptions}
+											entry={tableContent}
+											{dataColumn}
+											modelColumn={modelAColumn?.id}
+											{labelColumn}
+										/>
+									</div>
+								</td>
+								<td class="p-3 align-baseline">
+									<p class="mb-2">
+										<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+										{modelValueAndDiff($comparisonModel, tableContent)}
+									</p>
+									<div class="instance">
+										<svelte:component
+											this={viewMap[$project.view]}
+											options={viewOptions}
+											entry={tableContent}
+											{dataColumn}
+											modelColumn={modelBColumn?.id}
+											{labelColumn}
+										/>
+									</div>
+								</td>
+							{/if}
+							{#if $model !== undefined && $comparisonModel !== undefined}
+								<td class="p-3 align-text-top"
+									>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
+										? Number(tableContent['diff']).toFixed(2)
+										: tableContent['diff']}
+								</td>
+							{/if}
+						</tr>
+					{/each}
+				</tbody>
+			{/if}
 		{:catch e}
 			<p>error loading data: {e}</p>
 		{/await}

@@ -11,18 +11,20 @@
 
 	export let entry: Record<string, number | string | boolean | { role: string; content: string }[]>;
 	export let modelColumn: string;
+	export let dataColumn: string;
+	export let labelColumn: string;
 
 	let showall = false;
 	let renderedLabel = '';
 
 	$: fetchJSON = (async () => {
-		const response = await resolveDataPoint(entry);
+		const response = await resolveDataPoint(entry[dataColumn]);
 		const jsonResponse = JSON.parse(response as string);
 		showall = jsonResponse.length <= 5;
 		return jsonResponse;
 	})();
-	$: if (entry['label']) {
-		renderedLabel = purify.sanitize(parse(entry['label'] as string));
+	$: if (entry[labelColumn]) {
+		renderedLabel = purify.sanitize(parse(entry[labelColumn] as string));
 	}
 
 	function entryString(
@@ -62,7 +64,7 @@
 		{#if entry[modelColumn]}
 			<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
 		{/if}
-		{#if entry['label']}
+		{#if entry[labelColumn]}
 			<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
 				<span class="font-medium">Expected:</span>
 				<span>

@@ -14,6 +14,7 @@ export type { Body_upload_system } from './models/Body_upload_system';
 export type { Chart } from './models/Chart';
 export type { ChartResponse } from './models/ChartResponse';
 export { ChartType } from './models/ChartType';
+export type { DatasetSchema } from './models/DatasetSchema';
 export type { FilterPredicate } from './models/FilterPredicate';
 export type { FilterPredicateGroup } from './models/FilterPredicateGroup';
 export type { Folder } from './models/Folder';

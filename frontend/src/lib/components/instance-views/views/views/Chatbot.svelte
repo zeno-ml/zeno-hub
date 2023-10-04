@@ -6,9 +6,11 @@
 
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
+	export let dataColumn: string;
+	export let labelColumn: string;
 
 	$: fetchJSON = (async () => {
-		const response = await resolveDataPoint(entry);
+		const response = await resolveDataPoint(entry[dataColumn]);
 		const resp = await (response as Response).json();
 		return resp;
 	})();
@@ -23,8 +25,8 @@
 		{#if entry[modelColumn]}
 			<AssistantBlock input={modelContent} output={true} />
 		{/if}
-		{#if entry['label']}
-			<p class="m-2"><span class="mr-1 font-bold">expected:</span> {entry['label']}</p>
+		{#if entry[labelColumn]}
+			<p class="m-2"><span class="mr-1 font-bold">expected:</span> {entry[labelColumn]}</p>
 		{/if}
 	</div>
 {/await}

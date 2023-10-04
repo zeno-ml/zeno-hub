@@ -27,13 +27,15 @@ class ZenoColumnType(str, Enum):
     """Enumeration of possible column types in Zeno.
 
     Attributes:
-        DATA: input data instance. Either raw data or filename.
+        ID: unique identifier.
+        DATA: raw input data instance.
         LABEL: ground truth label.
         OUTPUT: model output.
-        FEATURE: metadata feature for an input data instance.
+        FEATURE: metadata feature for data instance.
         EMBEDDING: vector embedding representing a data instance or output.
     """
 
+    ID = "ID"
     DATA = "DATA"
     LABEL = "LABEL"
     OUTPUT = "OUTPUT"

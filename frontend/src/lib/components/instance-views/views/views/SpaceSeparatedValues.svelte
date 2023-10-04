@@ -4,16 +4,18 @@
 
 	export let entry: Record<string, number | string | boolean | { role: string; content: string }[]>;
 	export let modelColumn: string;
+	export let dataColumn: string;
+	export let labelColumn: string;
 
 	// Split each column by newlines then spaces.
 	$: fetchData = (async () => {
-		let response = await resolveDataPoint(entry);
+		let response = await resolveDataPoint(entry[dataColumn]);
 		if (response instanceof Response) {
 			response = await response.text();
 		}
 		return response.split('\n').map((x) => x.split(' '));
 	})();
-	$: labelEntries = (entry['label'] + '').split('\n').map((x) => x.split(' '));
+	$: labelEntries = (entry[labelColumn] + '').split('\n').map((x) => x.split(' '));
 	$: modelEntries = (entry[modelColumn] + '').split('\n').map((x) => x.split(' '));
 </script>
 
