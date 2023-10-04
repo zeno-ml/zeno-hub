@@ -10,6 +10,13 @@
 		data.user === null ? [] : data.projects.filter((proj) => proj.ownerName !== data.user?.name);
 </script>
 
+{#if ownProjects.length === 0}
+	<Banner>
+		Welcome to <a class="text-primary" href="https://zenoml.com">Zeno</a>! You don't have any
+		projects yet. Create one with the
+		<a class="text-primary" href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a>
+	</Banner>
+{/if}
 <div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
 	{#each ownProjects as project}
 		<Project {project} deletable />
@@ -18,10 +25,3 @@
 		<Project {project} />
 	{/each}
 </div>
-{#if ownProjects.length === 0}
-	<Banner>
-		Welcome to <a class="text-primary" href="https://zenoml.com">Zeno</a>! You don't have any
-		projects yet. Create one with the
-		<a class="text-primary" href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a>
-	</Banner>
-{/if}
