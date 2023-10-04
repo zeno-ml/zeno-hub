@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { ZenoService, type Project, type User } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
@@ -35,6 +36,7 @@
 			copySlices: copySlices,
 			copySystems: copySystems
 		}).then(() => {
+			invalidate('app:projects');
 			step = 2;
 		});
 	}
