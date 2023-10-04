@@ -86,9 +86,9 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
             # Copy data schema.
             db.execute(
                 sql.SQL(
-                    "INSERT INTO {} (column_id, name, type, data_type) (SELECT "
-                    "column_id, name, type, data_type, histogram FROM {} WHERE "
-                    "model is NULL);"
+                    "INSERT INTO {} (column_id, name, type, data_type, histogram) "
+                    "(SELECT column_id, name, type, data_type, histogram FROM {} "
+                    "WHERE model is NULL); "
                 ).format(
                     sql.Identifier(f"{new_uuid}_column_map"),
                     sql.Identifier(f"{project_uuid}_column_map"),
@@ -100,8 +100,8 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         # Copy data and systems schema.
         db.execute(
             sql.SQL(
-                "INSERT INTO {} (column_id, name, type, model, data_type) (SELECT "
-                "column_id, name, type, model, data_type, histogram FROM {});"
+                "INSERT INTO {} (column_id, name, type, model, data_type, histogram) "
+                "(SELECT column_id, name, type, model, data_type, histogram FROM {});"
             ).format(
                 sql.Identifier(f"{new_uuid}_column_map"),
                 sql.Identifier(f"{project_uuid}_column_map"),
