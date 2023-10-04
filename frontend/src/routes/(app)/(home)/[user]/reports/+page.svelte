@@ -21,6 +21,11 @@
 		reports={ownReports}
 	/>
 {/if}
+{#if ownReports.length === 0}
+	<Banner>
+		You haven't created any reports yet. Use reports to tell stories about your AI systems.
+	</Banner>
+{/if}
 <div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
 	{#each ownReports as report}
 		<Report {report} deletable />
@@ -29,8 +34,3 @@
 		<Report {report} />
 	{/each}
 </div>
-{#if ownReports.length === 0}
-	<Banner>
-		You haven't created any reports yet. Use reports to tell stories about your AI systems.
-	</Banner>
-{/if}

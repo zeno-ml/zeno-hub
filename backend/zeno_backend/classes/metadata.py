@@ -23,24 +23,11 @@ class HistogramBucket(CamelModel):
     metric: float | None = None
 
 
-class HistogramColumnRequest(CamelModel):
-    """Specification of a histogram column request in Zeno.
-
-    Attributes:
-        column (ZenoColumn): the column to be used for the histogram.
-        buckets (list[HistogramBucket]): the buckets to be used for the histogram.
-    """
-
-    column: ZenoColumn
-    buckets: list[HistogramBucket]
-
-
 class HistogramRequest(CamelModel):
     """Specification of a histogram request in Zeno.
 
     Attributes:
-        column_requests (list[HistogramColumnRequest]): the column requests to be used
-            for the histogram.
+        columns (list[ZenoColumn]): the columns to calculate histograms for.
         filter_predicates (FilterPredicateGroup | None): the filter predicates to be
             applied to the data.
         model (str | None): the model to be used for the histogram.
@@ -48,7 +35,7 @@ class HistogramRequest(CamelModel):
         data_ids (list[str] | None): the data ids to be used for the histogram.
     """
 
-    column_requests: list[HistogramColumnRequest]
+    columns: list[ZenoColumn]
     filter_predicates: FilterPredicateGroup | None = None
     model: str | None = None
     metric: Metric | None = None

@@ -67,12 +67,18 @@
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
 		<h2 class="text-xl mb-4">Project Administration</h2>
+		<!--Project Settings-->
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex flex-col">
 			<div class="flex mb-6">
-				<div class="flex flex-col mr-8">
+				<div class="flex flex-col mr-8 w-1/2">
 					<div>
-						<Textfield bind:value={config.name} label="Name" bind:this={input} />
+						<Textfield
+							bind:value={config.name}
+							label="Name"
+							bind:this={input}
+							style="width: 100%;"
+						/>
 					</div>
 					<div>
 						<Textfield
@@ -80,6 +86,7 @@
 							label="Number of displayed items"
 							bind:this={input}
 							type="number"
+							style="width: 100%;"
 						/>
 					</div>
 				</div>
@@ -96,17 +103,20 @@
 						<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
 						<span>Public visibility</span>
 					</div>
-					<Textfield
-						textarea
-						bind:value={config.description}
-						label="Description"
-						style="width: 100%"
-					/>
 				</div>
 			</div>
+			<div>
+				<Textfield
+					textarea
+					bind:value={config.description}
+					label="Description"
+					style="width: 100%"
+				/>
+			</div>
+			<!--Visibility Settings-->
 			{#if !config.public && userRequest}
 				{#await userRequest then currentUsers}
-					<div class="mb-5 flex flex-col" transition:fade>
+					<div class="mb-5 flex flex-col mt-12" transition:fade>
 						<h3 class="text-lg mb-2">Viewers</h3>
 						{#if currentUsers.length > 0}
 							<table>
@@ -185,72 +195,78 @@
 			{/if}
 			{#if !config.public && organizationRequest}
 				{#await organizationRequest then currentOrgs}
-					<div class="mb-5 flex flex-col" transition:fade>
-						<h3 class="text-lg mb-2">Organizations</h3>
-						{#if currentOrgs.length > 0}
-							<table>
-								<thead>
-									<th>Name</th>
-									<th class="w-1">Admin</th>
-									<th class="w-1" />
-								</thead>
-								<tbody>
-									{#each currentOrgs.sort((a, b) => {
-										if (a.admin && !b.admin) return -1;
-										else if (!a.admin && b.admin) return 1;
-										return a.name && b.name ? a.name.localeCompare(b.name) : 0;
-									}) as org}
-										<tr>
-											<td>
-												{org.name}
-											</td>
-											<td>
-												<Checkbox
-													checked={org.admin}
-													on:click={() =>
-														ZenoService.updateProjectOrg($project.uuid, {
-															...org,
-															admin: !org.admin
-														}).then(
-															() =>
-																(organizationRequest = ZenoService.getProjectOrgs($project.uuid))
-														)}
-												/>
-											</td>
-											<td style="text-align: end;">
-												<IconButton
-													on:click={() =>
-														ZenoService.deleteProjectOrg($project.uuid, org).then(
-															() =>
-																(organizationRequest = ZenoService.getProjectOrgs($project.uuid))
-														)}
-												>
-													<Icon tag="svg" viewBox="0 0 24 24">
-														<path fill="black" d={mdiClose} />
-													</Icon>
-												</IconButton>
-											</td>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
+					{#await ZenoService.getOrganizationNames() then oragnizationNames}
+						{@const availableOrgs = oragnizationNames.filter(
+							(currentOrg) => !currentOrgs.some((org) => org.id === currentOrg.id)
+						)}
+						{#if availableOrgs.length > 0 || currentOrgs.length > 0}
+							<div class="mb-5 flex flex-col" transition:fade>
+								<h3 class="text-lg mb-2">Organizations</h3>
+								{#if currentOrgs.length > 0}
+									<table>
+										<thead>
+											<th>Name</th>
+											<th class="w-1">Admin</th>
+											<th class="w-1" />
+										</thead>
+										<tbody>
+											{#each currentOrgs.sort((a, b) => {
+												if (a.admin && !b.admin) return -1;
+												else if (!a.admin && b.admin) return 1;
+												return a.name && b.name ? a.name.localeCompare(b.name) : 0;
+											}) as org}
+												<tr>
+													<td>
+														{org.name}
+													</td>
+													<td>
+														<Checkbox
+															checked={org.admin}
+															on:click={() =>
+																ZenoService.updateProjectOrg($project.uuid, {
+																	...org,
+																	admin: !org.admin
+																}).then(
+																	() =>
+																		(organizationRequest = ZenoService.getProjectOrgs(
+																			$project.uuid
+																		))
+																)}
+														/>
+													</td>
+													<td style="text-align: end;">
+														<IconButton
+															on:click={() =>
+																ZenoService.deleteProjectOrg($project.uuid, org).then(
+																	() =>
+																		(organizationRequest = ZenoService.getProjectOrgs(
+																			$project.uuid
+																		))
+																)}
+														>
+															<Icon tag="svg" viewBox="0 0 24 24">
+																<path fill="black" d={mdiClose} />
+															</Icon>
+														</IconButton>
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								{/if}
+								{#if availableOrgs.length > 0}
+									<Svelecte
+										style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
+										bind:value={selectedOrg}
+										on:change={addOrganization}
+										options={availableOrgs}
+										placeholder="add organization access"
+										searchable={true}
+									/>
+								{/if}
+							</div>
 						{/if}
-						{#await ZenoService.getOrganizationNames() then oragnizationNames}
-							{@const availableOrgs = oragnizationNames.filter(
-								(currentOrg) => !currentOrgs.some((org) => org.id === currentOrg.id)
-							)}
-							{#if availableOrgs.length > 0}
-								<Svelecte
-									style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
-									bind:value={selectedOrg}
-									on:change={addOrganization}
-									options={availableOrgs}
-									placeholder="add organization access"
-									searchable={true}
-								/>
-							{/if}
-						{/await}
-					</div>
+					{/await}
 				{/await}
 			{/if}
 			<div class="flex items-center self-end">
