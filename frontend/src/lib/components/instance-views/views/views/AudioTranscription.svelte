@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { resolveDataPoint } from '$lib/util/util';
-	import CircularProgress from '@smui/circular-progress';
-
 	export let entry: Record<string, number | string | boolean>;
 	export let modelColumn: string;
 	export let dataColumn: string;
@@ -9,14 +6,12 @@
 </script>
 
 <div class="p-4 border border-grey-lighter max-w-[450px] min-w-[400px] rounded">
-	{#await resolveDataPoint(entry[dataColumn])}
-		<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
-	{:then audioResponse}
-		{@const audioURL = audioResponse.toString()}
-		<audio controls src={audioURL}>
-			<source src={audioURL} type={'audio/' + audioURL.split('.').at(-1)} />
-		</audio>
-	{/await}
+	<audio controls src={`${entry[dataColumn]}`}>
+		<source
+			src={`${entry[dataColumn]}`}
+			type={'audio/' + `${entry[dataColumn]}`.split('.').at(-1)}
+		/>
+	</audio>
 	<div />
 	<p class="mt-3 text-grey">
 		<span class="font-semibold">label: </span>
