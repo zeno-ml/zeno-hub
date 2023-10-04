@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: Assign PR to creator
         uses: thomaseizinger/assign-pr-creator-action@v1.0.0
-        if: github.event_name == 'pull_request' && github.event.action == 'opened' && github.actor != 'dependabot[bot]'
+        if: github.actor != 'dependabot[bot]'
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
