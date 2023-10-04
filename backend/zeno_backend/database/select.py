@@ -1177,7 +1177,7 @@ async def histogram_buckets(
 
     Args:
         project_uuid (str): the project the user is currently working with.
-        columns (ZenoColumn): the column to get histogram buckets for.
+        columns (list[ZenoColumn]): the column to get histogram buckets for.
 
     Returns:
         dict[str, list[HistogramBucket]]: the histogram buckets for the given columns.
@@ -1348,15 +1348,15 @@ def column_id_from_name_and_model(
     if model is None:
         column_result = db.connect_execute_return(
             sql.SQL(
-                "SELECT column_id FROM {} " "WHERE name = %s AND model IS NULL;"
+                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
             ).format(sql.Identifier(f"{project}_column_map")),
             [column_name],
         )
     else:
         column_result = db.connect_execute_return(
-            sql.SQL(
-                "SELECT column_id FROM {} " "WHERE name = %s AND model = %s;"
-            ).format(sql.Identifier(f"{project}_column_map")),
+            sql.SQL("SELECT column_id FROM {} WHERE name = %s AND model = %s;").format(
+                sql.Identifier(f"{project}_column_map")
+            ),
             [column_name, model],
         )
 
