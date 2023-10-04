@@ -1,8 +1,6 @@
 <script lang="ts">
 	import Markdown from '$lib/components/general/Markdown.svelte';
-	import { resolveDataPoint } from '$lib/util/util';
 	import { mdiChevronUp } from '@mdi/js';
-	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import purify from 'isomorphic-dompurify';
 	import { parse } from 'marked';
 	import AssistantBlock from './openai-chat-markdown/AssistantBlock.svelte';
@@ -14,15 +12,12 @@
 	export let dataColumn: string;
 	export let labelColumn: string;
 
-	let showall = false;
 	let renderedLabel = '';
+	const data = JSON.parse(entry[dataColumn] as string);
+	let showAll = data.length <= 5;
 
-	$: fetchJSON = (async () => {
-		const response = await resolveDataPoint(entry[dataColumn]);
-		const jsonResponse = JSON.parse(response as string);
-		showall = jsonResponse.length <= 5;
-		return jsonResponse;
-	})();
+	$: shownData = showAll ? data : data.slice(-4);
+
 	$: if (entry[labelColumn]) {
 		renderedLabel = purify.sanitize(parse(entry[labelColumn] as string));
 	}
@@ -34,24 +29,21 @@
 	}
 </script>
 
-{#await fetchJSON}
-	<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
-{:then data}
-	{@const entries = showall ? data : data.slice(-4)}
-	<div class="flex flex-col border border-grey-light rounded p-2.5 m-1 max-w-4xl">
-		{#if !showall}
-			<button
-				class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
-				on:click={() => (showall = true)}
-			>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
-					<path d={mdiChevronUp} />
-				</svg>
-				<span class="pr-1">Show All</span>
-			</button>
-		{/if}
-		{#if data}
-			{#each entries as item}
+<div class="flex flex-col border border-grey-light rounded p-2.5 m-1 max-w-4xl">
+	{#if !showAll}
+		<button
+			class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
+			on:click={() => (showAll = true)}
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
+				<path d={mdiChevronUp} />
+			</svg>
+			<span class="pr-1">Show All</span>
+		</button>
+	{/if}
+	{#if shownData}
+		{#key shownData}
+			{#each shownData as item}
 				{#if item['role'] === 'system'}
 					<SystemBlock input={item['content']} />
 				{:else if item['role'] === 'assistant'}
@@ -60,17 +52,17 @@
 					<UserBlock input={item['content']} />
 				{/if}
 			{/each}
-		{/if}
-		{#if entry[modelColumn]}
-			<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
-		{/if}
-		{#if entry[labelColumn]}
-			<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
-				<span class="font-medium">Expected:</span>
-				<span>
-					<Markdown renderedText={renderedLabel} />
-				</span>
-			</div>
-		{/if}
-	</div>
-{/await}
+		{/key}
+	{/if}
+	{#if entry[modelColumn]}
+		<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
+	{/if}
+	{#if entry[labelColumn]}
+		<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
+			<span class="font-medium">Expected:</span>
+			<span>
+				<Markdown renderedText={renderedLabel} />
+			</span>
+		</div>
+	{/if}
+</div>
