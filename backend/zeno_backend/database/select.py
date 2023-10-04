@@ -1281,25 +1281,35 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
         )
 
 
-def column_id_from_name_and_model(project: str, column_name: str, model: str) -> str:
+def column_id_from_name_and_model(
+    project: str, column_name: str, model: str | None
+) -> str:
     """Get a column's id given its name and model.
 
     Args:
         project (str): the project the user is currently working with.
         column_name (str): the name of the column to be fetched.
-        model (str): the model of the column to be fetched.
+        model (str | None): the model of the column to be fetched.
 
     Returns:
         str: column id retreived by name and model.
     """
     db = Database()
-    column_result = db.connect_execute_return(
-        sql.SQL(
-            "SELECT column_id FROM {} "
-            "WHERE name = %s AND (model = %s OR model IS NULL);"
-        ).format(sql.Identifier(f"{project}_column_map")),
-        [column_name, model],
-    )
+    if model is None:
+        column_result = db.connect_execute_return(
+            sql.SQL(
+                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
+            ).format(sql.Identifier(f"{project}_column_map")),
+            [column_name],
+        )
+    else:
+        column_result = db.connect_execute_return(
+            sql.SQL(
+                "SELECT column_id FROM {} " "WHERE name = %s AND model = %s;"
+            ).format(sql.Identifier(f"{project}_column_map")),
+            [column_name, model],
+        )
+
     return str(column_result[0][0]) if len(column_result) > 0 else ""
 
 

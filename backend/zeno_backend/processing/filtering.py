@@ -43,11 +43,12 @@ def filter_to_sql(
                 val = f.value
                 if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
                     val = "%" + str(val) + "%"
-            column_id = (
-                f.column.id
-                if f.column.model is None or model is None
-                else column_id_from_name_and_model(project, f.column.name, model)
-            )
+
+            if f.column.model is None:
+                column_id = column_id_from_name_and_model(project, f.column.name, None)
+            else:
+                column_id = column_id_from_name_and_model(project, f.column.name, model)
+
             filt = (
                 filt
                 + sql.SQL(f.join.value)
