@@ -1339,7 +1339,7 @@ def column_id_from_name_and_model(
     Args:
         project (str): the project the user is currently working with.
         column_name (str): the name of the column to be fetched.
-        model (str, optional): the model of the column to be fetched. Defaults to "".
+        model (str | None): the model of the column to be fetched.
 
     Returns:
         str: column id retreived by name and model.
