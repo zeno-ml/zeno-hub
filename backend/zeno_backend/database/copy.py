@@ -74,7 +74,7 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
             sql.SQL(
                 "CREATE TABLE {}(column_id TEXT NOT NULL PRIMARY KEY, "
                 "name TEXT NOT NULL, type TEXT NOT NULL, model TEXT, "
-                "data_type TEXT NOT NULL);"
+                "data_type TEXT NOT NULL, histogram jsonb);"
             ).format(sql.Identifier(f"{new_uuid}_column_map"))
         )
 
@@ -87,7 +87,8 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
             db.execute(
                 sql.SQL(
                     "INSERT INTO {} (column_id, name, type, data_type) (SELECT "
-                    "column_id, name, type, data_type FROM {} WHERE model is NULL);"
+                    "column_id, name, type, data_type, histogram FROM {} WHERE "
+                    "model is NULL);"
                 ).format(
                     sql.Identifier(f"{new_uuid}_column_map"),
                     sql.Identifier(f"{project_uuid}_column_map"),
@@ -100,7 +101,7 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         db.execute(
             sql.SQL(
                 "INSERT INTO {} (column_id, name, type, model, data_type) (SELECT "
-                "column_id, name, type, model, data_type FROM {});"
+                "column_id, name, type, model, data_type, histogram FROM {});"
             ).format(
                 sql.Identifier(f"{new_uuid}_column_map"),
                 sql.Identifier(f"{project_uuid}_column_map"),
