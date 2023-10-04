@@ -20,16 +20,18 @@ def project(project: str):
     """
     with Database() as db:
         # Drop the primary table with project data.
-        db.execute(sql.SQL("DROP TABLE {} CASCADE;").format(sql.Identifier(project)))
+        db.execute(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(sql.Identifier(project))
+        )
         # Drop the table with column properties.
         db.execute(
-            sql.SQL("DROP TABLE {} CASCADE;").format(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{project}_column_map")
             )
         )
         # Drop the table with tag data.
         db.execute(
-            sql.SQL("DROP TABLE {} CASCADE;").format(
+            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
                 sql.Identifier(f"{project}_tags_datapoints")
             )
         )

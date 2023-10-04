@@ -72,3 +72,23 @@ class ProjectState(CamelModel):
     slices: list[Slice]
     tags: list[Tag]
     folders: list[Folder]
+
+
+class ProjectCopy(CamelModel):
+    """Specification for copying a Zeno project.
+
+    Attributes:
+        name (str): name of the new project.
+        data_url (str|None): base URL from which to read data instances.
+        copy_data (bool): whether to copy the data instances.
+        copy_systems (bool): whether to copy the systems.
+        copy_slices (bool): whether to copy the slices.
+        copy_charts (bool): whether to copy the charts.
+    """
+
+    name: str
+    data_url: str | None
+    copy_data: bool
+    copy_systems: bool
+    copy_slices: bool
+    copy_charts: bool

@@ -6,6 +6,6 @@
 
 <div class="flex flex-wrap items-start mb-6 overflow-y-scroll h-full">
 	{#each data.publicProjects as project}
-		<Project {project} />
+		<Project {project} user={data.user} />
 	{/each}
 </div>
