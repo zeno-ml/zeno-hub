@@ -1289,7 +1289,7 @@ def column_id_from_name_and_model(
     Args:
         project (str): the project the user is currently working with.
         column_name (str): the name of the column to be fetched.
-        model (str, optional): the model of the column to be fetched. Defaults to "".
+        model (str | None): the model of the column to be fetched.
 
     Returns:
         str: column id retreived by name and model.
@@ -1298,7 +1298,7 @@ def column_id_from_name_and_model(
     if model is None:
         column_result = db.connect_execute_return(
             sql.SQL(
-                "SELECT column_id FROM {} " "WHERE name = %s AND model IS NULL;"
+                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
             ).format(sql.Identifier(f"{project}_column_map")),
             [column_name],
         )
