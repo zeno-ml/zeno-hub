@@ -4,15 +4,14 @@
 /* eslint-disable */
 
 import type { FilterPredicateGroup } from './FilterPredicateGroup';
-import type { HistogramColumnRequest } from './HistogramColumnRequest';
 import type { Metric } from './Metric';
+import type { ZenoColumn } from './ZenoColumn';
 
 /**
  * Specification of a histogram request in Zeno.
  *
  * Attributes:
- * column_requests (list[HistogramColumnRequest]): the column requests to be used
- * for the histogram.
+ * columns (list[ZenoColumn]): the columns to calculate histograms for.
  * filter_predicates (FilterPredicateGroup | None): the filter predicates to be
  * applied to the data.
  * model (str | None): the model to be used for the histogram.
@@ -20,7 +19,7 @@ import type { Metric } from './Metric';
  * data_ids (list[str] | None): the data ids to be used for the histogram.
  */
 export type HistogramRequest = {
-	columnRequests: Array<HistogramColumnRequest>;
+	columns: Array<ZenoColumn>;
 	filterPredicates?: FilterPredicateGroup | null;
 	model?: string | null;
 	metric?: Metric | null;

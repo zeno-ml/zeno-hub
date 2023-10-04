@@ -1,4 +1,5 @@
 """Functions to select data from the database."""
+import asyncio
 import json
 
 from psycopg import sql
@@ -7,7 +8,7 @@ from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.metadata import StringFilterRequest
+from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import (
@@ -21,8 +22,9 @@ from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.table import TableRequest
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import Database
+from zeno_backend.database.database import Database, db_pool
 from zeno_backend.database.util import hash_api_key
+from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
 
 
 def models(project: str) -> list[str]:
@@ -1166,6 +1168,54 @@ def columns(project: str) -> list[ZenoColumn]:
             column_results,
         )
     )
+
+
+async def histogram_buckets(
+    project_uuid: str, columns: list[ZenoColumn]
+) -> dict[str, list[HistogramBucket]]:
+    """Get the histogram buckets for a column or create if they don't exist.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        columns (ZenoColumn): the column to get histogram buckets for.
+
+    Returns:
+        dict[str, list[HistogramBucket]]: the histogram buckets for the given columns.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT column_id, histogram FROM {} WHERE "
+                    + "column_id IN ({}) ORDER BY name;"
+                ).format(
+                    sql.Identifier(f"{project_uuid}_column_map"),
+                    sql.SQL(",").join(map(sql.Literal, [c.id for c in columns])),
+                )
+            )
+
+            histograms = await cur.fetchall()
+            if None in [h[1] for h in histograms]:
+                histograms = await asyncio.gather(
+                    *[calculate_histogram_bucket(project_uuid, col) for col in columns]
+                )
+                histograms = {col.id: histograms[i] for i, col in enumerate(columns)}
+                for col_id, hist in histograms.items():
+                    await cur.execute(
+                        sql.SQL(
+                            "UPDATE {} SET histogram = %s WHERE column_id = %s"
+                        ).format(sql.Identifier(f"{project_uuid}_column_map")),
+                        (
+                            json.dumps([h.model_dump(mode="json") for h in hist]),
+                            col_id,
+                        ),
+                    )
+                return histograms
+            else:
+                return {
+                    hist[0]: [HistogramBucket.model_validate(b) for b in hist[1]]
+                    for hist in histograms
+                }
 
 
 def table_data_paginated(

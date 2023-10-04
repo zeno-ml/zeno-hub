@@ -7,13 +7,14 @@ from psycopg import sql
 from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.metadata import (
     HistogramBucket,
-    HistogramColumnRequest,
     HistogramRequest,
 )
 from zeno_backend.database.database import db_pool
 
 
-async def histogram_bucket(project_uuid: str, col: ZenoColumn):
+async def calculate_histogram_bucket(
+    project_uuid: str, col: ZenoColumn
+) -> list[HistogramBucket]:
     """Calculate the histogram buckets for a single column.
 
     Args:
@@ -103,7 +104,8 @@ async def histogram_bucket(project_uuid: str, col: ZenoColumn):
 
 async def histogram_metric_and_count(
     request: HistogramRequest,
-    col_request: HistogramColumnRequest,
+    col: ZenoColumn,
+    buckets: list[HistogramBucket] | None,
     project_uuid: str,
     filter_sql: sql.Composed | None,
     calculate_histograms: bool,
@@ -112,7 +114,8 @@ async def histogram_metric_and_count(
 
     Args:
         request (HistogramRequest): the request object.
-        col_request (HistogramColumnRequest): the column request object.
+        col (ZenoColumn): the column request object.
+        buckets (list[HistogramBucket]): the buckets to calculate the metric for.
         project_uuid (str): the project the user is currently working with.
         filter_sql (sql.Composed): the filter to apply to the query.
         calculate_histograms (bool): whether to calculate the metric.
@@ -120,8 +123,6 @@ async def histogram_metric_and_count(
     Returns:
         HistogramBucket: the bucket with the metric added.
     """
-    col = col_request.column
-
     if (
         request.metric is not None
         and request.model is not None
@@ -131,10 +132,10 @@ async def histogram_metric_and_count(
     else:
         calculate_histograms = False
 
+    if buckets is None or len(buckets) == 0:
+        return []
     async with db_pool.connection() as conn:
         async with conn.cursor() as db:
-            if len(col_request.buckets) == 0:
-                return []
             await db.execute(
                 sql.SQL(
                     "SELECT column_id FROM {} "
@@ -197,7 +198,7 @@ async def histogram_metric_and_count(
                             if b.bucket in results_map
                             else 0,
                         )
-                        for b in col_request.buckets
+                        for b in buckets
                     ]
                 else:
                     results_map = {r[0]: r[1] for r in db_res}
@@ -208,12 +209,12 @@ async def histogram_metric_and_count(
                             if b.bucket in results_map
                             else 0,
                         )
-                        for b in col_request.buckets
+                        for b in buckets
                     ]
 
             elif col.data_type == MetadataType.CONTINUOUS:
                 case_statement = sql.SQL("CASE ")
-                for i, b in enumerate(col_request.buckets):
+                for i, b in enumerate(buckets):
                     case_statement += sql.SQL(
                         "WHEN {} >= {} AND {} < {} THEN {} "
                     ).format(
@@ -256,7 +257,7 @@ async def histogram_metric_and_count(
                             size=results_map[i][0] if i in results_map else 0,
                             metric=results_map[i][1] if i in results_map else 0,
                         )
-                        for i, b in enumerate(col_request.buckets)
+                        for i, b in enumerate(buckets)
                     ]
                 else:
                     results_map = {int(r[0]): r[1] for r in db_res if r[0] is not None}
@@ -266,7 +267,7 @@ async def histogram_metric_and_count(
                             bucket_end=b.bucket_end,
                             size=results_map[i] if i in results_map else 0,
                         )
-                        for i, b in enumerate(col_request.buckets)
+                        for i, b in enumerate(buckets)
                     ]
 
             elif col.data_type == MetadataType.BOOLEAN:
