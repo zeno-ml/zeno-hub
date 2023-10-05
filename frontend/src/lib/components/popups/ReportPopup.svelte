@@ -92,7 +92,7 @@
 				style="width: 100%"
 			/>
 		</div>
-		{#if !reportConfig.public && userRequest}
+		{#if userRequest}
 			{#await userRequest then currentUsers}
 				<div class="mb-5 flex flex-col" transition:fade>
 					<h3 class="text-lg mb-2">Viewers</h3>
@@ -169,7 +169,7 @@
 				</div>
 			{/await}
 		{/if}
-		{#if !reportConfig.public && organizationRequest}
+		{#if organizationRequest}
 			{#await organizationRequest then currentOrgs}
 				<div class="mb-5 flex flex-col" transition:fade>
 					<h3 class="text-lg mb-2">Organizations</h3>

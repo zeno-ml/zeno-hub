@@ -114,7 +114,7 @@
 				/>
 			</div>
 			<!--Visibility Settings-->
-			{#if !config.public && userRequest}
+			{#if userRequest}
 				{#await userRequest then currentUsers}
 					<div class="mb-5 flex flex-col mt-12" transition:fade>
 						<h3 class="text-lg mb-2">Viewers</h3>
@@ -193,7 +193,7 @@
 					</div>
 				{/await}
 			{/if}
-			{#if !config.public && organizationRequest}
+			{#if organizationRequest}
 				{#await organizationRequest then currentOrgs}
 					{#await ZenoService.getOrganizationNames() then oragnizationNames}
 						{@const availableOrgs = oragnizationNames.filter(
