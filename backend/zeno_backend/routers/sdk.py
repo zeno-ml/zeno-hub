@@ -1,5 +1,6 @@
 """FastAPI server endpoints for the Zeno SDK."""
 import uuid
+from typing import Optional
 
 import pyarrow as pa
 from amplitude import BaseEvent
@@ -162,7 +163,7 @@ async def upload_dataset_schema(
     project_uuid=Form(...),
     id_column=Form(...),
     data_column=Form(...),
-    label_column=Form(...),
+    label_column=Optional[Form(...)],
     file: UploadFile = File(...),
     api_key=Depends(APIKeyBearer()),
 ):
