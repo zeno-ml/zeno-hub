@@ -17,7 +17,7 @@
 		<a class="text-primary" href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a>
 	</Banner>
 {/if}
-<div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
+<div class="flex flex-wrap mb-6 overflow-y-scroll h-full content-start">
 	{#each ownProjects as project}
 		<Project {project} deletable user={data.user} />
 	{/each}

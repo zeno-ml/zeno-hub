@@ -16,13 +16,16 @@
 			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
 				<a
 					href={'/' + data.cognitoUser.name + '/projects'}
-					class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary`}
+					class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
 				>
 					My Hub
 				</a>
 			</Tooltip>
 			<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
-				<a href="/projects" class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary`}>
+				<a
+					href="/projects"
+					class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+				>
 					Discover
 				</a>
 			</Tooltip>

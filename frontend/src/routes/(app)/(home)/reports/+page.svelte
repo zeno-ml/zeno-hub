@@ -4,7 +4,7 @@
 	export let data;
 </script>
 
-<div class="flex flex-wrap justify-start mb-6 overflow-y-scroll h-full">
+<div class="flex flex-wrap mb-6 overflow-y-scroll h-full content-start">
 	{#each data.publicReports as report}
 		<Report {report} />
 	{/each}

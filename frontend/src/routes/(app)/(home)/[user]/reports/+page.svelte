@@ -26,7 +26,7 @@
 		You haven't created any reports yet. Use reports to tell stories about your AI systems.
 	</Banner>
 {/if}
-<div class="flex flex-wrap mb-6 overflow-y-scroll h-full">
+<div class="flex flex-wrap mb-6 overflow-y-scroll h-full content-start">
 	{#each ownReports as report}
 		<Report {report} deletable />
 	{/each}
