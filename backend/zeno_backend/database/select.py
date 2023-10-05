@@ -428,9 +428,8 @@ def user_by_api_key(api_key: str) -> User | None:
     )
     if len(user_res) > 0:
         return User(
-            id=int(user_res[0][0]),
-            name=str(user_res[0][1]),
-            cognito_id=user_res[0][2]) 
+            id=int(user_res[0][0]), name=str(user_res[0][1]), cognito_id=user_res[0][2]
+        )
     return None
 
 
