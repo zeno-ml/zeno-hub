@@ -11,7 +11,7 @@
 	let view = $page.route.id?.split('/').reverse()[0];
 </script>
 
-<div class="flex ml-2 items-center h-10">
+<div class="flex ml-2 mb-4 items-center h-10">
 	<Tooltip
 		content={'Projects are datasets and system outputs for evaluation'}
 		theme={'zeno-tooltip'}
@@ -19,8 +19,8 @@
 	>
 		<a
 			href={user ? '/' + user + '/projects' : '/projects'}
-			class="text-xl mr-6 text-black hover:text-primary
-        {view === 'projects' ? '' : 'text-grey-dark'}"
+			class="text-xl mr-6 text-black hover:text-primary p-2 rounded
+        {view === 'projects' ? 'bg-grey-lighter' : 'text-grey-dark'}"
 		>
 			Projects
 		</a>
@@ -32,8 +32,8 @@
 	>
 		<a
 			href={user ? '/' + user + '/reports' : '/reports'}
-			class="text-xl mr-4 hover:text-primary
-        {view === 'reports' ? '' : 'text-grey-dark'}"
+			class="text-xl mr-6 text-black hover:text-primary p-2 rounded
+        {view === 'reports' ? 'bg-grey-lighter' : 'text-grey-dark'}"
 		>
 			Reports
 		</a>
@@ -47,4 +47,3 @@
 		</Button>
 	{/if}
 </div>
-<div class="w-full mb-4 mt-2 h-0.5 bg-grey-light rounded-full" />
