@@ -410,7 +410,7 @@ def api_key_exists(api_key: str) -> bool:
         raise Exception("Error while checking whether API key exists.")
 
 
-def user_id_by_api_key(api_key: str) -> int | None:
+def user_by_api_key(api_key: str) -> User | None:
     """Get the user ID given an API key.
 
     Args:
@@ -422,10 +422,16 @@ def user_id_by_api_key(api_key: str) -> int | None:
     """
     db = Database()
     api_key_hash = hash_api_key(api_key)
-    user_id = db.connect_execute_return(
-        "SELECT id FROM users WHERE api_key_hash = %s;", [api_key_hash]
+    user_res = db.connect_execute_return(
+        "SELECT id, name, cognito_id FROM users WHERE api_key_hash = %s;",
+        [api_key_hash],
     )
-    return int(user_id[0][0]) if len(user_id) > 0 else None
+    if len(user_res) > 0:
+        return User(
+            id=int(user_res[0][0]),
+            name=str(user_res[0][1]),
+            cognito_id=user_res[0][2]) 
+    return None
 
 
 def user_name_by_api_key(api_key: str) -> str | None:
@@ -1450,7 +1456,7 @@ def user(name: str) -> User | None:
     """
     db = Database()
     user = db.connect_execute_return(
-        "SELECT id, name FROM users WHERE name = %s", [name]
+        "SELECT id, name, cognito_id FROM users WHERE name = %s", [name]
     )
     if len(user) == 0:
         return None
@@ -1458,6 +1464,7 @@ def user(name: str) -> User | None:
     return User(
         id=user[0] if isinstance(user[0], int) else -1,
         name=str(user[1]),
+        cognito_id=user[2],
         admin=None,
     )
 
@@ -1469,10 +1476,10 @@ def users() -> list[User]:
         list[User]: all registered users.
     """
     db = Database()
-    users = db.connect_execute_return("SELECT id, name FROM users;")
+    users = db.connect_execute_return("SELECT id, name, cognito_id FROM users;")
     return list(
         map(
-            lambda user: User(id=user[0], name=user[1], admin=None),
+            lambda user: User(id=user[0], name=user[1], cognito_id=user[2], admin=None),
             users,
         )
     )
