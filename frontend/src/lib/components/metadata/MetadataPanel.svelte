@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { collapseHeader } from '$lib/stores';
+	import { collapseHeader, models } from '$lib/stores';
 	import Histograms from './Histograms.svelte';
 	import HistogramsHeader from './HistogramsHeader.svelte';
 	import MetadataHeader from './MetadataHeader.svelte';
@@ -14,7 +14,9 @@
 		? 'hide-sidebar'
 		: 'show-sidebar'}"
 >
-	<MetadataHeader />
+	{#if $models.length > 0}
+		<MetadataHeader />
+	{/if}
 	<Slices />
 	<Tags />
 	{#if !compare}
