@@ -110,8 +110,8 @@ def create_project(
         response (Response): response object.
         api_key (str, optional): API key.
     """
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
+    user = select.user_by_api_key(api_key)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(
@@ -119,8 +119,6 @@ def create_project(
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    owner_name = select.user_name_by_api_key(api_key)
-    project.owner_name = owner_name if owner_name is not None else ""
 
     if project.view not in VIEWS:
         raise HTTPException(
@@ -131,9 +129,8 @@ def create_project(
             ),
         )
 
-    user_name = select.user_name_by_api_key(api_key)
-    if select.project_exists(user_id, project.name) and user_name is not None:
-        project_uuid = select.project_uuid(user_name, project.name)
+    if user is not None and select.project_exists(user.id, project.name):
+        project_uuid = select.project_uuid(user.name, project.name)
         if project_uuid is not None:
             project.uuid = project_uuid
             update.project(project)
@@ -145,14 +142,14 @@ def create_project(
             )
     else:
         project.uuid = str(uuid.uuid4())
+        insert.project(project, user.id)
         AmplitudeHandler().track(
             BaseEvent(
                 event_type="Project Created",
-                user_id="00000" + str(user_id),
+                user_id=user.cognito_id,
                 event_properties={"project_uuid": project.uuid},
             )
         )
-        insert.project(project, user_id)
         response.status_code = status.HTTP_201_CREATED
     return project
 
@@ -176,8 +173,8 @@ async def upload_dataset_schema(
         file (DatasetSchema): the dataset schema to upload.
         api_key (str, optional): API key.
     """
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
+    user = select.user_by_api_key(api_key)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(
@@ -201,7 +198,7 @@ async def upload_dataset_schema(
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Dataset Uploaded",
-            user_id="00000" + str(user_id),
+            user_id=user.cognito_id,
             event_properties={"project_uuid": project_uuid},
         )
     )
@@ -222,8 +219,8 @@ async def upload_dataset(
         file (UploadFile): the dataset to upload. Serialized Arrow RecordBatch.
         api_key (str, optional): API key.
     """
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
+    user = select.user_by_api_key(api_key)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(
@@ -271,8 +268,8 @@ async def upload_system_schema(
         file (Schema): the system PyArrow schema to upload.
         api_key (str, optional): API key.
     """
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
+    user = select.user_by_api_key(api_key)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(
@@ -296,7 +293,7 @@ async def upload_system_schema(
     AmplitudeHandler().track(
         BaseEvent(
             event_type="System Uploaded",
-            user_id="00000" + str(user_id),
+            user_id=user.cognito_id,
             event_properties={"project_uuid": project_uuid},
         )
     )
@@ -319,8 +316,8 @@ async def upload_system(
         file (UploadFile): the system to upload. Serialized Arrow RecordBatch.
         api_key (str, optional): API key.
     """
-    user_id = select.user_id_by_api_key(api_key)
-    if user_id is None:
+    user = select.user_by_api_key(api_key)
+    if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=(

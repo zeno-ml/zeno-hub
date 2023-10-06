@@ -534,8 +534,8 @@ def user(user: User) -> int | None:
     """
     db = Database()
     id = db.connect_execute_return(
-        'INSERT INTO users ("name") values(%s) RETURNING id;',
-        [user.name],
+        'INSERT INTO users ("name", cognito_id) values(%s, %s) RETURNING id;',
+        [user.name, user.cognito_id],
     )
     if id is not None:
         return id[0][0]

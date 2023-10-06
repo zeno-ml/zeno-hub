@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 import uvicorn
+from amplitude import BaseEvent
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +19,7 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
+from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.base import (
     GroupMetric,
     ZenoColumn,
@@ -596,9 +598,11 @@ def get_server() -> FastAPI:
 
     ####################################################################### Insert
     @api_app.post(
-        "/login", response_model=User, tags=["zeno"], dependencies=[Depends(auth)]
+        "/login",
+        response_model=User,
+        tags=["zeno"],
     )
-    def login(name: str):
+    def login(name: str, current_user=Depends(auth.claim())):
         try:
             fetched_user = select.user(name)
         except Exception as exc:
@@ -608,17 +612,36 @@ def get_server() -> FastAPI:
             ) from exc
         if fetched_user is None:
             try:
-                user = User(id=-1, name=name, admin=None)
+                user = User(
+                    id=-1, name=name, admin=None, cognito_id=current_user["sub"]
+                )
                 insert.user(user)
                 insert.api_key(user)
+                AmplitudeHandler().track(
+                    BaseEvent(
+                        event_type="Signup",
+                        user_id=user.cognito_id,
+                    )
+                )
                 return select.user(name)
             except Exception as exc:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=str(exc),
                 ) from exc
-        else:
-            return fetched_user
+
+        if fetched_user.cognito_id is None:
+            try:
+                update.user(
+                    User(id=fetched_user.id, name=name, cognito_id=current_user["sub"])
+                )
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=str(exc),
+                ) from exc
+
+        return fetched_user
 
     @api_app.post(
         "/folder/{project}",
