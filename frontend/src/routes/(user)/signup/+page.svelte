@@ -51,10 +51,14 @@
 			label="Repeat password"
 			class="w-56 mb-3"
 		/>
+		<p class="w-64 text-center mt-2">
+			Password must be at least 8 characters long and have at least one number, one special
+			character, and one uppercase letter.
+		</p>
 		<div class="mt-4 flex items-center">
 			<Checkbox bind:checked={agreed} />
-			<span
-				>By signing up you agree to our <a
+			<span>
+				By signing up you agree to our <a
 					href="/tos"
 					target="_blank"
 					class="text-primary visited:text-primary hover:underline">Terms of Service</a
