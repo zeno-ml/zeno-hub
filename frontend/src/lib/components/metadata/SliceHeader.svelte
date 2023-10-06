@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { project, selectionIds, selectionPredicates, selections } from '$lib/stores';
+	import { models, project, selectionIds, selectionPredicates, selections } from '$lib/stores';
 	import {
 		mdiCreation,
 		mdiCreationOutline,
@@ -29,7 +29,11 @@
 {#if showNewFolder}
 	<FolderPopup on:close={() => (showNewFolder = false)} />
 {/if}
-<div class="sticky top-14 bg-yellowish-light flex items-center justify-between z-10 min-h-[40px]">
+<div
+	class="sticky {$models.length > 0
+		? 'top-14'
+		: '-top-5'} bg-yellowish-light flex items-center justify-between z-10 min-h-[40px]"
+>
 	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
