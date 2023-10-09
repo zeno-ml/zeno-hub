@@ -151,6 +151,7 @@ def create_project(
             )
         )
         response.status_code = status.HTTP_201_CREATED
+    project.owner_name = user.name
     return project
 
 
