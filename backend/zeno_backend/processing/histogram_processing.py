@@ -149,10 +149,11 @@ async def histogram_metric_and_count(
             col_id = col_id[0]
 
             metric_col_id = None
+            metric_col_type = None
             if calculate_histograms and request.metric is not None:
                 await db.execute(
                     sql.SQL(
-                        "SELECT column_id FROM {} "
+                        "SELECT column_id, data_type FROM {} "
                         "WHERE name = %s AND (model = %s OR model IS NULL);"
                     ).format(sql.Identifier(f"{project_uuid}_column_map")),
                     [request.metric.columns[0], request.model],
@@ -160,13 +161,16 @@ async def histogram_metric_and_count(
                 metric_col_id = await db.fetchone()
                 if metric_col_id is None:
                     return []
+                metric_col_type = metric_col_id[1]
                 metric_col_id = metric_col_id[0]
 
             if col.data_type == MetadataType.NOMINAL:
                 if calculate_histograms and metric_col_id is not None:
                     statement = sql.SQL("SELECT {}, COUNT(*), AVG({}) FROM {}").format(
                         sql.Identifier(col_id),
-                        sql.Identifier(metric_col_id),
+                        sql.Identifier(metric_col_id)
+                        if metric_col_type != MetadataType.BOOLEAN
+                        else sql.Identifier(metric_col_id) + sql.SQL("::int"),
                         sql.Identifier(project_uuid),
                     )
                 else:
@@ -228,7 +232,9 @@ async def histogram_metric_and_count(
                 if calculate_histograms and metric_col_id is not None:
                     statement = sql.SQL("SELECT {}, COUNT(*), AVG({}) FROM {}").format(
                         case_statement,
-                        sql.Identifier(metric_col_id),
+                        sql.Identifier(metric_col_id)
+                        if metric_col_type != MetadataType.BOOLEAN
+                        else sql.Identifier(metric_col_id) + sql.SQL("::int"),
                         sql.Identifier(project_uuid),
                     )
                 else:
@@ -278,7 +284,9 @@ async def histogram_metric_and_count(
                     ).format(
                         sql.Identifier(col_id),
                         sql.Identifier(col_id),
-                        sql.Identifier(metric_col_id),
+                        sql.Identifier(metric_col_id)
+                        if metric_col_type != MetadataType.BOOLEAN
+                        else sql.Identifier(metric_col_id) + sql.SQL("::int"),
                         sql.Identifier(project_uuid),
                     )
                 else:
