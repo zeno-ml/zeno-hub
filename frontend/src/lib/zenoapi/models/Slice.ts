@@ -13,10 +13,12 @@ import type { FilterPredicateGroup } from './FilterPredicateGroup';
  * slice_name (str): the name of the slice.
  * folder_id (int | None): the id of the folder the slice belongs to.
  * filter_predicates (FilterPredicateGroup): the filter predicates of the slice.
+ * project_uuid (str | None): the uuid of the project the slice belongs to.
  */
 export type Slice = {
 	id: number;
 	sliceName: string;
-	folderId?: number | null;
 	filterPredicates: FilterPredicateGroup;
+	folderId?: number | null;
+	projectUuid?: string | null;
 };

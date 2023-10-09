@@ -1,8 +1,8 @@
 <script lang="ts">
+	import Markdown from '$lib/components/general/Markdown.svelte';
 	import type { ReportElement } from '$lib/zenoapi';
 	import purify from 'isomorphic-dompurify';
 	import { parse } from 'marked';
-	import Markdown from '../general/Markdown.svelte';
 
 	export let element: ReportElement;
 

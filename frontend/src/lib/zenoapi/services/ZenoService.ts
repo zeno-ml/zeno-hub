@@ -13,6 +13,7 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
+import type { InstancesTableRequest } from '../models/InstancesTableRequest';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
@@ -492,6 +493,24 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Instances Table
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static getInstancesTable(requestBody: InstancesTableRequest): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/instances-table',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Chart
 	 * @param chartId
 	 * @param ownerName
@@ -718,6 +737,24 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/charts-for-projects/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Slices For Projects
+	 * @param requestBody
+	 * @returns Slice Successful Response
+	 * @throws ApiError
+	 */
+	public static getSlicesForProjects(requestBody: Array<string>): CancelablePromise<Array<Slice>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slices-for-projects/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

@@ -31,3 +31,10 @@ class TableRequest(CamelModel):
     filter_predicates: FilterPredicateGroup | None = None
     sort: tuple[ZenoColumn | None, bool]
     data_ids: list[str] | None = None
+
+
+class InstancesTableRequest(CamelModel):
+    slice_id: int
+    model: str
+    offset: int
+    limit: int

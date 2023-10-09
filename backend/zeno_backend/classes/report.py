@@ -10,10 +10,12 @@ class ReportElementType(Enum):
     Attributes:
         CHART: chart element for a report.
         TEXT: text element for a report.
+        INSTANCES: list of instances element for a report.
     """
 
     CHART = "CHART"
     TEXT = "TEXT"
+    INSTANCES = "INSTANCES"
 
 
 class Report(CamelModel):

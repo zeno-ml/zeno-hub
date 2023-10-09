@@ -1,12 +1,12 @@
 <script lang="ts">
 	import BarChart from '$lib/components/chart/chart-types/bar-chart/BarChart.svelte';
+	import BeeswarmChart from '$lib/components/chart/chart-types/beeswarm-chart/BeeswarmChart.svelte';
+	import HeatMap from '$lib/components/chart/chart-types/heatmap-chart/HeatMap.svelte';
+	import LineChart from '$lib/components/chart/chart-types/line-chart/LineChart.svelte';
+	import RadarChart from '$lib/components/chart/chart-types/radar-chart/RadarChart.svelte';
+	import Table from '$lib/components/chart/chart-types/table/Table.svelte';
 	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import type { ComponentType } from 'svelte';
-	import BeeswarmChart from '../chart/chart-types/beeswarm-chart/BeeswarmChart.svelte';
-	import HeatMap from '../chart/chart-types/heatmap-chart/HeatMap.svelte';
-	import LineChart from '../chart/chart-types/line-chart/LineChart.svelte';
-	import RadarChart from '../chart/chart-types/radar-chart/RadarChart.svelte';
-	import Table from '../chart/chart-types/table/Table.svelte';
 
 	const chartMap: Record<string, ComponentType> = {
 		[ChartType.BAR]: BarChart,

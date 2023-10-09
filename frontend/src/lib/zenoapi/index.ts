@@ -24,6 +24,7 @@ export type { HeatmapParameters } from './models/HeatmapParameters';
 export type { HistogramBucket } from './models/HistogramBucket';
 export type { HistogramRequest } from './models/HistogramRequest';
 export type { HTTPValidationError } from './models/HTTPValidationError';
+export type { InstancesTableRequest } from './models/InstancesTableRequest';
 export { Join } from './models/Join';
 export { MetadataType } from './models/MetadataType';
 export type { Metric } from './models/Metric';

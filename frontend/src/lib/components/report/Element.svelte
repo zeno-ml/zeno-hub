@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
-	import ChartElement from './ChartElement.svelte';
-	import TextElement from './TextElement.svelte';
+	import ChartElement from './elements/ChartElement.svelte';
+	import InstancesElement from './elements/InstancesElement.svelte';
+	import TextElement from './elements/TextElement.svelte';
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
@@ -15,6 +16,8 @@
 			{#await chartOptions then options}
 				<ChartElement chart={options.filter((c) => c.id === element.chartId)[0]} />
 			{/await}
+		{:else if element.type === ReportElementType.INSTANCES}
+			<InstancesElement {element} />
 		{/if}
 	</div>
 </div>

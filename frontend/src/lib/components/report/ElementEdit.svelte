@@ -1,5 +1,11 @@
 <script lang="ts">
-	import { ReportElementType, ZenoService, type Chart, type ReportElement } from '$lib/zenoapi';
+	import {
+		ReportElementType,
+		ZenoService,
+		type Chart,
+		type ReportElement,
+		type Slice
+	} from '$lib/zenoapi';
 	import { mdiClose, mdiDrag } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
@@ -8,10 +14,26 @@
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
+	export let sliceOptions: Promise<Slice[]>;
 	export let dragEnabled = false;
 	export let reportId: number;
 
 	let timer: ReturnType<typeof setTimeout>;
+	let projectUuid: string | undefined | null;
+	let instancesElementSpec: { sliceId: number; modelName: string };
+
+	if (element.data !== null && element.data !== undefined) {
+		try {
+			instancesElementSpec = JSON.parse(element.data);
+			sliceOptions.then((r) => {
+				projectUuid = r.find((sli) =>
+					sli.id === instancesElementSpec?.sliceId ? instancesElementSpec.sliceId : ''
+				)?.projectUuid;
+			});
+		} catch {
+			instancesElementSpec = { sliceId: 0, modelName: '' };
+		}
+	}
 
 	const dispatch = createEventDispatcher();
 
@@ -28,6 +50,33 @@
 
 	function updateChart(e: CustomEvent) {
 		ZenoService.updateReportElement(reportId, { ...element, chartId: e.detail.id });
+	}
+
+	function updateInstancesSlice(e: CustomEvent) {
+		instancesElementSpec = {
+			sliceId: e.detail.id,
+			modelName: instancesElementSpec?.modelName
+		};
+		sliceOptions.then((r) => {
+			projectUuid = r.find((sli) =>
+				sli.id === instancesElementSpec?.sliceId ? instancesElementSpec.sliceId : ''
+			)?.projectUuid;
+		});
+
+		ZenoService.updateReportElement(reportId, {
+			...element,
+			data: JSON.stringify(instancesElementSpec)
+		});
+	}
+	function updateInstancesModel(e: CustomEvent) {
+		instancesElementSpec = {
+			sliceId: instancesElementSpec?.sliceId,
+			modelName: e.detail.label
+		};
+		ZenoService.updateReportElement(reportId, {
+			...element,
+			data: JSON.stringify(instancesElementSpec)
+		});
 	}
 </script>
 
@@ -47,7 +96,7 @@
 			style="margin-bottom: 10px;"
 			bind:value={element.type}
 			labelAsValue={true}
-			options={[ReportElementType.CHART, ReportElementType.TEXT]}
+			options={[ReportElementType.CHART, ReportElementType.TEXT, ReportElementType.INSTANCES]}
 			on:change={updateType}
 		/>
 		{#if element.type === ReportElementType.CHART}
@@ -61,6 +110,20 @@
 				bind:value={element.data}
 				style="width: 100%;"
 			/>
+		{:else if element.type === ReportElementType.INSTANCES}
+			{#await sliceOptions then options}
+				<Svelecte value={instancesElementSpec.sliceId} {options} on:change={updateInstancesSlice} />
+				{#if projectUuid}
+					{#await ZenoService.getModels(projectUuid) then models}
+						<Svelecte
+							labelAsValue={true}
+							value={models[0]}
+							options={models}
+							on:change={updateInstancesModel}
+						/>
+					{/await}
+				{/if}
+			{/await}
 		{/if}
 	</div>
 	<div class="flex">

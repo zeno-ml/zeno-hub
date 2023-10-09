@@ -8,7 +8,8 @@
 		ZenoService,
 		type Chart,
 		type Project,
-		type ReportElement
+		type ReportElement,
+		type Slice
 	} from '$lib/zenoapi';
 	import Button, { Label } from '@smui/button';
 	import Svelecte from 'svelecte';
@@ -26,6 +27,10 @@
 	let chartOptions: Promise<Chart[]> =
 		selectedProjects.length > 0
 			? ZenoService.getChartsForProjects(selectedProjects)
+			: new Promise(() => []);
+	let sliceOptions: Promise<Slice[]> =
+		selectedProjects.length > 0
+			? ZenoService.getSlicesForProjects(selectedProjects)
 			: new Promise(() => []);
 	let isEdit = false;
 	let dragEnabled = false;
@@ -132,6 +137,7 @@
 						bind:dragEnabled
 						reportId={$report.id}
 						{chartOptions}
+						{sliceOptions}
 						on:delete={() => deleteElement(element.id ?? -1)}
 					/>
 				{:else}
