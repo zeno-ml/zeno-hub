@@ -3,7 +3,9 @@
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
 		Join,
+		MetadataType,
 		Operation,
+		ZenoColumnType,
 		ZenoService,
 		type FilterPredicate,
 		type FilterPredicateGroup,
@@ -151,10 +153,31 @@
 		dispatch('close');
 	}
 
+	function createAllSlices() {
+		const predicates = predicateGroup.predicates[0];
+		if (Object.hasOwn(predicates, 'column'))
+			ZenoService.addAllSlices($project.uuid, (predicates as FilterPredicate).column).then(() => {
+				ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
+				dispatch('close');
+			});
+	}
+
 	function submit(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			saveSlice();
 		}
+	}
+
+	function checkNominalSinglePredicateNoEntry(predicates: FilterPredicateGroup) {
+		return (
+			!sliceToEdit &&
+			predicates.predicates.length === 1 &&
+			Object.hasOwn(predicates.predicates[0], 'column') &&
+			(predicates.predicates[0] as FilterPredicate).column.dataType === MetadataType.NOMINAL &&
+			(predicates.predicates[0] as FilterPredicate).column.columnType !== ZenoColumnType.ID &&
+			(predicates.predicates[0] as FilterPredicate).column.columnType !== ZenoColumnType.DATA &&
+			(predicates.predicates[0] as FilterPredicate).value === ''
+		);
 	}
 </script>
 
@@ -165,17 +188,27 @@
 		<Textfield class="mb-2 ml-3" bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
 		<div class="flex items-center flex-row-reverse">
-			<Button
-				variant="outlined"
-				on:click={saveSlice}
-				disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
-					(sliceToEdit &&
-						originalName !== sliceName &&
-						$slices.some((slice) => slice.sliceName === sliceName)) ||
-					!isValidPredicates}
-			>
-				{sliceToEdit ? 'Update Slice' : 'Create Slice'}
-			</Button>
+			{#if checkNominalSinglePredicateNoEntry(predicateGroup)}
+				<Button
+					variant="outlined"
+					on:click={createAllSlices}
+					disabled={$slices.some((slice) => slice.sliceName === sliceName)}
+				>
+					{'Create Slices for all Values'}
+				</Button>
+			{:else}
+				<Button
+					variant="outlined"
+					on:click={saveSlice}
+					disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
+						(sliceToEdit &&
+							originalName !== sliceName &&
+							$slices.some((slice) => slice.sliceName === sliceName)) ||
+						!isValidPredicates}
+				>
+					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
+				</Button>
+			{/if}
 			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
 				cancel
 			</Button>

@@ -10,7 +10,13 @@ from pyarrow import RecordBatch, Schema
 import zeno_backend.database.delete as delete
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart, ParametersEncoder
-from zeno_backend.classes.filter import PredicatesEncoder
+from zeno_backend.classes.filter import (
+    FilterPredicate,
+    FilterPredicateGroup,
+    Join,
+    Operation,
+    PredicatesEncoder,
+)
 from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import ReportElement
 from zeno_backend.classes.slice import Slice
@@ -469,6 +475,63 @@ def slice(project: str, req: Slice) -> int | None:
         return ids[0][0]
     else:
         return None
+
+
+async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] | None:
+    """Add slices for all values of a nominal data column.
+
+    Args:
+        project (str): project to add the slices to.
+        column (ZenoColumn): column for which to add slices.
+
+    Returns:
+        list[int]|None: ids of all added slices.
+    """
+    ids = []
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT DISTINCT {} FROM {}").format(
+                    sql.Identifier(column.id), sql.Identifier(project)
+                )
+            )
+            values = await cur.fetchall()
+            for value in values:
+                slice = Slice(
+                    id=-1,
+                    slice_name=f"{column.name} = {value[0]}",
+                    filter_predicates=FilterPredicateGroup(
+                        predicates=[
+                            FilterPredicate(
+                                column=column,
+                                operation=Operation.EQUAL,
+                                value=value[0],
+                                join=Join.OMITTED,
+                            )
+                        ],
+                        join=Join.OMITTED,
+                    ),
+                )
+                await cur.execute(
+                    sql.SQL(
+                        "SELECT id FROM slices WHERE name={} AND project_uuid={};"
+                    ).format(slice.slice_name, project)
+                )
+                exists = await cur.fetchall()
+                if len(exists) == 0:
+                    await cur.execute(
+                        "INSERT INTO slices (name, filter, project_uuid) "
+                        "VALUES (%s,%s,%s) RETURNING id;",
+                        [
+                            slice.slice_name,
+                            json.dumps(slice.filter_predicates, cls=PredicatesEncoder),
+                            project,
+                        ],
+                    )
+                    id = await cur.fetchone()
+                    if id is not None:
+                        ids.append(id[0])
+    return ids
 
 
 def chart(project: str, chart: Chart) -> int | None:

@@ -674,6 +674,21 @@ def get_server() -> FastAPI:
         return id
 
     @api_app.post(
+        "/all-slices/{project}",
+        response_model=list[int],
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    async def add_all_slices(project: str, req: ZenoColumn):
+        ids = await insert.all_slices_for_column(project, req)
+        if ids is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert slices",
+            )
+        return ids
+
+    @api_app.post(
         "/chart/{project}",
         response_model=int,
         tags=["zeno"],
