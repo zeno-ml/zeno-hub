@@ -12,7 +12,6 @@
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
-	export let width = 850;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -22,6 +21,7 @@
 			metric: number;
 		}>;
 	};
+	export let width: number;
 
 	let range: [number, number] = [0, 0];
 	let metrics: Metric[] = [];
@@ -96,7 +96,8 @@
 					? row
 					: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
 				range,
-				i === 0
+				i === 0,
+				width
 			)}
 			data={dataFilter(
 				data,

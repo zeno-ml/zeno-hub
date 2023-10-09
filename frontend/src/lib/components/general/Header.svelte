@@ -39,7 +39,16 @@
 {#if reportEdit && user !== null}
 	<ReportPopup reportConfig={$report} on:close={() => (reportEdit = false)} {user} />
 {/if}
-<nav class="z-20">
+<nav class="z-20 flex sm:hidden">
+	<header
+		class="w-full flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+	>
+		<a href="/">
+			<img class="w-8 pt-2 pb-2" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+		</a>
+	</header>
+</nav>
+<nav class="z-20 hidden sm:flex">
 	<header
 		class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
 	>

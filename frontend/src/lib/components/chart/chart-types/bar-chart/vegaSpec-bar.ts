@@ -15,8 +15,8 @@ export default function generateSpec(
 		description: 'A simple bar chart with embedded data.',
 		random_id: Date.now(), // used to force re-rendering of the chart
 		autosize: 'pad',
-		width: width,
 		height: height,
+		width: width,
 		data: {
 			name: 'table'
 		},
