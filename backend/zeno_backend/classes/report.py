@@ -78,3 +78,20 @@ class ReportStats(CamelModel):
 
     num_projects: int
     num_elements: int
+
+
+class InstancesElement(CamelModel):
+    """Data for an instances element in a Zeno report."""
+
+    slice_id: int
+    model_name: str
+
+
+class InstancesOptions(CamelModel):
+    """Necessary options to render an instances report element."""
+
+    view: str
+    id_column: str
+    data_column: str | None = None
+    label_column: str | None = None
+    model_column: str | None = None

@@ -35,6 +35,8 @@ from zeno_backend.classes.project import (
     ProjectStats,
 )
 from zeno_backend.classes.report import (
+    InstancesElement,
+    InstancesOptions,
     Report,
     ReportElement,
     ReportResponse,
@@ -302,6 +304,25 @@ def get_server() -> FastAPI:
             return_table.append(return_row)
 
         return json.dumps(return_table)
+
+    @api_app.post(
+        "/instances-options/",
+        response_model=InstancesOptions,
+        tags=["zeno"],
+    )
+    def get_instances_options(instances_element: InstancesElement, request: Request):
+        slice = select.slice_by_id(instances_element.slice_id)
+        if slice is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
+            )
+        project_uuid = slice.project_uuid
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        return select.instances_options(project_uuid, instances_element)
 
     @api_app.post(
         "/instances-table",

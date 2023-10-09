@@ -4,7 +4,7 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.base import MetadataType, ZenoColumn
+from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
@@ -12,6 +12,8 @@ from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import (
+    InstancesElement,
+    InstancesOptions,
     Report,
     ReportElement,
     ReportResponse,
@@ -1360,6 +1362,46 @@ def table_data_paginated(
             columns = [desc[0] for desc in db.cur.description]
         filter_results = db.cur.fetchall()
         return SQLTable(table=filter_results, columns=columns)
+
+
+def instances_options(
+    project_uuid: str, instances_element: InstancesElement
+) -> InstancesOptions | None:
+    with Database() as db:
+        # get project view
+        project_view = db.execute_return(
+            "SELECT view FROM projects WHERE uuid = %s;",
+            [project_uuid],
+        )
+
+        # get column names
+        column_names = db.execute_return(
+            sql.SQL(
+                "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
+            ).format(sql.Identifier(f"{project_uuid}_column_map")),
+            [instances_element.model_name],
+        )
+        id_column = None
+        data_column = None
+        label_column = None
+        model_column = None
+        for col_id, col_type in column_names:
+            if col_type == ZenoColumnType.ID:
+                id_column = col_id
+            elif col_type == ZenoColumnType.DATA:
+                data_column = col_id
+            elif col_type == ZenoColumnType.LABEL:
+                label_column = col_id
+            elif col_type == ZenoColumnType.OUTPUT:
+                model_column = col_id
+
+        return InstancesOptions(
+            view=project_view[0][0] if len(project_view) > 0 else "table",
+            id_column=id_column if id_column is not None else "",
+            data_column=data_column,
+            label_column=label_column,
+            model_column=model_column,
+        )
 
 
 def table_instances_paginated(

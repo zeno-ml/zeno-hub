@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type InstancesTableRequest = {
+/**
+ * Data for an instances element in a Zeno report.
+ */
+export type InstancesElement = {
 	sliceId: number;
-	model: string;
-	offset: number;
-	limit: number;
+	modelName: string;
 };

@@ -3,6 +3,7 @@
 		ReportElementType,
 		ZenoService,
 		type Chart,
+		type InstancesElement,
 		type ReportElement,
 		type Slice
 	} from '$lib/zenoapi';
@@ -20,7 +21,7 @@
 
 	let timer: ReturnType<typeof setTimeout>;
 	let projectUuid: string | undefined | null;
-	let instancesElementSpec: { sliceId: number; modelName: string };
+	let instancesElementSpec: InstancesElement;
 
 	if (element.data !== null && element.data !== undefined) {
 		try {

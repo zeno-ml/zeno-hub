@@ -13,6 +13,8 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
+import type { InstancesElement } from '../models/InstancesElement';
+import type { InstancesOptions } from '../models/InstancesOptions';
 import type { InstancesTableRequest } from '../models/InstancesTableRequest';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
@@ -484,6 +486,26 @@ export class ZenoService {
 			path: {
 				project_uuid: projectUuid
 			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Instances Options
+	 * @param requestBody
+	 * @returns InstancesOptions Successful Response
+	 * @throws ApiError
+	 */
+	public static getInstancesOptions(
+		requestBody: InstancesElement
+	): CancelablePromise<InstancesOptions> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/instances-options/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
