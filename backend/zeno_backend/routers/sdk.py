@@ -31,6 +31,7 @@ VIEWS = [
     "openai-chat",
     "space-separated-values",
     "text-classification",
+    "rag",
 ]
 
 # Bump only for breaking changes
