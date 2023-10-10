@@ -34,6 +34,8 @@ class TableRequest(CamelModel):
 
 
 class InstancesTableRequest(CamelModel):
+    """A request specification for table for report instances view."""
+
     slice_id: int
     model: str
     offset: int
