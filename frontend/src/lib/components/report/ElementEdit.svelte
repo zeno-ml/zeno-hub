@@ -3,9 +3,9 @@
 		ReportElementType,
 		ZenoService,
 		type Chart,
-		type InstancesElement,
 		type ReportElement,
-		type Slice
+		type Slice,
+		type SliceElementSpec
 	} from '$lib/zenoapi';
 	import { mdiClose, mdiDrag } from '@mdi/js';
 	import { Icon } from '@smui/button';
@@ -19,24 +19,31 @@
 	export let dragEnabled = false;
 	export let reportId: number;
 
+	const dispatch = createEventDispatcher();
 	let timer: ReturnType<typeof setTimeout>;
 	let projectUuid: string | undefined | null;
-	let instancesElementSpec: InstancesElement;
+	let sliceElementSpec: SliceElementSpec;
+	let models: string[] = [];
+
+	$: if (projectUuid) {
+		ZenoService.getModels(projectUuid).then((m) => {
+			models = m;
+			updateSliceModel(models[0]);
+		});
+	}
 
 	if (element.data !== null && element.data !== undefined) {
 		try {
-			instancesElementSpec = JSON.parse(element.data);
+			sliceElementSpec = JSON.parse(element.data);
 			sliceOptions.then((r) => {
 				projectUuid = r.find((sli) =>
-					sli.id === instancesElementSpec?.sliceId ? instancesElementSpec.sliceId : ''
+					sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
 				)?.projectUuid;
 			});
 		} catch {
-			instancesElementSpec = { sliceId: 0, modelName: '' };
+			sliceElementSpec = { sliceId: 0, modelName: '' };
 		}
 	}
-
-	const dispatch = createEventDispatcher();
 
 	function updateType(e: CustomEvent) {
 		ZenoService.updateReportElement(reportId, { ...element, type: e.detail.label });
@@ -49,33 +56,38 @@
 		}, 1000);
 	}
 
-	function updateChart(e: CustomEvent) {
-		ZenoService.updateReportElement(reportId, { ...element, chartId: e.detail.id });
+	function updateChartId(e: CustomEvent) {
+		ZenoService.updateReportElement(reportId, { ...element, data: `${e.detail.id}` });
 	}
 
-	function updateInstancesSlice(e: CustomEvent) {
-		instancesElementSpec = {
+	function updateSliceId(e: CustomEvent) {
+		sliceElementSpec = {
 			sliceId: e.detail.id,
-			modelName: instancesElementSpec?.modelName
+			modelName: sliceElementSpec?.modelName
 		};
 		sliceOptions.then((r) => {
 			projectUuid = r.find((sli) =>
-				sli.id === instancesElementSpec?.sliceId ? instancesElementSpec.sliceId : ''
+				sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
 			)?.projectUuid;
 		});
 
-		element.data = JSON.stringify(instancesElementSpec);
+		element.data = JSON.stringify(sliceElementSpec);
 		ZenoService.updateReportElement(reportId, {
 			...element,
 			data: element.data
 		});
 	}
-	function updateInstancesModel(e: CustomEvent) {
-		instancesElementSpec = {
-			sliceId: instancesElementSpec?.sliceId,
-			modelName: e.detail.label
+
+	function updateSliceModelEvent(e: CustomEvent) {
+		updateSliceModel(e.detail.label);
+	}
+
+	function updateSliceModel(model: string) {
+		sliceElementSpec = {
+			sliceId: sliceElementSpec?.sliceId,
+			modelName: model
 		};
-		element.data = JSON.stringify(instancesElementSpec);
+		element.data = JSON.stringify(sliceElementSpec);
 		ZenoService.updateReportElement(reportId, {
 			...element,
 			data: element.data
@@ -99,12 +111,12 @@
 			style="margin-bottom: 10px;"
 			bind:value={element.type}
 			labelAsValue={true}
-			options={[ReportElementType.CHART, ReportElementType.TEXT, ReportElementType.INSTANCES]}
+			options={Object.values(ReportElementType)}
 			on:change={updateType}
 		/>
 		{#if element.type === ReportElementType.CHART}
 			{#await chartOptions then options}
-				<Svelecte bind:value={element.chartId} {options} on:change={updateChart} />
+				<Svelecte bind:value={element.data} {options} on:change={updateChartId} />
 			{/await}
 		{:else if element.type === ReportElementType.TEXT}
 			<textarea
@@ -113,18 +125,16 @@
 				bind:value={element.data}
 				style="width: 100%;"
 			/>
-		{:else if element.type === ReportElementType.INSTANCES}
+		{:else if element.type === ReportElementType.SLICE}
 			{#await sliceOptions then options}
-				<Svelecte value={instancesElementSpec.sliceId} {options} on:change={updateInstancesSlice} />
-				{#if projectUuid}
-					{#await ZenoService.getModels(projectUuid) then models}
-						<Svelecte
-							labelAsValue={true}
-							value={models[0]}
-							options={models}
-							on:change={updateInstancesModel}
-						/>
-					{/await}
+				<Svelecte value={sliceElementSpec.sliceId} {options} on:change={updateSliceId} />
+				{#if models.length > 0}
+					<Svelecte
+						labelAsValue={true}
+						value={models[0]}
+						options={models}
+						on:change={updateSliceModelEvent}
+					/>
 				{/if}
 			{/await}
 		{/if}

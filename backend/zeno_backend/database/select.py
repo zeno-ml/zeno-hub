@@ -12,16 +12,19 @@ from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project, ProjectState, ProjectStats
 from zeno_backend.classes.report import (
-    InstancesElement,
-    InstancesOptions,
     Report,
     ReportElement,
     ReportResponse,
     ReportStats,
+    SliceElementOptions,
+    SliceElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
-from zeno_backend.classes.table import InstancesTableRequest, TableRequest
+from zeno_backend.classes.table import (
+    SliceTableRequest,
+    TableRequest,
+)
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database, db_pool
@@ -1040,8 +1043,10 @@ def slice_by_id(slice_id: int) -> Slice | None:
         "SELECT id, name, folder_id, filter, project_uuid FROM slices WHERE id = %s;",
         [slice_id],
     )
+
     if len(slice_result) == 0:
         return None
+
     return Slice(
         id=slice_result[0][0],
         slice_name=slice_result[0][1],
@@ -1365,17 +1370,17 @@ def table_data_paginated(
         return SQLTable(table=filter_results, columns=columns)
 
 
-def instances_options(
-    project_uuid: str, instances_element: InstancesElement
-) -> InstancesOptions | None:
-    """Get options to render instances element in reports.
+def slice_element_options(
+    project_uuid: str, instances_element: SliceElementSpec
+) -> SliceElementOptions | None:
+    """Get options to render slice element in reports.
 
     Args:
         project_uuid (str): the project the user is currently working with.
-        instances_element (InstancesElement): the instances element to get options for.
+        instances_element (SliceElementSpec): the slice element to get options for.
 
     Returns:
-        InstancesOptions | None: options for the instances element.
+        SliceElementOptions | None: options for the slice element.
     """
     with Database() as db:
         slice = db.execute_return(
@@ -1429,7 +1434,7 @@ def instances_options(
             elif col_type == ZenoColumnType.OUTPUT:
                 model_column = col_id
 
-        return InstancesOptions(
+        return SliceElementOptions(
             slice_name=slice[0][0] if len(slice) > 0 else "",
             slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
             view=project_view[0][0] if len(project_view) > 0 else "table",
@@ -1440,10 +1445,10 @@ def instances_options(
         )
 
 
-def table_instances_paginated(
+def slice_table(
     project_uuid: str,
     filter_sql: sql.Composed | None,
-    req: InstancesTableRequest,
+    req: SliceTableRequest,
 ) -> SQLTable:
     """Get a slice of the data saved in the project table.
 
@@ -1451,7 +1456,7 @@ def table_instances_paginated(
         project_uuid (str): uuid of the project to the user is currently working with.
         filter_sql (sql.Composed | None): filter to apply before fetching a slice of
             the data.
-        req (TableRequest): the request for the given table slice.
+        req (SliceTableRequest): the request for the given table slice.
 
     Raises:
         Exception: something failed while reading the data from the database.

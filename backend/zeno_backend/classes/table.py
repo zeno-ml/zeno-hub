@@ -33,8 +33,8 @@ class TableRequest(CamelModel):
     data_ids: list[str] | None = None
 
 
-class InstancesTableRequest(CamelModel):
-    """A request specification for table for report instances view."""
+class SliceTableRequest(CamelModel):
+    """Request for a slice of a table for Report view."""
 
     slice_id: int
     model: str

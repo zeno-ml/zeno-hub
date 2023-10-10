@@ -2,10 +2,10 @@
 	import { viewMap } from '$lib/components/instance-views/views/viewMap';
 	import {
 		ZenoService,
-		type InstancesElement,
-		type InstancesOptions,
-		type InstancesTableRequest,
-		type ReportElement
+		type ReportElement,
+		type SliceElementOptions,
+		type SliceElementSpec,
+		type SliceTableRequest
 	} from '$lib/zenoapi';
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Icon } from '@smui/button';
@@ -13,42 +13,42 @@
 
 	export let element: ReportElement;
 
-	let instancesElementSpec: InstancesElement | undefined;
-	let instancesOptions: InstancesOptions | undefined;
+	let sliceElementSpec: SliceElementSpec | undefined;
+	let sliceElementOptions: SliceElementOptions | undefined;
 	let table: Record<string, unknown>[] | undefined = [];
 	let page = 0;
 
 	try {
-		instancesElementSpec = JSON.parse(element.data as string) as InstancesElement;
+		sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
 	} catch (e) {
 		noop();
 	}
 
-	if (instancesElementSpec) {
-		ZenoService.getInstancesOptions(instancesElementSpec).then((r) => (instancesOptions = r));
+	if (sliceElementSpec) {
+		ZenoService.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
 	}
 
-	$: if (instancesElementSpec) {
-		ZenoService.getInstancesTable({
-			sliceId: instancesElementSpec.sliceId,
-			model: instancesElementSpec.modelName,
+	$: if (sliceElementSpec) {
+		ZenoService.getSliceTable({
+			sliceId: sliceElementSpec.sliceId,
+			model: sliceElementSpec.modelName,
 			offset: page * 2,
 			limit: 2
-		} as InstancesTableRequest).then((r) => (table = JSON.parse(r)));
+		} as SliceTableRequest).then((r) => (table = JSON.parse(r)));
 	}
 </script>
 
-{#if instancesOptions !== undefined && instancesElementSpec && table}
+{#if sliceElementOptions !== undefined && sliceElementSpec && table}
 	<div class="w-full">
 		<div class="flex justify-between mb-2">
 			<h3 class="text-lg">
-				Slice <span class="font-semibold">{instancesOptions.sliceName} </span>
-				{#if instancesElementSpec.modelName}
+				Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
+				{#if sliceElementSpec.modelName}
 					model
-					<span class="font-semibold">{instancesElementSpec.modelName}</span>
+					<span class="font-semibold">{sliceElementSpec.modelName}</span>
 				{/if}
 			</h3>
-			<p>{page * 2 + 1} - {page * 2 + 2} of {instancesOptions.sliceSize}</p>
+			<p>{page * 2 + 1} - {page * 2 + 2} of {sliceElementOptions.sliceSize}</p>
 		</div>
 		<div class="flex items-stretch w-full justify-between">
 			<button
@@ -65,16 +65,16 @@
 				</div>
 			</button>
 			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
-				{#if viewMap[instancesOptions.view] !== undefined && instancesOptions.idColumn !== undefined}
-					{#each table as inst (inst[instancesOptions.idColumn])}
+				{#if viewMap[sliceElementOptions.view] !== undefined && sliceElementOptions.idColumn !== undefined}
+					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0">
 							<svelte:component
-								this={viewMap[instancesOptions.view]}
+								this={viewMap[sliceElementOptions.view]}
 								options={{}}
 								entry={inst}
-								dataColumn={instancesOptions.dataColumn}
-								modelColumn={instancesOptions.modelColumn}
-								labelColumn={instancesOptions.labelColumn}
+								dataColumn={sliceElementOptions.dataColumn}
+								modelColumn={sliceElementOptions.modelColumn}
+								labelColumn={sliceElementOptions.labelColumn}
 							/>
 						</div>
 					{/each}
@@ -82,8 +82,8 @@
 			</div>
 			<button
 				class="hover:bg-yellowish-light flex items-center
-				{page * 2 + 2 >= instancesOptions.sliceSize ? 'bg-yellowish-light' : ''}"
-				disabled={page * 2 + 2 >= instancesOptions.sliceSize}
+				{page * 2 + 2 >= sliceElementOptions.sliceSize ? 'bg-yellowish-light' : ''}"
+				disabled={page * 2 + 2 >= sliceElementOptions.sliceSize}
 				on:click={() => page++}
 			>
 				<div class="w-6 h-6">

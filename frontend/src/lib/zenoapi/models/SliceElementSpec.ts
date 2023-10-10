@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type InstancesTableRequest = {
+/**
+ * Specification for slice element in a Zeno report.
+ */
+export type SliceElementSpec = {
 	sliceId: number;
-	model: string;
-	offset: number;
-	limit: number;
+	modelName: string;
 };

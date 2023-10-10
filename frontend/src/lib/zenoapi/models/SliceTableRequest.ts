@@ -4,9 +4,11 @@
 /* eslint-disable */
 
 /**
- * Data for an instances element in a Zeno report.
+ * Request for a slice of a table for Report view.
  */
-export type InstancesElement = {
+export type SliceTableRequest = {
 	sliceId: number;
-	modelName: string;
+	model: string;
+	offset: number;
+	limit: number;
 };

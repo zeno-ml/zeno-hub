@@ -35,16 +35,16 @@ from zeno_backend.classes.project import (
     ProjectStats,
 )
 from zeno_backend.classes.report import (
-    InstancesElement,
-    InstancesOptions,
     Report,
     ReportElement,
     ReportResponse,
     ReportStats,
+    SliceElementOptions,
+    SliceElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
-from zeno_backend.classes.table import InstancesTableRequest, TableRequest
+from zeno_backend.classes.table import SliceTableRequest, TableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.processing.chart import chart_data
@@ -306,11 +306,13 @@ def get_server() -> FastAPI:
         return json.dumps(return_table)
 
     @api_app.post(
-        "/instances-options/",
-        response_model=InstancesOptions,
+        "/slice-element-options/",
+        response_model=SliceElementOptions,
         tags=["zeno"],
     )
-    def get_instances_options(instances_element: InstancesElement, request: Request):
+    def get_slice_element_options(
+        instances_element: SliceElementSpec, request: Request
+    ):
         slice = select.slice_by_id(instances_element.slice_id)
         if slice is None:
             raise HTTPException(
@@ -322,14 +324,14 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
 
-        return select.instances_options(project_uuid, instances_element)
+        return select.slice_element_options(project_uuid, instances_element)
 
     @api_app.post(
-        "/instances-table",
+        "/slice-table",
         response_model=str,
         tags=["zeno"],
     )
-    def get_instances_table(req: InstancesTableRequest, request: Request):
+    def get_slice_table(req: SliceTableRequest, request: Request):
         slice = select.slice_by_id(req.slice_id)
         if slice is None:
             raise HTTPException(
@@ -346,7 +348,7 @@ def get_server() -> FastAPI:
 
         filter_sql = table_filter(project_uuid, req.model, slice.filter_predicates)
 
-        sql_table = select.table_instances_paginated(project_uuid, filter_sql, req)
+        sql_table = select.slice_table(project_uuid, filter_sql, req)
 
         return_table = []
         for row in sql_table.table:

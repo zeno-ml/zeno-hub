@@ -13,9 +13,6 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
-import type { InstancesElement } from '../models/InstancesElement';
-import type { InstancesOptions } from '../models/InstancesOptions';
-import type { InstancesTableRequest } from '../models/InstancesTableRequest';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
@@ -28,8 +25,11 @@ import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
 import type { ReportStats } from '../models/ReportStats';
 import type { Slice } from '../models/Slice';
+import type { SliceElementOptions } from '../models/SliceElementOptions';
+import type { SliceElementSpec } from '../models/SliceElementSpec';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
+import type { SliceTableRequest } from '../models/SliceTableRequest';
 import type { StringFilterRequest } from '../models/StringFilterRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { Tag } from '../models/Tag';
@@ -495,17 +495,17 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Instances Options
+	 * Get Slice Element Options
 	 * @param requestBody
-	 * @returns InstancesOptions Successful Response
+	 * @returns SliceElementOptions Successful Response
 	 * @throws ApiError
 	 */
-	public static getInstancesOptions(
-		requestBody: InstancesElement
-	): CancelablePromise<InstancesOptions> {
+	public static getSliceElementOptions(
+		requestBody: SliceElementSpec
+	): CancelablePromise<SliceElementOptions> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/instances-options/',
+			url: '/slice-element-options/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -515,15 +515,15 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Instances Table
+	 * Get Slice Table
 	 * @param requestBody
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getInstancesTable(requestBody: InstancesTableRequest): CancelablePromise<string> {
+	public static getSliceTable(requestBody: SliceTableRequest): CancelablePromise<string> {
 		return __request(OpenAPI, {
 			method: 'POST',
-			url: '/instances-table',
+			url: '/slice-table',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
