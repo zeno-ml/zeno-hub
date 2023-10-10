@@ -25,13 +25,6 @@
 	let sliceElementSpec: SliceElementSpec;
 	let models: string[] = [];
 
-	$: if (projectUuid) {
-		ZenoService.getModels(projectUuid).then((m) => {
-			models = m;
-			updateSliceModel(models[0]);
-		});
-	}
-
 	if (element.data !== null && element.data !== undefined) {
 		try {
 			sliceElementSpec = JSON.parse(element.data);
@@ -43,6 +36,10 @@
 		} catch {
 			sliceElementSpec = { sliceId: 0, modelName: '' };
 		}
+	}
+
+	$: if (projectUuid) {
+		ZenoService.getModels(projectUuid).then((m) => (models = m));
 	}
 
 	function updateType(e: CustomEvent) {
@@ -78,14 +75,10 @@
 		});
 	}
 
-	function updateSliceModelEvent(e: CustomEvent) {
-		updateSliceModel(e.detail.label);
-	}
-
-	function updateSliceModel(model: string) {
+	function updateSliceModel(e: CustomEvent) {
 		sliceElementSpec = {
 			sliceId: sliceElementSpec?.sliceId,
-			modelName: model
+			modelName: e.detail.label
 		};
 		element.data = JSON.stringify(sliceElementSpec);
 		ZenoService.updateReportElement(reportId, {
@@ -130,10 +123,10 @@
 				<Svelecte value={sliceElementSpec.sliceId} {options} on:change={updateSliceId} />
 				{#if models.length > 0}
 					<Svelecte
+						bind:value={sliceElementSpec.modelName}
 						labelAsValue={true}
-						value={models[0]}
 						options={models}
-						on:change={updateSliceModelEvent}
+						on:change={updateSliceModel}
 					/>
 				{/if}
 			{/await}
