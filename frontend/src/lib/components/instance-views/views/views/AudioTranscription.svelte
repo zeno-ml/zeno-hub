@@ -5,7 +5,7 @@
 	export let labelColumn: string;
 </script>
 
-<div class="p-4 border border-grey-lighter max-w-[375px] min-w-[375px] rounded">
+<div class="p-4 border border-grey-lighter max-w-[350px] min-w-[350px] rounded">
 	<audio controls src={`${entry[dataColumn]}`}>
 		<source
 			src={`${entry[dataColumn]}`}

@@ -8,16 +8,14 @@
 	export let chartOptions: Promise<Chart[]>;
 </script>
 
-<div class="flex items-center my-2 w-[800px]">
-	<div class="">
-		{#if element.type === ReportElementType.TEXT}
-			<TextElement {element} />
-		{:else if element.type === ReportElementType.CHART}
-			{#await chartOptions then options}
-				<ChartElement chart={options.filter((c) => c.id === element.chartId)[0]} />
-			{/await}
-		{:else if element.type === ReportElementType.INSTANCES}
-			<InstancesElement {element} />
-		{/if}
-	</div>
+<div class="flex items-center my-2">
+	{#if element.type === ReportElementType.TEXT}
+		<TextElement {element} />
+	{:else if element.type === ReportElementType.CHART}
+		{#await chartOptions then options}
+			<ChartElement chart={options.filter((c) => c.id === element.chartId)[0]} />
+		{/await}
+	{:else if element.type === ReportElementType.INSTANCES}
+		<InstancesElement {element} />
+	{/if}
 </div>

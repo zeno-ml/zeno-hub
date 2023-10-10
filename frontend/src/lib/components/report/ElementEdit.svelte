@@ -64,9 +64,10 @@
 			)?.projectUuid;
 		});
 
+		element.data = JSON.stringify(instancesElementSpec);
 		ZenoService.updateReportElement(reportId, {
 			...element,
-			data: JSON.stringify(instancesElementSpec)
+			data: element.data
 		});
 	}
 	function updateInstancesModel(e: CustomEvent) {
@@ -74,9 +75,10 @@
 			sliceId: instancesElementSpec?.sliceId,
 			modelName: e.detail.label
 		};
+		element.data = JSON.stringify(instancesElementSpec);
 		ZenoService.updateReportElement(reportId, {
 			...element,
-			data: JSON.stringify(instancesElementSpec)
+			data: element.data
 		});
 	}
 </script>

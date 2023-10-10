@@ -7,9 +7,11 @@
  * Necessary options to render an instances report element.
  */
 export type InstancesOptions = {
+	sliceName: string;
+	sliceSize: number;
 	view: string;
 	idColumn: string;
-	dataColumn: string;
-	labelColumn: string;
-	modelColumn: string;
+	dataColumn?: string | null;
+	labelColumn?: string | null;
+	modelColumn?: string | null;
 };

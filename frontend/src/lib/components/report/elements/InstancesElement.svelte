@@ -7,42 +7,91 @@
 		type InstancesTableRequest,
 		type ReportElement
 	} from '$lib/zenoapi';
+	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+	import { Icon } from '@smui/button';
+	import { noop } from 'svelte/internal';
 
 	export let element: ReportElement;
 
-	let instancesElementSpec = JSON.parse(element.data) as InstancesElement;
+	let instancesElementSpec: InstancesElement | undefined;
 	let instancesOptions: InstancesOptions | undefined;
-	let table = [];
+	let table: Record<string, unknown>[] | undefined = [];
+	let page = 0;
 
-	ZenoService.getInstancesOptions(instancesElementSpec).then((r) => (instancesOptions = r));
+	try {
+		instancesElementSpec = JSON.parse(element.data as string) as InstancesElement;
+	} catch (e) {
+		noop();
+	}
 
-	ZenoService.getInstancesTable({
-		sliceId: instancesElementSpec.sliceId,
-		model: instancesElementSpec.modelName,
-		offset: 0,
-		limit: 2
-	} as InstancesTableRequest).then((r) => (table = JSON.parse(r)));
+	if (instancesElementSpec) {
+		ZenoService.getInstancesOptions(instancesElementSpec).then((r) => (instancesOptions = r));
+	}
+
+	$: if (instancesElementSpec) {
+		ZenoService.getInstancesTable({
+			sliceId: instancesElementSpec.sliceId,
+			model: instancesElementSpec.modelName,
+			offset: page * 2,
+			limit: 2
+		} as InstancesTableRequest).then((r) => (table = JSON.parse(r)));
+	}
 </script>
 
-<h3 class="text-lg">
-	Slice <span class="font-semibold">{instancesElementSpec.sliceId}</span> model
-	<span class="font-semibold">{instancesElementSpec.modelName}</span>
-</h3>
-{#if instancesOptions && table.length > 0}
-	<div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
-		{#if viewMap[instancesOptions.view] !== undefined && instancesOptions.idColumn !== undefined}
-			{#each table as inst (inst[instancesOptions.idColumn])}
-				<div class="mr-2 mt-2">
-					<svelte:component
-						this={viewMap[instancesOptions.view]}
-						options={{}}
-						entry={inst}
-						dataColumn={instancesOptions.dataColumn}
-						modelColumn={instancesOptions.modelColumn}
-						labelColumn={instancesOptions.labelColumn}
-					/>
+{#if instancesOptions !== undefined && instancesElementSpec && table}
+	<div class="w-full">
+		<div class="flex justify-between mb-2">
+			<h3 class="text-lg">
+				Slice <span class="font-semibold">{instancesOptions.sliceName} </span>
+				{#if instancesElementSpec.modelName}
+					model
+					<span class="font-semibold">{instancesElementSpec.modelName}</span>
+				{/if}
+			</h3>
+			<p>{page * 2 + 1} - {page * 2 + 2} of {instancesOptions.sliceSize}</p>
+		</div>
+		<div class="flex items-stretch w-full justify-between">
+			<button
+				class="mr-2 hover:bg-yellowish-light {page === 0
+					? 'bg-yellowish-light'
+					: ''}  flex items-center"
+				disabled={page === 0}
+				on:click={() => page--}
+			>
+				<div class="w-6 h-6 align-middle">
+					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+						<path fill={page === 0 ? 'grey' : 'black'} d={mdiChevronLeft} />
+					</Icon>
 				</div>
-			{/each}
-		{/if}
+			</button>
+			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
+				{#if viewMap[instancesOptions.view] !== undefined && instancesOptions.idColumn !== undefined}
+					{#each table as inst (inst[instancesOptions.idColumn])}
+						<div class="m-auto mt-0">
+							<svelte:component
+								this={viewMap[instancesOptions.view]}
+								options={{}}
+								entry={inst}
+								dataColumn={instancesOptions.dataColumn}
+								modelColumn={instancesOptions.modelColumn}
+								labelColumn={instancesOptions.labelColumn}
+							/>
+						</div>
+					{/each}
+				{/if}
+			</div>
+			<button
+				class="hover:bg-yellowish-light flex items-center
+				{page * 2 + 2 >= instancesOptions.sliceSize ? 'bg-yellowish-light' : ''}"
+				disabled={page * 2 + 2 >= instancesOptions.sliceSize}
+				on:click={() => page++}
+			>
+				<div class="w-6 h-6">
+					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+						<path fill="black" d={mdiChevronRight} />
+					</Icon>
+				</div>
+			</button>
+		</div>
 	</div>
 {/if}

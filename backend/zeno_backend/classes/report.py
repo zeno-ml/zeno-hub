@@ -88,8 +88,20 @@ class InstancesElement(CamelModel):
 
 
 class InstancesOptions(CamelModel):
-    """Necessary options to render an instances report element."""
+    """Necessary options to render an instances report element.
 
+    Attributes:
+        slice_name (str): name of the slice to render.
+        slice_size (int): number of instances in the slice.
+        view (str): name of the instance view.
+        id_column (str): name of the column containing the instance id.
+        data_column (str | None): name of the column containing the instance data.
+        label_column (str | None): name of the column containing the instance label.
+        model_column (str | None): name of the column containing the instance model.
+    """
+
+    slice_name: str
+    slice_size: int
     view: str
     id_column: str
     data_column: str | None = None

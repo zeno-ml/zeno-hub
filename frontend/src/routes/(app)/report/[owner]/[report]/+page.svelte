@@ -17,23 +17,26 @@
 
 	export let data;
 
-	// Only set stores the report has changed.
+	let elements = data.reportElements.sort((a, b) => a.position - b.position);
+	let selectedProjects = data.report.linkedProjects ?? [];
+	let isEdit = false;
+	let dragEnabled = false;
+	let chartOptions: Promise<Chart[]> = new Promise(() => []);
+	let sliceOptions: Promise<Slice[]> = new Promise(() => []);
+
+	// Only set stores if the report has changed.
 	if ($report === undefined || $report.id !== data.report.id) {
 		report.set(data.report);
 	}
 
-	let elements = data.reportElements.sort((a, b) => a.position - b.position);
-	let selectedProjects = data.report.linkedProjects ?? [];
-	let chartOptions: Promise<Chart[]> =
+	$: chartOptions =
 		selectedProjects.length > 0
 			? ZenoService.getChartsForProjects(selectedProjects)
 			: new Promise(() => []);
-	let sliceOptions: Promise<Slice[]> =
+	$: sliceOptions =
 		selectedProjects.length > 0
 			? ZenoService.getSlicesForProjects(selectedProjects)
 			: new Promise(() => []);
-	let isEdit = false;
-	let dragEnabled = false;
 
 	function deleteElement(elementId: number) {
 		if (elementId < 0) return;
@@ -133,11 +136,11 @@
 			{#each elements as element (element.id)}
 				{#if isEdit}
 					<ElementEdit
-						{element}
+						bind:element
 						bind:dragEnabled
-						reportId={$report.id}
 						{chartOptions}
 						{sliceOptions}
+						reportId={$report.id}
 						on:delete={() => deleteElement(element.id ?? -1)}
 					/>
 				{:else}

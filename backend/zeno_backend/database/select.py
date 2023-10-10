@@ -26,6 +26,7 @@ from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database, db_pool
 from zeno_backend.database.util import hash_api_key
+from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
 
 
@@ -1367,14 +1368,47 @@ def table_data_paginated(
 def instances_options(
     project_uuid: str, instances_element: InstancesElement
 ) -> InstancesOptions | None:
+    """Get options to render instances element in reports.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        instances_element (InstancesElement): the instances element to get options for.
+
+    Returns:
+        InstancesOptions | None: options for the instances element.
+    """
     with Database() as db:
-        # get project view
+        slice = db.execute_return(
+            "SELECT name, filter FROM slices WHERE id = %s;",
+            [instances_element.slice_id],
+        )
+        if len(slice) == 0:
+            return None
+
         project_view = db.execute_return(
             "SELECT view FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
 
-        # get column names
+        filter = table_filter(
+            project_uuid,
+            instances_element.model_name,
+            filter_predicates=FilterPredicateGroup(
+                predicates=json.loads(slice[0][1])["predicates"],
+                join=Join.OMITTED,
+            ),
+        )
+
+        if filter is not None:
+            slice_size = db.execute_return(
+                sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
+                    sql.Identifier(project_uuid)
+                )
+                + filter
+            )
+        else:
+            slice_size = []
+
         column_names = db.execute_return(
             sql.SQL(
                 "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
@@ -1396,6 +1430,8 @@ def instances_options(
                 model_column = col_id
 
         return InstancesOptions(
+            slice_name=slice[0][0] if len(slice) > 0 else "",
+            slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
             view=project_view[0][0] if len(project_view) > 0 else "table",
             id_column=id_column if id_column is not None else "",
             data_column=data_column,
@@ -1412,7 +1448,7 @@ def table_instances_paginated(
     """Get a slice of the data saved in the project table.
 
     Args:
-        project (str): the project the user is currently working with.
+        project_uuid (str): uuid of the project to the user is currently working with.
         filter_sql (sql.Composed | None): filter to apply before fetching a slice of
             the data.
         req (TableRequest): the request for the given table slice.
@@ -1489,38 +1525,6 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
             if filter_results is not None
             else SQLTable(table=[], columns=[])
         )
-
-
-def column_id_from_name_and_model(
-    project: str, column_name: str, model: str | None
-) -> str:
-    """Get a column's id given its name and model.
-
-    Args:
-        project (str): the project the user is currently working with.
-        column_name (str): the name of the column to be fetched.
-        model (str | None): the model of the column to be fetched.
-
-    Returns:
-        str: column id retreived by name and model.
-    """
-    db = Database()
-    if model is None:
-        column_result = db.connect_execute_return(
-            sql.SQL(
-                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
-            ).format(sql.Identifier(f"{project}_column_map")),
-            [column_name],
-        )
-    else:
-        column_result = db.connect_execute_return(
-            sql.SQL("SELECT column_id FROM {} WHERE name = %s AND model = %s;").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [column_name, model],
-        )
-
-    return str(column_result[0][0]) if len(column_result) > 0 else ""
 
 
 def column(

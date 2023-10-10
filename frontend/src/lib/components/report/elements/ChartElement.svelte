@@ -25,14 +25,16 @@
 {#await chartData}
 	<p>Loading...</p>
 {:then data}
-	<h3 class="text-lg font-semibold">{chart.name}</h3>
-	<div>
-		<svelte:component
-			this={chartMap[chart.type]}
-			{chart}
-			data={JSON.parse(data)}
-			width={650}
-			height={chart.type == ChartType.RADAR ? 550 : 300}
-		/>
+	<div class="w-full">
+		<h3 class="text-lg font-semibold">{chart.name}</h3>
+		<div>
+			<svelte:component
+				this={chartMap[chart.type]}
+				{chart}
+				data={JSON.parse(data)}
+				width={650}
+				height={chart.type == ChartType.RADAR ? 550 : 300}
+			/>
+		</div>
 	</div>
 {/await}
