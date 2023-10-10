@@ -5,7 +5,39 @@ from psycopg import sql
 from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.filter import FilterPredicateGroup, Operation
 from zeno_backend.classes.metadata import HistogramBucket
-from zeno_backend.database.select import column_id_from_name_and_model
+from zeno_backend.database.database import Database
+
+
+def column_id_from_name_and_model(
+    project: str, column_name: str, model: str | None
+) -> str:
+    """Get a column's id given its name and model.
+
+    Args:
+        project (str): the project the user is currently working with.
+        column_name (str): the name of the column to be fetched.
+        model (str | None): the model of the column to be fetched.
+
+    Returns:
+        str: column id retreived by name and model.
+    """
+    db = Database()
+    if model is None:
+        column_result = db.connect_execute_return(
+            sql.SQL(
+                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
+            ).format(sql.Identifier(f"{project}_column_map")),
+            [column_name],
+        )
+    else:
+        column_result = db.connect_execute_return(
+            sql.SQL("SELECT column_id FROM {} WHERE name = %s AND model = %s;").format(
+                sql.Identifier(f"{project}_column_map")
+            ),
+            [column_name, model],
+        )
+
+    return str(column_result[0][0]) if len(column_result) > 0 else ""
 
 
 def filter_to_sql(

@@ -9,8 +9,10 @@
  * Attributes:
  * CHART: chart element for a report.
  * TEXT: text element for a report.
+ * SLICE: slice of instances for a report.
  */
 export enum ReportElementType {
 	CHART = 'CHART',
-	TEXT = 'TEXT'
+	TEXT = 'TEXT',
+	SLICE = 'SLICE'
 }

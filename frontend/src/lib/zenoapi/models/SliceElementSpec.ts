@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type Body_upload_dataset_schema = {
-	project_uuid: any;
-	id_column: any;
-	data_column: any;
-	label_column?: any;
-	file: Blob;
+/**
+ * Specification for slice element in a Zeno report.
+ */
+export type SliceElementSpec = {
+	sliceId: number;
+	modelName: string;
 };

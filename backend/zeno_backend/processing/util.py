@@ -3,7 +3,7 @@
 import pandas as pd
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
-from zeno_backend.database.select import column_id_from_name_and_model
+from zeno_backend.processing.filtering import column_id_from_name_and_model
 
 CHUNK_SIZE = 1024 * 1024  # adjust the chunk size as desired
 

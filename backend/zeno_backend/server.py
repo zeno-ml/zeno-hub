@@ -39,10 +39,12 @@ from zeno_backend.classes.report import (
     ReportElement,
     ReportResponse,
     ReportStats,
+    SliceElementOptions,
+    SliceElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
-from zeno_backend.classes.table import TableRequest
+from zeno_backend.classes.table import SliceTableRequest, TableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.processing.chart import chart_data
@@ -303,6 +305,60 @@ def get_server() -> FastAPI:
 
         return json.dumps(return_table)
 
+    @api_app.post(
+        "/slice-element-options/",
+        response_model=SliceElementOptions,
+        tags=["zeno"],
+    )
+    def get_slice_element_options(
+        instances_element: SliceElementSpec, request: Request
+    ):
+        slice = select.slice_by_id(instances_element.slice_id)
+        if slice is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
+            )
+        project_uuid = slice.project_uuid
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        return select.slice_element_options(project_uuid, instances_element)
+
+    @api_app.post(
+        "/slice-table",
+        response_model=str,
+        tags=["zeno"],
+    )
+    def get_slice_table(req: SliceTableRequest, request: Request):
+        slice = select.slice_by_id(req.slice_id)
+        if slice is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
+            )
+        project_uuid = slice.project_uuid
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        if not util.project_access_valid(project_uuid, request):
+            return Response(status_code=401)
+
+        filter_sql = table_filter(project_uuid, req.model, slice.filter_predicates)
+
+        sql_table = select.slice_table(project_uuid, filter_sql, req)
+
+        return_table = []
+        for row in sql_table.table:
+            return_row = {}
+            for i, col in enumerate(sql_table.columns):
+                return_row[col] = row[i]
+            return_table.append(return_row)
+
+        return json.dumps(return_table)
+
     @api_app.get(
         "/chart/{owner}/{project}/{chart_id}",
         response_model=ChartResponse,
@@ -472,6 +528,14 @@ def get_server() -> FastAPI:
     )
     def get_charts_for_projects(req: list[str]):
         return select.charts_for_projects(req)
+
+    @api_app.post(
+        "/slices-for-projects/",
+        response_model=list[Slice],
+        tags=["zeno"],
+    )
+    def get_slices_for_projects(req: list[str]):
+        return select.slices_for_projects(req)
 
     @api_app.post(
         "/slice-metrics/{project}",

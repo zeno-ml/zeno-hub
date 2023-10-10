@@ -25,8 +25,11 @@ import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
 import type { ReportStats } from '../models/ReportStats';
 import type { Slice } from '../models/Slice';
+import type { SliceElementOptions } from '../models/SliceElementOptions';
+import type { SliceElementSpec } from '../models/SliceElementSpec';
 import type { SliceFinderRequest } from '../models/SliceFinderRequest';
 import type { SliceFinderReturn } from '../models/SliceFinderReturn';
+import type { SliceTableRequest } from '../models/SliceTableRequest';
 import type { StringFilterRequest } from '../models/StringFilterRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { Tag } from '../models/Tag';
@@ -492,6 +495,44 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Slice Element Options
+	 * @param requestBody
+	 * @returns SliceElementOptions Successful Response
+	 * @throws ApiError
+	 */
+	public static getSliceElementOptions(
+		requestBody: SliceElementSpec
+	): CancelablePromise<SliceElementOptions> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slice-element-options/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Slice Table
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public static getSliceTable(requestBody: SliceTableRequest): CancelablePromise<string> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slice-table',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Chart
 	 * @param chartId
 	 * @param ownerName
@@ -718,6 +759,24 @@ export class ZenoService {
 		return __request(OpenAPI, {
 			method: 'POST',
 			url: '/charts-for-projects/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Slices For Projects
+	 * @param requestBody
+	 * @returns Slice Successful Response
+	 * @throws ApiError
+	 */
+	public static getSlicesForProjects(requestBody: Array<string>): CancelablePromise<Array<Slice>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/slices-for-projects/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

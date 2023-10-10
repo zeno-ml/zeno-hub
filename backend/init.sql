@@ -38,7 +38,6 @@ CREATE TABLE report_elements (
     report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
     type text NOT NULL,
     data text,
-    chart_id integer REFERENCES charts(id) ON DELETE CASCADE ON UPDATE CASCADE,
     position integer NOT NULL
 );
 

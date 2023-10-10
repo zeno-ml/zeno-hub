@@ -12,9 +12,11 @@ class Slice(CamelModel):
         slice_name (str): the name of the slice.
         folder_id (int | None): the id of the folder the slice belongs to.
         filter_predicates (FilterPredicateGroup): the filter predicates of the slice.
+        project_uuid (str | None): the uuid of the project the slice belongs to.
     """
 
     id: int
     slice_name: str
-    folder_id: int | None = None
     filter_predicates: FilterPredicateGroup
+    folder_id: int | None = None
+    project_uuid: str | None = None

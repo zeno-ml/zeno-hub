@@ -4,7 +4,7 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.base import MetadataType, ZenoColumn
+from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
@@ -16,14 +16,20 @@ from zeno_backend.classes.report import (
     ReportElement,
     ReportResponse,
     ReportStats,
+    SliceElementOptions,
+    SliceElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
-from zeno_backend.classes.table import TableRequest
+from zeno_backend.classes.table import (
+    SliceTableRequest,
+    TableRequest,
+)
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import Database, db_pool
 from zeno_backend.database.util import hash_api_key
+from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
 
 
@@ -627,6 +633,44 @@ def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     )
 
 
+def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
+    """Get all slices for a list of projects.
+
+    Args:
+        project_uuids (list[str]): the list of project uuids.
+
+
+    Returns:
+        list[Slice]: the list of slices.
+    """
+    db = Database()
+    slice_results = db.connect_execute_return(
+        sql.SQL(
+            "SELECT id, name, folder_id, filter, project_uuid"
+            " FROM slices WHERE project_uuid IN ({})"
+        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+    )
+
+    if len(slice_results) == 0:
+        return []
+
+    return list(
+        map(
+            lambda r: Slice(
+                id=r[0],
+                slice_name=r[1],
+                folder_id=r[2],
+                filter_predicates=FilterPredicateGroup(
+                    predicates=json.loads(r[3])["predicates"],
+                    join=Join.OMITTED,
+                ),
+                project_uuid=r[4],
+            ),
+            slice_results,
+        )
+    )
+
+
 def project_from_uuid(project_uuid: str) -> Project | None:
     """Get the project data given a UUID.
 
@@ -985,6 +1029,36 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
     return ret
 
 
+def slice_by_id(slice_id: int) -> Slice | None:
+    """Get a single slice by its ID.
+
+    Args:
+        slice_id (int): id of the slice to be fetched.
+
+    Returns:
+        Slice | None: slice as requested by the user.
+    """
+    db = Database()
+    slice_result = db.connect_execute_return(
+        "SELECT id, name, folder_id, filter, project_uuid FROM slices WHERE id = %s;",
+        [slice_id],
+    )
+
+    if len(slice_result) == 0:
+        return None
+
+    return Slice(
+        id=slice_result[0][0],
+        slice_name=slice_result[0][1],
+        folder_id=slice_result[0][2],
+        filter_predicates=FilterPredicateGroup(
+            predicates=json.loads(slice_result[0][3])["predicates"],
+            join=Join.OMITTED,
+        ),
+        project_uuid=slice_result[0][4],
+    )
+
+
 def folders(project: str) -> list[Folder]:
     """Get a list of all folders in a project.
 
@@ -1296,6 +1370,128 @@ def table_data_paginated(
         return SQLTable(table=filter_results, columns=columns)
 
 
+def slice_element_options(
+    project_uuid: str, instances_element: SliceElementSpec
+) -> SliceElementOptions | None:
+    """Get options to render slice element in reports.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        instances_element (SliceElementSpec): the slice element to get options for.
+
+    Returns:
+        SliceElementOptions | None: options for the slice element.
+    """
+    with Database() as db:
+        slice = db.execute_return(
+            "SELECT name, filter FROM slices WHERE id = %s;",
+            [instances_element.slice_id],
+        )
+        if len(slice) == 0:
+            return None
+
+        project_view = db.execute_return(
+            "SELECT view FROM projects WHERE uuid = %s;",
+            [project_uuid],
+        )
+
+        filter = table_filter(
+            project_uuid,
+            instances_element.model_name,
+            filter_predicates=FilterPredicateGroup(
+                predicates=json.loads(slice[0][1])["predicates"],
+                join=Join.OMITTED,
+            ),
+        )
+
+        if filter is not None:
+            slice_size = db.execute_return(
+                sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
+                    sql.Identifier(project_uuid)
+                )
+                + filter
+            )
+        else:
+            slice_size = []
+
+        column_names = db.execute_return(
+            sql.SQL(
+                "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
+            ).format(sql.Identifier(f"{project_uuid}_column_map")),
+            [instances_element.model_name],
+        )
+        id_column = None
+        data_column = None
+        label_column = None
+        model_column = None
+        for col_id, col_type in column_names:
+            if col_type == ZenoColumnType.ID:
+                id_column = col_id
+            elif col_type == ZenoColumnType.DATA:
+                data_column = col_id
+            elif col_type == ZenoColumnType.LABEL:
+                label_column = col_id
+            elif col_type == ZenoColumnType.OUTPUT:
+                model_column = col_id
+
+        return SliceElementOptions(
+            slice_name=slice[0][0] if len(slice) > 0 else "",
+            slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
+            view=project_view[0][0] if len(project_view) > 0 else "table",
+            id_column=id_column if id_column is not None else "",
+            data_column=data_column,
+            label_column=label_column,
+            model_column=model_column,
+        )
+
+
+def slice_table(
+    project_uuid: str,
+    filter_sql: sql.Composed | None,
+    req: SliceTableRequest,
+) -> SQLTable:
+    """Get a slice of the data saved in the project table.
+
+    Args:
+        project_uuid (str): uuid of the project to the user is currently working with.
+        filter_sql (sql.Composed | None): filter to apply before fetching a slice of
+            the data.
+        req (SliceTableRequest): the request for the given table slice.
+
+    Raises:
+        Exception: something failed while reading the data from the database.
+
+    Returns:
+        SQLTable: the resulting slice of the data as requested by the user.
+    """
+    with Database() as db:
+        if db.cur is None:
+            return SQLTable(table=[], columns=[])
+        filter_results = None
+        columns = []
+
+        filter = sql.SQL("")
+        if filter_sql is not None:
+            filter = sql.SQL("WHERE ") + filter_sql
+
+        final_statement = sql.SQL(" ").join(
+            [
+                sql.SQL("SELECT *"),
+                sql.SQL("FROM {}").format(sql.Identifier(project_uuid)),
+                filter,
+                sql.SQL("LIMIT {} OFFSET {};").format(
+                    sql.Literal(req.limit), sql.Literal(req.offset)
+                ),
+            ]
+        )
+        db.cur.execute(final_statement)
+
+        if db.cur.description is not None:
+            columns = [desc[0] for desc in db.cur.description]
+        filter_results = db.cur.fetchall()
+        return SQLTable(table=filter_results, columns=columns)
+
+
 def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
     """Get the filtered data table for the current project.
 
@@ -1334,38 +1530,6 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
             if filter_results is not None
             else SQLTable(table=[], columns=[])
         )
-
-
-def column_id_from_name_and_model(
-    project: str, column_name: str, model: str | None
-) -> str:
-    """Get a column's id given its name and model.
-
-    Args:
-        project (str): the project the user is currently working with.
-        column_name (str): the name of the column to be fetched.
-        model (str | None): the model of the column to be fetched.
-
-    Returns:
-        str: column id retreived by name and model.
-    """
-    db = Database()
-    if model is None:
-        column_result = db.connect_execute_return(
-            sql.SQL(
-                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
-            ).format(sql.Identifier(f"{project}_column_map")),
-            [column_name],
-        )
-    else:
-        column_result = db.connect_execute_return(
-            sql.SQL("SELECT column_id FROM {} WHERE name = %s AND model = %s;").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [column_name, model],
-        )
-
-    return str(column_result[0][0]) if len(column_result) > 0 else ""
 
 
 def column(
