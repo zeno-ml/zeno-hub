@@ -5,13 +5,14 @@ export default function generateSpec(
 	parameters: BeeswarmParameters,
 	xLabel: string,
 	domain: [number, number],
-	showLegend: boolean
+	showLegend: boolean,
+	width: number
 ): VisualizationSpec {
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description:
 			'A beeswarm chart example that uses a force-directed layout to group items by category.',
-		width: 800,
+		width: width,
 		height: 100,
 		random_id: Date.now(), // used to force re-rendering of the chart
 		padding: { left: 5, right: 5, top: 0, bottom: 20 },

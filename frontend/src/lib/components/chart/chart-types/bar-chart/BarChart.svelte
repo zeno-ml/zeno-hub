@@ -6,7 +6,7 @@
 	export let chart: Chart;
 	export let data: { table: Record<string, unknown> };
 	export let height = 400;
-	export let width = 800;
+	export let width: number;
 
 	let spec: VegaLiteSpec;
 
@@ -26,8 +26,8 @@
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: width,
 		height: height,
+		width: width,
 		scaleFactor: {
 			png: 3
 		},

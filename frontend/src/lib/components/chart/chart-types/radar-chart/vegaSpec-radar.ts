@@ -11,7 +11,7 @@ export default function generateSpec(
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
 		random_id: Date.now(), // used to force re-rendering of the chart
 		autosize: { type: 'none', contains: 'padding' },
-		padding: { left: 80, right: 60, top: 60, bottom: 50 },
+		padding: { left: 80, right: 200, top: 60, bottom: 50 },
 		width: width,
 		height: height,
 

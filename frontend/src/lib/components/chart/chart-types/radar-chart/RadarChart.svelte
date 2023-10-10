@@ -13,8 +13,8 @@
 			size: number;
 		}>;
 	};
-	export let width = 800;
 	export let height = 575;
+	export let width: number;
 
 	$: parameters = chart.parameters as RadarParameters;
 
