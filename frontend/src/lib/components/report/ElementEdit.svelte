@@ -21,20 +21,36 @@
 
 	const dispatch = createEventDispatcher();
 	let timer: ReturnType<typeof setTimeout>;
-	let projectUuid: string | undefined | null;
-	let sliceElementSpec: SliceElementSpec;
+
+	let projectUuid: string | null = null;
+	let sliceElementSpec: SliceElementSpec | null = null;
+	let chartId: number | null = null;
 	let models: string[] = [];
 
-	if (element.data !== null && element.data !== undefined) {
-		try {
-			sliceElementSpec = JSON.parse(element.data);
-			sliceOptions.then((r) => {
-				projectUuid = r.find((sli) =>
-					sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
-				)?.projectUuid;
-			});
-		} catch {
-			sliceElementSpec = { sliceId: 0, modelName: '' };
+	updateTypeObjects(element);
+
+	// set specific objects for each element type from the raw data string.
+	function updateTypeObjects(el: ReportElement) {
+		if (el.type === ReportElementType.CHART) {
+			if (el.data) {
+				chartId = parseInt(el.data);
+			} else {
+				chartOptions.then((r) => (chartId = r[0].id));
+			}
+		} else if (el.type === ReportElementType.SLICE) {
+			if (el.data) {
+				sliceElementSpec = JSON.parse(el.data);
+				sliceOptions.then((r) => {
+					let res = r.find((sli) =>
+						sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
+					);
+					if (res && res.projectUuid) {
+						projectUuid = res.projectUuid;
+					}
+				});
+			} else {
+				sliceOptions.then((r) => (sliceElementSpec = { sliceId: r[0].id, modelName: '' }));
+			}
 		}
 	}
 
@@ -43,7 +59,14 @@
 	}
 
 	function updateType(e: CustomEvent) {
-		ZenoService.updateReportElement(reportId, { ...element, type: e.detail.label });
+		element.data = null;
+		updateTypeObjects(element);
+		element = element;
+		ZenoService.updateReportElement(reportId, {
+			...element,
+			type: e.detail.label,
+			data: null
+		});
 	}
 
 	function updateData() {
@@ -54,18 +77,23 @@
 	}
 
 	function updateChartId(e: CustomEvent) {
-		ZenoService.updateReportElement(reportId, { ...element, data: `${e.detail.id}` });
+		element.data = `${e.detail.id}`;
+		ZenoService.updateReportElement(reportId, { ...element, data: element.data });
 	}
 
 	function updateSliceId(e: CustomEvent) {
+		if (!sliceElementSpec) return;
 		sliceElementSpec = {
 			sliceId: e.detail.id,
-			modelName: sliceElementSpec?.modelName
+			modelName: sliceElementSpec.modelName
 		};
 		sliceOptions.then((r) => {
-			projectUuid = r.find((sli) =>
+			let res = r.find((sli) =>
 				sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
-			)?.projectUuid;
+			);
+			if (res && res.projectUuid) {
+				projectUuid = res.projectUuid;
+			}
 		});
 
 		element.data = JSON.stringify(sliceElementSpec);
@@ -76,8 +104,9 @@
 	}
 
 	function updateSliceModel(e: CustomEvent) {
+		if (!sliceElementSpec) return;
 		sliceElementSpec = {
-			sliceId: sliceElementSpec?.sliceId,
+			sliceId: sliceElementSpec.sliceId,
 			modelName: e.detail.label
 		};
 		element.data = JSON.stringify(sliceElementSpec);
@@ -109,7 +138,7 @@
 		/>
 		{#if element.type === ReportElementType.CHART}
 			{#await chartOptions then options}
-				<Svelecte bind:value={element.data} {options} on:change={updateChartId} />
+				<Svelecte value={chartId} {options} on:change={updateChartId} />
 			{/await}
 		{:else if element.type === ReportElementType.TEXT}
 			<textarea
@@ -118,7 +147,7 @@
 				bind:value={element.data}
 				style="width: 100%;"
 			/>
-		{:else if element.type === ReportElementType.SLICE}
+		{:else if element.type === ReportElementType.SLICE && sliceElementSpec}
 			{#await sliceOptions then options}
 				<Svelecte value={sliceElementSpec.sliceId} {options} on:change={updateSliceId} />
 				{#if models.length > 0}

@@ -566,7 +566,7 @@ def report(
         )
 
         element_result = db.connect_execute_return(
-            "SELECT id, type, data, chart_id, position FROM report_elements "
+            "SELECT id, type, data, position FROM report_elements "
             "WHERE report_id = %s ORDER BY position;",
             [id],
         )
@@ -589,8 +589,7 @@ def report(
                         id=element[0],
                         type=element[1],
                         data=element[2],
-                        chart_id=element[3],
-                        position=element[4],
+                        position=element[3],
                     ),
                     element_result,
                 )
@@ -763,7 +762,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
     """
     db = Database()
     element_result = db.connect_execute_return(
-        "SELECT id, type, data, chart_id, position FROM report_elements "
+        "SELECT id, type, data, position FROM report_elements "
         "WHERE report_id = %s ORDER BY position;",
         [report_id],
     )
@@ -774,8 +773,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
                     id=element[0],
                     type=element[1],
                     data=element[2],
-                    chart_id=element[3],
-                    position=element[4],
+                    position=element[3],
                 ),
                 element_result,
             )
