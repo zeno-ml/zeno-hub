@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { mdiChevronUp } from '@mdi/js';
+	import { mdiChevronDown, mdiChevronUp } from '@mdi/js';
 	import AssistantBlock from './openai-chat/AssistantBlock.svelte';
 	import SystemBlock from './openai-chat/SystemBlock.svelte';
 	import UserBlock from './openai-chat/UserBlock.svelte';
@@ -22,17 +22,15 @@
 </script>
 
 <div class="flex flex-col border border-grey-light rounded p-2.5 m-1 w-[32rem]">
-	{#if !showAll}
-		<button
-			class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
-			on:click={() => (showAll = true)}
-		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
-				<path d={mdiChevronUp} />
-			</svg>
-			<span class="pr-1">Show All</span>
-		</button>
-	{/if}
+	<button
+		class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
+		on:click={() => (showAll = !showAll)}
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 fill-grey-darker">
+			<path d={showAll ? mdiChevronDown : mdiChevronUp} />
+		</svg>
+		<span class="pr-1">Show {showAll ? 'Less' : 'All'}</span>
+	</button>
 	{#if shownData}
 		{#key shownData}
 			{#each shownData as item}

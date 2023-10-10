@@ -18,6 +18,7 @@
 	};
 
 	export let chart: Chart;
+	export let width: number;
 
 	$: chartData = ZenoService.getChartData(chart.projectUuid, chart.id);
 </script>
@@ -31,8 +32,8 @@
 			<svelte:component
 				this={chartMap[chart.type]}
 				{chart}
+				{width}
 				data={JSON.parse(data)}
-				width={650}
 				height={chart.type == ChartType.RADAR ? 550 : 300}
 			/>
 		</div>

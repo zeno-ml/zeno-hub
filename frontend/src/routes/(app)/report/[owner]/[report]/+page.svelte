@@ -94,8 +94,10 @@
 	}
 </script>
 
-<div class="w-full bg-yellowish overflow-scroll">
-	<div class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 mt-6 mb-6 rounded shadow">
+<div class="w-full h-full bg-yellowish overflow-scroll">
+	<div
+		class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 md:mt-6 md:mb-6 sm:mt-0 sm:mb-0 rounded shadow"
+	>
 		<div class="flex items-center mt-12 justify-between">
 			<h1
 				class="text-5xl mr-6 text-grey-darkest"
