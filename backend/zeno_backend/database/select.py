@@ -229,7 +229,6 @@ def reports(user: User) -> list[Report]:
             "WHERE ur.user_id = %s;",
             [user.id],
         )
-        print(user_reports_result)
         user_reports = []
         if user_reports_result is not None:
             for res in user_reports_result:
