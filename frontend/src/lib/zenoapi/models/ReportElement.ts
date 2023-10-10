@@ -11,12 +11,10 @@ import type { ReportElementType } from './ReportElementType';
  * Attributes:
  * type (ReportElementType): what type of element this represents.
  * data (str | None): any data that the element holds.
- * chart_id (int | None): id of the chart this element is linked to.
  */
 export type ReportElement = {
 	id?: number | null;
 	type: ReportElementType;
 	position: number;
 	data?: string | null;
-	chartId?: number | null;
 };

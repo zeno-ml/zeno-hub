@@ -416,9 +416,9 @@ def report_element(report_id: int, element: ReportElement) -> int | None:
     """
     db = Database()
     id = db.connect_execute_return(
-        "INSERT INTO report_elements (report_id, type, data, chart_id, position)"
-        " VALUES (%s,%s,%s,%s,%s) RETURNING id;",
-        [report_id, element.type, element.data, element.chart_id, element.position],
+        "INSERT INTO report_elements (report_id, type, data, position)"
+        " VALUES (%s,%s,%s,%s) RETURNING id;",
+        [report_id, element.type, element.data, element.position],
     )
     if len(id) > 0:
         return id[0][0]

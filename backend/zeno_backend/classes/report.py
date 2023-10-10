@@ -46,14 +46,12 @@ class ReportElement(CamelModel):
     Attributes:
         type (ReportElementType): what type of element this represents.
         data (str | None): any data that the element holds.
-        chart_id (int | None): id of the chart this element is linked to.
     """
 
     id: int | None = None
     type: ReportElementType
     position: int
     data: str | None = None
-    chart_id: int | None = None
 
 
 class ReportResponse(CamelModel):
