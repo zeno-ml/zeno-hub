@@ -496,6 +496,16 @@ async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] |
                 )
             )
             values = await cur.fetchall()
+            if len(values) > 100:
+                raise Exception("Too many distinct values to create slices for.")
+            folder_id = None
+            if len(values) > 0:
+                await cur.execute(
+                    "INSERT INTO folders (name, project_uuid) VALUES (%s,%s) "
+                    "RETURNING id;",
+                    [column.name, project],
+                )
+                folder_id = await cur.fetchone()
             for value in values:
                 slice = Slice(
                     id=-1,
@@ -511,6 +521,7 @@ async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] |
                         ],
                         join=Join.OMITTED,
                     ),
+                    folder_id=None if folder_id is None else folder_id[0],
                 )
                 await cur.execute(
                     sql.SQL(
@@ -520,12 +531,13 @@ async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] |
                 exists = await cur.fetchall()
                 if len(exists) == 0:
                     await cur.execute(
-                        "INSERT INTO slices (name, filter, project_uuid) "
-                        "VALUES (%s,%s,%s) RETURNING id;",
+                        "INSERT INTO slices (name, filter, project_uuid, folder_id) "
+                        "VALUES (%s,%s,%s,%s) RETURNING id;",
                         [
                             slice.slice_name,
                             json.dumps(slice.filter_predicates, cls=PredicatesEncoder),
                             project,
+                            slice.folder_id,
                         ],
                     )
                     id = await cur.fetchone()

@@ -1706,13 +1706,20 @@ export class ZenoService {
 	/**
 	 * Delete Folder
 	 * @param requestBody
+	 * @param deleteSlices
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteFolder(requestBody: Folder): CancelablePromise<any> {
+	public static deleteFolder(
+		requestBody: Folder,
+		deleteSlices: boolean = false
+	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'DELETE',
 			url: '/folder',
+			query: {
+				delete_slices: deleteSlices
+			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

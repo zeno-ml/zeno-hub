@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import { folders, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { ZenoService, type Folder } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
+	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { slide } from 'svelte/transition';
@@ -19,6 +21,8 @@
 
 	let hovering = false;
 	let showOptions = false;
+	let showConfirmDelete = false;
+	let deleteSlices = true;
 
 	$: sls = $slices.filter((s) => s.folderId === folder.id);
 
@@ -49,6 +53,45 @@
 
 {#if editing}
 	<NewFolderPopup on:close={() => (editing = false)} folderToEdit={folder} />
+{/if}
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this folder?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+			deleteSlices = true;
+		}}
+		on:confirm={() => {
+			ZenoService.deleteFolder(folder, deleteSlices).then(() => {
+				slices.update((s) => {
+					if (deleteSlices) {
+						s = s.filter((slice) => slice.folderId !== folder.id);
+					} else {
+						s.forEach((slice) => {
+							if (slice.folderId === folder.id) {
+								slice.folderId = undefined;
+							}
+						});
+					}
+					return s;
+				});
+				folders.update((f) => {
+					const index = f.findIndex((f) => f.id === folder.id);
+					if (index !== -1) {
+						f.splice(index, 1);
+					}
+					return f;
+				});
+				showConfirmDelete = false;
+				deleteSlices = true;
+			});
+		}}
+	>
+		<div class="flex items-center">
+			<Checkbox bind:checked={deleteSlices} />
+			<span>Delete contained slices</span>
+		</div>
+	</Confirm>
 {/if}
 <div
 	class="relative flex justify-between px-2.5 mt-1 rounded h-9 bg-grey-lighter {dragOver
@@ -98,23 +141,7 @@
 							on:click={(e) => {
 								e.stopPropagation();
 								showOptions = false;
-								ZenoService.deleteFolder(folder).then(() => {
-									slices.update((s) => {
-										s.forEach((slice) => {
-											if (slice.folderId === folder.id) {
-												slice.folderId = undefined;
-											}
-										});
-										return s;
-									});
-									folders.update((f) => {
-										const index = f.findIndex((f) => f.id === folder.id);
-										if (index !== -1) {
-											f.splice(index, 1);
-										}
-										return f;
-									});
-								});
+								showConfirmDelete = true;
 							}}
 						>
 							<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;

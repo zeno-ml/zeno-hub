@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { columns, project, selectionPredicates, selections, slices } from '$lib/stores';
+	import { columns, folders, project, selectionPredicates, selections, slices } from '$lib/stores';
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
 		Join,
@@ -26,6 +26,7 @@
 	let folderId: number | undefined;
 	let predicateGroup: FilterPredicateGroup = { predicates: [], join: Join._ };
 	let nameInput: Textfield;
+	let error: string | undefined = undefined;
 
 	// Track original settings when editing.
 	let originalName = '';
@@ -37,6 +38,10 @@
 	}
 	// Declare this way instead of subscribe to avoid mis-tracking on $sliceToEdit.
 	$: updatePredicates();
+	$: {
+		predicateGroup;
+		error = undefined;
+	}
 
 	// check if predicates are valid (not empty)
 	function checkValidPredicates(preds: (FilterPredicateGroup | FilterPredicate)[]): boolean {
@@ -156,10 +161,17 @@
 	function createAllSlices() {
 		const predicates = predicateGroup.predicates[0];
 		if (Object.hasOwn(predicates, 'column'))
-			ZenoService.addAllSlices($project.uuid, (predicates as FilterPredicate).column).then(() => {
-				ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
-				dispatch('close');
-			});
+			ZenoService.addAllSlices($project.uuid, (predicates as FilterPredicate).column)
+				.then(() => {
+					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
+						folders.set(fetchedFolders)
+					);
+					ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
+					dispatch('close');
+				})
+				.catch((err) => {
+					error = err.body['detail'];
+				});
 	}
 
 	function submit(e: KeyboardEvent) {
@@ -216,5 +228,10 @@
 				<p style:margin-right="10px" style:color="red">slice already exists</p>
 			{/if}
 		</div>
+		{#if error}
+			<div class="flex items-center flex-row-reverse">
+				<p class="mt-2">{error}</p>
+			</div>
+		{/if}
 	</Content>
 </Popup>
