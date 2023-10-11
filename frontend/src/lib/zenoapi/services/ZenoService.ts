@@ -1057,6 +1057,31 @@ export class ZenoService {
 	}
 
 	/**
+	 * Add All Slices
+	 * @param project
+	 * @param requestBody
+	 * @returns number Successful Response
+	 * @throws ApiError
+	 */
+	public static addAllSlices(
+		project: string,
+		requestBody: ZenoColumn
+	): CancelablePromise<Array<number>> {
+		return __request(OpenAPI, {
+			method: 'POST',
+			url: '/all-slices/{project}',
+			path: {
+				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Add Chart
 	 * @param project
 	 * @param requestBody
@@ -1740,13 +1765,20 @@ export class ZenoService {
 	/**
 	 * Delete Folder
 	 * @param requestBody
+	 * @param deleteSlices
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteFolder(requestBody: Folder): CancelablePromise<any> {
+	public static deleteFolder(
+		requestBody: Folder,
+		deleteSlices: boolean = false
+	): CancelablePromise<any> {
 		return __request(OpenAPI, {
 			method: 'DELETE',
 			url: '/folder',
+			query: {
+				delete_slices: deleteSlices
+			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

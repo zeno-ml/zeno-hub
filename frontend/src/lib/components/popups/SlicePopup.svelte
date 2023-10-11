@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { columns, project, selectionPredicates, selections, slices } from '$lib/stores';
+	import { columns, folders, project, selectionPredicates, selections, slices } from '$lib/stores';
 	import { isPredicateGroup } from '$lib/util/typeCheck';
 	import {
 		Join,
+		MetadataType,
 		Operation,
+		ZenoColumnType,
 		ZenoService,
 		type FilterPredicate,
 		type FilterPredicateGroup,
@@ -24,6 +26,7 @@
 	let folderId: number | undefined;
 	let predicateGroup: FilterPredicateGroup = { predicates: [], join: Join._ };
 	let nameInput: Textfield;
+	let error: string | undefined = undefined;
 
 	// Track original settings when editing.
 	let originalName = '';
@@ -35,6 +38,10 @@
 	}
 	// Declare this way instead of subscribe to avoid mis-tracking on $sliceToEdit.
 	$: updatePredicates();
+	$: {
+		predicateGroup;
+		error = undefined;
+	}
 
 	// check if predicates are valid (not empty)
 	function checkValidPredicates(preds: (FilterPredicateGroup | FilterPredicate)[]): boolean {
@@ -151,10 +158,38 @@
 		dispatch('close');
 	}
 
+	function createAllSlices() {
+		const predicates = predicateGroup.predicates[0];
+		if (Object.hasOwn(predicates, 'column'))
+			ZenoService.addAllSlices($project.uuid, (predicates as FilterPredicate).column)
+				.then(() => {
+					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
+						folders.set(fetchedFolders)
+					);
+					ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
+					dispatch('close');
+				})
+				.catch((err) => {
+					error = err.body['detail'];
+				});
+	}
+
 	function submit(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			saveSlice();
 		}
+	}
+
+	function checkNominalSinglePredicateNoEntry(predicates: FilterPredicateGroup) {
+		return (
+			!sliceToEdit &&
+			predicates.predicates.length === 1 &&
+			Object.hasOwn(predicates.predicates[0], 'column') &&
+			(predicates.predicates[0] as FilterPredicate).column.dataType === MetadataType.NOMINAL &&
+			(predicates.predicates[0] as FilterPredicate).column.columnType !== ZenoColumnType.ID &&
+			(predicates.predicates[0] as FilterPredicate).column.columnType !== ZenoColumnType.DATA &&
+			(predicates.predicates[0] as FilterPredicate).value === ''
+		);
 	}
 </script>
 
@@ -165,17 +200,27 @@
 		<Textfield class="mb-2 ml-3" bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
 		<div class="flex items-center flex-row-reverse">
-			<Button
-				variant="outlined"
-				on:click={saveSlice}
-				disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
-					(sliceToEdit &&
-						originalName !== sliceName &&
-						$slices.some((slice) => slice.sliceName === sliceName)) ||
-					!isValidPredicates}
-			>
-				{sliceToEdit ? 'Update Slice' : 'Create Slice'}
-			</Button>
+			{#if checkNominalSinglePredicateNoEntry(predicateGroup)}
+				<Button
+					variant="outlined"
+					on:click={createAllSlices}
+					disabled={$slices.some((slice) => slice.sliceName === sliceName)}
+				>
+					{'Create Slices for all Values'}
+				</Button>
+			{:else}
+				<Button
+					variant="outlined"
+					on:click={saveSlice}
+					disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
+						(sliceToEdit &&
+							originalName !== sliceName &&
+							$slices.some((slice) => slice.sliceName === sliceName)) ||
+						!isValidPredicates}
+				>
+					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
+				</Button>
+			{/if}
 			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
 				cancel
 			</Button>
@@ -183,5 +228,10 @@
 				<p style:margin-right="10px" style:color="red">slice already exists</p>
 			{/if}
 		</div>
+		{#if error}
+			<div class="flex items-center flex-row-reverse">
+				<p class="mt-2">{error}</p>
+			</div>
+		{/if}
 	</Content>
 </Popup>

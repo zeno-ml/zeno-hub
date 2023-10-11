@@ -61,19 +61,29 @@ def report(report_id: int):
     )
 
 
-def folder(folder: Folder):
+async def folder(folder: Folder, delete_slices: bool):
     """Deletes a folder from an existing project.
 
     Args:
         folder (Folder): the folder to be deleted.
+        delete_slices (bool): whether to delete the slices in the folder as well.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM folders WHERE id = %s;",
-        [
-            folder.id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if delete_slices:
+                await cur.execute(
+                    "DELETE FROM slices WHERE folder_id = %s;",
+                    [
+                        folder.id,
+                    ],
+                )
+            await cur.execute(
+                "DELETE FROM folders WHERE id = %s;",
+                [
+                    folder.id,
+                ],
+            )
+            await conn.commit()
 
 
 def slice(req: Slice):

@@ -738,6 +738,27 @@ def get_server() -> FastAPI:
         return id
 
     @api_app.post(
+        "/all-slices/{project}",
+        response_model=list[int],
+        tags=["zeno"],
+        dependencies=[Depends(auth)],
+    )
+    async def add_all_slices(project: str, req: ZenoColumn):
+        try:
+            ids = await insert.all_slices_for_column(project, req)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=str(exc),
+            ) from exc
+        if ids is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to insert slices",
+            )
+        return ids
+
+    @api_app.post(
         "/chart/{project}",
         response_model=int,
         tags=["zeno"],
@@ -927,8 +948,8 @@ def get_server() -> FastAPI:
         delete.chart(chart)
 
     @api_app.delete("/folder", tags=["zeno"], dependencies=[Depends(auth)])
-    def delete_folder(folder: Folder):
-        delete.folder(folder)
+    async def delete_folder(folder: Folder, delete_slices: bool = False):
+        await delete.folder(folder, delete_slices)
 
     @api_app.delete("/tag", tags=["zeno"], dependencies=[Depends(auth)])
     def delete_tag(tag: Tag):
