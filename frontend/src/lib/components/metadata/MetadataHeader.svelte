@@ -15,7 +15,9 @@
 		comparisonColumn.set(comparisonColumnOptions[0]);
 	}
 
-	$: excludeModels = $models.filter((m) => m !== $model);
+	$: sortedModels = $models.sort((a, b) => a.localeCompare(b));
+	$: excludeModels = sortedModels.filter((m) => m !== $model);
+	$: sortedMetrics = $metrics.sort((a, b) => a.name.localeCompare(b.name));
 </script>
 
 <div class="sticky bg-yellowish-light -top-5 flex items-center pb-2.5 z-10 pt-1">
@@ -28,7 +30,7 @@
 				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 				bind:value={$model}
 			>
-				{#each $models as mod}
+				{#each sortedModels as mod}
 					<option class="p-1" value={mod}>{mod}</option>
 				{/each}
 			</select>
@@ -43,7 +45,7 @@
 				required
 				bind:value={$metric}
 			>
-				{#each $metrics as met}
+				{#each sortedMetrics as met}
 					<option value={met}>{met.name}</option>
 				{/each}
 			</select>
@@ -85,7 +87,7 @@
 			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
 			bind:value={$metric}
 		>
-			{#each $metrics as met}
+			{#each sortedMetrics as met}
 				<option value={met}>{met.name}</option>
 			{/each}
 		</select>
