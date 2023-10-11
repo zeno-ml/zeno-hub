@@ -251,9 +251,9 @@ def reports(user: User) -> list[Report]:
                             else list(
                                 map(lambda linked: str(linked[0]), linked_projects)
                             ),
-                            editor=res[4],
-                            public=res[5],
-                            description=res[6],
+                            editor=res[3],
+                            public=res[4],
+                            description=res[5],
                         )
                     )
 
@@ -287,9 +287,9 @@ def reports(user: User) -> list[Report]:
                             else list(
                                 map(lambda linked: str(linked[0]), linked_projects)
                             ),
-                            editor=res[4],
-                            public=res[5],
-                            description=res[6],
+                            editor=res[3],
+                            public=res[4],
+                            description=res[5],
                         )
                     )
         org_reports = list(
