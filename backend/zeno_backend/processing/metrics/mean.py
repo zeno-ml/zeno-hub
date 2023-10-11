@@ -80,7 +80,9 @@ def mean(
         else:
             res = db.cur.fetchone()
 
-        if res:
-            return GroupMetric(metric=float(res[1]) if res[1] else None, size=res[0])
+        if res is not None:
+            return GroupMetric(
+                metric=float(res[1]) if res[1] is not None else None, size=res[0]
+            )
         else:
             return GroupMetric(metric=None, size=0)
