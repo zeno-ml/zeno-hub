@@ -273,9 +273,17 @@ def get_server() -> FastAPI:
         "/slice-finder/{project}",
         tags=["zeno"],
         response_model=SliceFinderReturn,
-        dependencies=[Depends(auth)],
     )
-    def run_slice_finder(req: SliceFinderRequest, project: str):
+    def run_slice_finder(
+        req: SliceFinderRequest, project: str, current_user=Depends(auth.claim())
+    ):
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Ran Slice Finder",
+                user_id=current_user["sub"],
+                event_properties={"project_uuid": project},
+            )
+        )
         return slice_finder(project, req)
 
     @api_app.post(
@@ -726,15 +734,21 @@ def get_server() -> FastAPI:
         "/slice/{project}",
         response_model=int,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def add_slice(project: str, req: Slice):
+    def add_slice(project: str, req: Slice, current_user=Depends(auth.claim())):
         id = insert.slice(project, req)
         if id is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to insert slice",
             )
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Slice Created",
+                user_id=current_user["sub"],
+                event_properties={"project_uuid": project},
+            )
+        )
         return id
 
     @api_app.post(
@@ -762,15 +776,21 @@ def get_server() -> FastAPI:
         "/chart/{project}",
         response_model=int,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def add_chart(project: str, chart: Chart):
+    def add_chart(project: str, chart: Chart, current_user=Depends(auth.claim())):
         id = insert.chart(project, chart)
         if id is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to insert chart",
             )
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Chart Created",
+                user_id=current_user["sub"],
+                event_properties={"project_uuid": project},
+            )
+        )
         return id
 
     @api_app.post("/report/{name}", tags=["zeno"], dependencies=[Depends(auth)])
@@ -779,6 +799,12 @@ def get_server() -> FastAPI:
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         insert.report(name, user)
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Report Created",
+                user_id=current_user["sub"],
+            )
+        )
 
     @api_app.post("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_report_element(
@@ -793,21 +819,34 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to insert report element",
             )
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Report Element Created",
+                user_id=current_user["sub"],
+                event_properties={"report_id": report_id},
+            )
+        )
         return id
 
     @api_app.post(
         "/tag/{project}",
         response_model=int,
         tags=["zeno"],
-        dependencies=[Depends(auth)],
     )
-    def add_tag(tag: Tag, project: str):
+    def add_tag(tag: Tag, project: str, current_user=Depends(auth.claim())):
         id = insert.tag(project, tag)
         if id is None:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Failed to insert tag",
             )
+        AmplitudeHandler().track(
+            BaseEvent(
+                event_type="Tag Created",
+                user_id=current_user["sub"],
+                event_properties={"project_uuid": project},
+            )
+        )
         return id
 
     @api_app.post("/organization", tags=["zeno"], dependencies=[Depends(auth)])
