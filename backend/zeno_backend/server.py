@@ -451,6 +451,7 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="report is private",
             )
+        print(rep, util.get_user_from_token(request))
         return rep
 
     @api_app.post(

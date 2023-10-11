@@ -19,6 +19,7 @@ export async function load({ cookies, params, url }) {
 		};
 	}
 
+	console.log(OpenAPI.HEADERS);
 	let reportResponse: ReportResponse;
 	try {
 		reportResponse = await ZenoService.getReport(params.owner, params.report);
@@ -32,6 +33,8 @@ export async function load({ cookies, params, url }) {
 		}
 		throw error(404, 'Could not load report');
 	}
+
+	OpenAPI.HEADERS = undefined;
 
 	return {
 		report: reportResponse.report,

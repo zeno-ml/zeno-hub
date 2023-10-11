@@ -20,7 +20,7 @@
 </script>
 
 {#if element.data !== null && element.data !== undefined}
-	<div class="flex items-center my-2" bind:clientWidth={width}>
+	<div class="flex items-center my-2 ml-2" bind:clientWidth={width}>
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART}
