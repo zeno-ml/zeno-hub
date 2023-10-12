@@ -26,14 +26,13 @@
 	let userRequest = zenoClient.getProjectUsers(config.uuid);
 	let organizationRequest = zenoClient.getProjectOrgs(config.uuid);
 
-	$: invalidName = config.name.length === 0;
+	$: invalidName = config.name.length === 0 || config.name.match(/[/]/g) !== null;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function updateProject() {
 		zenoClient.updateProject(config).then(() => {
-			project.set(config);
 			dispatch('close');
 		});
 	}

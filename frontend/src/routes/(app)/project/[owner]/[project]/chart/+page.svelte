@@ -25,7 +25,11 @@
 					zenoClient
 						.addChart($project.uuid, chartDefaults('New Chart', 0, $project.uuid, ChartType.BAR))
 						.then((res) => {
-							goto(`/project/${$project.ownerName}/${$project.name}/chart/${res}?edit=true`);
+							goto(
+								`/project/${$project.ownerName}/${encodeURIComponent(
+									$project.name
+								)}/chart/${res}?edit=true`
+							);
 						});
 				}}
 			>

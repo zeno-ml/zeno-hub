@@ -64,8 +64,9 @@
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	function updateReportName(e: any) {
-		zenoClient.updateReport({ ...data.report, name: e.target?.textContent }).then(() => {
-			goto('/report/' + data.report.ownerName + '/' + e.target?.textContent);
+		const name = e.target?.textContent.replaceAll(/[/]/g, '');
+		zenoClient.updateReport({ ...data.report, name: name }).then(() => {
+			goto('/report/' + data.report.ownerName + '/' + encodeURIComponent(name));
 		});
 	}
 
