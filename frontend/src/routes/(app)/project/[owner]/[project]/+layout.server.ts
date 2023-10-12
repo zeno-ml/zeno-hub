@@ -1,4 +1,4 @@
-import { getClientAndUser } from '$lib/api/util';
+import { getClientAndUser } from '$lib/api/client';
 import type { URLParams } from '$lib/util/util';
 import type {
 	ApiError,

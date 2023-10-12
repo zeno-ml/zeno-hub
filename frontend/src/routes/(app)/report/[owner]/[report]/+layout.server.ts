@@ -1,4 +1,4 @@
-import { getClientAndUser } from '$lib/api/util';
+import { getClientAndUser } from '$lib/api/client';
 import type { ApiError } from '$lib/zenoapi';
 import { error, redirect } from '@sveltejs/kit';
 

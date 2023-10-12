@@ -1,4 +1,4 @@
-import { getClient } from '$lib/api/util';
+import { getClient } from '$lib/api/client';
 import type { Report } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 

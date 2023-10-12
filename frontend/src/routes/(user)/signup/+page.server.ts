@@ -3,7 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export const actions: Actions = {
-	signup: async ({ request, url }) => {
+	signup: async ({ request }) => {
 		const data = await request.formData();
 		const email = data.get('email');
 		const username = data.get('username');
@@ -41,6 +41,6 @@ export const actions: Actions = {
 				error: (error as Error).message
 			});
 		}
-		throw redirect(303, url.searchParams.get('redirectTo') ?? `/verify/${username}`);
+		throw redirect(303, `/verify/${username}`);
 	}
 };

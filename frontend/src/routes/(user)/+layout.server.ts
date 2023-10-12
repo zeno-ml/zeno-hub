@@ -1,8 +1,9 @@
+import { checkRefreshCookie } from '$lib/util/userCookieRefresh';
 import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ cookies, url }) => {
-	const userCookie = cookies.get('loggedIn');
-	if (userCookie) {
-		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
+	const cognitoUser = await checkRefreshCookie(cookies, url);
+	if (cognitoUser) {
+		throw redirect(303, '/');
 	}
 };

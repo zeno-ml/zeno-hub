@@ -1,4 +1,4 @@
-import { getClientAndUser } from '$lib/api/util';
+import { getClientAndUser } from '$lib/api/client';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, url }) {

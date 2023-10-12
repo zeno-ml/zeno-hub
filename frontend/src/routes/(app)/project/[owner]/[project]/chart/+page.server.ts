@@ -1,4 +1,4 @@
-import { getClient } from '$lib/api/util';
+import { getClient } from '$lib/api/client';
 import type { Chart } from '$lib/zenoapi/index';
 import { error } from '@sveltejs/kit';
 

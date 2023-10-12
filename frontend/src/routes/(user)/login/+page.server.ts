@@ -47,6 +47,6 @@ export const actions: Actions = {
 				showReset: err.name === 'NotAuthorizedException'
 			});
 		}
-		throw redirect(303, (data.get('redirect') as string) ?? '/');
+		throw redirect(303, data.has('redirect') ? (data.get('redirect') as string) : '/');
 	}
 };
