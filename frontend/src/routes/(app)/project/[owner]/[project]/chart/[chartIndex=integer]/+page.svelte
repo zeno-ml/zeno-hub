@@ -9,11 +9,13 @@
 	import ViewSelection from '$lib/components/chart/chart-page/view-selection/ViewSelection.svelte';
 	import { project } from '$lib/stores';
 	import { chartMap } from '$lib/util/charts';
-	import { ZenoService, type Chart } from '$lib/zenoapi';
+	import type { Chart, ZenoService } from '$lib/zenoapi';
+	import { getContext } from 'svelte';
 	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
 	export let data;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined;
@@ -39,7 +41,7 @@
 
 	function updateChart(chart: Chart) {
 		if ($project && $project.editor && browser) {
-			ZenoService.updateChart($project.uuid, chart).then(() => {
+			zenoClient.updateChart($project.uuid, chart).then(() => {
 				invalidate('app:chart');
 			});
 		}

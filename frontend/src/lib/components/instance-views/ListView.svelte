@@ -12,21 +12,22 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { Join, ZenoColumnType } from '$lib/zenoapi';
+	import { Join, ZenoColumnType, ZenoService } from '$lib/zenoapi';
 	import { Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
+	import { getContext } from 'svelte';
 	import { viewMap } from './views/viewMap';
 
 	export let numberOfInstances = 0;
 	export let viewOptions: Record<string, unknown> | undefined;
 
-	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
 	let currentPage = 0;
 	let lastPage = 0;
-
 	let sampleOptions = [
 		...new Set(
 			$project.samplesPerPage !== undefined
@@ -92,7 +93,8 @@
 			end - start,
 			$sort,
 			dataIds,
-			predicates
+			predicates,
+			zenoClient
 		);
 	}
 </script>

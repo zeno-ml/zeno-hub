@@ -20,6 +20,7 @@
 		type HistogramBucket,
 		type Metric
 	} from '$lib/zenoapi';
+	import { getContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
 
 	type HistogramState = {
@@ -27,6 +28,8 @@
 		metric: Metric | undefined;
 		selectionPredicates: FilterPredicateGroup | undefined;
 	};
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let metadataHistograms: Map<string, HistogramBucket[]> = new Map();
 
@@ -60,46 +63,48 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		ZenoService.calculateHistograms($project.uuid, {
-			columns: requestColumns,
-			filterPredicates: s.selectionPredicates,
-			model: s.model,
-			metric: s.metric,
-			dataIds
-		}).then((out) => {
-			requestingHistogramCounts.set(false);
+		zenoClient
+			.calculateHistograms($project.uuid, {
+				columns: requestColumns,
+				filterPredicates: s.selectionPredicates,
+				model: s.model,
+				metric: s.metric,
+				dataIds
+			})
+			.then((out) => {
+				requestingHistogramCounts.set(false);
 
-			if ($metricRange[0] === Infinity) {
-				metricRange.set(getMetricRange(out));
-			}
-			if (metadataHistograms.size == 0) {
-				requestColumns.forEach((c, i) => {
-					metadataHistograms.set(
-						c.id,
-						out[i].map((h) => ({
-							...h,
-							filteredSize: h.size
-						}))
-					);
-				});
-			} else {
-				[...metadataHistograms.keys()].forEach((k, i) => {
-					const hist = metadataHistograms.get(k);
-					if (hist) {
+				if ($metricRange[0] === Infinity) {
+					metricRange.set(getMetricRange(out));
+				}
+				if (metadataHistograms.size == 0) {
+					requestColumns.forEach((c, i) => {
 						metadataHistograms.set(
-							k,
-							hist.map((h, j) => {
-								h.metric = out[i][j].metric;
-								h.filteredSize = out[i][j].size;
-								return h;
-							})
+							c.id,
+							out[i].map((h) => ({
+								...h,
+								filteredSize: h.size
+							}))
 						);
-					}
-				});
-			}
+					});
+				} else {
+					[...metadataHistograms.keys()].forEach((k, i) => {
+						const hist = metadataHistograms.get(k);
+						if (hist) {
+							metadataHistograms.set(
+								k,
+								hist.map((h, j) => {
+									h.metric = out[i][j].metric;
+									h.filteredSize = out[i][j].size;
+									return h;
+								})
+							);
+						}
+					});
+				}
 
-			metadataHistograms = new Map(metadataHistograms);
-		});
+				metadataHistograms = new Map(metadataHistograms);
+			});
 	});
 </script>
 

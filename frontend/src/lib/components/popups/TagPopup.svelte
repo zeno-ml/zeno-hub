@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { project, selectionIds, tags } from '$lib/stores';
-	import { ZenoService } from '$lib/zenoapi';
+	import type { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let tagName = '';
 	let input: Textfield;
@@ -26,21 +27,23 @@
 			tagName = 'Tag ' + $tags.length;
 		}
 
-		ZenoService.addTag($project.uuid, {
-			id: 0,
-			tagName,
-			dataIds: []
-		}).then((res) => {
-			tags.update((t) => [
-				...t,
-				{
-					id: res,
-					tagName,
-					dataIds: []
-				}
-			]);
-			dispatch('close');
-		});
+		zenoClient
+			.addTag($project.uuid, {
+				id: 0,
+				tagName,
+				dataIds: []
+			})
+			.then((res) => {
+				tags.update((t) => [
+					...t,
+					{
+						id: res,
+						tagName,
+						dataIds: []
+					}
+				]);
+				dispatch('close');
+			});
 	}
 
 	function submit(e: KeyboardEvent) {

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ZenoService, type Chart, type HeatmapParameters } from '$lib/zenoapi';
+	import type { Chart, HeatmapParameters, ZenoService } from '$lib/zenoapi';
+	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
 	import generateSpec from './vegaSpec-heatmap';
 
@@ -13,11 +14,13 @@
 		}>;
 	};
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let spec: VegaLiteSpec;
 
 	$: parameters = chart.parameters as HeatmapParameters;
 	$: sliceVsSlice = parameters.xChannel === parameters.yChannel;
-	$: ZenoService.getMetrics(chart.projectUuid).then((metrics) => {
+	$: zenoClient.getMetrics(chart.projectUuid).then((metrics) => {
 		const metric = metrics.find((m) => m.id === parameters.metric);
 		if (metric) {
 			spec = generateSpec(parameters, metric.name);

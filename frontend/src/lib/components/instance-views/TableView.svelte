@@ -14,20 +14,22 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import type { ZenoColumn } from '$lib/zenoapi';
+	import type { ZenoColumn, ZenoService } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
 	import Checkbox from '@smui/checkbox';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
+	import { getContext } from 'svelte';
 	import { viewMap } from './views/viewMap';
 
 	export let numberOfInstances = 0;
 	export let viewOptions: Record<string, unknown> | undefined;
 
-	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
 	let columnHeader: ZenoColumn[] = [];
 	let currentTagIds: string[] = [];
 	let currentPage = 0;
@@ -108,7 +110,8 @@
 			end - start,
 			$sort,
 			dataIds,
-			predicates
+			predicates,
+			zenoClient
 		);
 	}
 

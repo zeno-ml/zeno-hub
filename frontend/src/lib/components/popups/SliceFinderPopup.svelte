@@ -14,21 +14,22 @@
 	import {
 		MetadataType,
 		ZenoColumnType,
-		ZenoService,
 		type SliceFinderReturn,
-		type ZenoColumn
+		type ZenoColumn,
+		type ZenoService
 	} from '$lib/zenoapi';
 	import { mdiClose, mdiInformationOutline } from '@mdi/js';
 	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import ChipsWrapper from '../metadata/ChipsWrapper.svelte';
 	import SliceFinderCell from '../metadata/cells/SliceFinderCell.svelte';
 	import Popup from './Popup.svelte';
 
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let blur = function (ev: CustomEvent<unknown>) {
 		ev.target !== null && (ev.target as HTMLElement).blur();
@@ -105,7 +106,7 @@
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-			sliceFinderReturn = await ZenoService.runSliceFinder($project.uuid, {
+			sliceFinderReturn = await zenoClient.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,
 				orderBy: orderByOptions[orderByIdx],

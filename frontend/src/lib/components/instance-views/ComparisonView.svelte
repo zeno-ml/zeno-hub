@@ -15,20 +15,22 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
-	import { Join, MetadataType, ZenoColumnType, type GroupMetric } from '$lib/zenoapi';
+	import { Join, MetadataType, ZenoColumnType, ZenoService, type GroupMetric } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
+	import { getContext } from 'svelte';
 	import { viewMap } from './views/viewMap';
 
 	export let viewOptions: Record<string, unknown> | undefined;
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
 	export let modelBResult: Promise<GroupMetric[] | undefined>;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
 	let instanceContainer: HTMLDivElement;
-
 	// Which model column to show sort for.
 	let sortModel = '';
 	let currentPage = 0;
@@ -151,7 +153,8 @@
 			end - start,
 			$compareSort,
 			dataIds,
-			predicates
+			predicates,
+			zenoClient
 		);
 
 		if (instanceContainer) {

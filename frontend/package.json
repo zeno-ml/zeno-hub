@@ -13,8 +13,7 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"smui-theme": "smui-theme compile static/smui.css -i src/theme",
-		"generate-api": "npx openapi-typescript-codegen --input http://127.0.0.1:8000/api/openapi.json --output ./src/lib/zenoapi --client fetch; npx prettier -w ./src/lib/zenoapi && npm run copy-openapi",
-		"copy-openapi": "shx cp ./OpenAPI_back.txt ./src/lib/zenoapi/core/OpenAPI.ts"
+		"generate-api": "npx openapi-typescript-codegen --input http://127.0.0.1:8000/api/openapi.json --output ./src/lib/zenoapi --name ZenoClient; npx prettier -w ./src/lib/zenoapi "
 	},
 	"devDependencies": {
 		"@formkit/auto-animate": "^1.0.0-pre-alpha.3",

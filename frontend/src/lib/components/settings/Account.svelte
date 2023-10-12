@@ -1,14 +1,16 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { ZenoService } from '$lib/zenoapi';
+	import type { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
+	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import FeatureFlagsPopup from '../popups/FeatureFlagsPopup.svelte';
 
 	export let email: string;
 	export let name: string;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	let api_key = '';
 	let copied = false;
 	let showFeatureFlags = false;
@@ -42,7 +44,7 @@
 	<Button
 		variant="raised"
 		class="mb-2"
-		on:click={() => ZenoService.createApiKey().then((key) => (api_key = key))}
+		on:click={() => zenoClient.createApiKey().then((key) => (api_key = key))}
 	>
 		Generate new API key
 	</Button>

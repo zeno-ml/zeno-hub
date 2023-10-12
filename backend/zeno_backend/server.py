@@ -491,7 +491,7 @@ def get_server() -> FastAPI:
     def get_projects(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
-            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
         return select.projects(user)
 
     @api_app.get(
@@ -510,7 +510,7 @@ def get_server() -> FastAPI:
     def get_reports(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
-            return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
         return select.reports(user)
 
     @api_app.get(

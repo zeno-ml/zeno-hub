@@ -2,17 +2,13 @@
 	import type { AuthUser } from '$lib/auth/types';
 	import Account from '$lib/components/settings/Account.svelte';
 	import OrganizationsTable from '$lib/components/settings/OrganizationsTable.svelte';
-	import { OpenAPI, type Organization, type User } from '$lib/zenoapi';
+	import type { Organization, User } from '$lib/zenoapi';
 
 	export let data;
 
 	$: user = data.user as User;
 	$: cognitoUser = data.cognitoUser as AuthUser;
 	$: organizations = data.organizations as Organization[];
-
-	$: OpenAPI.HEADERS = {
-		Authorization: 'Bearer ' + cognitoUser.accessToken
-	};
 </script>
 
 <div class="flex flex-col w-full bg-yellowish">

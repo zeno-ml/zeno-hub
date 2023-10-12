@@ -38,10 +38,11 @@ import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
+import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 export class ZenoService {
+	constructor(public readonly httpRequest: BaseHttpRequest) {}
+
 	/**
 	 * Create Project
 	 * Create a new project.
@@ -54,8 +55,8 @@ export class ZenoService {
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static createProject(requestBody: Project): CancelablePromise<Project> {
-		return __request(OpenAPI, {
+	public createProject(requestBody: Project): CancelablePromise<Project> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/project',
 			body: requestBody,
@@ -81,8 +82,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadDatasetSchema(formData: Body_upload_dataset_schema): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public uploadDatasetSchema(formData: Body_upload_dataset_schema): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/dataset-schema',
 			formData: formData,
@@ -106,11 +107,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadDataset(
-		projectUuid: string,
-		formData: Body_upload_dataset
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public uploadDataset(projectUuid: string, formData: Body_upload_dataset): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/dataset/{project_uuid}',
 			path: {
@@ -139,8 +137,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadSystemSchema(formData: Body_upload_system_schema): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public uploadSystemSchema(formData: Body_upload_system_schema): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/system-schema',
 			formData: formData,
@@ -166,12 +164,12 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static uploadSystem(
+	public uploadSystem(
 		projectUuid: string,
 		systemName: string,
 		formData: Body_upload_system
 	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/system/{project_uuid}/{system_name}',
 			path: {
@@ -192,8 +190,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static minClientVersion(): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public minClientVersion(): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/min-client-version'
 		});
@@ -204,8 +202,8 @@ export class ZenoService {
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static getUsers(): CancelablePromise<Array<User>> {
-		return __request(OpenAPI, {
+	public getUsers(): CancelablePromise<Array<User>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/users'
 		});
@@ -216,8 +214,8 @@ export class ZenoService {
 	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getOrganizationNames(): CancelablePromise<Array<Organization>> {
-		return __request(OpenAPI, {
+	public getOrganizationNames(): CancelablePromise<Array<Organization>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/organization-names'
 		});
@@ -230,8 +228,8 @@ export class ZenoService {
 	 * @returns binary Successful Response
 	 * @throws ApiError
 	 */
-	public static getData(project: string, dataId: string): CancelablePromise<Blob> {
-		return __request(OpenAPI, {
+	public getData(project: string, dataId: string): CancelablePromise<Blob> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/data/{project}',
 			path: {
@@ -252,8 +250,8 @@ export class ZenoService {
 	 * @returns ProjectStats Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectStats(project: string): CancelablePromise<ProjectStats> {
-		return __request(OpenAPI, {
+	public getProjectStats(project: string): CancelablePromise<ProjectStats> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-stats/{project}',
 			path: {
@@ -271,8 +269,8 @@ export class ZenoService {
 	 * @returns ReportStats Successful Response
 	 * @throws ApiError
 	 */
-	public static getReportStats(reportId: number): CancelablePromise<ReportStats> {
-		return __request(OpenAPI, {
+	public getReportStats(reportId: number): CancelablePromise<ReportStats> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/report-stats/{report_id}',
 			path: {
@@ -290,8 +288,8 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getModels(project: string): CancelablePromise<Array<string>> {
-		return __request(OpenAPI, {
+	public getModels(project: string): CancelablePromise<Array<string>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/models/{project}',
 			path: {
@@ -309,8 +307,8 @@ export class ZenoService {
 	 * @returns Metric Successful Response
 	 * @throws ApiError
 	 */
-	public static getMetrics(project: string): CancelablePromise<Array<Metric>> {
-		return __request(OpenAPI, {
+	public getMetrics(project: string): CancelablePromise<Array<Metric>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/metrics/{project}',
 			path: {
@@ -328,8 +326,8 @@ export class ZenoService {
 	 * @returns Folder Successful Response
 	 * @throws ApiError
 	 */
-	public static getFolders(project: string): CancelablePromise<Array<Folder>> {
-		return __request(OpenAPI, {
+	public getFolders(project: string): CancelablePromise<Array<Folder>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/folders/{project}',
 			path: {
@@ -347,8 +345,8 @@ export class ZenoService {
 	 * @returns Slice Successful Response
 	 * @throws ApiError
 	 */
-	public static getSlices(project: string): CancelablePromise<Array<Slice>> {
-		return __request(OpenAPI, {
+	public getSlices(project: string): CancelablePromise<Array<Slice>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/slices/{project}',
 			path: {
@@ -367,8 +365,8 @@ export class ZenoService {
 	 * @returns Chart Successful Response
 	 * @throws ApiError
 	 */
-	public static getCharts(ownerName: string, projectName: string): CancelablePromise<Array<Chart>> {
-		return __request(OpenAPI, {
+	public getCharts(ownerName: string, projectName: string): CancelablePromise<Array<Chart>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/charts/{owner}/{project}',
 			query: {
@@ -387,8 +385,8 @@ export class ZenoService {
 	 * @returns ZenoColumn Successful Response
 	 * @throws ApiError
 	 */
-	public static getColumns(project: string): CancelablePromise<Array<ZenoColumn>> {
-		return __request(OpenAPI, {
+	public getColumns(project: string): CancelablePromise<Array<ZenoColumn>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/columns/{project}',
 			path: {
@@ -406,8 +404,8 @@ export class ZenoService {
 	 * @returns Tag Successful Response
 	 * @throws ApiError
 	 */
-	public static getTags(project: string): CancelablePromise<Array<Tag>> {
-		return __request(OpenAPI, {
+	public getTags(project: string): CancelablePromise<Array<Tag>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/tags/{project}',
 			path: {
@@ -426,11 +424,11 @@ export class ZenoService {
 	 * @returns GroupMetric Successful Response
 	 * @throws ApiError
 	 */
-	public static getMetricForTag(
+	public getMetricForTag(
 		project: string,
 		requestBody: TagMetricKey
 	): CancelablePromise<GroupMetric> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/tag-metric/{project}',
 			path: {
@@ -451,11 +449,11 @@ export class ZenoService {
 	 * @returns SliceFinderReturn Successful Response
 	 * @throws ApiError
 	 */
-	public static runSliceFinder(
+	public runSliceFinder(
 		project: string,
 		requestBody: SliceFinderRequest
 	): CancelablePromise<SliceFinderReturn> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice-finder/{project}',
 			path: {
@@ -476,11 +474,11 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getFilteredTable(
+	public getFilteredTable(
 		projectUuid: string,
 		requestBody: TableRequest
 	): CancelablePromise<string> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/filtered-table/{project_uuid}',
 			path: {
@@ -500,10 +498,10 @@ export class ZenoService {
 	 * @returns SliceElementOptions Successful Response
 	 * @throws ApiError
 	 */
-	public static getSliceElementOptions(
+	public getSliceElementOptions(
 		requestBody: SliceElementSpec
 	): CancelablePromise<SliceElementOptions> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice-element-options/',
 			body: requestBody,
@@ -520,8 +518,8 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getSliceTable(requestBody: SliceTableRequest): CancelablePromise<string> {
-		return __request(OpenAPI, {
+	public getSliceTable(requestBody: SliceTableRequest): CancelablePromise<string> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice-table',
 			body: requestBody,
@@ -540,12 +538,12 @@ export class ZenoService {
 	 * @returns ChartResponse Successful Response
 	 * @throws ApiError
 	 */
-	public static getChart(
+	public getChart(
 		chartId: number,
 		ownerName: string,
 		projectName: string
 	): CancelablePromise<ChartResponse> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/chart/{owner}/{project}/{chart_id}',
 			path: {
@@ -568,8 +566,8 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getChartData(projectUuid: string, chartId: number): CancelablePromise<string> {
-		return __request(OpenAPI, {
+	public getChartData(projectUuid: string, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/chart-data/{project_uuid}/{chart_id}',
 			path: {
@@ -587,8 +585,8 @@ export class ZenoService {
 	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getOrganizations(): CancelablePromise<Array<Organization>> {
-		return __request(OpenAPI, {
+	public getOrganizations(): CancelablePromise<Array<Organization>> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/organizations'
 		});
@@ -600,8 +598,8 @@ export class ZenoService {
 	 * @returns boolean Successful Response
 	 * @throws ApiError
 	 */
-	public static isProjectPublic(projectUuid: string): CancelablePromise<boolean> {
-		return __request(OpenAPI, {
+	public isProjectPublic(projectUuid: string): CancelablePromise<boolean> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-public/{project_uuid}',
 			path: {
@@ -620,11 +618,8 @@ export class ZenoService {
 	 * @returns ProjectState Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectState(
-		ownerName: string,
-		projectName: string
-	): CancelablePromise<ProjectState> {
-		return __request(OpenAPI, {
+	public getProjectState(ownerName: string, projectName: string): CancelablePromise<ProjectState> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-state/{owner}/{project}',
 			query: {
@@ -644,11 +639,8 @@ export class ZenoService {
 	 * @returns ReportResponse Successful Response
 	 * @throws ApiError
 	 */
-	public static getReport(
-		ownerName: string,
-		reportName: string
-	): CancelablePromise<ReportResponse> {
-		return __request(OpenAPI, {
+	public getReport(ownerName: string, reportName: string): CancelablePromise<ReportResponse> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/report/{owner}/{report}',
 			query: {
@@ -667,8 +659,8 @@ export class ZenoService {
 	 * @returns ReportElement Successful Response
 	 * @throws ApiError
 	 */
-	public static getReportElements(reportId: any): CancelablePromise<Array<ReportElement>> {
-		return __request(OpenAPI, {
+	public getReportElements(reportId: any): CancelablePromise<Array<ReportElement>> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report-elements/{report_id}',
 			path: {
@@ -687,8 +679,8 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectUuid(ownerName: string, projectName: string): CancelablePromise<string> {
-		return __request(OpenAPI, {
+	public getProjectUuid(ownerName: string, projectName: string): CancelablePromise<string> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-uuid/{owner_name}/{project_name}',
 			path: {
@@ -706,8 +698,8 @@ export class ZenoService {
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjects(): CancelablePromise<Array<Project>> {
-		return __request(OpenAPI, {
+	public getProjects(): CancelablePromise<Array<Project>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/projects'
 		});
@@ -718,8 +710,8 @@ export class ZenoService {
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public static getPublicProjects(): CancelablePromise<Array<Project>> {
-		return __request(OpenAPI, {
+	public getPublicProjects(): CancelablePromise<Array<Project>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/public-projects'
 		});
@@ -730,8 +722,8 @@ export class ZenoService {
 	 * @returns Report Successful Response
 	 * @throws ApiError
 	 */
-	public static getReports(): CancelablePromise<Array<Report>> {
-		return __request(OpenAPI, {
+	public getReports(): CancelablePromise<Array<Report>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/reports'
 		});
@@ -742,8 +734,8 @@ export class ZenoService {
 	 * @returns Report Successful Response
 	 * @throws ApiError
 	 */
-	public static getPublicReports(): CancelablePromise<Array<Report>> {
-		return __request(OpenAPI, {
+	public getPublicReports(): CancelablePromise<Array<Report>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/public-reports'
 		});
@@ -755,8 +747,8 @@ export class ZenoService {
 	 * @returns Chart Successful Response
 	 * @throws ApiError
 	 */
-	public static getChartsForProjects(requestBody: Array<string>): CancelablePromise<Array<Chart>> {
-		return __request(OpenAPI, {
+	public getChartsForProjects(requestBody: Array<string>): CancelablePromise<Array<Chart>> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/charts-for-projects/',
 			body: requestBody,
@@ -773,8 +765,8 @@ export class ZenoService {
 	 * @returns Slice Successful Response
 	 * @throws ApiError
 	 */
-	public static getSlicesForProjects(requestBody: Array<string>): CancelablePromise<Array<Slice>> {
-		return __request(OpenAPI, {
+	public getSlicesForProjects(requestBody: Array<string>): CancelablePromise<Array<Slice>> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slices-for-projects/',
 			body: requestBody,
@@ -792,11 +784,11 @@ export class ZenoService {
 	 * @returns GroupMetric Successful Response
 	 * @throws ApiError
 	 */
-	public static getMetricsForSlices(
+	public getMetricsForSlices(
 		project: string,
 		requestBody: MetricRequest
 	): CancelablePromise<Array<GroupMetric>> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice-metrics/{project}',
 			path: {
@@ -817,11 +809,11 @@ export class ZenoService {
 	 * @returns HistogramBucket Successful Response
 	 * @throws ApiError
 	 */
-	public static calculateHistograms(
+	public calculateHistograms(
 		projectUuid: string,
 		requestBody: HistogramRequest
 	): CancelablePromise<Array<Array<HistogramBucket>>> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/histograms/{project_uuid}',
 			path: {
@@ -841,8 +833,8 @@ export class ZenoService {
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectUsers(project: string): CancelablePromise<Array<User>> {
-		return __request(OpenAPI, {
+	public getProjectUsers(project: string): CancelablePromise<Array<User>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-users/{project}',
 			path: {
@@ -860,8 +852,8 @@ export class ZenoService {
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static getReportUsers(reportId: number): CancelablePromise<Array<User>> {
-		return __request(OpenAPI, {
+	public getReportUsers(reportId: number): CancelablePromise<Array<User>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/report-users/{report_id}',
 			path: {
@@ -878,8 +870,8 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static createApiKey(): CancelablePromise<string> {
-		return __request(OpenAPI, {
+	public createApiKey(): CancelablePromise<string> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/api-key/'
 		});
@@ -891,8 +883,8 @@ export class ZenoService {
 	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getProjectOrgs(project: string): CancelablePromise<Array<Organization>> {
-		return __request(OpenAPI, {
+	public getProjectOrgs(project: string): CancelablePromise<Array<Organization>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-organizations/{project}',
 			path: {
@@ -910,8 +902,8 @@ export class ZenoService {
 	 * @returns Organization Successful Response
 	 * @throws ApiError
 	 */
-	public static getReportOrgs(reportId: number): CancelablePromise<Array<Organization>> {
-		return __request(OpenAPI, {
+	public getReportOrgs(reportId: number): CancelablePromise<Array<Organization>> {
+		return this.httpRequest.request({
 			method: 'GET',
 			url: '/report-organizations/{report_id}',
 			path: {
@@ -930,11 +922,11 @@ export class ZenoService {
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public static filterStringMetadata(
+	public filterStringMetadata(
 		project: string,
 		requestBody: StringFilterRequest
 	): CancelablePromise<Array<string>> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/string-filter/{project}',
 			path: {
@@ -954,8 +946,8 @@ export class ZenoService {
 	 * @returns User Successful Response
 	 * @throws ApiError
 	 */
-	public static login(name: string): CancelablePromise<User> {
-		return __request(OpenAPI, {
+	public login(name: string): CancelablePromise<User> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/login',
 			query: {
@@ -974,8 +966,8 @@ export class ZenoService {
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addFolder(project: string, name: string): CancelablePromise<number> {
-		return __request(OpenAPI, {
+	public addFolder(project: string, name: string): CancelablePromise<number> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/folder/{project}',
 			path: {
@@ -997,8 +989,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateFolder(project: string, requestBody: Folder): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateFolder(project: string, requestBody: Folder): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/folder/{project}',
 			path: {
@@ -1019,8 +1011,8 @@ export class ZenoService {
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addSlice(project: string, requestBody: Slice): CancelablePromise<number> {
-		return __request(OpenAPI, {
+	public addSlice(project: string, requestBody: Slice): CancelablePromise<number> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice/{project}',
 			path: {
@@ -1041,8 +1033,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateSlice(project: string, requestBody: Slice): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateSlice(project: string, requestBody: Slice): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/slice/{project}',
 			path: {
@@ -1063,11 +1055,8 @@ export class ZenoService {
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addAllSlices(
-		project: string,
-		requestBody: ZenoColumn
-	): CancelablePromise<Array<number>> {
-		return __request(OpenAPI, {
+	public addAllSlices(project: string, requestBody: ZenoColumn): CancelablePromise<Array<number>> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/all-slices/{project}',
 			path: {
@@ -1088,8 +1077,8 @@ export class ZenoService {
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addChart(project: string, requestBody: Chart): CancelablePromise<number> {
-		return __request(OpenAPI, {
+	public addChart(project: string, requestBody: Chart): CancelablePromise<number> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/chart/{project}',
 			path: {
@@ -1110,8 +1099,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateChart(project: string, requestBody: Chart): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateChart(project: string, requestBody: Chart): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/chart/{project}',
 			path: {
@@ -1131,8 +1120,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addReport(name: string): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addReport(name: string): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report/{name}',
 			path: {
@@ -1151,11 +1140,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addReportElement(
-		reportId: number,
-		requestBody: ReportElement
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addReportElement(reportId: number, requestBody: ReportElement): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report-element/{id}',
 			query: {
@@ -1175,8 +1161,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteReportElement(id: number): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteReportElement(id: number): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/report-element/{id}',
 			path: {
@@ -1195,8 +1181,8 @@ export class ZenoService {
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public static addTag(project: string, requestBody: Tag): CancelablePromise<number> {
-		return __request(OpenAPI, {
+	public addTag(project: string, requestBody: Tag): CancelablePromise<number> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/tag/{project}',
 			path: {
@@ -1217,8 +1203,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateTag(project: string, requestBody: Tag): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateTag(project: string, requestBody: Tag): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/tag/{project}',
 			path: {
@@ -1238,8 +1224,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addOrganization(requestBody: Body_add_organization): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addOrganization(requestBody: Body_add_organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/organization',
 			body: requestBody,
@@ -1256,8 +1242,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteOrganization(requestBody: Organization): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteOrganization(requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/organization',
 			body: requestBody,
@@ -1275,8 +1261,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addProjectUser(project: string, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/project-user/{project}',
 			path: {
@@ -1297,8 +1283,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateProjectUser(project: string, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/project-user/{project}',
 			path: {
@@ -1319,8 +1305,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteProjectUser(project: string, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/project-user/{project}',
 			path: {
@@ -1341,8 +1327,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/project-org/{project}',
 			path: {
@@ -1363,11 +1349,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateProjectOrg(
-		project: string,
-		requestBody: Organization
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/project-org/{project}',
 			path: {
@@ -1388,11 +1371,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteProjectOrg(
-		project: string,
-		requestBody: Organization
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteProjectOrg(project: string, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/project-org/{project}',
 			path: {
@@ -1413,8 +1393,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report-user/{report_id}',
 			path: {
@@ -1435,8 +1415,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/report-user/{report_id}',
 			path: {
@@ -1457,8 +1437,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteReportUser(reportId: number, requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/report-user/{report_id}',
 			path: {
@@ -1479,8 +1459,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static addReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public addReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report-org/{report_id}',
 			path: {
@@ -1501,11 +1481,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteReportOrg(
-		reportId: number,
-		requestBody: Organization
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/report-org/{report_id}',
 			path: {
@@ -1526,8 +1503,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static copyProject(projectUuid: string, requestBody: ProjectCopy): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public copyProject(projectUuid: string, requestBody: ProjectCopy): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'POST',
 			url: '/copy-project/{project_uuid}',
 			path: {
@@ -1547,8 +1524,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateUser(requestBody: User): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateUser(requestBody: User): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/user/',
 			body: requestBody,
@@ -1565,8 +1542,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateOrganization(requestBody: Organization): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateOrganization(requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/organization/',
 			body: requestBody,
@@ -1583,8 +1560,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateProject(requestBody: Project): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateProject(requestBody: Project): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/project/',
 			body: requestBody,
@@ -1602,11 +1579,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReportOrg(
-		reportId: number,
-		requestBody: Organization
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/report-org/{project}',
 			query: {
@@ -1627,11 +1601,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReportElement(
-		reportId: number,
-		requestBody: ReportElement
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateReportElement(reportId: number, requestBody: ReportElement): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/report-element/{report_id}',
 			path: {
@@ -1651,8 +1622,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReport(requestBody: Report): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public updateReport(requestBody: Report): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/report/',
 			body: requestBody,
@@ -1670,11 +1641,11 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static updateReportProjects(
+	public updateReportProjects(
 		reportId: number,
 		requestBody: Array<string>
 	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/report-projects/',
 			query: {
@@ -1694,8 +1665,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteProject(project: string): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteProject(project: string): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/project/{project}',
 			path: {
@@ -1713,8 +1684,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteReport(reportId: number): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteReport(reportId: number): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/report/{report_id}',
 			path: {
@@ -1732,8 +1703,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteSlice(requestBody: Slice): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteSlice(requestBody: Slice): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/slice',
 			body: requestBody,
@@ -1750,8 +1721,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteChart(requestBody: Chart): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteChart(requestBody: Chart): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/chart',
 			body: requestBody,
@@ -1769,11 +1740,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteFolder(
-		requestBody: Folder,
-		deleteSlices: boolean = false
-	): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteFolder(requestBody: Folder, deleteSlices: boolean = false): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/folder',
 			query: {
@@ -1793,8 +1761,8 @@ export class ZenoService {
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public static deleteTag(requestBody: Tag): CancelablePromise<any> {
-		return __request(OpenAPI, {
+	public deleteTag(requestBody: Tag): CancelablePromise<any> {
+		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/tag',
 			body: requestBody,

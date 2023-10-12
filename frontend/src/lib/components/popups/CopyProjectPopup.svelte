@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
-	import { ZenoService, type Project, type User } from '$lib/zenoapi';
+	import type { Project, User, ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
 	export let config: Project;
 	export let user: User;
 
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let input: Textfield;
 	let copyData = true;
@@ -28,17 +29,19 @@
 	}
 
 	function copyProject() {
-		ZenoService.copyProject(config.uuid, {
-			name: config.name,
-			dataUrl: null,
-			copyCharts: copyCharts,
-			copyData: copyData,
-			copySlices: copySlices,
-			copySystems: copySystems
-		}).then(() => {
-			invalidate('app:projects');
-			step = 2;
-		});
+		zenoClient
+			.copyProject(config.uuid, {
+				name: config.name,
+				dataUrl: null,
+				copyCharts: copyCharts,
+				copyData: copyData,
+				copySlices: copySlices,
+				copySystems: copySystems
+			})
+			.then(() => {
+				invalidate('app:projects');
+				step = 2;
+			});
 	}
 
 	function submit(e: KeyboardEvent) {

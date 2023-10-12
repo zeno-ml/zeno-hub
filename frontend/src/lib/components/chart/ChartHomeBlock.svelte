@@ -16,8 +16,11 @@
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+	import { getContext } from 'svelte';
 
 	export let chart: Chart;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let showOptions = false;
 	let iconMap = {
@@ -72,13 +75,15 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.addChart($project.uuid, {
-										id: 0,
-										name: 'Copy of ' + chart.name,
-										type: chart.type,
-										projectUuid: $project.uuid,
-										parameters: chart.parameters
-									}).then(() => invalidate('app:charts'));
+									zenoClient
+										.addChart($project.uuid, {
+											id: 0,
+											name: 'Copy of ' + chart.name,
+											type: chart.type,
+											projectUuid: $project.uuid,
+											parameters: chart.parameters
+										})
+										.then(() => invalidate('app:charts'));
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">content_copy</Icon>&nbsp;
@@ -90,7 +95,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteChart(chart).then(() => invalidate('app:charts'));
+									zenoClient.deleteChart(chart).then(() => invalidate('app:charts'));
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;

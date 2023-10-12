@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { viewMap } from '$lib/components/instance-views/views/viewMap';
-	import {
-		ZenoService,
-		type ReportElement,
-		type SliceElementOptions,
-		type SliceElementSpec,
-		type SliceTableRequest
+	import type {
+		ReportElement,
+		SliceElementOptions,
+		SliceElementSpec,
+		SliceTableRequest,
+		ZenoService
 	} from '$lib/zenoapi';
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import { noop } from 'svelte/internal';
+	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	let sliceElementSpec: SliceElementSpec | undefined;
 	let sliceElementOptions: SliceElementOptions | undefined;
 	let table: Record<string, unknown>[] | undefined = [];
@@ -20,21 +21,23 @@
 
 	try {
 		sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
-	} catch (e) {
-		noop();
+	} catch {
+		sliceElementSpec = undefined;
 	}
 
 	if (sliceElementSpec) {
-		ZenoService.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+		zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
 	}
 
 	$: if (sliceElementSpec) {
-		ZenoService.getSliceTable({
-			sliceId: sliceElementSpec.sliceId,
-			model: sliceElementSpec.modelName,
-			offset: page * 2,
-			limit: 2
-		} as SliceTableRequest).then((r) => (table = JSON.parse(r)));
+		zenoClient
+			.getSliceTable({
+				sliceId: sliceElementSpec.sliceId,
+				model: sliceElementSpec.modelName,
+				offset: page * 2,
+				limit: 2
+			} as SliceTableRequest)
+			.then((r) => (table = JSON.parse(r)));
 	}
 </script>
 

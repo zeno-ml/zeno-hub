@@ -1,38 +1,43 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
-	import { ZenoService, type Tag } from '$lib/zenoapi';
+	import type { Tag, ZenoService } from '$lib/zenoapi';
 	import { mdiInformationOutline, mdiPlus, mdiPlusCircle } from '@mdi/js';
 	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import { getContext } from 'svelte';
 	import TagPopup from '../popups/TagPopup.svelte';
 	import TagCell from './cells/TagCell.svelte';
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let showNewTag = false;
 
 	function saveChanges() {
 		if ($editTag === undefined) return;
-		ZenoService.updateTag($project.uuid, {
-			...$editTag,
-			dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
-		}).then(() => {
-			tags.update((t) => {
-				const index = t.findIndex((tag) => tag.id === $editTag?.id);
-				if (index !== -1 && $editTag !== undefined) {
-					t[index] = { ...$editTag, dataIds: $editedIds };
-				}
-				return t;
+		zenoClient
+			.updateTag($project.uuid, {
+				...$editTag,
+				dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
+			})
+			.then(() => {
+				tags.update((t) => {
+					const index = t.findIndex((tag) => tag.id === $editTag?.id);
+					if (index !== -1 && $editTag !== undefined) {
+						t[index] = { ...$editTag, dataIds: $editedIds };
+					}
+					return t;
+				});
+				let s = new Set<string>();
+				$selections.tags.forEach((tagId) => {
+					const tag: Tag | undefined = $tags.find((cur) => cur.id === tagId);
+					if (tag !== undefined) tag.dataIds.forEach((item) => s.add(item));
+					tagIds.set([...s]);
+				});
+				editTag.set(undefined);
+				editedIds.set([]);
 			});
-			let s = new Set<string>();
-			$selections.tags.forEach((tagId) => {
-				const tag: Tag | undefined = $tags.find((cur) => cur.id === tagId);
-				if (tag !== undefined) tag.dataIds.forEach((item) => s.add(item));
-				tagIds.set([...s]);
-			});
-			editTag.set(undefined);
-			editedIds.set([]);
-		});
 	}
 </script>
 

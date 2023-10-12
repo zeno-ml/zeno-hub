@@ -11,12 +11,15 @@
 	import { TrailingIcon } from '@smui/chips';
 	import { Label } from '@smui/common';
 	import AutoComplete from 'simple-svelte-autocomplete';
+	import { getContext } from 'svelte';
 	import SearchOption from './SearchOption.svelte';
 	import RegexIcon from './static/RegexIcon.svelte';
 
 	export let col: ZenoColumn;
 	export let filterPredicates: FilterPredicate[];
 	export let updatePredicates: (predicates: FilterPredicate[]) => void;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let operation = Operation.ILIKE;
 	let searchString = '';
@@ -71,7 +74,7 @@
 		}
 
 		try {
-			results = await ZenoService.filterStringMetadata($project.uuid, {
+			results = await zenoClient.filterStringMetadata($project.uuid, {
 				column: col,
 				filterString: input,
 				operation: operation

@@ -1,24 +1,20 @@
-import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { OpenAPI, ZenoService, type Report } from '$lib/zenoapi';
+import { getClient } from '$lib/api/util';
+import type { Report } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, depends, url }) {
 	depends('app:reports');
 
-	const userCookie = cookies.get('loggedIn');
-
+	const zenoClient = await getClient(cookies, url);
 	let reports: Report[] = [];
-	if (!userCookie) {
-		throw redirect(303, '/');
+
+	try {
+		reports = await zenoClient.getReports();
+	} catch {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
-	let cognitoUser = JSON.parse(userCookie);
-	cognitoUser = await checkRefreshCookie(cognitoUser, cookies, url);
-	OpenAPI.HEADERS = {
-		Authorization: 'Bearer ' + cognitoUser.accessToken
-	};
-	reports = await ZenoService.getReports();
 
 	return {
-		reports: reports
+		reports
 	};
 }

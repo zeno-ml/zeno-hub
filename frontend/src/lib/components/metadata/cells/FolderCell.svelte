@@ -3,22 +3,23 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import { folders, project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { ZenoService, type Folder } from '$lib/zenoapi';
+	import type { Folder, ZenoService } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+	import { getContext } from 'svelte';
 	import { slide } from 'svelte/transition';
 	import NewFolderPopup from '../../popups/FolderPopup.svelte';
 	import SliceCell from './SliceCell.svelte';
 
 	export let folder: Folder;
 
-	let editing = false;
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let editing = false;
 	let expandFolder = false;
 	let dragOver = false;
-
 	let hovering = false;
 	let showOptions = false;
 	let showConfirmDelete = false;
@@ -33,18 +34,20 @@
 			data.forEach((element) => {
 				const slice = $slices.find((slice) => slice.id === parseInt(element));
 				if (slice) {
-					ZenoService.updateSlice($project.uuid, {
-						...slice,
-						folderId: folder.id
-					}).then(() => {
-						slices.update((s) => {
-							const index = s.findIndex((s) => s.id === slice.id);
-							if (index !== -1) {
-								s[index] = { ...slice, folderId: folder.id };
-							}
-							return s;
+					zenoClient
+						.updateSlice($project.uuid, {
+							...slice,
+							folderId: folder.id
+						})
+						.then(() => {
+							slices.update((s) => {
+								const index = s.findIndex((s) => s.id === slice.id);
+								if (index !== -1) {
+									s[index] = { ...slice, folderId: folder.id };
+								}
+								return s;
+							});
 						});
-					});
 				}
 			});
 		}
@@ -62,7 +65,7 @@
 			deleteSlices = true;
 		}}
 		on:confirm={() => {
-			ZenoService.deleteFolder(folder, deleteSlices).then(() => {
+			zenoClient.deleteFolder(folder, deleteSlices).then(() => {
 				slices.update((s) => {
 					if (deleteSlices) {
 						s = s.filter((slice) => slice.folderId !== folder.id);

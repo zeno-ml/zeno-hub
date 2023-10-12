@@ -11,7 +11,8 @@ export async function getFilteredTable(
 	limit: number,
 	sort: [ZenoColumn | undefined, boolean],
 	dataIds: string[],
-	filterPredicates?: FilterPredicateGroup
+	filterPredicates?: FilterPredicateGroup,
+	client: ZenoService
 ) {
 	const requestedColumns = completeColumns.filter(
 		(c) =>
@@ -33,7 +34,7 @@ export async function getFilteredTable(
 		);
 	}
 
-	const res = await ZenoService.getFilteredTable(project_uuid, {
+	const res = await client.getFilteredTable(project_uuid, {
 		columns: requestedColumns,
 		model: filterModels[0],
 		diffColumn1,
