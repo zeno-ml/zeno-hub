@@ -633,7 +633,7 @@ def organization(user: User, organization: Organization):
         db.execute(
             "INSERT INTO user_organization (user_id, organization_id, admin) "
             "VALUES (%s,%s,%s);",
-            [user.id, id[0], True],
+            [user.id, id[0][0], True],
         )
         db.commit()
 
