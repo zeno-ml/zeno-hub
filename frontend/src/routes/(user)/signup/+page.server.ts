@@ -17,6 +17,27 @@ export const actions: Actions = {
 			error: 'Failed to create user.'
 		};
 
+		if ((username as string).startsWith('-')) {
+			return fail(422, { ...failProps, error: 'Your username cannot start with a dash.' });
+		}
+		if ((username as string).search(/^[a-zA-Z0-9-]+$/)) {
+			return fail(422, {
+				...failProps,
+				error: 'Your username may only contain alphanumeric characters or dashes.'
+			});
+		}
+		if ((username as string).length < 3) {
+			return fail(422, {
+				...failProps,
+				error: 'Your username must be at least 3 characters long.'
+			});
+		}
+		if ((username as string).length > 40) {
+			return fail(422, {
+				...failProps,
+				error: 'Your username cannot be longer than 40 characters.'
+			});
+		}
 		if (!password) {
 			return fail(422, { ...failProps, error: 'Please enter a password.' });
 		}
