@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ZenoService, type Organization, type User } from '$lib/zenoapi';
+	import type { Organization, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
@@ -8,11 +8,17 @@
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
 	export let organizationToEdit: Organization;
 	export let user: User;
+
+	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	let input: Textfield;
+	let selectedUser: User | undefined;
 
 	$: members = organizationToEdit.members.sort((a, b) => {
 		if (a.id === user.id) return -1;
@@ -22,18 +28,13 @@
 		return 0;
 	});
 
-	const dispatch = createEventDispatcher();
-
-	let input: Textfield;
-	let selectedUser: User | undefined;
-
 	$: invalidName = organizationToEdit.name.length === 0;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function updateOrganization() {
-		ZenoService.updateOrganization(organizationToEdit).then(() => dispatch('close'));
+		zenoClient.updateOrganization(organizationToEdit).then(() => dispatch('close'));
 	}
 
 	function submit(e: KeyboardEvent) {
@@ -106,7 +107,7 @@
 					</tbody>
 				</table>
 			{/if}
-			{#await ZenoService.getUsers() then users}
+			{#await zenoClient.getUsers() then users}
 				{@const availableUsers = users.filter(
 					(currentUser) =>
 						!(

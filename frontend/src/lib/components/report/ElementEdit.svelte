@@ -11,7 +11,7 @@
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
@@ -19,9 +19,9 @@
 	export let dragEnabled = false;
 	export let reportId: number;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	const dispatch = createEventDispatcher();
 	let timer: ReturnType<typeof setTimeout>;
-
 	let projectUuid: string | null = null;
 	let sliceElementSpec: SliceElementSpec | null = null;
 	let chartId: number | null = null;
@@ -55,14 +55,14 @@
 	}
 
 	$: if (projectUuid) {
-		ZenoService.getModels(projectUuid).then((m) => (models = m));
+		zenoClient.getModels(projectUuid).then((m) => (models = m));
 	}
 
 	function updateType(e: CustomEvent) {
 		element.data = null;
 		updateTypeObjects(element);
 		element = element;
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			type: e.detail.label,
 			data: null
@@ -72,13 +72,13 @@
 	function updateData() {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
-			ZenoService.updateReportElement(reportId, element);
+			zenoClient.updateReportElement(reportId, element);
 		}, 1000);
 	}
 
 	function updateChartId(e: CustomEvent) {
 		element.data = `${e.detail.id}`;
-		ZenoService.updateReportElement(reportId, { ...element, data: element.data });
+		zenoClient.updateReportElement(reportId, { ...element, data: element.data });
 	}
 
 	function updateSliceId(e: CustomEvent) {
@@ -97,7 +97,7 @@
 		});
 
 		element.data = JSON.stringify(sliceElementSpec);
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			data: element.data
 		});
@@ -110,7 +110,7 @@
 			modelName: e.detail.label
 		};
 		element.data = JSON.stringify(sliceElementSpec);
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			data: element.data
 		});

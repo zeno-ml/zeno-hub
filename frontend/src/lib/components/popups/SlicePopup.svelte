@@ -6,21 +6,22 @@
 		MetadataType,
 		Operation,
 		ZenoColumnType,
-		ZenoService,
 		type FilterPredicate,
 		type FilterPredicateGroup,
-		type Slice
+		type Slice,
+		type ZenoService
 	} from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import FilterGroupEntry from './FilterGroupEntry.svelte';
 	import Popup from './Popup.svelte';
 
 	export let sliceToEdit: Slice | undefined = undefined;
 
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let sliceName = '';
 	let folderId: number | undefined;
@@ -115,45 +116,49 @@
 		}
 
 		if (sliceToEdit) {
-			ZenoService.updateSlice($project.uuid, {
-				id: sliceToEdit.id,
-				sliceName,
-				filterPredicates: predicateGroup,
-				folderId: folderId
-			}).then(() => {
-				slices.update((s) => {
-					const index = s.findIndex((slice) => slice.id === sliceToEdit?.id);
-					s[index] = {
-						id: sliceToEdit ? sliceToEdit.id : -1,
-						sliceName,
-						filterPredicates: predicateGroup,
-						folderId: folderId
-					};
-					return s;
+			zenoClient
+				.updateSlice($project.uuid, {
+					id: sliceToEdit.id,
+					sliceName,
+					filterPredicates: predicateGroup,
+					folderId: folderId
+				})
+				.then(() => {
+					slices.update((s) => {
+						const index = s.findIndex((slice) => slice.id === sliceToEdit?.id);
+						s[index] = {
+							id: sliceToEdit ? sliceToEdit.id : -1,
+							sliceName,
+							filterPredicates: predicateGroup,
+							folderId: folderId
+						};
+						return s;
+					});
 				});
-			});
 		} else {
-			ZenoService.addSlice($project.uuid, {
-				id: 0,
-				sliceName,
-				filterPredicates: predicateGroup,
-				folderId: folderId
-			}).then((res) => {
-				slices.update((s) => [
-					...s,
-					{
-						id: res,
-						sliceName,
-						filterPredicates: predicateGroup,
-						folderId: folderId
-					}
-				]);
-				selections.update(() => ({
-					slices: [],
-					metadata: {},
-					tags: []
-				}));
-			});
+			zenoClient
+				.addSlice($project.uuid, {
+					id: 0,
+					sliceName,
+					filterPredicates: predicateGroup,
+					folderId: folderId
+				})
+				.then((res) => {
+					slices.update((s) => [
+						...s,
+						{
+							id: res,
+							sliceName,
+							filterPredicates: predicateGroup,
+							folderId: folderId
+						}
+					]);
+					selections.update(() => ({
+						slices: [],
+						metadata: {},
+						tags: []
+					}));
+				});
 		}
 		dispatch('close');
 	}
@@ -161,12 +166,13 @@
 	function createAllSlices() {
 		const predicates = predicateGroup.predicates[0];
 		if (Object.hasOwn(predicates, 'column'))
-			ZenoService.addAllSlices($project.uuid, (predicates as FilterPredicate).column)
+			zenoClient
+				.addAllSlices($project.uuid, (predicates as FilterPredicate).column)
 				.then(() => {
-					ZenoService.getFolders($project.uuid).then((fetchedFolders) =>
-						folders.set(fetchedFolders)
-					);
-					ZenoService.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
+					zenoClient
+						.getFolders($project.uuid)
+						.then((fetchedFolders) => folders.set(fetchedFolders));
+					zenoClient.getSlices($project.uuid).then((fetchedSlices) => slices.set(fetchedSlices));
 					dispatch('close');
 				})
 				.catch((err) => {

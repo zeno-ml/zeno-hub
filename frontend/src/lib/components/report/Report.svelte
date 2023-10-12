@@ -3,16 +3,19 @@
 	import ProjectStat from '$lib/components/project/ProjectStat.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
-	import { ZenoService, type Report } from '$lib/zenoapi';
+	import type { Report, ZenoService } from '$lib/zenoapi';
 	import { mdiDotsHorizontal, mdiFileTree, mdiSitemap } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
+	import { getContext } from 'svelte';
 
 	export let report: Report;
 	export let deletable = false;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let showOptions = false;
 	let hovering = false;
@@ -60,7 +63,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									ZenoService.deleteReport(report.id).then(() => invalidate('app:reports'));
+									zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
@@ -76,7 +79,7 @@
 		{report.description}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		{#await ZenoService.getReportStats(report.id)}
+		{#await zenoClient.getReportStats(report.id)}
 			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 		{:then stats}
 			<Tooltip

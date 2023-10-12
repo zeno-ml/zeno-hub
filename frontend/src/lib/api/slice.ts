@@ -1,5 +1,5 @@
 import { project } from '$lib/stores';
-import { ZenoService, type FilterPredicate, type GroupMetric, type MetricKey } from '$lib/zenoapi';
+import type { FilterPredicate, GroupMetric, MetricKey, ZenoService } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
 export function instanceOfFilterPredicate(object: object): object is FilterPredicate {
@@ -7,7 +7,10 @@ export function instanceOfFilterPredicate(object: object): object is FilterPredi
 }
 
 const metricKeyCache = new Map();
-export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<GroupMetric[] | null> {
+export async function getMetricsForSlices(
+	metricKeys: MetricKey[],
+	zenoClient: ZenoService
+): Promise<GroupMetric[] | null> {
 	if (metricKeys.length === 0) {
 		return null;
 	}
@@ -30,7 +33,7 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		const res = await ZenoService.getMetricsForSlices(config.uuid, {
+		const res = await zenoClient.getMetricsForSlices(config.uuid, {
 			metricKeys: keysToRequest
 		});
 		keysToRequest.forEach((key, i) => {
@@ -40,23 +43,4 @@ export async function getMetricsForSlices(metricKeys: MetricKey[]): Promise<Grou
 	}
 
 	return results;
-}
-
-export async function getMetricsForSlicesAndTags(
-	metricKeys: MetricKey[],
-	dataIds?: string[]
-): Promise<GroupMetric[] | undefined> {
-	if (metricKeys.length === 0) {
-		return undefined;
-	}
-	if (metricKeys.length > 0) {
-		const config = get(project);
-		if (!config) {
-			return Promise.reject('No project selected.');
-		}
-		return await ZenoService.getMetricsForSlices(config.uuid, {
-			metricKeys,
-			dataIds
-		});
-	}
 }

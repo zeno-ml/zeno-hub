@@ -2,22 +2,23 @@ import { dev } from '$app/environment';
 import { env as private_env } from '$env/dynamic/private';
 import { extractUserFromSession, refreshAccessToken } from '$lib/auth/cognito.js';
 import type { AuthUser } from '$lib/auth/types';
-import { OpenAPI } from '$lib/zenoapi';
 import type { Cookies } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 
-export async function checkRefreshCookie(
-	cognitoUser: AuthUser,
+export async function getOrRefreshCognitoUser(
 	cookies: Cookies,
 	url: URL
-): Promise<AuthUser> {
+): Promise<AuthUser | null> {
+	const loggedInCookie = cookies.get('loggedIn');
+	if (loggedInCookie === undefined) {
+		return null;
+	}
+
+	let cognitoUser = JSON.parse(loggedInCookie);
 	if (new Date() > new Date(cognitoUser.accessTokenExpires * 1000)) {
 		try {
 			const res = await refreshAccessToken(cognitoUser.refreshToken);
 			cognitoUser = extractUserFromSession(res);
-			OpenAPI.HEADERS = {
-				Authorization: 'Bearer ' + cognitoUser.accessToken
-			};
 			cookies.set('loggedIn', JSON.stringify(cognitoUser), {
 				path: '/',
 				httpOnly: true,
@@ -26,9 +27,9 @@ export async function checkRefreshCookie(
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (error) {
-			cookies.delete('loggedIn', { path: '/' });
 			throw redirect(303, `/login?redirectTo=${url.pathname}`);
 		}
 	}
+
 	return cognitoUser;
 }

@@ -1,20 +1,29 @@
 <script lang="ts">
 	import { navigating } from '$app/stores';
+	import { getEndpoint } from '$lib/api/util.js';
 	import Header from '$lib/components/general/Header.svelte';
-	import { authToken } from '$lib/stores';
-	import { OpenAPI } from '$lib/zenoapi/index';
+	import { ZenoClient } from '$lib/zenoapi';
 	import * as amplitude from '@amplitude/analytics-browser';
+	import { setContext } from 'svelte';
 
 	export let data;
 
-	$: {
-		if (data.cognitoUser !== null) {
-			authToken.set(data.cognitoUser.accessToken);
-			amplitude.setUserId(data.cognitoUser.id);
-			OpenAPI.HEADERS = {
-				Authorization: 'Bearer ' + data.cognitoUser.accessToken
-			};
-		}
+	$: if (data.cognitoUser !== null) {
+		amplitude.setUserId(data.cognitoUser.id);
+		setContext(
+			'zenoClient',
+			new ZenoClient({
+				BASE: getEndpoint(),
+				TOKEN: data.cognitoUser.accessToken
+			}).zeno
+		);
+	} else {
+		setContext(
+			'zenoClient',
+			new ZenoClient({
+				BASE: getEndpoint()
+			}).zeno
+		);
 	}
 </script>
 

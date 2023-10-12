@@ -1,14 +1,22 @@
 <script lang="ts">
 	import { getMetricsForSlices } from '$lib/api/slice';
 	import { metric } from '$lib/stores';
-	import type { Slice } from '$lib/zenoapi';
+	import type { Slice, ZenoService } from '$lib/zenoapi';
+	import { getContext } from 'svelte';
 
 	export let compare: boolean;
 	export let slice: Slice;
 	export let sliceModel: string;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	let result = getMetricsForSlices(
+		[{ slice: slice, model: sliceModel, metric: $metric ? $metric.id : -1 }],
+		zenoClient
+	);
 </script>
 
-{#await getMetricsForSlices( [{ slice: slice, model: sliceModel, metric: $metric ? $metric.id : -1 }] ) then res}
+{#await result then res}
 	{#if res !== null}
 		<button class={compare ? 'flex flex-col items-center mr-2.5 text-xs ' : 'flex items-center'}>
 			<span class="{!compare ? 'mr-2.5' : ''} text-right">

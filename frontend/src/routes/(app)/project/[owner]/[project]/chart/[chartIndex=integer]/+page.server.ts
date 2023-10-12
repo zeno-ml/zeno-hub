@@ -1,12 +1,14 @@
-import { ZenoService, type ChartResponse } from '$lib/zenoapi/index.js';
+import { getClient } from '$lib/api/client';
+import type { ChartResponse } from '$lib/zenoapi';
 import { error } from '@sveltejs/kit';
 
-export async function load({ params, depends }) {
+export async function load({ params, depends, cookies, url }) {
 	depends('app:chart');
 
+	const zenoClient = await getClient(cookies, url);
 	let chartResult: ChartResponse;
 	try {
-		chartResult = await ZenoService.getChart(
+		chartResult = await zenoClient.getChart(
 			parseInt(params.chartIndex),
 			params.owner,
 			params.project

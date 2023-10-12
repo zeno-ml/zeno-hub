@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { report } from '$lib/stores';
-	import { ZenoService, type Organization, type Report, type User } from '$lib/zenoapi';
+	import { page } from '$app/stores';
+	import type { Organization, Report, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
@@ -9,30 +9,31 @@
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Popup from './Popup.svelte';
 
-	export let reportConfig: Report;
 	export let user: User;
 
+	let report = $page.data.report as Report;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	const dispatch = createEventDispatcher();
 
 	let input: Textfield;
 	let selectedUser: User | undefined;
 	let selectedOrg: Organization | undefined;
 
-	let userRequest = ZenoService.getReportUsers($report.id);
-	let organizationRequest = ZenoService.getReportOrgs($report.id);
+	let userRequest = zenoClient.getReportUsers(report.id);
+	let organizationRequest = zenoClient.getReportOrgs(report.id);
 
-	$: invalidName = reportConfig.name.length === 0;
+	$: invalidName = report.name.length === 0;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function updateReport() {
-		ZenoService.updateReport(reportConfig).then(() => {
-			report.set(reportConfig);
+		zenoClient.updateReport(report).then(() => {
 			dispatch('close');
 		});
 	}
@@ -47,18 +48,22 @@
 	}
 
 	function addUser(e: CustomEvent) {
-		ZenoService.addReportUser($report.id, {
-			...e.detail,
-			admin: false
-		}).then(() => (userRequest = ZenoService.getReportUsers($report.id)));
+		zenoClient
+			.addReportUser(report.id, {
+				...e.detail,
+				admin: false
+			})
+			.then(() => (userRequest = zenoClient.getReportUsers(report.id)));
 		selectedUser = undefined;
 	}
 
 	function addOrganization(e: CustomEvent) {
-		ZenoService.addReportOrg($report.id, {
-			...e.detail,
-			admin: false
-		}).then(() => (organizationRequest = ZenoService.getReportOrgs($report.id)));
+		zenoClient
+			.addReportOrg(report.id, {
+				...e.detail,
+				admin: false
+			})
+			.then(() => (organizationRequest = zenoClient.getReportOrgs(report.id)));
 		selectedOrg = undefined;
 	}
 </script>
@@ -72,25 +77,17 @@
 			<div class="flex mb-6">
 				<div class="flex flex-col mr-8">
 					<div>
-						<Textfield bind:value={reportConfig.name} label="Name" bind:this={input} />
+						<Textfield bind:value={report.name} label="Name" bind:this={input} />
 					</div>
 				</div>
 				<div class="flex flex-col">
 					<div class="flex items-center">
-						<Checkbox
-							checked={reportConfig.public}
-							on:click={() => (reportConfig.public = !reportConfig.public)}
-						/>
+						<Checkbox checked={report.public} on:click={() => (report.public = !report.public)} />
 						<span>Public visibility</span>
 					</div>
 				</div>
 			</div>
-			<Textfield
-				textarea
-				bind:value={reportConfig.description}
-				label="Description"
-				style="width: 100%"
-			/>
+			<Textfield textarea bind:value={report.description} label="Description" style="width: 100%" />
 		</div>
 		{#if userRequest}
 			{#await userRequest then currentUsers}
@@ -121,10 +118,12 @@
 											<Checkbox
 												checked={member.admin}
 												on:click={() =>
-													ZenoService.updateReportUser($report.id, {
-														...member,
-														admin: !member.admin
-													}).then(() => (userRequest = ZenoService.getReportUsers($report.id)))}
+													zenoClient
+														.updateReportUser(report.id, {
+															...member,
+															admin: !member.admin
+														})
+														.then(() => (userRequest = zenoClient.getReportUsers(report.id)))}
 												disabled={member.id === user.id}
 											/>
 										</td>
@@ -132,9 +131,9 @@
 											{#if member.id !== user.id}
 												<IconButton
 													on:click={() =>
-														ZenoService.deleteReportUser($report.id, member).then(
-															() => (userRequest = ZenoService.getReportUsers($report.id))
-														)}
+														zenoClient
+															.deleteReportUser(report.id, member)
+															.then(() => (userRequest = zenoClient.getReportUsers(report.id)))}
 												>
 													<Icon tag="svg" viewBox="0 0 24 24">
 														<path fill="black" d={mdiClose} />
@@ -147,7 +146,7 @@
 							</tbody>
 						</table>
 					{/if}
-					{#await ZenoService.getUsers() then users}
+					{#await zenoClient.getUsers() then users}
 						{@const availableUsers = users.filter(
 							(currentUser) =>
 								!(
@@ -194,20 +193,24 @@
 											<Checkbox
 												checked={org.admin}
 												on:click={() =>
-													ZenoService.updateReportOrg($report.id, {
-														...org,
-														admin: !org.admin
-													}).then(
-														() => (organizationRequest = ZenoService.getReportOrgs($report.id))
-													)}
+													zenoClient
+														.updateReportOrg(report.id, {
+															...org,
+															admin: !org.admin
+														})
+														.then(
+															() => (organizationRequest = zenoClient.getReportOrgs(report.id))
+														)}
 											/>
 										</td>
 										<td style="text-align: end;">
 											<IconButton
 												on:click={() =>
-													ZenoService.deleteReportOrg($report.id, org).then(
-														() => (organizationRequest = ZenoService.getReportOrgs($report.id))
-													)}
+													zenoClient
+														.deleteReportOrg(report.id, org)
+														.then(
+															() => (organizationRequest = zenoClient.getReportOrgs(report.id))
+														)}
 											>
 												<Icon tag="svg" viewBox="0 0 24 24">
 													<path fill="black" d={mdiClose} />
@@ -219,7 +222,7 @@
 							</tbody>
 						</table>
 					{/if}
-					{#await ZenoService.getOrganizationNames() then oragnizationNames}
+					{#await zenoClient.getOrganizationNames() then oragnizationNames}
 						{@const availableOrgs = oragnizationNames.filter(
 							(currentOrg) => !currentOrgs.some((org) => org.id === currentOrg.id)
 						)}

@@ -1,18 +1,20 @@
 <script lang="ts">
-	import { getMetricsForTags } from '$lib/api/tag';
-	import { editTag, metric, model, selections, tagIds, tags } from '$lib/stores';
+	import { editTag, metric, model, project, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+	import { getContext } from 'svelte';
 
 	export let tag: Tag;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let hovering = false;
 	let showOptions = false;
 
-	$: result = getMetricsForTags(<TagMetricKey>{
+	$: result = zenoClient.getMetricForTag($project.uuid, <TagMetricKey>{
 		tag: tag,
 		model: $model,
 		metric: $metric?.id || -1
@@ -26,7 +28,7 @@
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		ZenoService.deleteTag(tag).then(() => {
+		zenoClient.deleteTag(tag).then(() => {
 			tags.update((t) => t.filter((t) => t.id !== tag.id));
 		});
 		tagIds.set([]);
@@ -210,7 +212,7 @@
 							hovering = false;
 						}}
 					>
-						{#if hovering}
+						{#if hovering && $project.editor}
 							<IconButton
 								size="button"
 								style="padding: 0px"

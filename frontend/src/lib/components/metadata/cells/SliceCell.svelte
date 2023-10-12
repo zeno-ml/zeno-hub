@@ -8,12 +8,15 @@
 	import Dialog, { Actions, Content, InitialFocus, Title } from '@smui/dialog';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
+	import { getContext } from 'svelte';
 	import SliceDetails from '../../general/SliceDetails.svelte';
 	import SlicePopup from '../../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
 
 	export let slice: Slice;
 	export let compare: boolean;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let confirmDelete = false;
 	let showTooltip = false;
@@ -35,9 +38,9 @@
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		ZenoService.deleteSlice(slice).then(() =>
-			slices.update((s) => s.filter((s) => s.id !== slice.id))
-		);
+		zenoClient
+			.deleteSlice(slice)
+			.then(() => slices.update((s) => s.filter((s) => s.id !== slice.id)));
 	}
 
 	function dragStart(e: DragEvent) {
@@ -55,7 +58,7 @@
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
 					if (slice) {
-						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
+						zenoClient.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
 							slices.update((s) => {
 								invalidate('app:state');
 								const index = s.findIndex((s) => s.id === slice.id);
@@ -191,7 +194,7 @@
 					hovering = false;
 				}}
 			>
-				{#if hovering}
+				{#if hovering && $project.editor}
 					<IconButton
 						size="button"
 						style="padding: 0px"

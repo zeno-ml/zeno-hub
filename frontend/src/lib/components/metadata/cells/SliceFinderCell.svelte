@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { project, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { ZenoService, type Slice } from '$lib/zenoapi';
+	import type { Slice, ZenoService } from '$lib/zenoapi';
 	import { mdiCheckCircle, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
+	import { getContext } from 'svelte';
 	import SliceDetails from '../../general/SliceDetails.svelte';
 
 	export let slice: Slice;
 	export let metric: string;
 	export let size: number;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let newSliceName = '';
 	let showSliceName = false;
@@ -27,7 +30,7 @@
 	/** Save a generated slice to the slice drawer **/
 	function addSlice() {
 		slice.sliceName = newSliceName;
-		ZenoService.addSlice($project.uuid, slice).then((res) => {
+		zenoClient.addSlice($project.uuid, slice).then((res) => {
 			slices.update((s) => [...s, { ...slice, id: res }]);
 			showSliceName = false;
 			created = true;
@@ -36,7 +39,7 @@
 
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
-		ZenoService.deleteSlice(slice).then(() => {
+		zenoClient.deleteSlice(slice).then(() => {
 			slices.update((s) => s.filter((sli) => sli.id !== slice.id));
 			created = false;
 		});
