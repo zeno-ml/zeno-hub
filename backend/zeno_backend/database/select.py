@@ -529,7 +529,7 @@ def report(
             [report_name, owner_id],
         )
         if len(report_result) == 0:
-            raise Exception("Project does not exist.")
+            raise Exception("Report does not exist.")
         id = report_result[0][0]
 
         if user is None:

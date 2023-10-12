@@ -22,7 +22,7 @@
 </script>
 
 <button
-	on:click={() => goto(`/report/${report.ownerName}/${report.name}`)}
+	on:click={() => goto(`/report/${report.ownerName}/${encodeURIComponent(report.name)}`)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}

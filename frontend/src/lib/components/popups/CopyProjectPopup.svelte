@@ -23,7 +23,9 @@
 	let oldName = config.name;
 
 	$: invalidName =
-		config.name.length === 0 || (config.name === oldName && config.ownerName === user.name);
+		config.name.length === 0 ||
+		(config.name === oldName && config.ownerName === user.name) ||
+		config.name.match(/[/]/g) !== null;
 	$: if (input) {
 		input.getElement().focus();
 	}
@@ -109,9 +111,10 @@
 					<div class="flex flex-col mr-8">
 						<div class="mb-4">
 							Your Project has been copied and can be accessed at <a
-								href={`/project/${user.name}/${config.name}`}
+								href={`/project/${user.name}/${encodeURIComponent(config.name)}`}
 								target="_blank"
-								class="text-primary hover:underline">/project/{user.name}/{config.name}</a
+								class="text-primary hover:underline"
+								>/project/{user.name}/{encodeURIComponent(config.name)}</a
 							>.
 						</div>
 						{#if !copyData}

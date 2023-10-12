@@ -41,7 +41,7 @@
 	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
 {/if}
 <button
-	on:click={() => goto(`/project/${project.ownerName}/${project.name}`)}
+	on:click={() => goto(`/project/${project.ownerName}/${encodeURIComponent(project.name)}`)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
