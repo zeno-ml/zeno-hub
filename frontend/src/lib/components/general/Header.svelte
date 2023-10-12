@@ -98,7 +98,7 @@
 					icon={mdiCog}
 					on:click={() => (projectEdit = true)}
 				/>
-			{:else if $page.url.pathname.startsWith('/report')}
+			{:else if $page.url.pathname.startsWith('/report/') && $page.data.report.editor}
 				<HeaderIcon
 					pageName={'editReport'}
 					tooltipContent={"Edit your report's configuration"}

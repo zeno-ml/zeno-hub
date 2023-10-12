@@ -5,9 +5,12 @@ import type { AuthUser } from '$lib/auth/types';
 import type { Cookies } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 
-export async function checkRefreshCookie(cookies: Cookies, url: URL): Promise<AuthUser | null> {
+export async function getOrRefreshCognitoUser(
+	cookies: Cookies,
+	url: URL
+): Promise<AuthUser | null> {
 	const loggedInCookie = cookies.get('loggedIn');
-	if (!loggedInCookie) {
+	if (loggedInCookie === undefined) {
 		return null;
 	}
 
