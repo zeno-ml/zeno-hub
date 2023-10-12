@@ -17,6 +17,7 @@
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 	import CopyProjectPopup from '../popups/CopyProjectPopup.svelte';
 	import ProjectStat from './ProjectStat.svelte';
 
@@ -29,6 +30,7 @@
 	let showOptions = false;
 	let hovering = false;
 	let showCopy = false;
+	let showConfirmDelete = false;
 
 	function getProjectIcon() {
 		if (project.view.includes('image')) return mdiImage;
@@ -39,6 +41,18 @@
 
 {#if showCopy && user !== null}
 	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
+{/if}
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this project?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+			showConfirmDelete = false;
+		}}
+	/>
 {/if}
 <button
 	on:click={() => goto(`/project/${project.ownerName}/${project.name}`)}
@@ -92,7 +106,7 @@
 										on:click={(e) => {
 											e.stopPropagation();
 											showOptions = false;
-											zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+											showConfirmDelete = true;
 										}}
 									>
 										<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon

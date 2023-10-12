@@ -12,6 +12,7 @@
 	import IconButton from '@smui/icon-button';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher, getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
@@ -26,6 +27,7 @@
 	let sliceElementSpec: SliceElementSpec | null = null;
 	let chartId: number | null = null;
 	let models: string[] = [];
+	let showConfirmDelete = false;
 
 	updateTypeObjects(element);
 
@@ -117,6 +119,18 @@
 	}
 </script>
 
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this element?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			dispatch('delete');
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
 <div class="flex items-center my-2 border border-grey-light rounded p-4">
 	<div class="flex mr-2 cursor-move">
 		<Icon
@@ -162,7 +176,7 @@
 		{/if}
 	</div>
 	<div class="flex">
-		<IconButton on:click={() => dispatch('delete')}>
+		<IconButton on:click={() => (showConfirmDelete = true)}>
 			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={mdiClose} />
 			</Icon>

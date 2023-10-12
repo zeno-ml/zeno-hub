@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
-	import Button, { Label } from '@smui/button';
-	import Dialog, { Actions, Content, InitialFocus, Title } from '@smui/dialog';
+	import { Content } from '@smui/dialog';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
 	import { getContext } from 'svelte';
@@ -18,11 +18,11 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let confirmDelete = false;
 	let showTooltip = false;
 	let hovering = false;
 	let showOptions = false;
 	let editing = false;
+	let showConfirmDelete = false;
 
 	$: selected = $selections.slices.includes(slice.id);
 	$: transferData =
@@ -31,7 +31,6 @@
 			: [slice.id].join(',');
 
 	function removeSlice() {
-		confirmDelete = false;
 		selections.update((m) => {
 			for (let key in m.metadata) {
 				m.metadata[key] = { predicates: [], join: Join.AND };
@@ -139,6 +138,18 @@
 			<SliceDetails predicateGroup={slice.filterPredicates} />
 		</div>
 	{/if}
+	{#if showConfirmDelete}
+		<Confirm
+			message="Are you sure you want to delete this slice?"
+			on:cancel={() => {
+				showConfirmDelete = false;
+			}}
+			on:confirm={() => {
+				removeSlice();
+				showConfirmDelete = false;
+			}}
+		/>
+	{/if}
 	<div class="flex items-center w-full justify-between">
 		<span
 			on:mouseover={() => (showTooltip = true)}
@@ -174,7 +185,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									removeSlice();
+									showConfirmDelete = true;
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
@@ -212,22 +223,3 @@
 		</div>
 	</div>
 </button>
-
-<Dialog
-	bind:open={confirmDelete}
-	scrimClickAction=""
-	escapeKeyAction=""
-	aria-labelledby="delete-slice"
-	aria-describedby="delete-slice"
->
-	<Title id="simple-title">Delete Slice</Title>
-	<Content id="simple-content">Do you really want to delete this slice?</Content>
-	<Actions>
-		<Button on:click={() => (confirmDelete = false)}>
-			<Label>No</Label>
-		</Button>
-		<Button use={[InitialFocus]} on:click={() => removeSlice()}>
-			<Label>Yes</Label>
-		</Button>
-	</Actions>
-</Dialog>
