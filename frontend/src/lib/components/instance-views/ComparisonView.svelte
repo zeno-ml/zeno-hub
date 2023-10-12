@@ -153,8 +153,8 @@
 			end - start,
 			$compareSort,
 			dataIds,
-			predicates,
-			zenoClient
+			zenoClient,
+			predicates
 		);
 
 		if (instanceContainer) {

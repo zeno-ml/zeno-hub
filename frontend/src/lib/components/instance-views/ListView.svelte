@@ -93,8 +93,8 @@
 			end - start,
 			$sort,
 			dataIds,
-			predicates,
-			zenoClient
+			zenoClient,
+			predicates
 		);
 	}
 </script>

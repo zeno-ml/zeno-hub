@@ -1,5 +1,4 @@
-import type { FilterPredicateGroup, ZenoColumn } from '$lib/zenoapi';
-import { ZenoService } from '$lib/zenoapi';
+import type { FilterPredicateGroup, ZenoColumn, ZenoService } from '$lib/zenoapi';
 import { ZenoColumnType } from '$lib/zenoapi/models/ZenoColumnType';
 
 export async function getFilteredTable(
@@ -11,8 +10,8 @@ export async function getFilteredTable(
 	limit: number,
 	sort: [ZenoColumn | undefined, boolean],
 	dataIds: string[],
-	filterPredicates?: FilterPredicateGroup,
-	client: ZenoService
+	client: ZenoService,
+	filterPredicates?: FilterPredicateGroup
 ) {
 	const requestedColumns = completeColumns.filter(
 		(c) =>
