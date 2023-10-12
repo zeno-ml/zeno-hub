@@ -5,6 +5,7 @@
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import { tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 	import OrganizationPopup from '../popups/OrganizationPopup.svelte';
 
 	export let organizations: Organization[];
@@ -13,6 +14,8 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let organizationToEdit: Organization | undefined;
+	let showConfirmDelete = false;
+	let organizationToDelete: Organization | undefined;
 </script>
 
 {#if organizationToEdit}
@@ -24,6 +27,22 @@
 			zenoClient
 				.getOrganizations()
 				.then((fetchedOrganizations) => (organizations = fetchedOrganizations));
+		}}
+	/>
+{/if}
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this organization?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			if (organizationToDelete !== undefined) {
+				zenoClient
+					.deleteOrganization(organizationToDelete)
+					.then(() => zenoClient.getOrganizations().then((orgs) => (organizations = orgs)));
+			}
+			showConfirmDelete = false;
 		}}
 	/>
 {/if}
@@ -140,11 +159,8 @@
 								>
 									<IconButton
 										on:click={() => {
-											zenoClient
-												.deleteOrganization(organization)
-												.then(() =>
-													zenoClient.getOrganizations().then((orgs) => (organizations = orgs))
-												);
+											organizationToDelete = organization;
+											showConfirmDelete = true;
 										}}
 										disabled={!organization.admin}
 									>

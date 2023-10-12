@@ -11,6 +11,7 @@
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 
 	export let report: Report;
 	export let deletable = false;
@@ -19,8 +20,21 @@
 
 	let showOptions = false;
 	let hovering = false;
+	let showConfirmDelete = false;
 </script>
 
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this report?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
 <button
 	on:click={() => goto(`/report/${report.ownerName}/${report.name}`)}
 	on:mouseover={() => (hovering = true)}
@@ -63,7 +77,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
+									showConfirmDelete = true;
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;

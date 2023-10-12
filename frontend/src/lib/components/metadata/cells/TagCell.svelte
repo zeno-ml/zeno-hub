@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import { editTag, metric, model, project, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
@@ -13,6 +14,7 @@
 
 	let hovering = false;
 	let showOptions = false;
+	let showConfirmDelete = false;
 
 	$: result = zenoClient.getMetricForTag($project.uuid, <TagMetricKey>{
 		tag: tag,
@@ -136,6 +138,18 @@
 	}
 </script>
 
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this tag?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			removeTag();
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
 <button
 	class="relative border border-grey-lighter rounded-2xl mt-1 flex items-center justify-between px-2.5 parent h-9 overflow-visible w-full {selected
 		? 'bg-greenish-light'
@@ -182,7 +196,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									removeTag();
+									showConfirmDelete = true;
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
