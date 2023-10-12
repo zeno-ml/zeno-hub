@@ -7,19 +7,27 @@
 		type Slice,
 		type SliceElementSpec
 	} from '$lib/zenoapi';
+	import { mdiClose } from '@mdi/js';
+	import { Icon } from '@smui/button';
+	import IconButton from '@smui/icon-button';
 	import Svelecte from 'svelecte';
+	import { createEventDispatcher, getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
 	export let sliceOptions: Promise<Slice[]>;
 	export let reportId: number;
 
-	let timer: ReturnType<typeof setTimeout>;
+	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let timer: ReturnType<typeof setTimeout>;
 	let projectUuid: string | null = null;
 	let sliceElementSpec: SliceElementSpec | null = null;
 	let chartId: number | null = null;
 	let models: string[] = [];
+	let showConfirmDelete = false;
 
 	updateTypeObjects(element);
 
@@ -49,14 +57,14 @@
 	}
 
 	$: if (projectUuid) {
-		ZenoService.getModels(projectUuid).then((m) => (models = m));
+		zenoClient.getModels(projectUuid).then((m) => (models = m));
 	}
 
 	function updateType(e: CustomEvent) {
 		element.data = null;
 		updateTypeObjects(element);
 		element = element;
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			type: e.detail.label,
 			data: null
@@ -66,13 +74,13 @@
 	function updateData() {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
-			ZenoService.updateReportElement(reportId, element);
+			zenoClient.updateReportElement(reportId, element);
 		}, 1000);
 	}
 
 	function updateChartId(e: CustomEvent) {
 		element.data = `${e.detail.id}`;
-		ZenoService.updateReportElement(reportId, { ...element, data: element.data });
+		zenoClient.updateReportElement(reportId, { ...element, data: element.data });
 	}
 
 	function updateSliceId(e: CustomEvent) {
@@ -91,7 +99,7 @@
 		});
 
 		element.data = JSON.stringify(sliceElementSpec);
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			data: element.data
 		});
@@ -104,14 +112,26 @@
 			modelName: e.detail.label
 		};
 		element.data = JSON.stringify(sliceElementSpec);
-		ZenoService.updateReportElement(reportId, {
+		zenoClient.updateReportElement(reportId, {
 			...element,
 			data: element.data
 		});
 	}
 </script>
 
-<div class="flex items-center my-2 p-4">
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this element?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			dispatch('delete');
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
+<div class="flex items-center my-2 border border-grey-light rounded p-4">
 	<div class="w-full">
 		<Svelecte
 			style="margin-bottom: 10px;"
@@ -144,5 +164,12 @@
 				{/if}
 			{/await}
 		{/if}
+	</div>
+	<div class="flex">
+		<IconButton on:click={() => (showConfirmDelete = true)}>
+			<Icon tag="svg" viewBox="0 0 24 24">
+				<path fill="black" d={mdiClose} />
+			</Icon>
+		</IconButton>
 	</div>
 </div>

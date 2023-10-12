@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { getMetricsForSlicesAndTags } from '$lib/api/slice';
 	import {
 		comparisonModel,
 		editTag,
@@ -12,13 +11,14 @@
 	} from '$lib/stores';
 	import {
 		Join,
+		ZenoService,
 		type FilterPredicateGroup,
 		type GroupMetric,
 		type Metric,
 		type MetricKey,
 		type Slice
 	} from '$lib/zenoapi';
-	import { onMount } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import SelectionBar from '../metadata/SelectionBar.svelte';
 	import ComparisonView from './ComparisonView.svelte';
 	import ListView from './ListView.svelte';
@@ -26,6 +26,8 @@
 	import { optionsMap } from './views/viewMap';
 
 	export let compare: boolean;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let selected = 'list';
 	let currentResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
@@ -39,10 +41,10 @@
 
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
-	$: currentResult = getMetricsForSlicesAndTags(
-		getMetricKeys($model, $metric, $selectionPredicates),
-		[...new Set([...secureTagIds, ...secureSelectionIds])]
-	);
+	$: currentResult = zenoClient.getMetricsForSlices($project.uuid, {
+		metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
+		dataIds: [...new Set([...secureTagIds, ...secureSelectionIds])]
+	});
 
 	$: modelAResult = compare
 		? getCompareResults($model, $metric, $selectionPredicates)
@@ -79,7 +81,7 @@
 		];
 	}
 
-	function getCompareResults(
+	async function getCompareResults(
 		model: string | undefined,
 		metric: Metric | undefined,
 		predicates?: FilterPredicateGroup
@@ -90,7 +92,10 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		return getMetricsForSlicesAndTags(getMetricKeys(model, metric, predicates), dataIds);
+		return zenoClient.getMetricsForSlices($project.uuid, {
+			metricKeys: getMetricKeys(model, metric, predicates),
+			dataIds
+		});
 	}
 
 	$: currentResult.then((d) => {

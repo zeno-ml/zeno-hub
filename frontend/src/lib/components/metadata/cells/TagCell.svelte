@@ -1,18 +1,22 @@
 <script lang="ts">
-	import { getMetricsForTags } from '$lib/api/tag';
-	import { editTag, metric, model, selections, tagIds, tags } from '$lib/stores';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import { editTag, metric, model, project, selections, tagIds, tags } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
+	import { getContext } from 'svelte';
 
 	export let tag: Tag;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let hovering = false;
 	let showOptions = false;
+	let showConfirmDelete = false;
 
-	$: result = getMetricsForTags(<TagMetricKey>{
+	$: result = zenoClient.getMetricForTag($project.uuid, <TagMetricKey>{
 		tag: tag,
 		model: $model,
 		metric: $metric?.id || -1
@@ -26,7 +30,7 @@
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		ZenoService.deleteTag(tag).then(() => {
+		zenoClient.deleteTag(tag).then(() => {
 			tags.update((t) => t.filter((t) => t.id !== tag.id));
 		});
 		tagIds.set([]);
@@ -134,6 +138,18 @@
 	}
 </script>
 
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this tag?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			removeTag();
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
 <button
 	class="relative border border-grey-lighter rounded-2xl mt-1 flex items-center justify-between px-2.5 parent h-9 overflow-visible w-full {selected
 		? 'bg-greenish-light'
@@ -180,7 +196,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									removeTag();
+									showConfirmDelete = true;
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
@@ -210,7 +226,7 @@
 							hovering = false;
 						}}
 					>
-						{#if hovering}
+						{#if hovering && $project.editor}
 							<IconButton
 								size="button"
 								style="padding: 0px"

@@ -117,8 +117,17 @@ def table_filter(
         filter_result = filter_to_sql(filter_predicates, project, model)
 
     if data_ids is not None and len(data_ids) > 0:
-        datapoint_filter = sql.SQL("data_id IN ({})").format(
-            sql.SQL(",").join(map(sql.Literal, data_ids))
+        db = Database()
+        id_column = db.connect_execute_return(
+            sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                sql.Identifier(f"{project}_column_map")
+            ),
+        )
+        if len(id_column) == 0:
+            return None
+        datapoint_filter = sql.SQL("{} IN ({})").format(
+            sql.Identifier(id_column[0][0]),
+            sql.SQL(",").join(map(sql.Literal, data_ids)),
         )
         if filter_result is not None:
             filter_result += sql.SQL(" AND ") + datapoint_filter

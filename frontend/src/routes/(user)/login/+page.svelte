@@ -1,9 +1,16 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
 	export let form;
+
+	let redirect = '';
+	if (browser) {
+		const urlParams = new URLSearchParams(window.location.search);
+		redirect = urlParams.get('redirect') ?? '';
+	}
 </script>
 
 <form
@@ -13,6 +20,7 @@
 	use:enhance
 >
 	<div class="flex flex-col items-center">
+		<input type="hidden" name="redirect" value={redirect} />
 		<a href="/">
 			<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
 		</a>

@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import Element from '$lib/components/report/Element.svelte';
 	import ElementEdit from '$lib/components/report/ElementEdit.svelte';
-	import { report } from '$lib/stores.js';
 	import {
 		ReportElementType,
 		ZenoService,
@@ -14,6 +12,7 @@
 	import { mdiDrag } from '@mdi/js';
 	import Button, { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
+	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
 
 	export let data;
@@ -25,57 +24,49 @@
 	let chartOptions: Promise<Chart[]> = new Promise(() => []);
 	let sliceOptions: Promise<Slice[]> = new Promise(() => []);
 
-	// Only set stores if the report has changed.
-	if ($report === undefined || $report.id !== data.report.id) {
-		report.set(data.report);
-	}
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	$: chartOptions =
 		selectedProjects.length > 0
-			? ZenoService.getChartsForProjects(selectedProjects)
+			? zenoClient.getChartsForProjects(selectedProjects)
 			: new Promise(() => []);
 	$: sliceOptions =
 		selectedProjects.length > 0
-			? ZenoService.getSlicesForProjects(selectedProjects)
+			? zenoClient.getSlicesForProjects(selectedProjects)
 			: new Promise(() => []);
 
 	function deleteElement(elementId: number) {
 		if (elementId < 0) return;
 		elements = elements.filter((e) => e.id !== elementId);
-		ZenoService.deleteReportElement(elementId);
+		zenoClient.deleteReportElement(elementId);
 	}
 
 	function addElement(elementIndex: number) {
-		ZenoService.addReportElement($report.id, {
-			type: ReportElementType.TEXT,
-			data: 'new element',
-			position: elementIndex
-		}).then(
-			(res) =>
-				(elements = [
-					...elements,
-					{
-						id: res,
-						type: ReportElementType.TEXT,
-						data: 'new element',
-						position: elementIndex
-					}
-				])
-		);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function updateReportName(e: any) {
-		ZenoService.updateReport({ ...$report, name: e.target?.textContent }).then(() => {
-			goto('/report/' + $report.ownerName + '/' + e.target?.textContent);
-		});
+		zenoClient
+			.addReportElement(data.report.id, {
+				type: ReportElementType.TEXT,
+				data: 'new element',
+				position: elementIndex
+			})
+			.then(
+				(res) =>
+					(elements = [
+						...elements,
+						{
+							id: res,
+							type: ReportElementType.TEXT,
+							data: 'new element',
+							position: elementIndex
+						}
+					])
+			);
 	}
 
 	function updateReportProjects(e: CustomEvent) {
 		const projectUuids = e.detail.map((p: Project) => p.uuid);
-		ZenoService.updateReportProjects($report.id, projectUuids);
+		zenoClient.updateReportProjects(data.report.id, projectUuids);
 		if (projectUuids.length > 0) {
-			chartOptions = ZenoService.getChartsForProjects(projectUuids);
+			chartOptions = zenoClient.getChartsForProjects(projectUuids);
 		} else {
 			chartOptions = new Promise(() => []);
 		}
@@ -84,7 +75,7 @@
 	function handleDropped(e: CustomEvent) {
 		e.detail.items.forEach((item: ReportElement, index: number) => {
 			item.position = index;
-			ZenoService.updateReportElement($report.id, { ...item, position: index });
+			zenoClient.updateReportElement(data.report.id, { ...item, position: index });
 		});
 		elements = e.detail.items;
 		dragEnabled = false;
@@ -100,15 +91,15 @@
 		class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 md:mt-6 md:mb-6 sm:mt-0 sm:mb-0 rounded shadow"
 	>
 		<div class="flex items-center mt-12 justify-between">
-			<h1 class="text-5xl mr-6 text-grey-darkest" on:blur={(e) => updateReportName(e)}>
-				{$report.name}
+			<h1 class="text-5xl mr-6 text-grey-darkest">
+				{data.report.name}
 			</h1>
 		</div>
-		<h5 class="mt-4 ml-1 text-lg">Author: {$report.ownerName}</h5>
+		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
 
-		{#if $report.editor}
+		{#if data.report.editor}
 			<p class="mt-4 mb-2">Associated Projects</p>
-			{#await ZenoService.getProjects() then projects}
+			{#await zenoClient.getProjects() then projects}
 				<Svelecte
 					bind:value={selectedProjects}
 					on:change={updateReportProjects}
@@ -131,7 +122,7 @@
 					class="border-2 hover:border-primary-mid rounded p-4 relative {editId === element.id
 						? 'border-primary-mid'
 						: 'border-white'}
-					{$report.editor ? 'group/edit' : ''}"
+					{data.report.editor ? 'group/edit' : ''}"
 				>
 					<button
 						class="group-hover/edit:block hidden px-4 py-1 border-primary-mid border-2 absolute bg-white -top-4 rounded-md"
@@ -161,14 +152,14 @@
 						</Icon>
 					</div>
 					{#if editId === element.id}
-						<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={$report.id} />
+						<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={data.report.id} />
 					{:else}
 						<Element {element} {chartOptions} />
 					{/if}
 				</div>
 			{/each}
 			<br />
-			{#if $report.editor}
+			{#if data.report.editor}
 				<Button variant="raised" on:click={() => addElement(elements.length)}>Add Element</Button>
 			{/if}
 		</div>

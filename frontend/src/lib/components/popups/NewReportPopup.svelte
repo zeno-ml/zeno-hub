@@ -1,30 +1,34 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { showNewReport } from '$lib/stores';
-	import { ZenoService, type Report } from '$lib/zenoapi';
+	import type { Report, ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
 	export let user: string;
 	export let reports: Report[];
 
-	let reportName = '';
-
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let reportName = '';
 	let input: Textfield;
 
-	$: invalidName = reports.filter((rep) => rep.name === reportName).length > 0;
+	$: invalidName =
+		reports.filter((rep) => rep.name === reportName).length > 0 ||
+		reportName.match(/[/]/g) !== null;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function addReport() {
 		showNewReport.set(false);
-		ZenoService.addReport(reportName).then(() => goto(`/report/${user}/${reportName}`));
+		zenoClient
+			.addReport(reportName)
+			.then(() => goto(`/report/${user}/${encodeURIComponent(reportName)}`));
 	}
 
 	function submit(e: KeyboardEvent) {
@@ -54,6 +58,12 @@
 		</Button>
 	</Content>
 	{#if invalidName && reportName.length > 0}
-		<p style:margin-right="10px" style:color="red">report already exists</p>
+		<p class="mt-2 text-primary">
+			{#if reportName.match(/[/]/g) !== null}
+				A report name cannot contain a "/".
+			{:else}
+				report already exists
+			{/if}
+		</p>
 	{/if}
 </Popup>

@@ -7,8 +7,11 @@
 	import { mdiPlus } from '@mdi/js';
 	import Button from '@smui/button/src/Button.svelte';
 	import { Icon } from '@smui/icon-button';
+	import { getContext } from 'svelte';
 
 	export let data;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	$: charts.set(data.charts);
 </script>
@@ -19,12 +22,15 @@
 		{#if $project.editor}
 			<Button
 				on:click={() => {
-					ZenoService.addChart(
-						$project.uuid,
-						chartDefaults('New Chart', 0, $project.uuid, ChartType.BAR)
-					).then((res) => {
-						goto(`/project/${$project.ownerName}/${$project.name}/chart/${res}?edit=true`);
-					});
+					zenoClient
+						.addChart($project.uuid, chartDefaults('New Chart', 0, $project.uuid, ChartType.BAR))
+						.then((res) => {
+							goto(
+								`/project/${$project.ownerName}/${encodeURIComponent(
+									$project.name
+								)}/chart/${res}?edit=true`
+							);
+						});
 				}}
 			>
 				<Icon class="mr-2" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">

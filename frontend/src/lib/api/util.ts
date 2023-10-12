@@ -4,9 +4,9 @@ import { env } from '$env/dynamic/public';
 export function getEndpoint() {
 	if (env.PUBLIC_BACKEND_ENDPOINT == 'http://zeno-backend:8000') {
 		if (browser) {
-			return '/dockerzeno';
+			return '/dockerzeno/api';
 		}
-		return 'http://zeno-backend:8000';
+		return 'http://zeno-backend:8000/api';
 	}
-	return env.PUBLIC_BACKEND_ENDPOINT;
+	return env.PUBLIC_BACKEND_ENDPOINT + '/api';
 }

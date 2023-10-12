@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { folders, project } from '$lib/stores';
-	import { ZenoService, type Folder } from '$lib/zenoapi';
+	import type { Folder, ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
 	export let folderToEdit: Folder | undefined = undefined;
 
-	let dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let folderName = folderToEdit ? folderToEdit.name : '';
 	let input: Textfield;
@@ -22,25 +23,27 @@
 
 	function editFolder() {
 		if (folderToEdit) {
-			ZenoService.updateFolder($project.uuid, {
-				...folderToEdit,
-				name: folderName
-			}).then(() => {
-				folders.update((f) => {
-					const index = f.findIndex((f) => f.id === folderToEdit?.id);
-					if (index !== -1 && folderToEdit) {
-						f[index] = { ...folderToEdit, name: folderName };
-					}
-					return f;
+			zenoClient
+				.updateFolder($project.uuid, {
+					...folderToEdit,
+					name: folderName
+				})
+				.then(() => {
+					folders.update((f) => {
+						const index = f.findIndex((f) => f.id === folderToEdit?.id);
+						if (index !== -1 && folderToEdit) {
+							f[index] = { ...folderToEdit, name: folderName };
+						}
+						return f;
+					});
 				});
-			});
 		}
 		dispatch('close');
 	}
 
 	/** Create a folder using the folderName variable **/
 	function createFolder() {
-		ZenoService.addFolder($project.uuid, folderName).then((res) => {
+		zenoClient.addFolder($project.uuid, folderName).then((res) => {
 			folders.update((f) => [
 				...f,
 				{

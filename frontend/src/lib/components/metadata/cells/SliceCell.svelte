@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
-	import Button, { Label } from '@smui/button';
-	import Dialog, { Actions, Content, InitialFocus, Title } from '@smui/dialog';
+	import { Content } from '@smui/dialog';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper from '@smui/paper';
+	import { getContext } from 'svelte';
 	import SliceDetails from '../../general/SliceDetails.svelte';
 	import SlicePopup from '../../popups/SlicePopup.svelte';
 	import SliceCellResult from './SliceCellResult.svelte';
@@ -15,11 +16,13 @@
 	export let slice: Slice;
 	export let compare: boolean;
 
-	let confirmDelete = false;
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let showTooltip = false;
 	let hovering = false;
 	let showOptions = false;
 	let editing = false;
+	let showConfirmDelete = false;
 
 	$: selected = $selections.slices.includes(slice.id);
 	$: transferData =
@@ -28,16 +31,15 @@
 			: [slice.id].join(',');
 
 	function removeSlice() {
-		confirmDelete = false;
 		selections.update((m) => {
 			for (let key in m.metadata) {
 				m.metadata[key] = { predicates: [], join: Join.AND };
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		ZenoService.deleteSlice(slice).then(() =>
-			slices.update((s) => s.filter((s) => s.id !== slice.id))
-		);
+		zenoClient
+			.deleteSlice(slice)
+			.then(() => slices.update((s) => s.filter((s) => s.id !== slice.id)));
 	}
 
 	function dragStart(e: DragEvent) {
@@ -55,7 +57,7 @@
 				data.forEach((element) => {
 					const slice = $slices.find((slice) => slice.id === parseInt(element));
 					if (slice) {
-						ZenoService.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
+						zenoClient.updateSlice($project.uuid, { ...slice, folderId: undefined }).then(() =>
 							slices.update((s) => {
 								invalidate('app:state');
 								const index = s.findIndex((s) => s.id === slice.id);
@@ -136,6 +138,18 @@
 			<SliceDetails predicateGroup={slice.filterPredicates} />
 		</div>
 	{/if}
+	{#if showConfirmDelete}
+		<Confirm
+			message="Are you sure you want to delete this slice?"
+			on:cancel={() => {
+				showConfirmDelete = false;
+			}}
+			on:confirm={() => {
+				removeSlice();
+				showConfirmDelete = false;
+			}}
+		/>
+	{/if}
 	<div class="flex items-center w-full justify-between">
 		<span
 			on:mouseover={() => (showTooltip = true)}
@@ -171,7 +185,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									removeSlice();
+									showConfirmDelete = true;
 								}}
 							>
 								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
@@ -191,7 +205,7 @@
 					hovering = false;
 				}}
 			>
-				{#if hovering}
+				{#if hovering && $project.editor}
 					<IconButton
 						size="button"
 						style="padding: 0px"
@@ -209,22 +223,3 @@
 		</div>
 	</div>
 </button>
-
-<Dialog
-	bind:open={confirmDelete}
-	scrimClickAction=""
-	escapeKeyAction=""
-	aria-labelledby="delete-slice"
-	aria-describedby="delete-slice"
->
-	<Title id="simple-title">Delete Slice</Title>
-	<Content id="simple-content">Do you really want to delete this slice?</Content>
-	<Actions>
-		<Button on:click={() => (confirmDelete = false)}>
-			<Label>No</Label>
-		</Button>
-		<Button use={[InitialFocus]} on:click={() => removeSlice()}>
-			<Label>Yes</Label>
-		</Button>
-	</Actions>
-</Dialog>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { project } from '$lib/stores';
-	import { ZenoService, type Organization, type Project, type User } from '$lib/zenoapi';
+	import type { Organization, Project, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
@@ -9,7 +9,7 @@
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import Popup from './Popup.svelte';
 
@@ -17,22 +17,22 @@
 	export let user: User;
 
 	const dispatch = createEventDispatcher();
+	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let input: Textfield;
 	let selectedUser: User | undefined;
 	let selectedOrg: Organization | undefined;
 
-	let userRequest = ZenoService.getProjectUsers(config.uuid);
-	let organizationRequest = ZenoService.getProjectOrgs(config.uuid);
+	let userRequest = zenoClient.getProjectUsers(config.uuid);
+	let organizationRequest = zenoClient.getProjectOrgs(config.uuid);
 
-	$: invalidName = config.name.length === 0;
+	$: invalidName = config.name.length === 0 || config.name.match(/[/]/g) !== null;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function updateProject() {
-		ZenoService.updateProject(config).then(() => {
-			project.set(config);
+		zenoClient.updateProject(config).then(() => {
 			dispatch('close');
 		});
 	}
@@ -47,18 +47,22 @@
 	}
 
 	function addUser(e: CustomEvent) {
-		ZenoService.addProjectUser($project.uuid, {
-			...e.detail,
-			admin: false
-		}).then(() => (userRequest = ZenoService.getProjectUsers($project.uuid)));
+		zenoClient
+			.addProjectUser($project.uuid, {
+				...e.detail,
+				admin: false
+			})
+			.then(() => (userRequest = zenoClient.getProjectUsers($project.uuid)));
 		selectedUser = undefined;
 	}
 
 	function addOrganization(e: CustomEvent) {
-		ZenoService.addProjectOrg($project.uuid, {
-			...e.detail,
-			admin: false
-		}).then(() => (organizationRequest = ZenoService.getProjectOrgs($project.uuid)));
+		zenoClient
+			.addProjectOrg($project.uuid, {
+				...e.detail,
+				admin: false
+			})
+			.then(() => (organizationRequest = zenoClient.getProjectOrgs($project.uuid)));
 		selectedOrg = undefined;
 	}
 </script>
@@ -143,12 +147,14 @@
 												<Checkbox
 													checked={member.admin}
 													on:click={() =>
-														ZenoService.updateProjectUser($project.uuid, {
-															...member,
-															admin: !member.admin
-														}).then(
-															() => (userRequest = ZenoService.getProjectUsers($project.uuid))
-														)}
+														zenoClient
+															.updateProjectUser($project.uuid, {
+																...member,
+																admin: !member.admin
+															})
+															.then(
+																() => (userRequest = zenoClient.getProjectUsers($project.uuid))
+															)}
 													disabled={member.id === user.id}
 												/>
 											</td>
@@ -156,9 +162,11 @@
 												{#if member.id !== user.id}
 													<IconButton
 														on:click={() =>
-															ZenoService.deleteProjectUser($project.uuid, member).then(
-																() => (userRequest = ZenoService.getProjectUsers($project.uuid))
-															)}
+															zenoClient
+																.deleteProjectUser($project.uuid, member)
+																.then(
+																	() => (userRequest = zenoClient.getProjectUsers($project.uuid))
+																)}
 													>
 														<Icon tag="svg" viewBox="0 0 24 24">
 															<path fill="black" d={mdiClose} />
@@ -171,7 +179,7 @@
 								</tbody>
 							</table>
 						{/if}
-						{#await ZenoService.getUsers() then users}
+						{#await zenoClient.getUsers() then users}
 							{@const availableUsers = users.filter(
 								(currentUser) =>
 									!(
@@ -195,7 +203,7 @@
 			{/if}
 			{#if organizationRequest}
 				{#await organizationRequest then currentOrgs}
-					{#await ZenoService.getOrganizationNames() then oragnizationNames}
+					{#await zenoClient.getOrganizationNames() then oragnizationNames}
 						{@const availableOrgs = oragnizationNames.filter(
 							(currentOrg) => !currentOrgs.some((org) => org.id === currentOrg.id)
 						)}
@@ -223,26 +231,30 @@
 														<Checkbox
 															checked={org.admin}
 															on:click={() =>
-																ZenoService.updateProjectOrg($project.uuid, {
-																	...org,
-																	admin: !org.admin
-																}).then(
-																	() =>
-																		(organizationRequest = ZenoService.getProjectOrgs(
-																			$project.uuid
-																		))
-																)}
+																zenoClient
+																	.updateProjectOrg($project.uuid, {
+																		...org,
+																		admin: !org.admin
+																	})
+																	.then(
+																		() =>
+																			(organizationRequest = zenoClient.getProjectOrgs(
+																				$project.uuid
+																			))
+																	)}
 														/>
 													</td>
 													<td style="text-align: end;">
 														<IconButton
 															on:click={() =>
-																ZenoService.deleteProjectOrg($project.uuid, org).then(
-																	() =>
-																		(organizationRequest = ZenoService.getProjectOrgs(
-																			$project.uuid
-																		))
-																)}
+																zenoClient
+																	.deleteProjectOrg($project.uuid, org)
+																	.then(
+																		() =>
+																			(organizationRequest = zenoClient.getProjectOrgs(
+																				$project.uuid
+																			))
+																	)}
 														>
 															<Icon tag="svg" viewBox="0 0 24 24">
 																<path fill="black" d={mdiClose} />

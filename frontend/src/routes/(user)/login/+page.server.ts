@@ -1,12 +1,15 @@
 import { dev } from '$app/environment';
 import { env as private_env } from '$env/dynamic/private';
 import { extractUserFromSession, getSession } from '$lib/auth/cognito';
-import { OpenAPI, ZenoService } from '$lib/zenoapi';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
+export async function load({ cookies }) {
+	cookies.delete('loggedIn', { path: '/' });
+}
+
 export const actions: Actions = {
-	login: async ({ request, cookies, url }) => {
+	login: async ({ request, cookies }) => {
 		const data = await request.formData();
 		const username = data.get('username') as string;
 		const password = data.get('password') as string;
@@ -34,12 +37,8 @@ export const actions: Actions = {
 		try {
 			const res = await getSession(username, password);
 			const user = extractUserFromSession(res);
-			OpenAPI.HEADERS = {
-				Authorization: 'Bearer ' + user.accessToken
-			};
 			cookies.set('loggedIn', JSON.stringify(user), {
 				path: '/',
-				httpOnly: true,
 				sameSite: 'strict',
 				secure: !dev && private_env.ALLOW_INSECURE_HTTP != 'true',
 				maxAge: 60 * 60 * 24 * 30
@@ -52,8 +51,11 @@ export const actions: Actions = {
 				showReset: err.name === 'NotAuthorizedException'
 			});
 		}
-
-		await ZenoService.login(username);
-		throw redirect(303, url.searchParams.get('redirectTo') ?? '/');
+		throw redirect(
+			303,
+			data.has('redirect') && data.get('redirect') !== ''
+				? (data.get('redirect') as string)
+				: `/${username}/projects`
+		);
 	}
 };

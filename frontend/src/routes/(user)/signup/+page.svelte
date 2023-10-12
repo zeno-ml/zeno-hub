@@ -67,10 +67,12 @@
 		</div>
 		<Button type="submit" variant="raised" class="mt-5" disabled={!agreed}>Sign Up</Button>
 		<p class="mt-5">
-			Already have an account? <a href="/">Log in now!</a>
+			Already have an account? <a href="/" class="text-primary visited:text-primary hover:underline"
+				>Log in now!</a
+			>
 		</p>
 		{#if form?.error}
-			<p>{form.error}</p>
+			<p class="text-primary mt-4">{form.error}</p>
 		{/if}
 	</div>
 </form>

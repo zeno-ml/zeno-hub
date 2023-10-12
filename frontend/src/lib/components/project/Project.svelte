@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
-	import { ZenoService, type Project, type User } from '$lib/zenoapi';
+	import type { Project, User, ZenoService } from '$lib/zenoapi';
 	import {
 		mdiChartBar,
 		mdiDotsHorizontal,
@@ -16,6 +16,8 @@
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
+	import { getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 	import CopyProjectPopup from '../popups/CopyProjectPopup.svelte';
 	import ProjectStat from './ProjectStat.svelte';
 
@@ -23,9 +25,12 @@
 	export let deletable = false;
 	export let user: User | null = null;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let showOptions = false;
 	let hovering = false;
 	let showCopy = false;
+	let showConfirmDelete = false;
 
 	function getProjectIcon() {
 		if (project.view.includes('image')) return mdiImage;
@@ -37,8 +42,20 @@
 {#if showCopy && user !== null}
 	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
 {/if}
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this project?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+			showConfirmDelete = false;
+		}}
+	/>
+{/if}
 <button
-	on:click={() => goto(`/project/${project.ownerName}/${project.name}`)}
+	on:click={() => goto(`/project/${project.ownerName}/${encodeURIComponent(project.name)}`)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
@@ -89,9 +106,7 @@
 										on:click={(e) => {
 											e.stopPropagation();
 											showOptions = false;
-											ZenoService.deleteProject(project.uuid).then(() =>
-												invalidate('app:projects')
-											);
+											showConfirmDelete = true;
 										}}
 									>
 										<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon
@@ -111,7 +126,7 @@
 		{project.description}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		{#await ZenoService.getProjectStats(project.uuid)}
+		{#await zenoClient.getProjectStats(project.uuid)}
 			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
 		{:then stats}
 			<Tooltip

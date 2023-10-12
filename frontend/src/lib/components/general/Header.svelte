@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { authToken, collapseHeader, models, project, report } from '$lib/stores';
+	import { collapseHeader, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -27,7 +27,6 @@
 	$: currentTab = $page.url.href.split('/').pop();
 
 	async function logout() {
-		authToken.set(undefined);
 		await fetch('/api/logout', { method: 'POST' });
 		location.reload();
 	}
@@ -37,7 +36,7 @@
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 {#if reportEdit && user !== null}
-	<ReportPopup reportConfig={$report} on:close={() => (reportEdit = false)} {user} />
+	<ReportPopup on:close={() => (reportEdit = false)} {user} />
 {/if}
 <nav class="z-20 flex sm:hidden">
 	<header
@@ -92,14 +91,14 @@
 			{/if}
 		</div>
 		<div class="flex flex-col items-center justify-center mb-3">
-			{#if $page.url.pathname.startsWith('/project') && $project?.ownerName === user?.name}
+			{#if $page.url.pathname.startsWith('/project/') && $project?.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}
 					tooltipContent={"Edit your project's configuration"}
 					icon={mdiCog}
 					on:click={() => (projectEdit = true)}
 				/>
-			{:else if $page.url.pathname.startsWith('/report') && $report?.ownerName === user?.name}
+			{:else if $page.url.pathname.startsWith('/report/') && $page.data.report.editor}
 				<HeaderIcon
 					pageName={'editReport'}
 					tooltipContent={"Edit your report's configuration"}
@@ -107,7 +106,7 @@
 					on:click={() => (reportEdit = true)}
 				/>
 			{/if}
-			{#if $authToken}
+			{#if user}
 				<HeaderIcon
 					pageName={'account'}
 					tooltipContent={'Manage your account'}

@@ -8,6 +8,7 @@
 		type Slice
 	} from '$lib/zenoapi';
 	import { extent } from 'd3-array';
+	import { getContext } from 'svelte';
 	import { Vega } from 'svelte-vega';
 	import generateSpec from './vegaSpec-beeswarm';
 
@@ -23,14 +24,16 @@
 	};
 	export let width: number;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let range: [number, number] = [0, 0];
 	let metrics: Metric[] = [];
 	let slices: Slice[] = [];
 
-	ZenoService.getMetrics(chart.projectUuid).then((met) => {
+	zenoClient.getMetrics(chart.projectUuid).then((met) => {
 		metrics = met;
 	});
-	ZenoService.getSlices(chart.projectUuid).then((sli) => {
+	zenoClient.getSlices(chart.projectUuid).then((sli) => {
 		slices = sli;
 	});
 

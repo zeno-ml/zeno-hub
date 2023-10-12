@@ -10,6 +10,7 @@
 	} from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
 	import DataTable, { Body, Cell, Head, Row } from '@smui/data-table';
+	import { getContext } from 'svelte';
 	import SliceDetailsContainer from './SliceDetailsContainer.svelte';
 	import TableRow from './TableRow.svelte';
 
@@ -23,12 +24,14 @@
 		}>;
 	};
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let metrics: Metric[] = [];
 	let slices: Slice[] = [];
-	ZenoService.getMetrics(chart.projectUuid).then((met) => {
+	zenoClient.getMetrics(chart.projectUuid).then((met) => {
 		metrics = met;
 	});
-	ZenoService.getSlices(chart.projectUuid).then((sli) => {
+	zenoClient.getSlices(chart.projectUuid).then((sli) => {
 		slices = sli;
 	});
 

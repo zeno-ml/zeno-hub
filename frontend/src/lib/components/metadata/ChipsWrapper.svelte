@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { selectionIds, selectionPredicates, selections, tagIds } from '$lib/stores';
+	import { project, selectionIds, selectionPredicates, selections, tagIds } from '$lib/stores';
 	import { Join, type FilterPredicate } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import SlicePopup from '../popups/SlicePopup.svelte';
@@ -37,6 +37,18 @@
 			<IdsChip />
 		{/if}
 		{#if $selectionPredicates !== undefined || $tagIds !== undefined || $selectionIds !== undefined}
+			{#if $project.editor}
+				<Button
+					variant="outlined"
+					class="ml-2"
+					on:keydown={() => ({})}
+					on:click={() => {
+						showNewSlice = true;
+					}}
+				>
+					create slice
+				</Button>
+			{/if}
 			<Button
 				variant="outlined"
 				class="ml-2"
@@ -56,18 +68,6 @@
 				}}
 			>
 				clear all
-			</Button>
-		{/if}
-		{#if $selectionPredicates !== undefined && $tagIds === undefined && $selectionIds === undefined}
-			<Button
-				variant="outlined"
-				class="ml-2"
-				on:keydown={() => ({})}
-				on:click={() => {
-					showNewSlice = true;
-				}}
-			>
-				create slice
 			</Button>
 		{/if}
 	{/if}

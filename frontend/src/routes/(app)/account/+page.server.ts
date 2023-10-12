@@ -1,23 +1,20 @@
-import { checkRefreshCookie } from '$lib/util/userCookieRefresh.js';
-import { OpenAPI, ZenoService } from '$lib/zenoapi';
+import { getClientAndUser } from '$lib/api/client';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, url }) {
-	const userCookie = cookies.get('loggedIn');
-	if (!userCookie) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+	const { zenoClient, cognitoUser } = await getClientAndUser(cookies, url);
+
+	if (!cognitoUser) {
+		throw redirect(303, '/');
 	}
-	let cognitoUser = JSON.parse(userCookie);
-	cognitoUser = await checkRefreshCookie(cognitoUser, cookies, url);
-	// If the user is not authenticated, redirect to the login page
-	if (!cognitoUser.id || !cognitoUser.accessToken) {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+
+	let user, organizations;
+	try {
+		user = await zenoClient.login(cognitoUser.name);
+		organizations = await zenoClient.getOrganizations();
+	} catch (e) {
+		throw redirect(303, '/');
 	}
-	OpenAPI.HEADERS = {
-		Authorization: 'Bearer ' + cognitoUser.accessToken
-	};
-	const user = await ZenoService.login(cognitoUser.name);
-	const organizations = await ZenoService.getOrganizations();
 
 	return {
 		cognitoUser: cognitoUser,
