@@ -14,20 +14,24 @@
 </script>
 
 <div
-	class="absolute inset-0 z-20 flex justify-center items-baseline p-12 bg-grey bg-opacity-60"
+	class="fixed inset-0 z-20 flex justify-center items-baseline p-12 bg-grey bg-opacity-60"
 	transition:fade={{ duration: 200 }}
 	bind:clientHeight={paperHeight}
 >
-	<Paper class="pt-3 flex flex-col" elevation={7}>
+	<Paper class="p-6 flex flex-col" elevation={7}>
 		<Content>
-			<span>{message}</span>
+			<div class="mb-4">{message}</div>
 			<slot />
-			<div class="flex flex-row-reverse">
-				<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('confirm')}>
-					{confirmText}
-				</Button>
+			<div class="flex m-auto justify-center">
 				<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('cancel')}>
 					{cancelText}
+				</Button>
+				<Button
+					style="margin-right: 10px"
+					variant="unelevated"
+					on:click={() => dispatch('confirm')}
+				>
+					{confirmText}
 				</Button>
 			</div>
 		</Content>

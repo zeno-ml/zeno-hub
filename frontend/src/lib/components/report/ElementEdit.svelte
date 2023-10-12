@@ -7,19 +7,14 @@
 		type Slice,
 		type SliceElementSpec
 	} from '$lib/zenoapi';
-	import { mdiClose } from '@mdi/js';
-	import { Icon } from '@smui/button';
-	import IconButton from '@smui/icon-button';
 	import Svelecte from 'svelecte';
-	import { createEventDispatcher, getContext } from 'svelte';
-	import Confirm from '../popups/Confirm.svelte';
+	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
 	export let chartOptions: Promise<Chart[]>;
 	export let sliceOptions: Promise<Slice[]>;
 	export let reportId: number;
 
-	const dispatch = createEventDispatcher();
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let timer: ReturnType<typeof setTimeout>;
@@ -27,7 +22,6 @@
 	let sliceElementSpec: SliceElementSpec | null = null;
 	let chartId: number | null = null;
 	let models: string[] = [];
-	let showConfirmDelete = false;
 
 	updateTypeObjects(element);
 
@@ -119,19 +113,7 @@
 	}
 </script>
 
-{#if showConfirmDelete}
-	<Confirm
-		message="Are you sure you want to delete this element?"
-		on:cancel={() => {
-			showConfirmDelete = false;
-		}}
-		on:confirm={() => {
-			dispatch('delete');
-			showConfirmDelete = false;
-		}}
-	/>
-{/if}
-<div class="flex items-center my-2 border border-grey-light rounded p-4">
+<div class="flex items-center p-3">
 	<div class="w-full">
 		<Svelecte
 			style="margin-bottom: 10px;"
@@ -155,6 +137,7 @@
 			{#await sliceOptions then options}
 				<Svelecte value={sliceElementSpec.sliceId} {options} on:change={updateSliceId} />
 				{#if models.length > 0}
+					<div class="mt-3" />
 					<Svelecte
 						bind:value={sliceElementSpec.modelName}
 						labelAsValue={true}
@@ -164,12 +147,5 @@
 				{/if}
 			{/await}
 		{/if}
-	</div>
-	<div class="flex">
-		<IconButton on:click={() => (showConfirmDelete = true)}>
-			<Icon tag="svg" viewBox="0 0 24 24">
-				<path fill="black" d={mdiClose} />
-			</Icon>
-		</IconButton>
 	</div>
 </div>

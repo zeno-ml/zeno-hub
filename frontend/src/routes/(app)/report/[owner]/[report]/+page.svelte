@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Element from '$lib/components/report/Element.svelte';
-	import ElementEdit from '$lib/components/report/ElementEdit.svelte';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import {
 		ReportElementType,
 		ZenoService,
@@ -9,8 +9,6 @@
 		type ReportElement,
 		type Slice
 	} from '$lib/zenoapi';
-	import { mdiDrag } from '@mdi/js';
-	import Button, { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -20,6 +18,7 @@
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
+	let showConfirmDelete = -1;
 	let dragEnabled = false;
 	let chartOptions: Promise<Chart[]> = new Promise(() => []);
 	let sliceOptions: Promise<Slice[]> = new Promise(() => []);
@@ -48,18 +47,16 @@
 				data: 'new element',
 				position: elementIndex
 			})
-			.then(
-				(res) =>
-					(elements = [
-						...elements,
-						{
-							id: res,
-							type: ReportElementType.TEXT,
-							data: 'new element',
-							position: elementIndex
-						}
-					])
-			);
+			.then((res) => {
+				elements.filter((d) => d.position >= elementIndex).forEach((d) => d.position++);
+				elements.push({
+					id: res,
+					type: ReportElementType.TEXT,
+					data: 'new element',
+					position: elementIndex
+				});
+				elements = elements.sort((a, b) => a.position - b.position);
+			});
 	}
 
 	function updateReportProjects(e: CustomEvent) {
@@ -86,6 +83,18 @@
 	}
 </script>
 
+{#if showConfirmDelete !== -1}
+	<Confirm
+		message="Are you sure you want to delete this element?"
+		on:cancel={() => {
+			showConfirmDelete = -1;
+		}}
+		on:confirm={() => {
+			deleteElement(showConfirmDelete);
+			showConfirmDelete = -1;
+		}}
+	/>
+{/if}
 <div class="w-full h-full bg-yellowish overflow-scroll">
 	<div
 		class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 md:mt-6 md:mb-6 sm:mt-0 sm:mb-0 rounded shadow"
@@ -96,6 +105,7 @@
 			</h1>
 		</div>
 		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
+		<hr class="mt-4 bg-grey-dark" />
 
 		{#if data.report.editor}
 			<p class="mt-4 mb-2">Associated Projects</p>
@@ -110,58 +120,31 @@
 					options={projects}
 				/>
 			{/await}
+			<hr class="mt-4 bg-grey-dark" />
 		{/if}
 		<div
-			class="flex flex-col hover:border-primary-mid"
-			use:dndzone={{ items: elements, dragDisabled: !dragEnabled }}
+			class="flex flex-col mt-2"
+			use:dndzone={{
+				items: elements,
+				dragDisabled: !dragEnabled,
+				dropTargetStyle: {},
+				flipDurationMs: 0
+			}}
 			on:consider={handleMoved}
 			on:finalize={handleDropped}
 		>
 			{#each elements as element (element.id)}
-				<div
-					class="border-2 hover:border-primary-mid rounded p-4 relative {editId === element.id
-						? 'border-primary-mid'
-						: 'border-white'}
-					{data.report.editor ? 'group/edit' : ''}"
-				>
-					<button
-						class="group-hover/edit:block hidden px-4 py-1 border-primary-mid border-2 absolute bg-white -top-4 rounded-md"
-						on:click={() =>
-							editId === element.id || element.id === null || element.id === undefined
-								? (editId = -1)
-								: (editId = element.id)}
-					>
-						{editId === element.id ? 'done' : 'edit'}
-					</button>
-					<button
-						class="group-hover/edit:block hidden px-4 py-1 border-primary-mid border-2 absolute bg-white -top-4 right-4 rounded-md"
-						on:click={() => deleteElement(element.id ?? -1)}
-					>
-						{'delete'}
-					</button>
-					<div
-						class="group-hover/edit:flex hidden mr-2 cursor-move absolute -left-3 bg-white border-primary-mid border-2 rounded-md"
-					>
-						<Icon
-							style="outline:none; width: 24px; height: 24px"
-							tag="svg"
-							viewBox="0 0 24 24"
-							on:mousedown={() => (dragEnabled = true)}
-						>
-							<path fill="black" d={mdiDrag} />
-						</Icon>
-					</div>
-					{#if editId === element.id}
-						<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={data.report.id} />
-					{:else}
-						<Element {element} {chartOptions} />
-					{/if}
-				</div>
+				<ElementContainer
+					bind:element
+					bind:editId
+					bind:dragEnabled
+					bind:showConfirmDelete
+					{addElement}
+					{chartOptions}
+					{sliceOptions}
+					report={data.report}
+				/>
 			{/each}
-			<br />
-			{#if data.report.editor}
-				<Button variant="raised" on:click={() => addElement(elements.length)}>Add Element</Button>
-			{/if}
 		</div>
 	</div>
 </div>
