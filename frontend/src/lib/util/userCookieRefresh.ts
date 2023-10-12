@@ -27,7 +27,6 @@ export async function getOrRefreshCognitoUser(
 				maxAge: 60 * 60 * 24 * 30
 			});
 		} catch (error) {
-			cookies.delete('loggedIn', { path: '/' });
 			throw redirect(303, `/login?redirectTo=${url.pathname}`);
 		}
 	}

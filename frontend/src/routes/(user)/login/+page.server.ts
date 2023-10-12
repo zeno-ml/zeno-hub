@@ -4,6 +4,10 @@ import { extractUserFromSession, getSession } from '$lib/auth/cognito';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
+export async function load({ cookies }) {
+	cookies.delete('loggedIn', { path: '/' });
+}
+
 export const actions: Actions = {
 	login: async ({ request, cookies }) => {
 		const data = await request.formData();
