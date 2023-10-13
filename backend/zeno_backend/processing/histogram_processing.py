@@ -108,7 +108,6 @@ async def histogram_metric_and_count(
     buckets: list[HistogramBucket] | None,
     project_uuid: str,
     filter_sql: sql.Composed | None,
-    calculate_histograms: bool,
 ) -> list[HistogramBucket]:
     """Calculate the metric and count for a column.
 
@@ -118,16 +117,11 @@ async def histogram_metric_and_count(
         buckets (list[HistogramBucket]): the buckets to calculate the metric for.
         project_uuid (str): the project the user is currently working with.
         filter_sql (sql.Composed): the filter to apply to the query.
-        calculate_histograms (bool): whether to calculate the metric.
 
     Returns:
         HistogramBucket: the bucket with the metric added.
     """
-    if (
-        request.metric is not None
-        and request.model is not None
-        and calculate_histograms
-    ):
+    if request.metric is not None and request.model is not None:
         calculate_histograms = True
     else:
         calculate_histograms = False

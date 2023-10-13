@@ -300,15 +300,11 @@ def get_server() -> FastAPI:
 
         sql_table = select.table_data_paginated(project_uuid, filter_sql, req)
 
-        project = select.project_from_uuid(project_uuid)
         return_table = []
         for row in sql_table.table:
             return_row = {}
             for i, col in enumerate(sql_table.columns):
-                if col == "data" and project and project.data_url:
-                    return_row[col] = project.data_url + row[i]
-                else:
-                    return_row[col] = row[i]
+                return_row[col] = row[i]
             return_table.append(return_row)
 
         return json.dumps(return_table)
@@ -604,7 +600,6 @@ def get_server() -> FastAPI:
                     histograms[col.id],
                     project_uuid,
                     filter_sql,
-                    project_obj.calculate_histogram_metrics,
                 )
                 for col in req.columns
             ]

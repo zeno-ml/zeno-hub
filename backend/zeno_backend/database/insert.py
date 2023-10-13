@@ -67,16 +67,14 @@ def project(project_config: Project, owner_id: int):
     """
     with Database() as db:
         db.execute(
-            "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
-            + "calculate_histogram_metrics, samples_per_page, public, description) "
-            + "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);",
+            "INSERT INTO projects (uuid, name, owner_id, view, "
+            + "samples_per_page, public, description) "
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s);",
             [
                 project_config.uuid,
                 project_config.name,
                 owner_id,
                 project_config.view,
-                project_config.data_url,
-                project_config.calculate_histogram_metrics,
                 project_config.samples_per_page,
                 project_config.public,
                 project_config.description,
