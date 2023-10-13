@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import {
 		ReportElementType,
@@ -120,7 +121,12 @@
 					options={projects}
 				/>
 			{/await}
-			<hr class="mt-4 bg-grey-dark" />
+			<hr class="mt-4 mb-4 bg-grey-dark" />
+			<AddElementButton
+				position={0}
+				{addElement}
+				alwaysShow={elements.length === 0 ? true : false}
+			/>
 		{/if}
 		<div
 			class="flex flex-col mt-2"
@@ -128,7 +134,7 @@
 				items: elements,
 				dragDisabled: !dragEnabled,
 				dropTargetStyle: {},
-				flipDurationMs: 0
+				flipDurationMs: 100
 			}}
 			on:consider={handleMoved}
 			on:finalize={handleDropped}
