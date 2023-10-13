@@ -17,12 +17,14 @@
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { getContext } from 'svelte';
+	import Confirm from '../popups/Confirm.svelte';
 
 	export let chart: Chart;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let showOptions = false;
+	let showDelete = false;
 	let iconMap = {
 		[ChartType.TABLE]: mdiTable,
 		[ChartType.LINE]: mdiChartLine,
@@ -33,6 +35,16 @@
 	};
 </script>
 
+{#if showDelete}
+	<Confirm
+		message={'Are you sure you want to delete this chart?'}
+		on:confirm={() => {
+			showOptions = false;
+			zenoClient.deleteChart(chart).then(() => invalidate('app:charts'));
+		}}
+		on:cancel={() => (showDelete = false)}
+	/>
+{/if}
 <button
 	class="border-solid mr-4 mb-4 rounded-sm border-grey-light border shadow-sm flex flex-col py-1 px-5 hover:shadow-md"
 	on:click={() => goto(`chart/${chart.id}?edit=false`)}
@@ -95,7 +107,7 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									zenoClient.deleteChart(chart).then(() => invalidate('app:charts'));
+									showDelete = true;
 								}}
 							>
 								<Icon style="font-size: 20px;" class="material-icons">delete_outline</Icon>&nbsp;
