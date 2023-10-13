@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import type { Organization, Report, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
@@ -32,10 +33,10 @@
 		input.getElement().focus();
 	}
 
-	function updateReport() {
-		zenoClient.updateReport(report).then(() => {
-			dispatch('close');
-		});
+	async function updateReport() {
+		await zenoClient.updateReport(report);
+		goto(`/report/${report.ownerName}/${encodeURI(report.name)}`);
+		dispatch('close');
 	}
 
 	function submit(e: KeyboardEvent) {

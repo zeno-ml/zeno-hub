@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import Element from '$lib/components/report/Element.svelte';
-	import ElementEdit from '$lib/components/report/ElementEdit.svelte';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
+	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import {
 		ReportElementType,
 		ZenoService,
@@ -10,7 +10,6 @@
 		type ReportElement,
 		type Slice
 	} from '$lib/zenoapi';
-	import Button, { Label } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -19,7 +18,8 @@
 
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
 	let selectedProjects = data.report.linkedProjects ?? [];
-	let isEdit = false;
+	let editId = -1;
+	let showConfirmDelete = -1;
 	let dragEnabled = false;
 	let chartOptions: Promise<Chart[]> = new Promise(() => []);
 	let sliceOptions: Promise<Slice[]> = new Promise(() => []);
@@ -48,26 +48,16 @@
 				data: 'new element',
 				position: elementIndex
 			})
-			.then(
-				(res) =>
-					(elements = [
-						...elements,
-						{
-							id: res,
-							type: ReportElementType.TEXT,
-							data: 'new element',
-							position: elementIndex
-						}
-					])
-			);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	function updateReportName(e: any) {
-		const name = e.target?.textContent.replaceAll(/[/]/g, '');
-		zenoClient.updateReport({ ...data.report, name: name }).then(() => {
-			goto('/report/' + data.report.ownerName + '/' + encodeURIComponent(name));
-		});
+			.then((res) => {
+				elements.filter((d) => d.position >= elementIndex).forEach((d) => d.position++);
+				elements.push({
+					id: res,
+					type: ReportElementType.TEXT,
+					data: 'new element',
+					position: elementIndex
+				});
+				elements = elements.sort((a, b) => a.position - b.position);
+			});
 	}
 
 	function updateReportProjects(e: CustomEvent) {
@@ -94,27 +84,31 @@
 	}
 </script>
 
+{#if showConfirmDelete !== -1}
+	<Confirm
+		message="Are you sure you want to delete this element?"
+		on:cancel={() => {
+			showConfirmDelete = -1;
+		}}
+		on:confirm={() => {
+			deleteElement(showConfirmDelete);
+			showConfirmDelete = -1;
+		}}
+	/>
+{/if}
 <div class="w-full h-full bg-yellowish overflow-scroll">
 	<div
 		class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 md:mt-6 md:mb-6 sm:mt-0 sm:mb-0 rounded shadow"
 	>
 		<div class="flex items-center mt-12 justify-between">
-			<h1
-				class="text-5xl mr-6 text-grey-darkest"
-				contenteditable={isEdit ? true : false}
-				on:blur={(e) => updateReportName(e)}
-			>
+			<h1 class="text-5xl mr-6 text-grey-darkest">
 				{data.report.name}
 			</h1>
-			{#if data.report.editor}
-				<Button variant="raised" on:click={() => (isEdit = !isEdit)}>
-					<Label>{isEdit ? 'View' : 'Edit'}</Label>
-				</Button>
-			{/if}
 		</div>
 		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
+		<hr class="mt-4 bg-grey-dark" />
 
-		{#if isEdit}
+		{#if data.report.editor}
 			<p class="mt-4 mb-2">Associated Projects</p>
 			{#await zenoClient.getProjects() then projects}
 				<Svelecte
@@ -127,31 +121,36 @@
 					options={projects}
 				/>
 			{/await}
+			<hr class="mt-4 mb-4 bg-grey-dark" />
+			<AddElementButton
+				position={0}
+				{addElement}
+				alwaysShow={elements.length === 0 ? true : false}
+			/>
 		{/if}
-		<hr class="mt-6 mb-2 text-grey-light" />
 		<div
-			class="flex flex-col"
-			use:dndzone={{ items: elements, dragDisabled: !dragEnabled }}
+			class="flex flex-col mt-2"
+			use:dndzone={{
+				items: elements,
+				dragDisabled: !dragEnabled,
+				dropTargetStyle: {},
+				flipDurationMs: 100
+			}}
 			on:consider={handleMoved}
 			on:finalize={handleDropped}
 		>
 			{#each elements as element (element.id)}
-				{#if isEdit}
-					<ElementEdit
-						bind:element
-						bind:dragEnabled
-						{chartOptions}
-						{sliceOptions}
-						reportId={data.report.id}
-						on:delete={() => deleteElement(element.id ?? -1)}
-					/>
-				{:else}
-					<Element {element} {chartOptions} />
-				{/if}
+				<ElementContainer
+					bind:element
+					bind:editId
+					bind:dragEnabled
+					bind:showConfirmDelete
+					{addElement}
+					{chartOptions}
+					{sliceOptions}
+					report={data.report}
+				/>
 			{/each}
-			{#if isEdit}
-				<Button variant="raised" on:click={() => addElement(elements.length)}>Add Element</Button>
-			{/if}
 		</div>
 	</div>
 </div>

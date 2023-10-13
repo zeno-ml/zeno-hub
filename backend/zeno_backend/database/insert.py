@@ -426,6 +426,12 @@ def report_element(report_id: int, element: ReportElement) -> int | None:
         " VALUES (%s,%s,%s,%s) RETURNING id;",
         [report_id, element.type, element.data, element.position],
     )
+    # update position of all elements after insert
+    db.connect_execute(
+        "UPDATE report_elements SET position = position + 1 WHERE report_id = %s "
+        "AND position >= %s;",
+        [report_id, element.position],
+    )
     if len(id) > 0:
         return id[0][0]
 
