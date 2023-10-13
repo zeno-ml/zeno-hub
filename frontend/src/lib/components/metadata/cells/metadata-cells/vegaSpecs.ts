@@ -1,6 +1,6 @@
 import type { VegaLiteSpec } from 'svelte-vega';
 
-export function nominalVegaSpec(metricRange: [number, number], metrics: boolean) {
+export function nominalVegaSpec(metricRange: [number, number]) {
 	const sizeSpec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		data: {
@@ -69,14 +69,12 @@ export function nominalVegaSpec(metricRange: [number, number], metrics: boolean)
 							type: 'quantitative',
 							title: 'Filtered Count'
 						},
-						metrics
-							? {
-									field: 'metric',
-									type: 'quantitative',
-									title: 'Metric',
-									format: '.2f'
-							  }
-							: {}
+						{
+							field: 'metric',
+							type: 'quantitative',
+							title: 'Metric',
+							format: '.2f'
+						}
 					],
 					strokeWidth: {
 						condition: [
@@ -118,7 +116,7 @@ export function nominalVegaSpec(metricRange: [number, number], metrics: boolean)
 	return sizeSpec;
 }
 
-export function continuousVegaSpec(metricRange: [number, number], metrics: boolean) {
+export function continuousVegaSpec(metricRange: [number, number]) {
 	const histogramSpec = {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		data: {
@@ -199,14 +197,12 @@ export function continuousVegaSpec(metricRange: [number, number], metrics: boole
 							type: 'quantitative',
 							title: 'Filtered Count'
 						},
-						metrics
-							? {
-									field: 'metric',
-									type: 'quantitative',
-									title: 'Metric',
-									format: '.2f'
-							  }
-							: {}
+						{
+							field: 'metric',
+							type: 'quantitative',
+							title: 'Metric',
+							format: '.2f'
+						}
 					]
 				}
 			}

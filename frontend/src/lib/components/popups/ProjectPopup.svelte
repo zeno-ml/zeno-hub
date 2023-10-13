@@ -96,14 +96,6 @@
 				</div>
 				<div class="flex flex-col">
 					<div class="flex items-center">
-						<Checkbox
-							checked={config.calculateHistogramMetrics}
-							on:click={() =>
-								(config.calculateHistogramMetrics = !config.calculateHistogramMetrics)}
-						/>
-						<span>Calculate histogram metrics</span>
-					</div>
-					<div class="flex items-center">
 						<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
 						<span>Public visibility</span>
 					</div>
