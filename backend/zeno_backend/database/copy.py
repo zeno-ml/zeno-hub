@@ -28,8 +28,8 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
     with Database() as db:
         # Get project to copy from.
         project_result = db.execute_return(
-            "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
-            "samples_per_page, public, description FROM projects WHERE uuid = %s;",
+            "SELECT uuid, name, view, samples_per_page, public, "
+            "description FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
         if len(project_result) == 0:
@@ -38,21 +38,17 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         # Create new project in DB.
         new_uuid = str(uuid.uuid4())
         db.execute(
-            "INSERT INTO projects (uuid, name, owner_id, view, data_url, "
-            + "calculate_histogram_metrics, samples_per_page, public, description) "
-            + "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s);",
+            "INSERT INTO projects (uuid, name, owner_id, view, "
+            + "samples_per_page, public, description) "
+            + "VALUES (%s,%s,%s,%s,%s,,%s,%s);",
             [
                 new_uuid,
                 copy_spec.name,
                 user.id,
                 str(project_result[0][2]),
-                copy_spec.data_url
-                if copy_spec.data_url is not None
-                else str(project_result[0][3]),
-                bool(project_result[0][4]),
-                project_result[0][5] if isinstance(project_result[0][5], int) else 10,
+                project_result[0][3] if isinstance(project_result[0][3], int) else 10,
                 False,
-                str(project_result[0][7]),
+                str(project_result[0][5]),
             ],
         )
         db.execute(

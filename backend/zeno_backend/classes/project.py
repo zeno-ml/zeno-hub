@@ -13,29 +13,24 @@ class Project(CamelModel):
     Attributes:
         uuid (str): UUID of the task.
         name (str): name of the task.
+        description (str): description of the project. Default "".
         metrics (list[Metric]): metrics to calculate for the task.
         owner_name (str): name of the user who owns the task.
         view (str): name of the view to use for the task.
-        data_url (Optional[str]): base URL from which to read data instances.
         editor (bool): whether the current user is an editor of the project.
-        calculate_histogram_metrics (bool): whether to calculate histogram metrics.
-            Default True.
         samples_per_page (int): number of datapoints to show per page. Default 10.
         public (bool): whether the task is public. Default False.
-        description (str): description of the project. Default "".
     """
 
     uuid: str
     name: str
+    description: str = ""
     metrics: list[Metric] = []
     owner_name: str
     view: str
-    data_url: str | None
     editor: bool
-    calculate_histogram_metrics: bool = True
     samples_per_page: int = 10
     public: bool = False
-    description: str = ""
 
 
 class ProjectStats(CamelModel):
@@ -79,7 +74,6 @@ class ProjectCopy(CamelModel):
 
     Attributes:
         name (str): name of the new project.
-        data_url (str|None): base URL from which to read data instances.
         copy_data (bool): whether to copy the data instances.
         copy_systems (bool): whether to copy the systems.
         copy_slices (bool): whether to copy the slices.
@@ -87,7 +81,6 @@ class ProjectCopy(CamelModel):
     """
 
     name: str
-    data_url: str | None
     copy_data: bool
     copy_systems: bool
     copy_slices: bool

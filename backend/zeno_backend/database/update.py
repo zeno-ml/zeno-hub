@@ -204,14 +204,12 @@ def project(project_config: Project):
     """
     with Database() as db:
         db.execute(
-            "UPDATE projects SET name = %s, calculate_histogram_metrics = %s, "
-            "view = %s, data_url = %s, samples_per_page = %s, public = %s, "
+            "UPDATE projects SET name = %s, "
+            "view = %s, samples_per_page = %s, public = %s, "
             "description = %s WHERE uuid = %s;",
             [
                 project_config.name,
-                project_config.calculate_histogram_metrics,
                 project_config.view,
-                project_config.data_url,
                 project_config.samples_per_page,
                 project_config.public,
                 project_config.description,

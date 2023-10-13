@@ -34,7 +34,6 @@
 		zenoClient
 			.copyProject(config.uuid, {
 				name: config.name,
-				dataUrl: null,
 				copyCharts: copyCharts,
 				copyData: copyData,
 				copySlices: copySlices,
@@ -69,9 +68,6 @@
 						bind:this={input}
 						invalid={invalidName}
 					/>
-				</div>
-				<div>
-					<Textfield bind:value={config.dataUrl} label="Data base URL" />
 				</div>
 				<div class="flex items-center">
 					<Checkbox bind:checked={copyData} />

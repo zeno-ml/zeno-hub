@@ -62,7 +62,7 @@ def projects(user: User) -> list[Project]:
     """
     with Database() as db:
         own_projects_result = db.execute_return(
-            "SELECT uuid, name, view, data_url, calculate_histogram_metrics, "
+            "SELECT uuid, name, view, "
             "samples_per_page, public, description FROM projects WHERE owner_id = %s;",
             [user.id],
         )
@@ -73,20 +73,18 @@ def projects(user: User) -> list[Project]:
                     name=project[1],
                     owner_name=user.name,
                     view=project[2],
-                    data_url=project[3],
-                    calculate_histogram_metrics=bool(project[4]),
-                    samples_per_page=project[5],
+                    samples_per_page=project[3],
                     editor=True,
-                    public=project[6],
-                    description=project[7],
+                    public=project[4],
+                    description=project[5],
                 ),
                 own_projects_result,
             )
         )
 
         user_projects_result = db.execute_return(
-            "SELECT p.uuid, p.name, p.owner_id, p.view, p.data_url, "
-            "p.calculate_histogram_metrics, p.samples_per_page, up.editor, p.public, "
+            "SELECT p.uuid, p.name, p.owner_id, p.view, "
+            "p.samples_per_page, up.editor, p.public, "
             "p.description FROM projects AS p JOIN user_project AS up "
             "ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
             [user.id],
@@ -104,18 +102,16 @@ def projects(user: User) -> list[Project]:
                         name=res[1],
                         owner_name=str(owner_name),
                         view=res[3],
-                        data_url=res[4],
-                        calculate_histogram_metrics=bool(res[5]),
-                        samples_per_page=res[6],
-                        editor=res[7],
-                        public=res[8],
-                        description=res[9],
+                        samples_per_page=res[4],
+                        editor=res[5],
+                        public=res[6],
+                        description=res[7],
                     )
                 )
 
         project_org_result = db.execute_return(
-            "SELECT p.uuid, p.name, p.owner_id, p.view, p.calculate_histogram_metrics,"
-            " p.data_url, p.samples_per_page, op.editor, p.public, p.description "
+            "SELECT p.uuid, p.name, p.owner_id, p.view,"
+            " p.samples_per_page, op.editor, p.public, p.description "
             "FROM projects AS p JOIN (SELECT op.project_uuid, uo.organization_id, "
             "editor FROM user_organization as uo JOIN organization_project as op"
             " ON uo.organization_id = op.organization_id "
@@ -135,12 +131,10 @@ def projects(user: User) -> list[Project]:
                         name=res[1],
                         owner_name=str(owner_name),
                         view=res[3],
-                        calculate_histogram_metrics=bool(res[4]),
-                        data_url=res[5],
-                        samples_per_page=res[6],
-                        editor=res[7],
-                        public=res[8],
-                        description=res[9],
+                        samples_per_page=res[4],
+                        editor=res[5],
+                        public=res[6],
+                        description=res[7],
                     )
                 )
         org_projects = list(
@@ -161,7 +155,7 @@ def public_projects() -> list[Project]:
     """
     with Database() as db:
         project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
+            "SELECT uuid, name, owner_id, view, "
             "samples_per_page, description FROM projects WHERE public IS TRUE;",
         )
         projects = []
@@ -177,12 +171,10 @@ def public_projects() -> list[Project]:
                         name=res[1],
                         owner_name=str(owner_name),
                         view=res[3],
-                        data_url=res[4],
-                        calculate_histogram_metrics=bool(res[5]),
-                        samples_per_page=res[6],
+                        samples_per_page=res[4],
                         editor=False,
                         public=True,
-                        description=res[7],
+                        description=res[5],
                     )
                 )
         return projects
@@ -681,7 +673,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
     """
     with Database() as db:
         project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, data_url, calculate_histogram_metrics, "
+            "SELECT uuid, name, owner_id, view, "
             "samples_per_page, public, description "
             "FROM projects WHERE uuid = %s;",
             [project_uuid],
@@ -698,14 +690,12 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 name=str(project_result[1]),
                 owner_name=str(owner_result[0][0]),
                 view=str(project_result[3]),
-                data_url=str(project_result[4]),
                 editor=False,
-                calculate_histogram_metrics=bool(project_result[5]),
-                samples_per_page=project_result[6]
-                if isinstance(project_result[6], int)
+                samples_per_page=project_result[4]
+                if isinstance(project_result[4], int)
                 else 10,
-                public=bool(project_result[7]),
-                description=str(project_result[8]),
+                public=bool(project_result[5]),
+                description=str(project_result[6]),
             )
 
 
