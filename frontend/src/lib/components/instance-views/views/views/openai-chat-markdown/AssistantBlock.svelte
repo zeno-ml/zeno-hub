@@ -10,6 +10,7 @@
 </script>
 
 <div class="my-1 flex items-end relative z-0">
+	<!-- Robot Icon -->
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 640 512"
