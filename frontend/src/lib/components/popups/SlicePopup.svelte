@@ -167,7 +167,11 @@
 		const predicates = predicateGroup.predicates[0];
 		if (Object.hasOwn(predicates, 'column'))
 			zenoClient
-				.addAllSlices($project.uuid, (predicates as FilterPredicate).column)
+				.addAllSlices(
+					$project.uuid,
+					(predicates as FilterPredicate).column,
+					sliceName === '' ? undefined : sliceName
+				)
 				.then(() => {
 					zenoClient
 						.getFolders($project.uuid)

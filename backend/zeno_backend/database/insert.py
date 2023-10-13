@@ -483,12 +483,15 @@ def slice(project: str, req: Slice) -> int | None:
         return None
 
 
-async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] | None:
+async def all_slices_for_column(
+    project: str, column: ZenoColumn, name: str | None = None
+) -> list[int] | None:
     """Add slices for all values of a nominal data column.
 
     Args:
         project (str): project to add the slices to.
         column (ZenoColumn): column for which to add slices.
+        name (str | None): name of the folder to add the slices to.
 
     Returns:
         list[int]|None: ids of all added slices.
@@ -509,13 +512,13 @@ async def all_slices_for_column(project: str, column: ZenoColumn) -> list[int] |
                 await cur.execute(
                     "INSERT INTO folders (name, project_uuid) VALUES (%s,%s) "
                     "RETURNING id;",
-                    [column.name, project],
+                    [name if name is not None else column.name, project],
                 )
                 folder_id = await cur.fetchone()
             for value in values:
                 slice = Slice(
                     id=-1,
-                    slice_name=f"{column.name} = {value[0]}",
+                    slice_name=str(value[0]),
                     filter_predicates=FilterPredicateGroup(
                         predicates=[
                             FilterPredicate(
