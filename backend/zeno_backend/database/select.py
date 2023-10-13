@@ -1829,7 +1829,7 @@ def filtered_short_string_column_values(
         return short_ret
     for result in returned_strings[0:5]:
         idx = result[0].find(req.filter_string)
-        loc_str = result[0][0 if idx < 20 else idx - 20: idx + 20]
+        loc_str = result[0][0 if idx < 20 else idx - 20 : idx + 20]
         if len(result[0]) > 40 + len(req.filter_string):
             if idx - 20 > 0:
                 loc_str = "..." + loc_str
