@@ -6,9 +6,9 @@
 
 	export let element: ReportElement;
 
-	let renderedInput = element.data ? purify.sanitize(parse(element.data)) : '';
+	$: renderedInput = element.data ? purify.sanitize(parse(element.data)) : '';
 </script>
 
-<article class="max-w-3xl">
+<article class="w-full overflow-hidden break-words">
 	<Markdown renderedText={renderedInput} />
 </article>

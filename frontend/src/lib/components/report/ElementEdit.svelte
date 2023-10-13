@@ -26,17 +26,19 @@
 	updateTypeObjects(element);
 
 	// set specific objects for each element type from the raw data string.
-	function updateTypeObjects(el: ReportElement) {
+	async function updateTypeObjects(el: ReportElement) {
 		if (el.type === ReportElementType.CHART) {
 			if (el.data) {
 				chartId = parseInt(el.data);
 			} else {
-				chartOptions.then((r) => (chartId = r[0].id));
+				const options = await chartOptions;
+				chartId = options[0].id;
+				element.data = `${chartId}`;
 			}
 		} else if (el.type === ReportElementType.SLICE) {
 			if (el.data) {
 				sliceElementSpec = JSON.parse(el.data);
-				sliceOptions.then((r) => {
+				await sliceOptions.then((r) => {
 					let res = r.find((sli) =>
 						sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
 					);
@@ -45,7 +47,9 @@
 					}
 				});
 			} else {
-				sliceOptions.then((r) => (sliceElementSpec = { sliceId: r[0].id, modelName: '' }));
+				const options = await sliceOptions;
+				sliceElementSpec = { sliceId: options[0].id, modelName: '' };
+				element.data = JSON.stringify(sliceElementSpec);
 			}
 		}
 	}
@@ -56,12 +60,12 @@
 
 	function updateType(e: CustomEvent) {
 		element.data = null;
-		updateTypeObjects(element);
-		element = element;
-		zenoClient.updateReportElement(reportId, {
-			...element,
-			type: e.detail.label,
-			data: null
+		updateTypeObjects(element).then(() => {
+			zenoClient.updateReportElement(reportId, {
+				...element,
+				type: e.detail.label,
+				data: null
+			});
 		});
 	}
 

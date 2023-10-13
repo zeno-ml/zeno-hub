@@ -19,14 +19,14 @@
 	let table: Record<string, unknown>[] | undefined = [];
 	let page = 0;
 
-	try {
-		sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
-	} catch {
-		sliceElementSpec = undefined;
-	}
-
-	if (sliceElementSpec) {
-		zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+	$: {
+		element.data;
+		try {
+			sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
+			zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+		} catch {
+			sliceElementSpec = undefined;
+		}
 	}
 
 	$: if (sliceElementSpec) {
