@@ -1052,15 +1052,23 @@ export class ZenoService {
 	 * Add All Slices
 	 * @param project
 	 * @param requestBody
+	 * @param name
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public addAllSlices(project: string, requestBody: ZenoColumn): CancelablePromise<Array<number>> {
+	public addAllSlices(
+		project: string,
+		requestBody: ZenoColumn,
+		name?: string | null
+	): CancelablePromise<Array<number>> {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/all-slices/{project}',
 			path: {
 				project: project
+			},
+			query: {
+				name: name
 			},
 			body: requestBody,
 			mediaType: 'application/json',

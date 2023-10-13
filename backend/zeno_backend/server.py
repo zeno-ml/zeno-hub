@@ -757,9 +757,9 @@ def get_server() -> FastAPI:
         tags=["zeno"],
         dependencies=[Depends(auth)],
     )
-    async def add_all_slices(project: str, req: ZenoColumn):
+    async def add_all_slices(project: str, req: ZenoColumn, name: str | None = None):
         try:
-            ids = await insert.all_slices_for_column(project, req)
+            ids = await insert.all_slices_for_column(project, req, name)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
