@@ -1,5 +1,11 @@
 <script lang="ts">
-	import type { Chart, Report, ReportElement, Slice } from '$lib/zenoapi';
+	import {
+		ReportElementType,
+		type Chart,
+		type Report,
+		type ReportElement,
+		type Slice
+	} from '$lib/zenoapi';
 	import { mdiDrag } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import AddElementButton from './AddElementButton.svelte';
@@ -51,7 +57,14 @@
 			</Icon>
 		</div>
 		{#if editId === element.id}
-			<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+			<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
+				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+					<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+				</div>
+				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+					<Element {element} {chartOptions} />
+				</div>
+			</div>
 		{:else}
 			<Element {element} {chartOptions} />
 		{/if}

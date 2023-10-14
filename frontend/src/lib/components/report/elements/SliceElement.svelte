@@ -19,15 +19,7 @@
 	let table: Record<string, unknown>[] | undefined = [];
 	let page = 0;
 
-	try {
-		sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
-	} catch {
-		sliceElementSpec = undefined;
-	}
-
-	if (sliceElementSpec) {
-		zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
-	}
+	$: updateSliceElementSpec(element.data as string);
 
 	$: if (sliceElementSpec) {
 		zenoClient
@@ -38,6 +30,16 @@
 				limit: 2
 			} as SliceTableRequest)
 			.then((r) => (table = JSON.parse(r)));
+	}
+
+	function updateSliceElementSpec(data: string) {
+		page = 0;
+		try {
+			sliceElementSpec = JSON.parse(data) as SliceElementSpec;
+			zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+		} catch {
+			sliceElementSpec = undefined;
+		}
 	}
 </script>
 
@@ -51,7 +53,9 @@
 					<span class="font-semibold">{sliceElementSpec.modelName}</span>
 				{/if}
 			</h3>
-			<p>{page * 2 + 1} - {page * 2 + 2} of {sliceElementOptions.sliceSize}</p>
+			<p>
+				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
+			</p>
 		</div>
 		<div class="flex items-stretch w-full justify-between">
 			<button

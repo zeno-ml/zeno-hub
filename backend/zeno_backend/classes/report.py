@@ -82,7 +82,7 @@ class SliceElementSpec(CamelModel):
     """Specification for slice element in a Zeno report."""
 
     slice_id: int
-    model_name: str
+    model_name: str | None = None
 
 
 class SliceElementOptions(CamelModel):
