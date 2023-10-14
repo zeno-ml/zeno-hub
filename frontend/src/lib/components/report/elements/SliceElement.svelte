@@ -19,15 +19,7 @@
 	let table: Record<string, unknown>[] | undefined = [];
 	let page = 0;
 
-	$: {
-		element.data;
-		try {
-			sliceElementSpec = JSON.parse(element.data as string) as SliceElementSpec;
-			zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
-		} catch {
-			sliceElementSpec = undefined;
-		}
-	}
+	$: updateSliceElementSpec(element.data as string);
 
 	$: if (sliceElementSpec) {
 		zenoClient
@@ -38,6 +30,16 @@
 				limit: 2
 			} as SliceTableRequest)
 			.then((r) => (table = JSON.parse(r)));
+	}
+
+	function updateSliceElementSpec(data: string) {
+		page = 0;
+		try {
+			sliceElementSpec = JSON.parse(data) as SliceElementSpec;
+			zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+		} catch {
+			sliceElementSpec = undefined;
+		}
 	}
 </script>
 
