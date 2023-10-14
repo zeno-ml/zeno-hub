@@ -2,6 +2,7 @@
 from enum import Enum
 
 from zeno_backend.classes.base import CamelModel
+from zeno_backend.classes.project import Project
 
 
 class ReportElementType(Enum):
@@ -98,9 +99,9 @@ class SliceElementOptions(CamelModel):
         model_column (str | None): name of the column containing the instance model.
     """
 
+    project: Project
     slice_name: str
     slice_size: int
-    view: str
     id_column: str
     data_column: str | None = None
     label_column: str | None = None

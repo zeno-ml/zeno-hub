@@ -1378,9 +1378,13 @@ def slice_element_options(
         if len(slice) == 0:
             return None
 
-        project_view = db.execute_return(
-            "SELECT view FROM projects WHERE uuid = %s;",
+        project = db.execute_return(
+            "SELECT uuid, name, view, samples_per_page, public, description, owner_id "
+            "FROM projects WHERE uuid = %s;",
             [project_uuid],
+        )
+        owner_name = db.execute_return(
+            "SELECT name FROM users WHERE id = %s", [project[0][6]]
         )
 
         filter = table_filter(
@@ -1425,11 +1429,18 @@ def slice_element_options(
         return SliceElementOptions(
             slice_name=slice[0][0] if len(slice) > 0 else "",
             slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
-            view=project_view[0][0] if len(project_view) > 0 else "table",
             id_column=id_column if id_column is not None else "",
             data_column=data_column,
             label_column=label_column,
             model_column=model_column,
+            project=Project(
+                uuid=project[0][0],
+                name=project[0][1],
+                description=project[0][5],
+                owner_name=owner_name[0][0],
+                view=project[0][2],
+                editor=False,
+            ),
         )
 
 

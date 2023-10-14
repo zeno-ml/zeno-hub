@@ -3,6 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { Project } from './Project';
+
 /**
  * Necessary options to render a slice report element.
  *
@@ -16,9 +18,9 @@
  * model_column (str | None): name of the column containing the instance model.
  */
 export type SliceElementOptions = {
+	project: Project;
 	sliceName: string;
 	sliceSize: number;
-	view: string;
 	idColumn: string;
 	dataColumn?: string | null;
 	labelColumn?: string | null;
