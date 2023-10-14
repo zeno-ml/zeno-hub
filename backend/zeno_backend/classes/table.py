@@ -37,6 +37,6 @@ class SliceTableRequest(CamelModel):
     """Request for a slice of a table for Report view."""
 
     slice_id: int
-    model: str
+    model: str | None = None
     offset: int
     limit: int

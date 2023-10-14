@@ -38,14 +38,13 @@
 		} else if (el.type === ReportElementType.SLICE) {
 			if (el.data) {
 				sliceElementSpec = JSON.parse(el.data);
-				await sliceOptions.then((r) => {
-					let res = r.find((sli) =>
-						sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
-					);
-					if (res && res.projectUuid) {
-						projectUuid = res.projectUuid;
-					}
-				});
+				let slices = await sliceOptions;
+				let res = slices.find((sli) =>
+					sli.id === sliceElementSpec?.sliceId ? sliceElementSpec.sliceId : ''
+				);
+				if (res && res.projectUuid) {
+					projectUuid = res.projectUuid;
+				}
 			} else {
 				const options = await sliceOptions;
 				sliceElementSpec = { sliceId: options[0].id, modelName: '' };

@@ -8,5 +8,5 @@
  */
 export type SliceElementSpec = {
 	sliceId: number;
-	modelName: string;
+	modelName?: string | null;
 };

@@ -8,7 +8,7 @@
  */
 export type SliceTableRequest = {
 	sliceId: number;
-	model: string;
+	model?: string | null;
 	offset: number;
 	limit: number;
 };
