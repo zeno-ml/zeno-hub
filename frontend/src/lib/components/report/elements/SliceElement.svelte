@@ -53,7 +53,9 @@
 					<span class="font-semibold">{sliceElementSpec.modelName}</span>
 				{/if}
 			</h3>
-			<p>{page * 2 + 1} - {page * 2 + 2} of {sliceElementOptions.sliceSize}</p>
+			<p>
+				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
+			</p>
 		</div>
 		<div class="flex items-stretch w-full justify-between">
 			<button
