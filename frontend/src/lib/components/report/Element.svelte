@@ -25,7 +25,7 @@
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART}
 			{#await chartOptions then options}
-				<ChartElement chart={options.filter((c) => c.id === chartId)[0]} width={width - 200} />
+				<ChartElement chart={options.filter((c) => c.id === chartId)[0]} {width} />
 			{/await}
 		{:else if element.type === ReportElementType.SLICE}
 			<SliceElement {element} />

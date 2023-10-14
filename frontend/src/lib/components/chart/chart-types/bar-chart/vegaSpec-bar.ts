@@ -14,9 +14,9 @@ export default function generateSpec(
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
 		description: 'A simple bar chart with embedded data.',
 		random_id: Date.now(), // used to force re-rendering of the chart
-		autosize: 'pad',
 		height: height,
 		width: width,
+		autosize: 'fit',
 		data: {
 			name: 'table'
 		},
