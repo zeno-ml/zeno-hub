@@ -16,6 +16,7 @@ export default function generateSpec(
 		random_id: Date.now(), // used to force re-rendering of the chart
 		width: width,
 		height: height,
+		autosize: 'fit',
 		padding: { top: 20 },
 		data: {
 			name: 'table'
