@@ -425,21 +425,26 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
+
         project = select.project_from_uuid(project_uuid)
         if project is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
+
         if not util.project_access_valid(project_uuid, request):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Project is private",
             )
+
         user = util.get_user_from_token(request)
-        if user is not None:
-            if user.name == project.owner_name:
-                project.editor = True
-        return select.project_state(project_uuid, project)
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            )
+
+        return select.project_state(project_uuid, user, project)
 
     @api_app.get(
         "/report/{owner}/{report}", response_model=ReportResponse, tags=["zeno"]

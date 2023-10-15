@@ -770,11 +770,14 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
         )
 
 
-def project_state(project_uuid: str, project: Project) -> ProjectState | None:
+def project_state(
+    project_uuid: str, user: User, project: Project
+) -> ProjectState | None:
     """Get the state variables of a project.
 
     Args:
         project_uuid (str): the uuid of the project to be fetched.
+        user (User): the user making the request.
         project (Project): the project object with project metadata.
 
     Returns:
@@ -883,6 +886,15 @@ def project_state(project_uuid: str, project: Project) -> ProjectState | None:
             ),
         )
         models = [m[0] for m in model_results]
+
+        editor = db.execute_return(
+            "SELECT editor FROM user_project WHERE user_id = %s AND project_uuid = %s;",
+            [user.id, project_uuid],
+        )
+        if len(editor) == 0:
+            project.editor = False
+        else:
+            project.editor = bool(editor[0][0])
 
         return ProjectState(
             project=project,
