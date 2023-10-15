@@ -896,6 +896,16 @@ def project_state(
         else:
             project.editor = bool(editor[0][0])
 
+        if not project.editor:
+            org_editor = db.execute_return(
+                "SELECT editor FROM organization_project AS op JOIN user_organization "
+                "AS uo ON op.organization_id = uo.organization_id "
+                "WHERE uo.user_id = %s AND op.project_uuid = %s AND uo.admin = TRUE;",
+                [user.id, project_uuid],
+            )
+            if len(org_editor) > 0:
+                project.editor = bool(org_editor[0][0])
+
         return ProjectState(
             project=project,
             metrics=metrics,
