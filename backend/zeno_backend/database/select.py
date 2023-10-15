@@ -542,14 +542,9 @@ def report(
                 "WHERE r.report_id = %s AND o.user_id = %s;",
                 [id, user.id],
             )
-            editor = (
-                bool(org_editor[0])
-                if org_editor is not None and len(org_editor) > 0
-                else False
-            ) or (
-                bool(user_editor)
-                if user_editor is not None and len(user_editor) > 0
-                else False
+            org_editor = [bool(o[0]) for o in org_editor]
+            editor = any(org_editor) or (
+                bool(user_editor[0][0]) if len(user_editor) > 0 else False
             )
 
         linked_projects = db.execute_return(
@@ -887,24 +882,22 @@ def project_state(
         )
         models = [m[0] for m in model_results]
 
-        editor = db.execute_return(
-            "SELECT editor FROM user_project WHERE user_id = %s AND project_uuid = %s;",
+        # Check whether the user or an org of the user have project edit rights
+        user_editor = db.execute_return(
+            "SELECT editor FROM user_project WHERE user_id = %s AND project_uuid = %s",
             [user.id, project_uuid],
         )
-        if len(editor) == 0:
-            project.editor = False
-        else:
-            project.editor = bool(editor[0][0])
+        org_editor = db.execute_return(
+            "SELECT editor FROM organization_project AS r JOIN user_organization "
+            "AS o ON r.organization_id = o.organization_id "
+            "WHERE r.project_uuid = %s AND o.user_id = %s;",
+            [project_uuid, user.id],
+        )
 
-        if not project.editor:
-            org_editor = db.execute_return(
-                "SELECT editor FROM organization_project AS op JOIN user_organization "
-                "AS uo ON op.organization_id = uo.organization_id "
-                "WHERE uo.user_id = %s AND op.project_uuid = %s AND uo.admin = TRUE;",
-                [user.id, project_uuid],
-            )
-            if len(org_editor) > 0:
-                project.editor = bool(org_editor[0][0])
+        org_editor = [bool(o[0]) for o in org_editor]
+        project.editor = any(org_editor) or (
+            bool(user_editor[0][0]) if len(user_editor) > 0 else False
+        )
 
         return ProjectState(
             project=project,

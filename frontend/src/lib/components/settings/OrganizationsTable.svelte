@@ -73,7 +73,6 @@
 			<thead class="border-b border-grey-lighter pb-2 top-0 left-0 sticky bg-background">
 				<th>Name</th>
 				<th># Members</th>
-				<th class="text-right">Admin</th>
 			</thead>
 			<tbody>
 				{#each organizations.sort((a, b) => {

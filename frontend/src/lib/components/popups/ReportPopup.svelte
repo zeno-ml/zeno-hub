@@ -72,7 +72,7 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
-		<h2 class="text-xl mb-4">Report Administration</h2>
+		<h2 class="text-xl mb-4">Report Settings</h2>
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex flex-col">
 			<div class="flex mb-6">
@@ -100,7 +100,7 @@
 								class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
 							>
 								<th>Email</th>
-								<th class="w-1">Admin</th>
+								<th class="w-1">Editor</th>
 								<th class="w-1" />
 							</thead>
 							<tbody>
@@ -177,7 +177,7 @@
 						<table>
 							<thead>
 								<th>Name</th>
-								<th class="w-1">Admin</th>
+								<th class="w-1">Editor</th>
 								<th class="w-1" />
 							</thead>
 							<tbody>
