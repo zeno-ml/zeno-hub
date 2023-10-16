@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { viewMap } from '$lib/components/instance-views/views/viewMap';
+	import type { URLParams } from '$lib/util/util';
 	import type {
 		ReportElement,
 		SliceElementOptions,
@@ -9,6 +11,7 @@
 	} from '$lib/zenoapi';
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Icon } from '@smui/button';
+	import Button from '@smui/button/';
 	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
@@ -41,11 +44,24 @@
 			sliceElementSpec = undefined;
 		}
 	}
+
+	function encodeParams() {
+		const params = {
+			model: sliceElementSpec?.modelName,
+			metric: undefined,
+			comparisonModel: undefined,
+			comparisonColumn: undefined,
+			compareSort: undefined,
+			metricRange: undefined,
+			selections: { slices: [sliceElementSpec?.sliceId], tags: [], metadata: {} }
+		} as URLParams;
+		return `?params=${btoa(JSON.stringify(params))}`;
+	}
 </script>
 
 {#if sliceElementOptions !== undefined && sliceElementSpec && table}
 	<div class="w-full">
-		<div class="flex justify-between mb-2">
+		<div class="flex items-center mb-2">
 			<h3 class="text-lg">
 				Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
 				{#if sliceElementSpec.modelName}
@@ -53,6 +69,15 @@
 					<span class="font-semibold">{sliceElementSpec.modelName}</span>
 				{/if}
 			</h3>
+			<Button
+				variant="outlined"
+				class="ml-4"
+				on:click={() =>
+					goto(
+						`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
+							encodeParams()
+					)}>Explore</Button
+			>
 			<p>
 				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
 			</p>
@@ -72,11 +97,11 @@
 				</div>
 			</button>
 			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
-				{#if viewMap[sliceElementOptions.view] !== undefined && sliceElementOptions.idColumn !== undefined}
+				{#if viewMap[sliceElementOptions.project.view] !== undefined && sliceElementOptions.idColumn !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0">
 							<svelte:component
-								this={viewMap[sliceElementOptions.view]}
+								this={viewMap[sliceElementOptions.project.view]}
 								options={{}}
 								entry={inst}
 								dataColumn={sliceElementOptions.dataColumn}
