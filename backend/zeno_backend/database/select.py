@@ -537,13 +537,12 @@ def report(
                 [user.id, id],
             )
             org_editor = db.execute_return(
-                "SELECT editor FROM organization_report AS r JOIN user_organization "
+                "SELECT * FROM organization_report AS r JOIN user_organization "
                 "AS o ON r.organization_id = o.organization_id "
-                "WHERE r.report_id = %s AND o.user_id = %s;",
+                "WHERE r.report_id = %s AND o.user_id = %s AND r.editor = TRUE;",
                 [id, user.id],
             )
-            org_editor = [bool(o[0]) for o in org_editor]
-            editor = any(org_editor) or (
+            editor = len(org_editor) > 0 or (
                 bool(user_editor[0][0]) if len(user_editor) > 0 else False
             )
 
@@ -888,14 +887,13 @@ def project_state(
             [user.id, project_uuid],
         )
         org_editor = db.execute_return(
-            "SELECT editor FROM organization_project AS r JOIN user_organization "
+            "SELECT * FROM organization_project AS r JOIN user_organization "
             "AS o ON r.organization_id = o.organization_id "
-            "WHERE r.project_uuid = %s AND o.user_id = %s;",
+            "WHERE r.project_uuid = %s AND o.user_id = %s AND r.editor = TRUE;",
             [project_uuid, user.id],
         )
 
-        org_editor = [bool(o[0]) for o in org_editor]
-        project.editor = any(org_editor) or (
+        project.editor = len(org_editor) > 0 or (
             bool(user_editor[0][0]) if len(user_editor) > 0 else False
         )
 
