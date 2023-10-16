@@ -39,8 +39,6 @@
 		selections.set(data.selections);
 
 		model.subscribe((mod) => {
-			// URL parameters set by selection subscription.
-			selections.set({ metadata: {}, slices: [], tags: [] });
 			if ($comparisonModel && $comparisonModel === mod) {
 				comparisonModel.set($models.filter((m) => m !== mod)[0]);
 			}
