@@ -4,6 +4,7 @@
 	import { parse } from 'marked';
 
 	export let input: string;
+	export let output = false;
 
 	let renderedInput = purify.sanitize(parse(input));
 </script>
@@ -19,7 +20,7 @@
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 448 512"
-		class="w-3.5 ml-2.5 mt-2 fill-grey-darker"
+		class={`${output ? 'fill-primary' : 'fill-grey-darker'} w-3.5 ml-2.5 mt-2`}
 	>
 		<!-- Person Icon -->
 		<path
