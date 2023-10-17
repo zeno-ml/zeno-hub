@@ -61,25 +61,23 @@
 
 {#if sliceElementOptions !== undefined && sliceElementSpec && table}
 	<div class="w-full">
-		<div class="flex items-center mb-2 justify-between">
-			<div class="flex">
-				<h3 class="text-lg">
-					Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
-					{#if sliceElementSpec.modelName}
-						model
-						<span class="font-semibold">{sliceElementSpec.modelName}</span>
-					{/if}
-				</h3>
-				<Button
-					variant="outlined"
-					class="ml-4"
-					on:click={() =>
-						goto(
-							`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
-								encodeParams()
-						)}>Explore</Button
-				>
-			</div>
+		<div class="flex items-center mb-2">
+			<h3 class="text-lg">
+				Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
+				{#if sliceElementSpec.modelName}
+					model
+					<span class="font-semibold">{sliceElementSpec.modelName}</span>
+				{/if}
+			</h3>
+			<Button
+				variant="outlined"
+				class="ml-4"
+				on:click={() =>
+					goto(
+						`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
+							encodeParams()
+					)}>Explore</Button
+			>
 			<p class="ml-auto">
 				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
 			</p>
