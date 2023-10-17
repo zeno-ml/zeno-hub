@@ -5,7 +5,7 @@
 	import TextElement from './elements/TextElement.svelte';
 
 	export let element: ReportElement;
-	export let chartOptions: Promise<Chart[]>;
+	export let chartOptions: Chart[];
 
 	let width;
 
@@ -24,9 +24,7 @@
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART}
-			{#await chartOptions then options}
-				<ChartElement chart={options.filter((c) => c.id === chartId)[0]} {width} />
-			{/await}
+			<ChartElement chart={chartOptions.filter((c) => c.id === chartId)[0]} {width} />
 		{:else if element.type === ReportElementType.SLICE}
 			<SliceElement {element} />
 		{/if}

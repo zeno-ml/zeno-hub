@@ -2,14 +2,7 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
-	import {
-		ReportElementType,
-		ZenoService,
-		type Chart,
-		type Project,
-		type ReportElement,
-		type Slice
-	} from '$lib/zenoapi';
+	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -21,19 +14,8 @@
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let dragEnabled = false;
-	let chartOptions: Promise<Chart[]> = new Promise(() => []);
-	let sliceOptions: Promise<Slice[]> = new Promise(() => []);
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-
-	$: chartOptions =
-		selectedProjects.length > 0
-			? zenoClient.getChartsForProjects(selectedProjects)
-			: new Promise(() => []);
-	$: sliceOptions =
-		selectedProjects.length > 0
-			? zenoClient.getSlicesForProjects(selectedProjects)
-			: new Promise(() => []);
 
 	function deleteElement(elementId: number) {
 		if (elementId < 0) return;
@@ -63,11 +45,6 @@
 	function updateReportProjects(e: CustomEvent) {
 		const projectUuids = e.detail.map((p: Project) => p.uuid);
 		zenoClient.updateReportProjects(data.report.id, projectUuids);
-		if (projectUuids.length > 0) {
-			chartOptions = zenoClient.getChartsForProjects(projectUuids);
-		} else {
-			chartOptions = new Promise(() => []);
-		}
 	}
 
 	function handleDropped(e: CustomEvent) {
@@ -146,8 +123,7 @@
 					bind:dragEnabled
 					bind:showConfirmDelete
 					{addElement}
-					{chartOptions}
-					{sliceOptions}
+					{selectedProjects}
 					report={data.report}
 				/>
 			{/each}
