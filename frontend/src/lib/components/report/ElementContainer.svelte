@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		ReportElementType,
+		ZenoService,
 		type Chart,
 		type Report,
 		type ReportElement,
@@ -8,18 +9,31 @@
 	} from '$lib/zenoapi';
 	import { mdiDrag } from '@mdi/js';
 	import { Icon } from '@smui/button';
+	import { getContext } from 'svelte';
 	import AddElementButton from './AddElementButton.svelte';
 	import Element from './Element.svelte';
 	import ElementEdit from './ElementEdit.svelte';
 
 	export let element: ReportElement;
 	export let report: Report;
-	export let chartOptions: Chart[];
-	export let sliceOptions: Slice[];
+	export let selectedProjects: string[];
 	export let editId: number;
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;
 	export let addElement: (elementIndex: number) => void;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	$: chartOptions = (
+		selectedProjects.length > 0
+			? zenoClient.getChartsForProjects(selectedProjects)
+			: new Promise(() => [] as Chart[])
+	) as Promise<Chart[]>;
+	$: sliceOptions = (
+		selectedProjects.length > 0
+			? zenoClient.getSlicesForProjects(selectedProjects)
+			: new Promise(() => [] as Slice[])
+	) as Promise<Slice[]>;
 </script>
 
 <div>
@@ -56,18 +70,22 @@
 				<path fill="black" d={mdiDrag} />
 			</Icon>
 		</div>
-		{#if editId === element.id}
-			<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
-				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-					<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+		{#await chartOptions then chartOptions}
+			{#if editId === element.id}
+				<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
+					<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+						{#await sliceOptions then sliceOptions}
+							<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+						{/await}
+					</div>
+					<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+						<Element {element} {chartOptions} />
+					</div>
 				</div>
-				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-					<Element {element} {chartOptions} />
-				</div>
-			</div>
-		{:else}
-			<Element {element} {chartOptions} />
-		{/if}
+			{:else}
+				<Element {element} {chartOptions} />
+			{/if}
+		{/await}
 	</div>
 	{#if report.editor}
 		<AddElementButton position={element.position + 1} {addElement} />
