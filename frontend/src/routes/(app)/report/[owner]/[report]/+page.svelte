@@ -39,6 +39,7 @@
 					position: elementIndex
 				});
 				elements = elements.sort((a, b) => a.position - b.position);
+				editId = res;
 			});
 	}
 

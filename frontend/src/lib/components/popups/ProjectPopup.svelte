@@ -23,8 +23,21 @@
 	let selectedUser: User | undefined;
 	let selectedOrg: Organization | undefined;
 
-	let userRequest = zenoClient.getProjectUsers(config.uuid);
-	let organizationRequest = zenoClient.getProjectOrgs(config.uuid);
+	let projectUsers: User[] = [];
+	let allUsers: User[] = [];
+	zenoClient.getUsers().then((r) => (allUsers = r));
+	zenoClient.getProjectUsers($project.uuid).then((r) => (projectUsers = r));
+	let projectOrganizations: Organization[] = [];
+	let allOrganizations: Organization[] = [];
+	zenoClient.getProjectOrgs($project.uuid).then((r) => (projectOrganizations = r));
+	zenoClient.getOrganizationNames().then((r) => (allOrganizations = r));
+
+	$: availableUsers = allUsers.filter(
+		(u) => u.id !== user.id && !projectUsers.some((member) => member.id === u.id)
+	);
+	$: availableOrgs = allOrganizations.filter(
+		(currentOrg) => !projectOrganizations.some((org) => org.id === currentOrg.id)
+	);
 
 	$: invalidName = config.name.length === 0 || config.name.match(/[/]/g) !== null;
 	$: if (input) {
@@ -52,7 +65,7 @@
 				...e.detail,
 				admin: false
 			})
-			.then(() => (userRequest = zenoClient.getProjectUsers($project.uuid)));
+			.then(() => zenoClient.getProjectUsers($project.uuid).then((r) => (projectUsers = r)));
 		selectedUser = undefined;
 	}
 
@@ -62,14 +75,16 @@
 				...e.detail,
 				admin: false
 			})
-			.then(() => (organizationRequest = zenoClient.getProjectOrgs($project.uuid)));
+			.then(() => zenoClient.getProjectOrgs($project.uuid).then((r) => (projectOrganizations = r)));
 		selectedOrg = undefined;
 	}
 </script>
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content style="display: flex; flex-direction: column; width: 800px;">
+	<Content
+		style="display: flex; flex-direction: column; width: 800px; max-height: 80vh; overflow-y: scroll"
+	>
 		<h2 class="text-xl mb-4">Project Settings</h2>
 		<!--Project Settings-->
 		<h3 class="text-lg">Settings</h3>
@@ -110,169 +125,154 @@
 				/>
 			</div>
 			<!--Visibility Settings-->
-			{#if userRequest}
-				{#await userRequest then currentUsers}
-					<div class="mb-5 flex flex-col mt-12" transition:fade>
-						<h3 class="text-lg mb-2">Viewers</h3>
-						{#if currentUsers.length > 0}
+			<div class="mb-5 flex flex-col mt-12" transition:fade>
+				<h3 class="text-lg mb-2">Viewers</h3>
+				{#if projectUsers.length > 0}
+					<table>
+						<thead
+							class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+						>
+							<th>Email</th>
+							<th class="w-1">Editor</th>
+							<th class="w-1" />
+						</thead>
+						<tbody>
+							{#each projectUsers.sort((a, b) => {
+								if (a.id === user.id) return -1;
+								else if (b.id === user.id) return 1;
+								else if (a.admin && !b.admin) return -1;
+								else if (!a.admin && b.admin) return 1;
+								else return 0;
+							}) as member}
+								<tr>
+									<td>
+										{member.name}
+									</td>
+									<td>
+										<Checkbox
+											checked={member.admin}
+											on:click={() =>
+												zenoClient
+													.updateProjectUser($project.uuid, {
+														...member,
+														admin: !member.admin
+													})
+													.then(() =>
+														zenoClient
+															.getProjectUsers($project.uuid)
+															.then((r) => (projectUsers = r))
+													)}
+											disabled={member.id === user.id}
+										/>
+									</td>
+									<td style="text-align: end;">
+										{#if member.id !== user.id}
+											<IconButton
+												on:click={() =>
+													zenoClient
+														.deleteProjectUser($project.uuid, member)
+														.then(() =>
+															zenoClient
+																.getProjectUsers($project.uuid)
+																.then((r) => (projectUsers = r))
+														)}
+											>
+												<Icon tag="svg" viewBox="0 0 24 24">
+													<path fill="black" d={mdiClose} />
+												</Icon>
+											</IconButton>
+										{/if}
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{/if}
+				{#if availableUsers.length > 0}
+					<Svelecte
+						style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
+						bind:value={selectedUser}
+						on:change={addUser}
+						options={availableUsers}
+						placeholder="add collaborators"
+						searchable={true}
+					/>
+				{/if}
+			</div>
+			{#await zenoClient.getOrganizationNames() then oragnizationNames}
+				{@const availableOrgs = oragnizationNames.filter(
+					(currentOrg) => !projectOrganizations.some((org) => org.id === currentOrg.id)
+				)}
+				{#if availableOrgs.length > 0 || projectOrganizations.length > 0}
+					<div class="mb-5 flex flex-col" transition:fade>
+						<h3 class="text-lg mb-2">Organizations</h3>
+						{#if projectOrganizations.length > 0}
 							<table>
-								<thead
-									class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
-								>
-									<th>Email</th>
+								<thead>
+									<th>Name</th>
 									<th class="w-1">Editor</th>
 									<th class="w-1" />
 								</thead>
 								<tbody>
-									{#each currentUsers.sort((a, b) => {
-										if (a.id === user.id) return -1;
-										else if (b.id === user.id) return 1;
-										else if (a.admin && !b.admin) return -1;
+									{#each projectOrganizations.sort((a, b) => {
+										if (a.admin && !b.admin) return -1;
 										else if (!a.admin && b.admin) return 1;
-										else return 0;
-									}) as member}
+										return a.name && b.name ? a.name.localeCompare(b.name) : 0;
+									}) as org}
 										<tr>
 											<td>
-												{member.name}
+												{org.name}
 											</td>
 											<td>
 												<Checkbox
-													checked={member.admin}
+													checked={org.admin}
 													on:click={() =>
 														zenoClient
-															.updateProjectUser($project.uuid, {
-																...member,
-																admin: !member.admin
+															.updateProjectOrg($project.uuid, {
+																...org,
+																admin: !org.admin
 															})
-															.then(
-																() => (userRequest = zenoClient.getProjectUsers($project.uuid))
+															.then(() =>
+																zenoClient
+																	.getProjectOrgs($project.uuid)
+																	.then((r) => (projectOrganizations = r))
 															)}
-													disabled={member.id === user.id}
 												/>
 											</td>
 											<td style="text-align: end;">
-												{#if member.id !== user.id}
-													<IconButton
-														on:click={() =>
-															zenoClient
-																.deleteProjectUser($project.uuid, member)
-																.then(
-																	() => (userRequest = zenoClient.getProjectUsers($project.uuid))
-																)}
-													>
-														<Icon tag="svg" viewBox="0 0 24 24">
-															<path fill="black" d={mdiClose} />
-														</Icon>
-													</IconButton>
-												{/if}
+												<IconButton
+													on:click={() =>
+														zenoClient
+															.deleteProjectOrg($project.uuid, org)
+															.then(() =>
+																zenoClient
+																	.getProjectOrgs($project.uuid)
+																	.then((r) => (projectOrganizations = r))
+															)}
+												>
+													<Icon tag="svg" viewBox="0 0 24 24">
+														<path fill="black" d={mdiClose} />
+													</Icon>
+												</IconButton>
 											</td>
 										</tr>
 									{/each}
 								</tbody>
 							</table>
 						{/if}
-						{#await zenoClient.getUsers() then users}
-							{@const availableUsers = users.filter(
-								(currentUser) =>
-									!(
-										currentUser.id === user.id ||
-										currentUsers.some((member) => member.id === currentUser.id)
-									)
-							)}
-							{#if availableUsers.length > 0}
-								<Svelecte
-									style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
-									bind:value={selectedUser}
-									on:change={addUser}
-									options={availableUsers}
-									placeholder="add collaborators"
-									searchable={true}
-								/>
-							{/if}
-						{/await}
-					</div>
-				{/await}
-			{/if}
-			{#if organizationRequest}
-				{#await organizationRequest then currentOrgs}
-					{#await zenoClient.getOrganizationNames() then oragnizationNames}
-						{@const availableOrgs = oragnizationNames.filter(
-							(currentOrg) => !currentOrgs.some((org) => org.id === currentOrg.id)
-						)}
-						{#if availableOrgs.length > 0 || currentOrgs.length > 0}
-							<div class="mb-5 flex flex-col" transition:fade>
-								<h3 class="text-lg mb-2">Organizations</h3>
-								{#if currentOrgs.length > 0}
-									<table>
-										<thead>
-											<th>Name</th>
-											<th class="w-1">Editor</th>
-											<th class="w-1" />
-										</thead>
-										<tbody>
-											{#each currentOrgs.sort((a, b) => {
-												if (a.admin && !b.admin) return -1;
-												else if (!a.admin && b.admin) return 1;
-												return a.name && b.name ? a.name.localeCompare(b.name) : 0;
-											}) as org}
-												<tr>
-													<td>
-														{org.name}
-													</td>
-													<td>
-														<Checkbox
-															checked={org.admin}
-															on:click={() =>
-																zenoClient
-																	.updateProjectOrg($project.uuid, {
-																		...org,
-																		admin: !org.admin
-																	})
-																	.then(
-																		() =>
-																			(organizationRequest = zenoClient.getProjectOrgs(
-																				$project.uuid
-																			))
-																	)}
-														/>
-													</td>
-													<td style="text-align: end;">
-														<IconButton
-															on:click={() =>
-																zenoClient
-																	.deleteProjectOrg($project.uuid, org)
-																	.then(
-																		() =>
-																			(organizationRequest = zenoClient.getProjectOrgs(
-																				$project.uuid
-																			))
-																	)}
-														>
-															<Icon tag="svg" viewBox="0 0 24 24">
-																<path fill="black" d={mdiClose} />
-															</Icon>
-														</IconButton>
-													</td>
-												</tr>
-											{/each}
-										</tbody>
-									</table>
-								{/if}
-								{#if availableOrgs.length > 0}
-									<Svelecte
-										style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
-										bind:value={selectedOrg}
-										on:change={addOrganization}
-										options={availableOrgs}
-										placeholder="add organization access"
-										searchable={true}
-									/>
-								{/if}
-							</div>
+						{#if availableOrgs.length > 0}
+							<Svelecte
+								style="width: 280px; height: 30px; flex:none; align-self: end; margin-bottom: 20px;"
+								bind:value={selectedOrg}
+								on:change={addOrganization}
+								options={availableOrgs}
+								placeholder="add organization access"
+								searchable={true}
+							/>
 						{/if}
-					{/await}
-				{/await}
-			{/if}
+					</div>
+				{/if}
+			{/await}
 			<div class="flex items-center self-end">
 				<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
 					>Cancel</Button
