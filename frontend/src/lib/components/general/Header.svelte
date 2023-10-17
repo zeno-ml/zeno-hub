@@ -61,14 +61,14 @@
 						pageName={'explore'}
 						tooltipContent={'Explore your data and system outputs'}
 						icon={mdiCompassOutline}
-						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
+						on:click={() => goto(new URL('/explore', getProjectRouteFromURL($page.url)))}
 					/>
 					{#if $models.length > 1}
 						<HeaderIcon
 							pageName={'compare'}
 							tooltipContent={'Qualitatively compare system outputs'}
 							icon={mdiCompare}
-							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
+							on:click={() => goto(new URL('/compare', getProjectRouteFromURL($page.url)))}
 						/>
 					{/if}
 					<HeaderIcon
