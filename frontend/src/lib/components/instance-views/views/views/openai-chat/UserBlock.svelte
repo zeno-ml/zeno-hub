@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let input: string;
+	export let output = false;
 </script>
 
 <div class="my-1 flex justify-end items-end relative z-0">
@@ -13,7 +14,7 @@
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 448 512"
-		class="w-3.5 ml-2.5 mt-2 fill-grey-darker"
+		class={`${output ? 'fill-primary' : 'fill-grey-darker'} w-3.5 ml-2.5 mt-2`}
 	>
 		<!-- Person Icon -->
 		<path

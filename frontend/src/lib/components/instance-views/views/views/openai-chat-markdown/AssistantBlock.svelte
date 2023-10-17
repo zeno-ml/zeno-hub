@@ -21,12 +21,12 @@
 		/>
 	</svg>
 
-	<p
+	<div
 		class="rounded m-0 p-2.5 relative self-start bg-background max-w-[70%]
 		before:content-[''] before:-z-[1] before:h-6 before:bottom-0 before:absolute before:rounded-br-2xl before:bg-grey-darker before:w-5 before:-left-2.5
 		after:content-[''] after:-z-[1] after:h-6 after:bottom-0 after:absolute after:rounded-br-xl after:bg-background after:w-2.5 after:-left-2.5
 		{output ? 'border border-primary before:bg-primary' : 'border border-grey-darker'}"
 	>
 		<Markdown renderedText={renderedInput} />
-	</p>
+	</div>
 </div>

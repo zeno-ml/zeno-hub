@@ -12,25 +12,36 @@
 	export let dataColumn: string;
 	export let labelColumn: string;
 
+	const data = JSON.parse(entry[dataColumn] as string).map((e: any) => {
+		e['output'] = false;
+		return e;
+	});
 	let renderedLabel = '';
-	const data = JSON.parse(entry[dataColumn] as string);
-	let showAll = data.length <= 5;
+	let outputData: { role: string; content: string; output: boolean }[] = [];
 
-	$: shownData = showAll ? data : data.slice(-4);
+	if (modelColumn) {
+		try {
+			outputData = JSON.parse(entry[modelColumn] as string).map((e: any) => {
+				e['output'] = true;
+				return e;
+			});
+		} catch {
+			outputData = [{ role: 'assistant', content: entry[modelColumn] as string, output: true }];
+		}
+	}
+
+	let allData = [...data, ...outputData];
+	let showAll = allData.length <= 5;
 
 	$: if (entry[labelColumn]) {
 		renderedLabel = purify.sanitize(parse(entry[labelColumn] as string));
 	}
 
-	function entryString(
-		value: number | string | boolean | { role: string; content: string }[]
-	): string {
-		return `${value}`;
-	}
+	$: shownData = showAll ? allData : allData.slice(-4);
 </script>
 
-<div class="flex flex-col border border-grey-light rounded p-2.5 m-1 max-w-4xl">
-	{#if data.length > 4}
+<div class="flex flex-col border border-grey-light rounded p-2.5 m-1">
+	{#if allData.length > 4}
 		<button
 			class="self-center bg-transparent cursor-pointer flex items-center p-1 -mt-1.5 rounded-2xl hover:bg-grey-lighter"
 			on:click={() => (showAll = !showAll)}
@@ -47,15 +58,12 @@
 				{#if item['role'] === 'system'}
 					<SystemBlock input={item['content']} />
 				{:else if item['role'] === 'assistant'}
-					<AssistantBlock input={item['content']} />
+					<AssistantBlock input={item['content']} output={item['output']} />
 				{:else if item['role'] === 'user'}
-					<UserBlock input={item['content']} />
+					<UserBlock input={item['content']} output={item['output']} />
 				{/if}
 			{/each}
 		{/key}
-	{/if}
-	{#if entry[modelColumn]}
-		<AssistantBlock input={entryString(entry[modelColumn])} output={true} />
 	{/if}
 	{#if entry[labelColumn]}
 		<div class="flex flex-col -mx-2.5 -mb-2.5 mt-2.5 p-1 border-t border-grey-lighter">
