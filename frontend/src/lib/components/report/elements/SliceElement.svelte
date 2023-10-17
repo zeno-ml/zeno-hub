@@ -78,7 +78,7 @@
 							encodeParams()
 					)}>Explore</Button
 			>
-			<p>
+			<p class="ml-auto">
 				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
 			</p>
 		</div>
@@ -97,7 +97,7 @@
 				</div>
 			</button>
 			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
-				{#if viewMap[sliceElementOptions.project.view] !== undefined && sliceElementOptions.idColumn !== undefined}
+				{#if viewMap[sliceElementOptions.project.view] !== undefined && sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0">
 							<svelte:component

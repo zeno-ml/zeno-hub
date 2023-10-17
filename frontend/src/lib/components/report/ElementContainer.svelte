@@ -14,8 +14,8 @@
 
 	export let element: ReportElement;
 	export let report: Report;
-	export let chartOptions: Promise<Chart[]>;
-	export let sliceOptions: Promise<Slice[]>;
+	export let chartOptions: Chart[];
+	export let sliceOptions: Slice[];
 	export let editId: number;
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;

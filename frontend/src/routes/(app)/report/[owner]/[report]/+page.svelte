@@ -139,18 +139,22 @@
 			on:consider={handleMoved}
 			on:finalize={handleDropped}
 		>
-			{#each elements as element (element.id)}
-				<ElementContainer
-					bind:element
-					bind:editId
-					bind:dragEnabled
-					bind:showConfirmDelete
-					{addElement}
-					{chartOptions}
-					{sliceOptions}
-					report={data.report}
-				/>
-			{/each}
+			{#await chartOptions then chartOptions}
+				{#await sliceOptions then sliceOptions}
+					{#each elements as element (element.id)}
+						<ElementContainer
+							bind:element
+							bind:editId
+							bind:dragEnabled
+							bind:showConfirmDelete
+							{addElement}
+							{chartOptions}
+							{sliceOptions}
+							report={data.report}
+						/>
+					{/each}
+				{/await}
+			{/await}
 		</div>
 	</div>
 </div>
