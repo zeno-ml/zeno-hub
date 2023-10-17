@@ -286,8 +286,8 @@ def reports(user: User) -> list[Report]:
                     )
         org_reports = list(
             filter(
-                lambda project: not any(p.uuid == project.uuid for p in user_reports)
-                and not any(p.uuid == project.uuid for p in own_reports),
+                lambda report: not any(p.id == report.id for p in user_reports)
+                and not any(p.id == report.id for p in own_reports),
                 org_reports,
             )
         )
