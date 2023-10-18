@@ -439,11 +439,6 @@ def get_server() -> FastAPI:
             )
 
         user = util.get_user_from_token(request)
-        if user is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
-
         return select.project_state(project_uuid, user, project)
 
     @api_app.get(

@@ -765,7 +765,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
 
 
 def project_state(
-    project_uuid: str, user: User, project: Project
+    project_uuid: str, user: User | None, project: Project
 ) -> ProjectState | None:
     """Get the state variables of a project.
 
@@ -881,21 +881,22 @@ def project_state(
         )
         models = [m[0] for m in model_results]
 
-        # Check whether the user or an org of the user have project edit rights
-        user_editor = db.execute_return(
-            "SELECT editor FROM user_project WHERE user_id = %s AND project_uuid = %s",
-            [user.id, project_uuid],
-        )
-        org_editor = db.execute_return(
-            "SELECT * FROM organization_project AS r JOIN user_organization "
-            "AS o ON r.organization_id = o.organization_id "
-            "WHERE r.project_uuid = %s AND o.user_id = %s AND r.editor = TRUE;",
-            [project_uuid, user.id],
-        )
-
-        project.editor = len(org_editor) > 0 or (
-            bool(user_editor[0][0]) if len(user_editor) > 0 else False
-        )
+        if user is not None:
+            # Check whether the user or an org of the user have project edit rights
+            user_editor = db.execute_return(
+                "SELECT editor FROM user_project WHERE user_id = %s AND "
+                "project_uuid = %s",
+                [user.id, project_uuid],
+            )
+            org_editor = db.execute_return(
+                "SELECT * FROM organization_project AS r JOIN user_organization "
+                "AS o ON r.organization_id = o.organization_id "
+                "WHERE r.project_uuid = %s AND o.user_id = %s AND r.editor = TRUE;",
+                [project_uuid, user.id],
+            )
+            project.editor = len(org_editor) > 0 or (
+                bool(user_editor[0][0]) if len(user_editor) > 0 else False
+            )
 
         return ProjectState(
             project=project,
