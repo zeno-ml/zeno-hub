@@ -3,6 +3,8 @@ import json
 from enum import Enum
 from typing import LiteralString
 
+from pydantic import StrictBool, StrictFloat, StrictInt, StrictStr
+
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 
 
@@ -76,13 +78,13 @@ class FilterPredicate(CamelModel):
     Attributes:
         column (ZenoColumn): column to be filtered.
         operation (Operation): operation to be applied.
-        value (str | float | int | bool): value to be compared against.
+        value (StrictStr | StrictBool | StrictInt | StrictFloat): value to filter with.
         join (Join): join operator to be used.
     """
 
     column: ZenoColumn
     operation: Operation
-    value: str | float | int | bool
+    value: StrictStr | StrictBool | StrictInt | StrictFloat
     join: Join
 
 
