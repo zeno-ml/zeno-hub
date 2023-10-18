@@ -10,7 +10,7 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let result = getMetricsForSlices(
+	$: result = getMetricsForSlices(
 		[{ slice: slice, model: sliceModel, metric: $metric ? $metric.id : -1 }],
 		zenoClient
 	);
