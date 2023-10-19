@@ -11,7 +11,7 @@
 	let view = $page.route.id?.split('/').reverse()[0];
 </script>
 
-<div class="flex ml-2 mb-4 items-center h-10">
+<div class="flex mb-4 items-center h-10">
 	<Tooltip
 		content={'Projects are datasets and system outputs for evaluation'}
 		theme={'zeno-tooltip'}
@@ -47,3 +47,16 @@
 		</Button>
 	{/if}
 </div>
+{#if view === 'projects' && !user}
+	<p class="italic text-lg mb-4 ml-1 text-grey-dark">
+		Explore, evaluate, and visualize AI systems with Zeno Projects. <a
+			class="text-primary"
+			href="http://zenoml.com">Learn more!</a
+		>
+	</p>
+{:else if view === 'reports' && !user}
+	<p class="italic text-lg mb-4 ml-1 text-grey-dark">
+		Author interactive, data-driven AI evaluation reports.
+		<a class="text-primary" href="http://zenoml.com">Learn more!</a>
+	</p>
+{/if}

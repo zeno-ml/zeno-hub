@@ -12,12 +12,15 @@
 
 {#if ownProjects.length === 0}
 	<Banner>
-		Welcome to <a class="text-primary" href="https://zenoml.com">Zeno</a>! You don't have any
-		projects yet. Create one with the
-		<a class="text-primary" href="https://github.com/zeno-ml/zeno-client">Zeno Client.</a>
+		Welcome to <a class="text-primary" href="https://zenoml.com">Zeno</a>! You haven't created any
+		projects yet. Check out the
+		<a class="text-primary" href="https://zenoml.com/docs/intro/#creating-a-project"
+			>Getting Started Guide</a
+		>!
 	</Banner>
+	<br />
 {/if}
-<div class="flex flex-wrap mb-6 overflow-y-scroll h-full content-start">
+<div class="flex flex-wrap mb-6 h-full content-start">
 	{#each ownProjects as project}
 		<Project {project} deletable user={data.user} />
 	{/each}

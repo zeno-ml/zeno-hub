@@ -3,6 +3,9 @@ export default {
 	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
 		extend: {},
+		fontFamily: {
+			header: ['"Hammersmith One"', 'sans-serif']
+		},
 		colors: {
 			primary: {
 				DEFAULT: '#6a1b9a',
