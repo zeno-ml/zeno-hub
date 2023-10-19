@@ -9,7 +9,7 @@ export async function load({ cookies, depends, url }) {
 
 	let projects: ProjectDetails[] = [];
 	try {
-		projects = await zenoClient.getProjects();
+		projects = await zenoClient.getProjectsDetails();
 	} catch (e) {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}

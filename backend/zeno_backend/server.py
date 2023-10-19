@@ -469,11 +469,11 @@ def get_server() -> FastAPI:
         return uuid
 
     @api_app.get(
-        "/projects",
+        "/projects-details",
         response_model=list[ProjectDetails],
         tags=["zeno"],
     )
-    def get_projects(current_user=Depends(auth.claim())):
+    def get_projects_details(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -487,11 +487,11 @@ def get_server() -> FastAPI:
         ]
 
     @api_app.get(
-        "/public-projects",
+        "/public-projects-details",
         response_model=list[ProjectDetails],
         tags=["zeno"],
     )
-    def get_public_projects():
+    def get_public_projects_details():
         projects = select.public_projects()
         project_stats = []
         for proj in projects:
@@ -502,11 +502,22 @@ def get_server() -> FastAPI:
         ]
 
     @api_app.get(
-        "/reports",
+        "/projects",
+        response_model=list[Project],
+        tags=["zeno"],
+    )
+    def get_projects(current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        return select.projects(user)
+
+    @api_app.get(
+        "/reports-details",
         response_model=list[ReportDetails],
         tags=["zeno"],
     )
-    def get_reports(current_user=Depends(auth.claim())):
+    def get_reports_details(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -520,11 +531,11 @@ def get_server() -> FastAPI:
         ]
 
     @api_app.get(
-        "/public-reports",
+        "/public-reports-details",
         response_model=list[ReportDetails],
         tags=["zeno"],
     )
-    def get_public_reports():
+    def get_public_reports_details():
         reports = select.public_reports()
         report_stats = []
         for rep in reports:
@@ -533,6 +544,17 @@ def get_server() -> FastAPI:
             ReportDetails(report=rep, statistics=report_stats[i])
             for i, rep in enumerate(reports)
         ]
+
+    @api_app.get(
+        "/reports",
+        response_model=list[Report],
+        tags=["zeno"],
+    )
+    def get_reports(current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        return select.reports(user)
 
     @api_app.post(
         "/charts-for-projects/",

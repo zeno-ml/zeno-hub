@@ -7,7 +7,7 @@ export async function load({ depends }) {
 	const zenoClient = new ZenoClient({
 		BASE: getEndpoint()
 	}).zeno;
-	const publicProjects = await zenoClient.getPublicProjects();
+	const publicProjects = await zenoClient.getPublicProjectsDetails();
 
 	return {
 		publicProjects: publicProjects

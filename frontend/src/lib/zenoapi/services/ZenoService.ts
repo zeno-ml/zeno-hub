@@ -656,11 +656,35 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Projects
+	 * Get Projects Details
 	 * @returns ProjectDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getProjects(): CancelablePromise<Array<ProjectDetails>> {
+	public getProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/projects-details'
+		});
+	}
+
+	/**
+	 * Get Public Projects Details
+	 * @returns ProjectDetails Successful Response
+	 * @throws ApiError
+	 */
+	public getPublicProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/public-projects-details'
+		});
+	}
+
+	/**
+	 * Get Projects
+	 * @returns Project Successful Response
+	 * @throws ApiError
+	 */
+	public getProjects(): CancelablePromise<Array<Project>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/projects'
@@ -668,38 +692,38 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Public Projects
-	 * @returns ProjectDetails Successful Response
+	 * Get Reports Details
+	 * @returns ReportDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getPublicProjects(): CancelablePromise<Array<ProjectDetails>> {
+	public getReportsDetails(): CancelablePromise<Array<ReportDetails>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/public-projects'
+			url: '/reports-details'
+		});
+	}
+
+	/**
+	 * Get Public Reports Details
+	 * @returns ReportDetails Successful Response
+	 * @throws ApiError
+	 */
+	public getPublicReportsDetails(): CancelablePromise<Array<ReportDetails>> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/public-reports-details'
 		});
 	}
 
 	/**
 	 * Get Reports
-	 * @returns ReportDetails Successful Response
+	 * @returns Report Successful Response
 	 * @throws ApiError
 	 */
-	public getReports(): CancelablePromise<Array<ReportDetails>> {
+	public getReports(): CancelablePromise<Array<Report>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/reports'
-		});
-	}
-
-	/**
-	 * Get Public Reports
-	 * @returns ReportDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getPublicReports(): CancelablePromise<Array<ReportDetails>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/public-reports'
 		});
 	}
 
