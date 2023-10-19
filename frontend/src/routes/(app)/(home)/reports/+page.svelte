@@ -6,6 +6,6 @@
 
 <div class="flex flex-wrap mb-6 h-full content-start">
 	{#each data.publicReports as report}
-		<Report {report} />
+		<Report report={report.report} stats={report.statistics} />
 	{/each}
 </div>

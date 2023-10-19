@@ -18,12 +18,12 @@ import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectCopy } from '../models/ProjectCopy';
+import type { ProjectDetails } from '../models/ProjectDetails';
 import type { ProjectState } from '../models/ProjectState';
-import type { ProjectStats } from '../models/ProjectStats';
 import type { Report } from '../models/Report';
+import type { ReportDetails } from '../models/ReportDetails';
 import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
-import type { ReportStats } from '../models/ReportStats';
 import type { Slice } from '../models/Slice';
 import type { SliceElementOptions } from '../models/SliceElementOptions';
 import type { SliceElementSpec } from '../models/SliceElementSpec';
@@ -237,44 +237,6 @@ export class ZenoService {
 			},
 			query: {
 				data_id: dataId
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Project Stats
-	 * @param project
-	 * @returns ProjectStats Successful Response
-	 * @throws ApiError
-	 */
-	public getProjectStats(project: string): CancelablePromise<ProjectStats> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/project-stats/{project}',
-			path: {
-				project: project
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Report Stats
-	 * @param reportId
-	 * @returns ReportStats Successful Response
-	 * @throws ApiError
-	 */
-	public getReportStats(reportId: number): CancelablePromise<ReportStats> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/report-stats/{report_id}',
-			path: {
-				report_id: reportId
 			},
 			errors: {
 				422: `Validation Error`
@@ -695,10 +657,10 @@ export class ZenoService {
 
 	/**
 	 * Get Projects
-	 * @returns Project Successful Response
+	 * @returns ProjectDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getProjects(): CancelablePromise<Array<Project>> {
+	public getProjects(): CancelablePromise<Array<ProjectDetails>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/projects'
@@ -707,10 +669,10 @@ export class ZenoService {
 
 	/**
 	 * Get Public Projects
-	 * @returns Project Successful Response
+	 * @returns ProjectDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getPublicProjects(): CancelablePromise<Array<Project>> {
+	public getPublicProjects(): CancelablePromise<Array<ProjectDetails>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/public-projects'
@@ -719,10 +681,10 @@ export class ZenoService {
 
 	/**
 	 * Get Reports
-	 * @returns Report Successful Response
+	 * @returns ReportDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getReports(): CancelablePromise<Array<Report>> {
+	public getReports(): CancelablePromise<Array<ReportDetails>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/reports'
@@ -731,10 +693,10 @@ export class ZenoService {
 
 	/**
 	 * Get Public Reports
-	 * @returns Report Successful Response
+	 * @returns ReportDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getPublicReports(): CancelablePromise<Array<Report>> {
+	public getPublicReports(): CancelablePromise<Array<ReportDetails>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/public-reports'

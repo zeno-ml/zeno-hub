@@ -6,6 +6,6 @@
 
 <div class="flex flex-wrap mb-6 h-full content-start">
 	{#each data.publicProjects as project}
-		<Project {project} user={data.user} />
+		<Project project={project.project} stats={project.statistics} user={data.user} />
 	{/each}
 </div>

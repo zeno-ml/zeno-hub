@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 /**
- * Statistical numbers of a Zeno project.
+ * Statistics for projects.
  *
  * Attributes:
  * num_instances (int): number of data instances in the project.

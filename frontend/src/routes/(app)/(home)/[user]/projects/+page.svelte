@@ -5,9 +5,13 @@
 	export let data;
 
 	$: ownProjects =
-		data.user === null ? [] : data.projects.filter((proj) => proj.ownerName === data.user?.name);
+		data.user === null
+			? []
+			: data.projects.filter((proj) => proj.project.ownerName === data.user?.name);
 	$: sharedProjects =
-		data.user === null ? [] : data.projects.filter((proj) => proj.ownerName !== data.user?.name);
+		data.user === null
+			? []
+			: data.projects.filter((proj) => proj.project.ownerName !== data.user?.name);
 </script>
 
 {#if ownProjects.length === 0}
@@ -22,9 +26,9 @@
 {/if}
 <div class="flex flex-wrap mb-6 h-full content-start">
 	{#each ownProjects as project}
-		<Project {project} deletable user={data.user} />
+		<Project project={project.project} stats={project.statistics} user={data.user} deletable />
 	{/each}
 	{#each sharedProjects as project}
-		<Project {project} user={data.user} />
+		<Project project={project.project} stats={project.statistics} user={data.user} />
 	{/each}
 </div>

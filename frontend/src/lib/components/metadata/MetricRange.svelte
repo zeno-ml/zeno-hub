@@ -3,9 +3,9 @@
 </script>
 
 {#if $metrics.length !== 0 && $metricRange[0] !== Infinity && $metricRange[0] !== null}
-	<div class="flex items-center mr-1 text-grey-dark">
-		<span class="mr-[15px]">
-			{$metric ? $metric.name + ':' : ''}
+	<div class="flex items-center justify-end mr-1 text-grey-dark w-full overflow-hidden">
+		<span class="mr-4 ml-4 whitespace-nowrap overflow-hidden text-ellipsis">
+			{$metric ? $metric.name : ''}
 		</span>
 		<span
 			contenteditable="true"

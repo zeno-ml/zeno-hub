@@ -1,5 +1,5 @@
 import { getClient } from '$lib/api/client';
-import type { Project } from '$lib/zenoapi';
+import type { ProjectDetails } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, depends, url }) {
@@ -7,7 +7,7 @@ export async function load({ cookies, depends, url }) {
 
 	const zenoClient = await getClient(cookies, url);
 
-	let projects: Project[] = [];
+	let projects: ProjectDetails[] = [];
 	try {
 		projects = await zenoClient.getProjects();
 	} catch (e) {

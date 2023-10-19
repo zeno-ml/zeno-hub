@@ -31,14 +31,14 @@ from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
+    ProjectDetails,
     ProjectState,
-    ProjectStats,
 )
 from zeno_backend.classes.report import (
     Report,
+    ReportDetails,
     ReportElement,
     ReportResponse,
-    ReportStats,
     SliceElementOptions,
     SliceElementSpec,
 )
@@ -124,7 +124,8 @@ def get_server() -> FastAPI:
     def ping():
         return Response(status_code=status.HTTP_200_OK)
 
-    ###################################################################### Fetch
+    # Fetch
+
     @api_app.get(
         "/users", response_model=list[User], tags=["zeno"], dependencies=[Depends(auth)]
     )
@@ -153,26 +154,6 @@ def get_server() -> FastAPI:
             return Response(status_code=404)
         blob = open(file_path, "rb").read()
         return Response(blob)
-
-    @api_app.get(
-        "/project-stats/{project}",
-        response_model=ProjectStats,
-        tags=["zeno"],
-    )
-    def get_project_stats(project: str, request: Request):
-        if not util.project_access_valid(project, request):
-            return Response(status_code=401)
-        return select.project_stats(project)
-
-    @api_app.get(
-        "/report-stats/{report_id}",
-        response_model=ReportStats,
-        tags=["zeno"],
-    )
-    def get_report_stats(report_id: int, request: Request):
-        if not util.report_access_valid(report_id, request):
-            return Response(status_code=401)
-        return select.report_stats(report_id)
 
     @api_app.get(
         "/models/{project}",
@@ -489,41 +470,69 @@ def get_server() -> FastAPI:
 
     @api_app.get(
         "/projects",
-        response_model=list[Project],
+        response_model=list[ProjectDetails],
         tags=["zeno"],
     )
     def get_projects(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.projects(user)
+        projects = select.projects(user)
+        project_stats = []
+        for proj in projects:
+            project_stats.append(select.project_stats(proj.uuid))
+        return [
+            ProjectDetails(project=proj, statistics=project_stats[i])
+            for i, proj in enumerate(projects)
+        ]
 
     @api_app.get(
         "/public-projects",
-        response_model=list[Project],
+        response_model=list[ProjectDetails],
         tags=["zeno"],
     )
     def get_public_projects():
-        return select.public_projects()
+        projects = select.public_projects()
+        project_stats = []
+        for proj in projects:
+            project_stats.append(select.project_stats(proj.uuid))
+        return [
+            ProjectDetails(project=proj, statistics=project_stats[i])
+            for i, proj in enumerate(projects)
+        ]
 
     @api_app.get(
         "/reports",
-        response_model=list[Report],
+        response_model=list[ReportDetails],
         tags=["zeno"],
     )
     def get_reports(current_user=Depends(auth.claim())):
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.reports(user)
+        reports = select.reports(user)
+        report_stats = []
+        for rep in reports:
+            report_stats.append(select.report_stats(rep.id))
+        return [
+            ReportDetails(report=rep, statistics=report_stats[i])
+            for i, rep in enumerate(reports)
+        ]
 
     @api_app.get(
         "/public-reports",
-        response_model=list[Report],
+        response_model=list[ReportDetails],
         tags=["zeno"],
     )
     def get_public_reports():
-        return select.public_reports()
+        reports = select.public_reports()
+        report_stats = []
+        for rep in reports:
+            report_stats.append(select.report_stats(rep.id))
+        return [
+            ReportDetails(report=rep, statistics=report_stats[i])
+            for i, rep in enumerate(reports)
+        ]
 
     @api_app.post(
         "/charts-for-projects/",
@@ -663,7 +672,8 @@ def get_server() -> FastAPI:
             return Response(status_code=401)
         return select.filtered_short_string_column_values(project, req)
 
-    ####################################################################### Insert
+    # Insert
+
     @api_app.post(
         "/login",
         response_model=User,
@@ -885,7 +895,7 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         copy.project_copy(project_uuid, copy_spec, user)
 
-    ####################################################################### Update
+    # Update
     @api_app.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(auth)])
     def update_slice(req: Slice, project: str):
         update.slice(req, project)
@@ -952,7 +962,7 @@ def get_server() -> FastAPI:
     def update_report_projects(report_id: int, project_uuids: list[str]):
         update.report_projects(report_id, project_uuids)
 
-    ####################################################################### Delete
+    # Delete
     @api_app.delete("/project/{project}", tags=["zeno"])
     def delete_project(project: str, current_user=Depends(auth.claim())):
         project_obj = select.project_from_uuid(project)
