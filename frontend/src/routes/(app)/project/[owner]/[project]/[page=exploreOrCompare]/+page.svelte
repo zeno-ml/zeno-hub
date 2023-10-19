@@ -1,12 +1,26 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Banner from '$lib/components/general/Banner.svelte';
 	import InstanceView from '$lib/components/instance-views/InstanceView.svelte';
 	import MetadataPanel from '$lib/components/metadata/MetadataPanel.svelte';
+	import Button from '@smui/button';
 
 	export let data;
+
+	let width: number;
 </script>
 
-{#if !data.hasData}
+<svelte:window bind:innerWidth={width} />
+
+{#if width < 600}
+	<div class="text-lg p-10 m-10 rounded-md bg-primary-dark text-white">
+		Projects are currently not supported on mobile. Please open this project on a computer, or check
+		out some of the Zeno Reports.
+	</div>
+	<div class="m-auto text-center">
+		<Button variant="raised" on:click={() => goto('/reports')}>Explore Reports</Button>
+	</div>
+{:else if !data.hasData}
 	<div class="m-auto text-center">
 		<Banner>
 			Your haven't uploaded any data to your project yet.

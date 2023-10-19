@@ -60,7 +60,7 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid m-1 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-80 h-60"
+	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-full sm:w-80 h-60"
 >
 	<div class="flex flex-col w-full">
 		<div class="flex justify-between items-center">
