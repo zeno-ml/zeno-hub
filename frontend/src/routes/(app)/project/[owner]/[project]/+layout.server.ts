@@ -109,6 +109,7 @@ export async function load({ cookies, params, url }) {
 		metrics: project_result.metrics,
 		folders: project_result.folders,
 		tags: project_result.tags,
+		hasData: project_result.hasData,
 		model: model,
 		metric: metric,
 		comparisonModel: comparisonModel,

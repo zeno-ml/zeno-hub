@@ -32,14 +32,17 @@
 	$: predicates = filterPredicates.predicates as FilterPredicate[];
 
 	function updatePredicates(predicates: FilterPredicate[]) {
-		selections.update((mets) => ({
-			slices: mets.slices,
-			metadata: {
-				...mets.metadata,
-				[col.id]: { predicates, join: Join._ }
-			},
-			tags: mets.tags
-		}));
+		let metadata = {
+			...$selections.metadata,
+			[col.id]: { predicates, join: Join._ }
+		};
+		metadata = Object.keys(metadata)
+			.filter((k) => metadata[k].predicates.length > 0)
+			.reduce(
+				(res, k) => ((res[k] = metadata[k]), res),
+				{} as Record<string, FilterPredicateGroup>
+			);
+		selections.update((sel) => ({ ...sel, metadata: metadata }));
 	}
 
 	function getChartType(dataType: MetadataType, histogram: HistogramBucket[]) {

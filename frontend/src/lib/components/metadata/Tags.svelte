@@ -62,24 +62,22 @@
 	</div>
 	{#if $project.editor && !$page.url.href.includes('compare')}
 		<div class="flex items-center justify-between">
-			<div>
-				<div
-					use:tooltip={{
-						content: 'Create a new tag',
-						position: 'left',
-						theme: 'zeno-tooltip'
-					}}
-				>
-					<IconButton on:click={() => (showNewTag = true)}>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							{#if $selectionIds !== undefined}
-								<path class="fill-greenish" d={mdiPlusCircle} />
-							{:else}
-								<path class="fill-grey" d={mdiPlus} />
-							{/if}
-						</Icon>
-					</IconButton>
-				</div>
+			<div
+				use:tooltip={{
+					content: 'Create a new tag',
+					position: 'left',
+					theme: 'zeno-tooltip'
+				}}
+			>
+				<IconButton on:click={() => (showNewTag = true)}>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						{#if $selectionIds !== undefined}
+							<path class="fill-greenish" d={mdiPlusCircle} />
+						{:else}
+							<path class="fill-grey" d={mdiPlus} />
+						{/if}
+					</Icon>
+				</IconButton>
 			</div>
 		</div>
 	{/if}

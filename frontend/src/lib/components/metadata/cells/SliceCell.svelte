@@ -118,18 +118,30 @@
 {#if editing}
 	<SlicePopup on:close={() => (editing = false)} sliceToEdit={slice} />
 {/if}
+{#if showConfirmDelete}
+	<Confirm
+		message="Are you sure you want to delete this slice?"
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => {
+			showConfirmDelete = false;
+			removeSlice();
+		}}
+	/>
+{/if}
 <button
 	class="border border-grey-lighter rounded mt-1 flex items-center w-full px-2.5 justify-between text-grey overflow-visible relative
 	{selected ? ' bg-primary-light' : ''} 
 	{compare ? ' py-1 h-11' : 'h-9'}"
 	on:click={(e) => selectSliceCell(e, slice)}
-	draggable="true"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
 	on:dragstart={dragStart}
 	on:dragend={dragEnd}
+	draggable="true"
 >
 	{#if showTooltip}
 		<div
@@ -137,18 +149,6 @@
 		>
 			<SliceDetails predicateGroup={slice.filterPredicates} />
 		</div>
-	{/if}
-	{#if showConfirmDelete}
-		<Confirm
-			message="Are you sure you want to delete this slice?"
-			on:cancel={() => {
-				showConfirmDelete = false;
-			}}
-			on:confirm={() => {
-				removeSlice();
-				showConfirmDelete = false;
-			}}
-		/>
 	{/if}
 	<div class="flex items-center w-full justify-between">
 		<span
@@ -170,7 +170,7 @@
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
 							<button
-								class="flex items-center w-20 py px-2"
+								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;

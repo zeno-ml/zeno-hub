@@ -13,12 +13,12 @@ import type { ZenoColumn } from './ZenoColumn';
  * Attributes:
  * column (ZenoColumn): column to be filtered.
  * operation (Operation): operation to be applied.
- * value (str | float | int | bool): value to be compared against.
+ * value (str | float | bool | int): value to be compared against.
  * join (Join): join operator to be used.
  */
 export type FilterPredicate = {
 	column: ZenoColumn;
 	operation: Operation;
-	value: string | number | boolean;
+	value: string | boolean | number;
 	join: Join;
 };
