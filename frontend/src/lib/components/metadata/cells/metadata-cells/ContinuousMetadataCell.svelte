@@ -55,7 +55,6 @@
 				join: Join.AND
 			} as FilterPredicate;
 		} else {
-			localSelection = [];
 			filterPredicates = [];
 		}
 		updatePredicates(filterPredicates);
@@ -63,7 +62,7 @@
 </script>
 
 <!-- We shallow copy histogram to remove the vega identifiers and force it to update the chart when new data is passed in. -->
-<div id="histogram" on:mouseup={setSelection}>
+<div id="histogram" on:mousedown={() => window.addEventListener('mouseup', setSelection)}>
 	<VegaLite
 		bind:view
 		spec={continuousVegaSpec($metricRange)}
