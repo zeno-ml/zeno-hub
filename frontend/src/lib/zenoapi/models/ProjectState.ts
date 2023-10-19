@@ -21,6 +21,7 @@ import type { ZenoColumn } from './ZenoColumn';
  * slices (list[Slice]): slices in the project.
  * tags (list[Tag]): tags in the project.
  * folders (list[Folder]): folders in the project.
+ * has_data (bool): whether the project has data instances.
  */
 export type ProjectState = {
 	project: Project;
@@ -30,4 +31,5 @@ export type ProjectState = {
 	slices: Array<Slice>;
 	tags: Array<Tag>;
 	folders: Array<Folder>;
+	hasData: boolean;
 };
