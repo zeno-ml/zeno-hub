@@ -480,7 +480,7 @@ def get_server() -> FastAPI:
         projects = select.projects(user)
         project_stats = []
         for proj in projects:
-            project_stats.append(select.project_stats(proj.uuid))
+            project_stats.append(select.project_stats(proj.uuid, user.id))
         return [
             ProjectDetails(project=proj, statistics=project_stats[i])
             for i, proj in enumerate(projects)
@@ -491,11 +491,14 @@ def get_server() -> FastAPI:
         response_model=list[ProjectDetails],
         tags=["zeno"],
     )
-    def get_public_projects_details():
+    def get_public_projects_details(req: Request):
+        user = util.get_user_from_token(req)
         projects = select.public_projects()
         project_stats = []
         for proj in projects:
-            project_stats.append(select.project_stats(proj.uuid))
+            project_stats.append(
+                select.project_stats(proj.uuid, user.id if user else None)
+            )
         return [
             ProjectDetails(project=proj, statistics=project_stats[i])
             for i, proj in enumerate(projects)
@@ -524,7 +527,7 @@ def get_server() -> FastAPI:
         reports = select.reports(user)
         report_stats = []
         for rep in reports:
-            report_stats.append(select.report_stats(rep.id))
+            report_stats.append(select.report_stats(rep.id, user.id))
         return [
             ReportDetails(report=rep, statistics=report_stats[i])
             for i, rep in enumerate(reports)
@@ -535,11 +538,12 @@ def get_server() -> FastAPI:
         response_model=list[ReportDetails],
         tags=["zeno"],
     )
-    def get_public_reports_details():
+    def get_public_reports_details(req: Request):
+        user = util.get_user_from_token(req)
         reports = select.public_reports()
         report_stats = []
         for rep in reports:
-            report_stats.append(select.report_stats(rep.id))
+            report_stats.append(select.report_stats(rep.id, user.id if user else None))
         return [
             ReportDetails(report=rep, statistics=report_stats[i])
             for i, rep in enumerate(reports)
@@ -555,6 +559,20 @@ def get_server() -> FastAPI:
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
         return select.reports(user)
+
+    @api_app.post("/like-report/{report_id}", tags=["zeno"])
+    def like_report(report_id: int, current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        return insert.like_report(user.id, report_id)
+
+    @api_app.post("/like-project/{project_uuid}", tags=["zeno"])
+    def like_project(project_uuid: str, current_user=Depends(auth.claim())):
+        user = select.user(current_user["username"])
+        if user is None:
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        return insert.like_project(user.id, project_uuid)
 
     @api_app.post(
         "/charts-for-projects/",

@@ -1,12 +1,9 @@
-import { getEndpoint } from '$lib/api/util';
-import { ZenoClient } from '$lib/zenoapi';
+import { getClient } from '$lib/api/client.js';
 
-export async function load({ depends }) {
+export async function load({ depends, cookies, url }) {
 	depends('app:projects');
 
-	const zenoClient = new ZenoClient({
-		BASE: getEndpoint()
-	}).zeno;
+	const zenoClient = await getClient(cookies, url);
 	const publicProjects = await zenoClient.getPublicProjectsDetails();
 
 	return {

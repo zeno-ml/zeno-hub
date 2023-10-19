@@ -728,6 +728,44 @@ export class ZenoService {
 	}
 
 	/**
+	 * Like Report
+	 * @param reportId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public likeReport(reportId: number): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/like-report/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Like Project
+	 * @param projectUuid
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public likeProject(projectUuid: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/like-project/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Charts For Projects
 	 * @param requestBody
 	 * @returns Chart Successful Response

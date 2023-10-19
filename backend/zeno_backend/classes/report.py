@@ -73,10 +73,14 @@ class ReportStats(CamelModel):
     Attributes:
         num_projects (int): number of projects that are linked to the report.
         num_elements (int): number of elements in the report.
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
     """
 
     num_projects: int
     num_elements: int
+    num_likes: int
+    user_liked: bool = False
 
 
 class ReportDetails(CamelModel):

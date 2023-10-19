@@ -33,9 +33,14 @@
 {/if}
 <div class="flex flex-wrap mb-6 h-full content-start">
 	{#each ownReports as report}
-		<Report report={report.report} stats={report.statistics} deletable />
+		<Report
+			report={report.report}
+			stats={report.statistics}
+			loggedIn={data.user !== null}
+			deletable
+		/>
 	{/each}
 	{#each sharedReports as report}
-		<Report report={report.report} stats={report.statistics} />
+		<Report report={report.report} stats={report.statistics} loggedIn={data.user !== null} />
 	{/each}
 </div>
