@@ -12,7 +12,7 @@
 <svelte:window bind:innerWidth={width} />
 
 {#if width < 600}
-	<div class="text-lg p-10 m-10 rounded-md bg-primary text-white">
+	<div class="text-lg p-10 m-10 rounded-md bg-primary-dark text-white">
 		Projects are currently not supported on mobile. Please open this project on a computer, or check
 		out some of the Zeno Reports.
 	</div>

@@ -1,0 +1,16 @@
+[
+	{
+		"type": "markdown",
+		"content": "Hello World"
+	},
+	{
+		"type": "chart",
+		"project": "name/project",
+		"name": "New Chart"
+	},
+	{
+		"type": "slice",
+		"project": "name/project",
+		"name": "my slice"
+	}
+]
