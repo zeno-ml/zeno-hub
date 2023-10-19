@@ -58,6 +58,7 @@ class ProjectState(CamelModel):
         slices (list[Slice]): slices in the project.
         tags (list[Tag]): tags in the project.
         folders (list[Folder]): folders in the project.
+        has_data (bool): whether the project has data instances.
     """
 
     project: Project
@@ -67,6 +68,7 @@ class ProjectState(CamelModel):
     slices: list[Slice]
     tags: list[Tag]
     folders: list[Folder]
+    has_data: bool
 
 
 class ProjectCopy(CamelModel):

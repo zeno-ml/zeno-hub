@@ -898,6 +898,16 @@ def project_state(
                 bool(user_editor[0][0]) if len(user_editor) > 0 else False
             )
 
+        has_data = db.execute_return(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
+            "table_schema = 'public' AND table_name = %s);",
+            [project_uuid],
+        )
+        if len(has_data) > 0:
+            has_data = has_data[0][0]
+        else:
+            has_data = False
+
         return ProjectState(
             project=project,
             metrics=metrics,
@@ -906,6 +916,7 @@ def project_state(
             slices=slices,
             tags=tags,
             models=models,
+            has_data=has_data,
         )
 
 
