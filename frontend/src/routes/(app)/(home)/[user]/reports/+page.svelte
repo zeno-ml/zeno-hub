@@ -9,11 +9,11 @@
 	$: ownReports =
 		data.user === null
 			? []
-			: data.reports.filter((rep) => rep.report.ownerName === data.user?.name);
+			: data.reportDetails.filter((rep) => rep.report.ownerName === data.user?.name);
 	$: sharedReports =
 		data.user === null
 			? []
-			: data.reports.filter((rep) => rep.report.ownerName !== data.user?.name);
+			: data.reportDetails.filter((rep) => rep.report.ownerName !== data.user?.name);
 </script>
 
 {#if $showNewReport && data.user !== null}

@@ -5,7 +5,7 @@
 </script>
 
 <div class="flex flex-wrap mb-6 h-full content-start">
-	{#each data.publicReports as report}
-		<Report report={report.report} stats={report.statistics} />
+	{#each data.publicReportDetails as reportDetails}
+		<Report report={reportDetails.report} stats={reportDetails.statistics} />
 	{/each}
 </div>

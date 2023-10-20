@@ -4,7 +4,7 @@
 
 {#if $metrics.length !== 0 && $metricRange[0] !== Infinity && $metricRange[0] !== null}
 	<div class="flex items-center justify-end mr-1 text-grey-dark w-full overflow-hidden">
-		<span class="mr-4 ml-4 whitespace-nowrap overflow-hidden text-ellipsis">
+		<span class="mx-4 whitespace-nowrap overflow-hidden text-ellipsis">
 			{$metric ? $metric.name : ''}
 		</span>
 		<span
