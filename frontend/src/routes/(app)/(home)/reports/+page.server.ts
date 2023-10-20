@@ -5,9 +5,9 @@ export async function load({ depends, cookies, url }) {
 	depends('app:reports');
 
 	const zenoClient = await getClient(cookies, url);
-	const publicReports = await zenoClient.getPublicReportsDetails();
+	const publicReportDetails = await zenoClient.getPublicReportsDetails();
 
 	return {
-		publicReports: publicReports
+		publicReportDetails
 	};
 }

@@ -5,7 +5,7 @@
 </script>
 
 <div class="flex flex-wrap mb-6 h-full content-start">
-	{#each data.publicProjects as project}
-		<Project project={project.project} stats={project.statistics} user={data.user} />
+	{#each data.publicProjectDetails as projectDetails}
+		<Project project={projectDetails.project} stats={projectDetails.statistics} user={data.user} />
 	{/each}
 </div>

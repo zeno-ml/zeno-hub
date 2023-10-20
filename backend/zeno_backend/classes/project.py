@@ -63,6 +63,18 @@ class ProjectDetails(CamelModel):
     statistics: ProjectStats
 
 
+class ProjectDetails(CamelModel):
+    """Project and details for homepage rendering.
+
+    Attributes:
+        project (Project): project object with project metadata.
+        statistics (ProjectStats): project statistics.
+    """
+
+    project: Project
+    statistics: ProjectStats
+
+
 class ProjectState(CamelModel):
     """State variables for a Zeno project.
 

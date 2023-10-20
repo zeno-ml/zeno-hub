@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="border-r border-r-grey-lighter h-full pl-5 pr-5 pb-5 pt-2 overflow-y-auto shrink-0 bg-yellowish-light w-[380px] {$collapseHeader
+	class="border-r border-r-grey-lighter h-full px-5 pb-5 pt-2 overflow-y-auto shrink-0 bg-yellowish-light w-[380px] {$collapseHeader
 		? 'hide-sidebar'
 		: 'show-sidebar'}"
 >
