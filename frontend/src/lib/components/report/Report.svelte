@@ -136,7 +136,7 @@
 					</Tooltip>
 				</button>
 			{:else}
-				<div class=" w-6 h-6 fill-primary cursor-not-allowed">
+				<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
 					<Tooltip
 						content={`Report likes. Log in to like.`}
 						theme={'zeno-tooltip'}
@@ -146,7 +146,7 @@
 							<path d={mdiHeart} />
 						</Icon>
 					</Tooltip>
-				</div>
+				</button>
 			{/if}
 		</div>
 	</div>

@@ -4,14 +4,10 @@
 
 	export let data;
 
-	$: ownProjects =
-		data.user === null
-			? []
-			: data.projectDetails.filter((proj) => proj.project.ownerName === data.user?.name);
-	$: sharedProjects =
-		data.user === null
-			? []
-			: data.projectDetails.filter((proj) => proj.project.ownerName !== data.user?.name);
+	$: ownProjects = data.projectDetails.filter((proj) => proj.project.ownerName === data.user?.name);
+	$: sharedProjects = data.projectDetails.filter(
+		(proj) => proj.project.ownerName !== data.user?.name
+	);
 </script>
 
 {#if ownProjects.length === 0}
