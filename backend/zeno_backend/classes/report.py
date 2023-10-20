@@ -95,18 +95,6 @@ class ReportDetails(CamelModel):
     statistics: ReportStats
 
 
-class ReportDetails(CamelModel):
-    """Report and details for homepage rendering.
-
-    Attributes:
-        report (Report): report object with report metadata.
-        statistics (ReportStats): report statistics.
-    """
-
-    report: Report
-    statistics: ReportStats
-
-
 class SliceElementSpec(CamelModel):
     """Specification for slice element in a Zeno report."""
 
