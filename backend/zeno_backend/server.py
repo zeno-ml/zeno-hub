@@ -480,7 +480,7 @@ def get_server() -> FastAPI:
         projects = select.projects(user)
         project_stats = []
         for proj in projects:
-            project_stats.append(select.project_stats(proj.uuid))
+            project_stats.append(select.project_stats(proj.uuid, user.id))
         return [
             ProjectDetails(project=proj, statistics=project_stats[i])
             for i, proj in enumerate(projects)
@@ -527,7 +527,7 @@ def get_server() -> FastAPI:
         reports = select.reports(user)
         report_stats = []
         for rep in reports:
-            report_stats.append(select.report_stats(rep.id))
+            report_stats.append(select.report_stats(rep.id, user.id))
         return [
             ReportDetails(report=rep, statistics=report_stats[i])
             for i, rep in enumerate(reports)

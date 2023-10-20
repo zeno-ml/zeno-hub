@@ -447,7 +447,6 @@ def like_report(user_id: int, report_id: int):
             [user_id, report_id],
         )
         if len(user_liked) > 0:
-            # remove like
             db.execute(
                 "DELETE FROM report_like WHERE user_id = %s AND report_id = %s;",
                 [user_id, report_id],
@@ -461,7 +460,7 @@ def like_report(user_id: int, report_id: int):
 
 
 def like_project(user_id: int, project_uuid: str):
-    """Like a report.
+    """Like a project.
 
     Args:
         user_id: the id of the user liking the report.
@@ -473,7 +472,6 @@ def like_project(user_id: int, project_uuid: str):
             [user_id, project_uuid],
         )
         if len(user_liked) > 0:
-            # remove like
             db.execute(
                 "DELETE FROM project_like WHERE user_id = %s AND project_uuid = %s;",
                 [user_id, project_uuid],
