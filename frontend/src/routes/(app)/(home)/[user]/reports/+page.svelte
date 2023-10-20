@@ -7,9 +7,13 @@
 	export let data;
 
 	$: ownReports =
-		data.user === null ? [] : data.reports.filter((rep) => rep.ownerName === data.user?.name);
+		data.user === null
+			? []
+			: data.reportDetails.filter((rep) => rep.report.ownerName === data.user?.name);
 	$: sharedReports =
-		data.user === null ? [] : data.reports.filter((rep) => rep.ownerName !== data.user?.name);
+		data.user === null
+			? []
+			: data.reportDetails.filter((rep) => rep.report.ownerName !== data.user?.name);
 </script>
 
 {#if $showNewReport && data.user !== null}
@@ -18,7 +22,7 @@
 			showNewReport.set(false);
 		}}
 		user={data.user.name}
-		reports={ownReports}
+		reports={ownReports.map((r) => r.report)}
 	/>
 {/if}
 {#if ownReports.length === 0}
@@ -29,9 +33,9 @@
 {/if}
 <div class="flex flex-wrap mb-6 h-full content-start">
 	{#each ownReports as report}
-		<Report {report} deletable />
+		<Report report={report.report} stats={report.statistics} deletable />
 	{/each}
 	{#each sharedReports as report}
-		<Report {report} />
+		<Report report={report.report} stats={report.statistics} />
 	{/each}
 </div>

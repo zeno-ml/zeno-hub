@@ -34,7 +34,7 @@ class Project(CamelModel):
 
 
 class ProjectStats(CamelModel):
-    """Statistical numbers of a Zeno project.
+    """Statistics for projects.
 
     Attributes:
         num_instances (int): number of data instances in the project.
@@ -45,6 +45,18 @@ class ProjectStats(CamelModel):
     num_instances: int
     num_charts: int
     num_models: int
+
+
+class ProjectDetails(CamelModel):
+    """Project and details for homepage rendering.
+
+    Attributes:
+        project (Project): project object with project metadata.
+        statistics (ProjectStats): project statistics.
+    """
+
+    project: Project
+    statistics: ProjectStats
 
 
 class ProjectState(CamelModel):

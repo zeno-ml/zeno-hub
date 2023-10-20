@@ -8,9 +8,9 @@ export async function load({ depends }) {
 	const zenoClient = new ZenoClient({
 		BASE: getEndpoint()
 	}).zeno;
-	const publicReports = await zenoClient.getPublicReports();
+	const publicReportDetails = await zenoClient.getPublicReportsDetails();
 
 	return {
-		publicReports: publicReports
+		publicReportDetails
 	};
 }

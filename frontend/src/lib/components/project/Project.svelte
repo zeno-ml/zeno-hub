@@ -2,7 +2,7 @@
 	import { goto, invalidate } from '$app/navigation';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
-	import type { Project, User, ZenoService } from '$lib/zenoapi';
+	import type { Project, ProjectStats, User, ZenoService } from '$lib/zenoapi';
 	import {
 		mdiChartBar,
 		mdiDotsHorizontal,
@@ -12,7 +12,6 @@
 		mdiText
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
@@ -22,6 +21,7 @@
 	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
+	export let stats: ProjectStats;
 	export let deletable = false;
 	export let user: User | null = null;
 
@@ -126,36 +126,32 @@
 		{project.description}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		{#await zenoClient.getProjectStats(project.uuid)}
-			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
-		{:then stats}
-			<Tooltip
-				content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
-					stats.numInstances !== 1 ? 's' : ''
-				}.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
-			</Tooltip>
-			<Tooltip
-				content={`This project has ${shortenNumber(stats.numModels, 1)} system${
-					stats.numModels !== 1 ? 's' : ''
-				}.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
-			</Tooltip>
-			<Tooltip
-				content={`This project has ${shortenNumber(stats.numCharts, 1)} chart${
-					stats.numCharts !== 1 ? 's' : ''
-				}.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
-			</Tooltip>
-		{/await}
+		<Tooltip
+			content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
+				stats.numInstances !== 1 ? 's' : ''
+			}.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
+		</Tooltip>
+		<Tooltip
+			content={`This project has ${shortenNumber(stats.numModels, 1)} system${
+				stats.numModels !== 1 ? 's' : ''
+			}.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
+		</Tooltip>
+		<Tooltip
+			content={`This project has ${shortenNumber(stats.numCharts, 1)} chart${
+				stats.numCharts !== 1 ? 's' : ''
+			}.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
+		</Tooltip>
 	</div>
 </button>

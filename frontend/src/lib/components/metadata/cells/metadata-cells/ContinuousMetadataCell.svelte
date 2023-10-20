@@ -57,6 +57,7 @@
 		} else {
 			filterPredicates = [];
 		}
+		window.removeEventListener('mouseup', setSelection);
 		updatePredicates(filterPredicates);
 	}
 </script>

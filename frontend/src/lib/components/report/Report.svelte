@@ -3,10 +3,9 @@
 	import ProjectStat from '$lib/components/project/ProjectStat.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
-	import type { Report, ZenoService } from '$lib/zenoapi';
+	import type { Report, ReportStats, ZenoService } from '$lib/zenoapi';
 	import { mdiDotsHorizontal, mdiFileTree, mdiSitemap } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import CircularProgress from '@smui/circular-progress/src/CircularProgress.svelte';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { Tooltip } from '@svelte-plugins/tooltips';
@@ -14,6 +13,7 @@
 	import Confirm from '../popups/Confirm.svelte';
 
 	export let report: Report;
+	export let stats: ReportStats;
 	export let deletable = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
@@ -93,27 +93,23 @@
 		{report.description}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		{#await zenoClient.getReportStats(report.id)}
-			<CircularProgress style="height: 32px; width: 32px; margin-right:20px" indeterminate />
-		{:then stats}
-			<Tooltip
-				content={`This report has ${shortenNumber(stats.numProjects, 1)} project${
-					stats.numProjects !== 1 ? 's' : ''
-				} linked to it.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiFileTree} text={stats.numProjects} />
-			</Tooltip>
-			<Tooltip
-				content={`This report has ${shortenNumber(stats.numElements, 1)} element${
-					stats.numElements !== 1 ? 's' : ''
-				}.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiSitemap} text={stats.numElements} />
-			</Tooltip>
-		{/await}
+		<Tooltip
+			content={`This report has ${shortenNumber(stats.numProjects, 1)} project${
+				stats.numProjects !== 1 ? 's' : ''
+			} linked to it.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiFileTree} text={stats.numProjects} />
+		</Tooltip>
+		<Tooltip
+			content={`This report has ${shortenNumber(stats.numElements, 1)} element${
+				stats.numElements !== 1 ? 's' : ''
+			}.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiSitemap} text={stats.numElements} />
+		</Tooltip>
 	</div>
 </button>
