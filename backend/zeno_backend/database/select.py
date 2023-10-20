@@ -920,27 +920,44 @@ def project_state(
         )
 
 
-def project_stats(project: str) -> ProjectStats | None:
+def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats | None:
     """Get statistics for a specified project.
 
     Args:
-        project (str): uuid of the project to get statistics for.
+        project_uuid (str): uuid of the project to get statistics for.
+        user_id (int): id of the user making the request.
 
     Returns:
         ProjectStats | None: statistics of the specified project.
     """
     with Database() as db:
         num_instances = db.execute_return(
-            sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project))
+            sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project_uuid))
         )
         num_charts = db.execute_return(
-            "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project]
+            "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project_uuid]
         )
         num_models = db.execute_return(
             sql.SQL("SELECT COUNT(DISTINCT model) " "FROM {};").format(
-                sql.Identifier(f"{project}_column_map")
+                sql.Identifier(f"{project_uuid}_column_map")
             )
         )
+        num_likes = db.execute_return(
+            "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
+        )
+
+        user_liked = False
+        if user_id is not None:
+            user_liked = db.execute_return(
+                "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s AND "
+                "user_id = %s);",
+                [project_uuid, user_id],
+            )
+            if len(user_liked) > 0:
+                user_liked = bool(user_liked[0][0])
+            else:
+                user_liked = False
+
         return (
             ProjectStats(
                 num_instances=num_instances[0][0]
@@ -948,17 +965,20 @@ def project_stats(project: str) -> ProjectStats | None:
                 else 0,
                 num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
                 num_models=num_models[0][0] if isinstance(num_models[0][0], int) else 0,
+                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+                user_liked=user_liked,
             )
             if len(num_charts) > 0 and len(num_instances) > 0 and len(num_models) > 0
             else None
         )
 
 
-def report_stats(report_id: int) -> ReportStats | None:
+def report_stats(report_id: int, user_id: int | None = None) -> ReportStats | None:
     """Get statistics for a specified report.
 
     Args:
         report_id (int): id of the report to get statistics for.
+        user_id (int): id of the user making the request.
 
     Returns:
         ReportStats | None: statistics of the specified report.
@@ -971,6 +991,22 @@ def report_stats(report_id: int) -> ReportStats | None:
         num_elements = db.execute_return(
             "SELECT COUNT(*) FROM report_elements " "WHERE report_id = %s;", [report_id]
         )
+        num_likes = db.execute_return(
+            "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [report_id]
+        )
+
+        user_liked = False
+        if user_id is not None:
+            user_liked = db.execute_return(
+                "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
+                "user_id = %s);",
+                [report_id, user_id],
+            )
+            if len(user_liked) > 0:
+                user_liked = bool(user_liked[0][0])
+            else:
+                user_liked = False
+
         return (
             ReportStats(
                 num_projects=num_projects[0][0]
@@ -979,6 +1015,8 @@ def report_stats(report_id: int) -> ReportStats | None:
                 num_elements=num_elements[0][0]
                 if isinstance(num_elements[0][0], int)
                 else 0,
+                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+                user_liked=user_liked,
             )
             if len(num_projects) > 0 and len(num_elements) > 0
             else None

@@ -14,8 +14,7 @@ export const load = async ({ cookies, url }) => {
 		return {
 			cognitoUser
 		};
+	} else {
+		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
-	return {
-		cognitoUser: null
-	};
 };

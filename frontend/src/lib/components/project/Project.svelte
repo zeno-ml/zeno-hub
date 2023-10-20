@@ -4,8 +4,9 @@
 	import { shortenNumber } from '$lib/util/util';
 	import type { Project, ProjectStats, User, ZenoService } from '$lib/zenoapi';
 	import {
-		mdiChartBar,
 		mdiDotsHorizontal,
+		mdiHeart,
+		mdiHeartOutline,
 		mdiImage,
 		mdiLayersTriple,
 		mdiTag,
@@ -144,14 +145,42 @@
 		>
 			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
 		</Tooltip>
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numCharts, 1)} chart${
-				stats.numCharts !== 1 ? 's' : ''
-			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiChartBar} text={stats.numCharts} />
-		</Tooltip>
+		<div class="flex ml-auto">
+			<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
+			{#if user}
+				<button
+					class=" w-6 h-6 fill-primary"
+					on:click={(e) => {
+						e.stopPropagation();
+						if (stats.userLiked) {
+							stats.userLiked = false;
+							stats.numLikes = Math.max(0, stats.numLikes - 1);
+						} else {
+							stats.userLiked = true;
+							stats.numLikes++;
+						}
+						zenoClient.likeProject(project.uuid);
+					}}
+				>
+					<Tooltip content={`Like this project!`} theme={'zeno-tooltip'} position="bottom">
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{:else}
+				<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
+					<Tooltip
+						content={`Project likes. Log in to like.`}
+						theme={'zeno-tooltip'}
+						position="bottom"
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={mdiHeart} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{/if}
+		</div>
 	</div>
 </button>

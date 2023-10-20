@@ -88,7 +88,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="mt-6 flex flex-col h-full">
+	<div class="mt-6 flex flex-col">
 		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>

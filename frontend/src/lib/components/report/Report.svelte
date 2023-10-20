@@ -4,7 +4,7 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
 	import type { Report, ReportStats, ZenoService } from '$lib/zenoapi';
-	import { mdiDotsHorizontal, mdiFileTree, mdiSitemap } from '@mdi/js';
+	import { mdiDotsHorizontal, mdiFileTree, mdiHeart, mdiHeartOutline, mdiSitemap } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
@@ -14,6 +14,7 @@
 
 	export let report: Report;
 	export let stats: ReportStats;
+	export let loggedIn = false;
 	export let deletable = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
@@ -111,5 +112,42 @@
 		>
 			<ProjectStat icon={mdiSitemap} text={stats.numElements} />
 		</Tooltip>
+		<div class="flex ml-auto">
+			<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
+			{#if loggedIn}
+				<button
+					class=" w-6 h-6 fill-primary"
+					on:click={(e) => {
+						e.stopPropagation();
+						if (stats.userLiked) {
+							stats.userLiked = false;
+							stats.numLikes = Math.max(0, stats.numLikes - 1);
+						} else {
+							stats.userLiked = true;
+							stats.numLikes++;
+						}
+						zenoClient.likeReport(report.id);
+					}}
+				>
+					<Tooltip content={`Like this report!`} theme={'zeno-tooltip'} position="bottom">
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{:else}
+				<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
+					<Tooltip
+						content={`Report likes. Log in to like.`}
+						theme={'zeno-tooltip'}
+						position="bottom"
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={mdiHeart} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{/if}
+		</div>
 	</div>
 </button>

@@ -434,6 +434,56 @@ def report_element(report_id: int, element: ReportElement) -> int | None:
         return id[0][0]
 
 
+def like_report(user_id: int, report_id: int):
+    """Like a report.
+
+    Args:
+        user_id: the id of the user liking the report.
+        report_id: the id of the report to be liked.
+    """
+    with Database() as db:
+        user_liked = db.execute_return(
+            "SELECT id FROM report_like WHERE user_id = %s AND report_id = %s;",
+            [user_id, report_id],
+        )
+        if len(user_liked) > 0:
+            db.execute(
+                "DELETE FROM report_like WHERE user_id = %s AND report_id = %s;",
+                [user_id, report_id],
+            )
+            db.commit()
+        else:
+            db.connect_execute(
+                "INSERT INTO report_like (user_id, report_id) VALUES (%s,%s);",
+                [user_id, report_id],
+            )
+
+
+def like_project(user_id: int, project_uuid: str):
+    """Like a project.
+
+    Args:
+        user_id: the id of the user liking the report.
+        project_uuid: the uuid of the project to be liked.
+    """
+    with Database() as db:
+        user_liked = db.execute_return(
+            "SELECT id FROM project_like WHERE user_id = %s AND project_uuid = %s;",
+            [user_id, project_uuid],
+        )
+        if len(user_liked) > 0:
+            db.execute(
+                "DELETE FROM project_like WHERE user_id = %s AND project_uuid = %s;",
+                [user_id, project_uuid],
+            )
+            db.commit()
+        else:
+            db.connect_execute(
+                "INSERT INTO project_like (user_id, project_uuid) VALUES (%s,%s);",
+                [user_id, project_uuid],
+            )
+
+
 def folder(project: str, name: str) -> int | None:
     """Adding a folder to an existing project.
 

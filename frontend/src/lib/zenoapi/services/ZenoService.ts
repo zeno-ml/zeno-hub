@@ -37,8 +37,8 @@ import type { TagMetricKey } from '../models/TagMetricKey';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
-import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
+import type { CancelablePromise } from '../core/CancelablePromise';
 
 export class ZenoService {
 	constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -724,6 +724,44 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/reports'
+		});
+	}
+
+	/**
+	 * Like Report
+	 * @param reportId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public likeReport(reportId: number): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/like-report/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Like Project
+	 * @param projectUuid
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public likeProject(projectUuid: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/like-project/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 

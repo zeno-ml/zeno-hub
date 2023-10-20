@@ -40,11 +40,15 @@ class ProjectStats(CamelModel):
         num_instances (int): number of data instances in the project.
         num_charts (int): number of charts that have been created for the project.
         num_models (int): number of models associated with the project
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
     """
 
     num_instances: int
     num_charts: int
     num_models: int
+    num_likes: int
+    user_liked: bool
 
 
 class ProjectDetails(CamelModel):
