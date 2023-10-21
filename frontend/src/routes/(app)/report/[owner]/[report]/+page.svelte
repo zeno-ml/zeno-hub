@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
@@ -9,13 +10,22 @@
 
 	export let data;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
+	let allProjects: Project[] = [];
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let dragEnabled = false;
 
-	const zenoClient = getContext('zenoClient') as ZenoService;
+	$: reportProjects = allProjects.filter((p) => selectedProjects.includes(p.uuid));
+
+	if (data.report.editor) {
+		zenoClient.getProjects({ user: $page.data.user.name }).then((projects) => {
+			allProjects = projects;
+		});
+	}
 
 	function deleteElement(elementId: number) {
 		if (elementId < 0) return;
@@ -88,7 +98,7 @@
 
 		{#if data.report.editor}
 			<p class="mt-4 mb-2">Associated Projects</p>
-			{#await zenoClient.getProjects() then projects}
+			{#await zenoClient.getProjects({ user: $page.data.user.name }) then projects}
 				<Svelecte
 					bind:value={selectedProjects}
 					on:change={updateReportProjects}
@@ -124,7 +134,7 @@
 					bind:dragEnabled
 					bind:showConfirmDelete
 					{addElement}
-					{selectedProjects}
+					{reportProjects}
 					report={data.report}
 				/>
 			{/each}

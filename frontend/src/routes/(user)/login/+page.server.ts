@@ -55,7 +55,7 @@ export const actions: Actions = {
 			303,
 			data.has('redirect') && data.get('redirect') !== ''
 				? (data.get('redirect') as string)
-				: `/${username}/projects`
+				: `/${username}`
 		);
 	}
 };

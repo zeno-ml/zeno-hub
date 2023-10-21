@@ -1,29 +1,31 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import HomeHeader from '$lib/components/general/HomeHeader.svelte';
 	import { Tooltip } from '@svelte-plugins/tooltips';
 
 	export let data;
 
-	let isExplore =
-		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
+	let isExplore = $page.route.id === '/(app)/(home)';
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white overflow-y-scroll">
+<div class="flex flex-col w-full h-full overflow-y-scroll p-8 pt-5 bg-white max-w-7xl m-auto">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
 				<a
-					href={'/' + data.cognitoUser.name + '/projects'}
-					class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+					href={'/' + data.cognitoUser.name}
+					class={`mr-6 ${
+						isExplore ? 'text-grey-dark' : 'underline'
+					} hover:text-primary uppercase font-bold`}
 				>
 					My Hub
 				</a>
 			</Tooltip>
 			<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
 				<a
-					href="/projects"
-					class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+					href="/"
+					class={`${
+						!isExplore ? 'text-grey-dark' : 'underline'
+					} hover:text-primary uppercase font-bold`}
 				>
 					Discover
 				</a>
@@ -31,7 +33,7 @@
 		</div>
 	{:else}
 		<div
-			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 sm:h-60 flex-col sm:flex-row"
+			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 sm:h-44 flex-col sm:flex-row"
 		>
 			<div>
 				<h1 class="text-5xl font-header ml-6">Welcome to Zeno</h1>
@@ -89,7 +91,6 @@
 		</div>
 	{/if}
 	<div class="mt-6 flex flex-col">
-		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>
 </div>

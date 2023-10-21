@@ -19,6 +19,22 @@ class ReportElementType(Enum):
     SLICE = "SLICE"
 
 
+class ReportStats(CamelModel):
+    """Statistics for a Zeno report.
+
+    Attributes:
+        num_projects (int): number of projects that are linked to the report.
+        num_elements (int): number of elements in the report.
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
+    """
+
+    num_projects: int
+    num_elements: int
+    num_likes: int
+    user_liked: bool
+
+
 class Report(CamelModel):
     """Representation of a report in Zeno.
 
@@ -39,6 +55,7 @@ class Report(CamelModel):
     editor: bool
     public: bool = False
     description: str = ""
+    stats: ReportStats | None = None
 
 
 class ReportElement(CamelModel):
@@ -65,34 +82,6 @@ class ReportResponse(CamelModel):
 
     report: Report
     report_elements: list[ReportElement]
-
-
-class ReportStats(CamelModel):
-    """Statistical numbers of a Zeno report.
-
-    Attributes:
-        num_projects (int): number of projects that are linked to the report.
-        num_elements (int): number of elements in the report.
-        num_likes (int): number of likes the report has.
-        user_liked (bool): whether the current user has liked the report.
-    """
-
-    num_projects: int
-    num_elements: int
-    num_likes: int
-    user_liked: bool = False
-
-
-class ReportDetails(CamelModel):
-    """Report and details for homepage rendering.
-
-    Attributes:
-        report (Report): report object with report metadata.
-        statistics (ReportStats): report statistics.
-    """
-
-    report: Report
-    statistics: ReportStats
 
 
 class SliceElementSpec(CamelModel):
@@ -122,3 +111,19 @@ class SliceElementOptions(CamelModel):
     data_column: str | None = None
     label_column: str | None = None
     model_column: str | None = None
+
+
+class ReportsRequest(CamelModel):
+    """Request for reports in Zeno.
+
+    Attributes:
+        user (str): name of the user to get reports for.
+        offset (int): offset of the first report to get.
+        limit (int): number of reports to get.
+        order (str): order of the reports.
+    """
+
+    user: str | None = None
+    offset: int = 0
+    limit: int | None = None
+    order: str | None = None

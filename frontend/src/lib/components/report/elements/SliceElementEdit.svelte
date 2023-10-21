@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { ReportElement, Slice, SliceElementSpec, ZenoService } from '$lib/zenoapi';
+	import type { Project, ReportElement, Slice, SliceElementSpec, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
+	export let reportProjects: Project[];
 	export let sliceOptions: Slice[];
 	export let reportId: number;
 	export let sliceElementSpec: SliceElementSpec;
@@ -18,6 +19,14 @@
 			models = modelsRequest;
 		});
 	}
+
+	$: options = sliceOptions.map((s) => {
+		return {
+			name: `${s.sliceName} (${reportProjects.find((p) => p.uuid === s.projectUuid)?.name})`,
+			id: s.id,
+			projectUuid: s.projectUuid
+		};
+	});
 
 	function updateSliceId(e: CustomEvent) {
 		sliceElementSpec = {
@@ -50,21 +59,13 @@
 	}
 </script>
 
-{#await zenoClient.getProjects() then projects}
-	{@const options = sliceOptions.map((s) => {
-		return {
-			name: `${s.sliceName} (${projects.find((p) => p.uuid === s.projectUuid)?.name})`,
-			id: s.id
-		};
-	})}
-	<Svelecte
-		value={sliceElementSpec.sliceId}
-		{options}
-		on:change={updateSliceId}
-		valueField="id"
-		labelField="name"
-	/>
-{/await}
+<Svelecte
+	value={sliceElementSpec.sliceId}
+	{options}
+	on:change={updateSliceId}
+	valueField="id"
+	labelField="name"
+/>
 {#if models.length > 0}
 	<div class="mt-3" />
 	<Svelecte

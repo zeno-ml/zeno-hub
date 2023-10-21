@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 /**
- * Statistical numbers of a Zeno report.
+ * Statistics for a Zeno report.
  *
  * Attributes:
  * num_projects (int): number of projects that are linked to the report.
@@ -16,5 +16,5 @@ export type ReportStats = {
 	numProjects: number;
 	numElements: number;
 	numLikes: number;
-	userLiked?: boolean;
+	userLiked: boolean;
 };

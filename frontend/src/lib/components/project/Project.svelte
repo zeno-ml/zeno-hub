@@ -22,7 +22,7 @@
 	import ProjectStat from './ProjectStat.svelte';
 
 	export let project: Project;
-	export let stats: ProjectStats;
+	export let stats: ProjectStats | null | undefined;
 	export let deletable = false;
 	export let user: User | null = null;
 
@@ -37,6 +37,18 @@
 		if (project.view.includes('image')) return mdiImage;
 		if (project.view.includes('chat') || project.view.includes('text')) return mdiText;
 		else return mdiTag;
+	}
+
+	function updateLikes(project_uuid: string) {
+		if (stats === undefined || stats === null) return;
+		if (stats.userLiked) {
+			stats.userLiked = false;
+			stats.numLikes = Math.max(0, stats.numLikes - 1);
+		} else {
+			stats.userLiked = true;
+			stats.numLikes++;
+		}
+		zenoClient.likeProject(project_uuid);
 	}
 </script>
 
@@ -61,7 +73,7 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-full sm:w-80 h-60"
+	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md"
 >
 	<div class="flex flex-col w-full">
 		<div class="flex justify-between items-center">
@@ -123,64 +135,59 @@
 		</div>
 	</div>
 	<p class="mr-2 text-base truncate flex-shrink-0">{project.ownerName}</p>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
+	<p class="my-2 mr-2 text-sm text-left overflow-y-auto flex-grow">
 		{project.description}
 	</p>
-	<div class="flex items-center w-full mb-2 mt-3">
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
-				stats.numInstances !== 1 ? 's' : ''
-			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
-		</Tooltip>
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numModels, 1)} system${
-				stats.numModels !== 1 ? 's' : ''
-			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
-		</Tooltip>
-		<div class="flex ml-auto">
-			<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
-			{#if user}
-				<button
-					class=" w-6 h-6 fill-primary"
-					on:click={(e) => {
-						e.stopPropagation();
-						if (stats.userLiked) {
-							stats.userLiked = false;
-							stats.numLikes = Math.max(0, stats.numLikes - 1);
-						} else {
-							stats.userLiked = true;
-							stats.numLikes++;
-						}
-						zenoClient.likeProject(project.uuid);
-					}}
-				>
-					<Tooltip content={`Like this project!`} theme={'zeno-tooltip'} position="bottom">
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
-						</Icon>
-					</Tooltip>
-				</button>
-			{:else}
-				<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
-					<Tooltip
-						content={`Project likes. Log in to like.`}
-						theme={'zeno-tooltip'}
-						position="bottom"
+	{#if stats !== null && stats !== undefined}
+		<div class="flex items-center mb-2 mt-3 w-full">
+			<Tooltip
+				content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
+					stats.numInstances !== 1 ? 's' : ''
+				}.`}
+				theme={'zeno-tooltip'}
+				position="bottom"
+			>
+				<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
+			</Tooltip>
+			<Tooltip
+				content={`This project has ${shortenNumber(stats.numModels, 1)} system${
+					stats.numModels !== 1 ? 's' : ''
+				}.`}
+				theme={'zeno-tooltip'}
+				position="bottom"
+			>
+				<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
+			</Tooltip>
+			<div class="flex ml-auto">
+				<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
+				{#if user}
+					<button
+						class=" w-6 h-6 fill-primary"
+						on:click={(e) => {
+							e.stopPropagation();
+							updateLikes(project.uuid);
+						}}
 					>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path d={mdiHeart} />
-						</Icon>
-					</Tooltip>
-				</button>
-			{/if}
+						<Tooltip content={`Like this project!`} theme={'zeno-tooltip'} position="bottom">
+							<Icon tag="svg" viewBox="0 0 24 24">
+								<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
+							</Icon>
+						</Tooltip>
+					</button>
+				{:else}
+					<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
+						<Tooltip
+							content={`Project likes. Log in to like.`}
+							theme={'zeno-tooltip'}
+							position="bottom"
+						>
+							<Icon tag="svg" viewBox="0 0 24 24">
+								<path d={mdiHeart} />
+							</Icon>
+						</Tooltip>
+					</button>
+				{/if}
+			</div>
 		</div>
-	</div>
+	{/if}
 </button>

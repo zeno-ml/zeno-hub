@@ -3,6 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import type { ReportStats } from './ReportStats';
+
 /**
  * Representation of a report in Zeno.
  *
@@ -23,4 +25,5 @@ export type Report = {
 	editor: boolean;
 	public?: boolean;
 	description?: string;
+	stats?: ReportStats | null;
 };

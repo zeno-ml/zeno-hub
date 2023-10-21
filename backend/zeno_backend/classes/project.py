@@ -7,6 +7,24 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 
 
+class ProjectStats(CamelModel):
+    """Statistics for a Zeno project.
+
+    Attributes:
+        num_instances (int): number of data instances in the project.
+        num_charts (int): number of charts that have been created for the project.
+        num_models (int): number of models associated with the project
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
+    """
+
+    num_instances: int
+    num_charts: int
+    num_models: int
+    num_likes: int
+    user_liked: bool
+
+
 class Project(CamelModel):
     """Projects with datasets & models.
 
@@ -31,36 +49,7 @@ class Project(CamelModel):
     editor: bool
     samples_per_page: int = 10
     public: bool = False
-
-
-class ProjectStats(CamelModel):
-    """Statistics for projects.
-
-    Attributes:
-        num_instances (int): number of data instances in the project.
-        num_charts (int): number of charts that have been created for the project.
-        num_models (int): number of models associated with the project
-        num_likes (int): number of likes the report has.
-        user_liked (bool): whether the current user has liked the report.
-    """
-
-    num_instances: int
-    num_charts: int
-    num_models: int
-    num_likes: int
-    user_liked: bool
-
-
-class ProjectDetails(CamelModel):
-    """Project and details for homepage rendering.
-
-    Attributes:
-        project (Project): project object with project metadata.
-        statistics (ProjectStats): project statistics.
-    """
-
-    project: Project
-    statistics: ProjectStats
+    stats: ProjectStats | None = None
 
 
 class ProjectState(CamelModel):
@@ -103,3 +92,19 @@ class ProjectCopy(CamelModel):
     copy_systems: bool
     copy_slices: bool
     copy_charts: bool
+
+
+class ProjectsRequest(CamelModel):
+    """Request for a list of projects.
+
+    Attributes:
+        user (str): username of the user to get projects for.
+        offset (int): offset to query projects table.
+        limit (int): limit to query projects table.
+        order (str): order to sort query with.
+    """
+
+    user: str | None = None
+    offset: int = 0
+    limit: int | None = None
+    order: str | None = None

@@ -3,6 +3,7 @@
 		ReportElementType,
 		ZenoService,
 		type Chart,
+		type Project,
 		type ReportElement,
 		type Slice,
 		type SliceElementSpec
@@ -14,6 +15,7 @@
 	import TextElementEdit from './elements/TextElementEdit.svelte';
 
 	export let element: ReportElement;
+	export let reportProjects: Project[];
 	export let chartOptions: Chart[];
 	export let sliceOptions: Slice[];
 	export let reportId: number;
@@ -53,11 +55,17 @@
 			on:change={updateType}
 		/>
 		{#if element.type === ReportElementType.CHART}
-			<ChartElementEdit bind:element {chartOptions} {reportId} />
+			<ChartElementEdit bind:element {chartOptions} {reportId} {reportProjects} />
 		{:else if element.type === ReportElementType.TEXT}
 			<TextElementEdit bind:element {reportId} />
 		{:else if element.type === ReportElementType.SLICE && sliceElementSpec}
-			<SliceElementEdit bind:element {sliceOptions} bind:sliceElementSpec {reportId} />
+			<SliceElementEdit
+				bind:element
+				{sliceOptions}
+				bind:sliceElementSpec
+				{reportId}
+				{reportProjects}
+			/>
 		{/if}
 	</div>
 </div>

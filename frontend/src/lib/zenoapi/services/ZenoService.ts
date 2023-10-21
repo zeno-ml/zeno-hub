@@ -13,17 +13,18 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
+import type { HomepageData } from '../models/HomepageData';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectCopy } from '../models/ProjectCopy';
-import type { ProjectDetails } from '../models/ProjectDetails';
+import type { ProjectsRequest } from '../models/ProjectsRequest';
 import type { ProjectState } from '../models/ProjectState';
 import type { Report } from '../models/Report';
-import type { ReportDetails } from '../models/ReportDetails';
 import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
+import type { ReportsRequest } from '../models/ReportsRequest';
 import type { Slice } from '../models/Slice';
 import type { SliceElementOptions } from '../models/SliceElementOptions';
 import type { SliceElementSpec } from '../models/SliceElementSpec';
@@ -37,8 +38,8 @@ import type { TagMetricKey } from '../models/TagMetricKey';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
-import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
+import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 export class ZenoService {
 	constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -222,29 +223,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Data
-	 * @param project
-	 * @param dataId
-	 * @returns binary Successful Response
-	 * @throws ApiError
-	 */
-	public getData(project: string, dataId: string): CancelablePromise<Blob> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/data/{project}',
-			path: {
-				project: project
-			},
-			query: {
-				data_id: dataId
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Get Models
 	 * @param project
 	 * @returns string Successful Response
@@ -334,25 +312,6 @@ export class ZenoService {
 			query: {
 				owner_name: ownerName,
 				project_name: projectName
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Columns
-	 * @param project
-	 * @returns ZenoColumn Successful Response
-	 * @throws ApiError
-	 */
-	public getColumns(project: string): CancelablePromise<Array<ZenoColumn>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/columns/{project}',
-			path: {
-				project: project
 			},
 			errors: {
 				422: `Validation Error`
@@ -656,74 +615,69 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Projects Details
-	 * @returns ProjectDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/projects-details'
-		});
-	}
-
-	/**
-	 * Get Public Projects Details
-	 * @returns ProjectDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getPublicProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/public-projects-details'
-		});
-	}
-
-	/**
 	 * Get Projects
+	 * @param requestBody
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public getProjects(): CancelablePromise<Array<Project>> {
+	public getProjects(requestBody: ProjectsRequest): CancelablePromise<Array<Project>> {
 		return this.httpRequest.request({
-			method: 'GET',
-			url: '/projects'
-		});
-	}
-
-	/**
-	 * Get Reports Details
-	 * @returns ReportDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getReportsDetails(): CancelablePromise<Array<ReportDetails>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/reports-details'
-		});
-	}
-
-	/**
-	 * Get Public Reports Details
-	 * @returns ReportDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getPublicReportsDetails(): CancelablePromise<Array<ReportDetails>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/public-reports-details'
+			method: 'POST',
+			url: '/projects',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
 	/**
 	 * Get Reports
+	 * @param requestBody
 	 * @returns Report Successful Response
 	 * @throws ApiError
 	 */
-	public getReports(): CancelablePromise<Array<Report>> {
+	public getReports(requestBody: ReportsRequest): CancelablePromise<Array<Report>> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/reports',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Public Homepage Data
+	 * @returns HomepageData Successful Response
+	 * @throws ApiError
+	 */
+	public getPublicHomepageData(): CancelablePromise<HomepageData> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/reports'
+			url: '/homepage/'
+		});
+	}
+
+	/**
+	 * Get Homepage Data
+	 * @param user
+	 * @returns HomepageData Successful Response
+	 * @throws ApiError
+	 */
+	public getHomepageData(user: string): CancelablePromise<HomepageData> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/homepage/{user}',
+			path: {
+				user: user
+			},
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 

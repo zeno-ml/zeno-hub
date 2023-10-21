@@ -3,6 +3,7 @@
 		ReportElementType,
 		ZenoService,
 		type Chart,
+		type Project,
 		type Report,
 		type ReportElement,
 		type Slice
@@ -16,7 +17,7 @@
 
 	export let element: ReportElement;
 	export let report: Report;
-	export let selectedProjects: string[];
+	export let reportProjects: Project[];
 	export let editId: number;
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;
@@ -25,13 +26,13 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	$: chartOptions = (
-		selectedProjects.length > 0
-			? zenoClient.getChartsForProjects(selectedProjects)
+		reportProjects.length > 0
+			? zenoClient.getChartsForProjects(reportProjects.map((p) => p.uuid))
 			: new Promise(() => [] as Chart[])
 	) as Promise<Chart[]>;
 	$: sliceOptions = (
-		selectedProjects.length > 0
-			? zenoClient.getSlicesForProjects(selectedProjects)
+		reportProjects.length > 0
+			? zenoClient.getSlicesForProjects(reportProjects.map((p) => p.uuid))
 			: new Promise(() => [] as Slice[])
 	) as Promise<Slice[]>;
 </script>
@@ -75,7 +76,13 @@
 				<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
 					<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
 						{#await sliceOptions then sliceOptions}
-							<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+							<ElementEdit
+								bind:element
+								{chartOptions}
+								{sliceOptions}
+								{reportProjects}
+								reportId={report.id}
+							/>
 						{/await}
 					</div>
 					<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>

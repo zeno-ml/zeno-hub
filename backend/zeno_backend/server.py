@@ -26,19 +26,20 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.homepage import HomepageData
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
-    ProjectDetails,
+    ProjectsRequest,
     ProjectState,
 )
 from zeno_backend.classes.report import (
     Report,
-    ReportDetails,
     ReportElement,
     ReportResponse,
+    ReportsRequest,
     SliceElementOptions,
     SliceElementSpec,
 )
@@ -142,20 +143,6 @@ def get_server() -> FastAPI:
         return select.organization_names()
 
     @api_app.get(
-        "/data/{project}",
-        response_model=bytes,
-        tags=["zeno"],
-    )
-    def get_data(project: str, data_id: str, request: Request):
-        if not util.project_access_valid(project, request):
-            return Response(status_code=401)
-        file_path = Path("data", project, data_id)
-        if not Path.is_file(file_path):
-            return Response(status_code=404)
-        blob = open(file_path, "rb").read()
-        return Response(blob)
-
-    @api_app.get(
         "/models/{project}",
         response_model=list[str],
         tags=["zeno"],
@@ -209,16 +196,6 @@ def get_server() -> FastAPI:
         if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         return select.charts(project_uuid)
-
-    @api_app.get(
-        "/columns/{project}",
-        response_model=list[ZenoColumn],
-        tags=["zeno"],
-    )
-    def get_columns(project: str, request: Request):
-        if not util.project_access_valid(project, request):
-            return Response(status_code=401)
-        return select.columns(project)
 
     @api_app.get(
         "/tags/{project}",
@@ -468,97 +445,64 @@ def get_server() -> FastAPI:
             return Response(status_code=401)
         return uuid
 
-    @api_app.get(
-        "/projects-details",
-        response_model=list[ProjectDetails],
-        tags=["zeno"],
-    )
-    def get_projects_details(current_user=Depends(auth.claim())):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        projects = select.projects(user)
-        project_stats = []
-        for proj in projects:
-            project_stats.append(select.project_stats(proj.uuid, user.id))
-        return [
-            ProjectDetails(project=proj, statistics=project_stats[i])
-            for i, proj in enumerate(projects)
-        ]
-
-    @api_app.get(
-        "/public-projects-details",
-        response_model=list[ProjectDetails],
-        tags=["zeno"],
-    )
-    def get_public_projects_details(req: Request):
-        user = util.get_user_from_token(req)
-        projects = select.public_projects()
-        project_stats = []
-        for proj in projects:
-            project_stats.append(
-                select.project_stats(proj.uuid, user.id if user else None)
-            )
-        return [
-            ProjectDetails(project=proj, statistics=project_stats[i])
-            for i, proj in enumerate(projects)
-        ]
-
-    @api_app.get(
+    @api_app.post(
         "/projects",
         response_model=list[Project],
         tags=["zeno"],
     )
-    def get_projects(current_user=Depends(auth.claim())):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.projects(user)
-
-    @api_app.get(
-        "/reports-details",
-        response_model=list[ReportDetails],
-        tags=["zeno"],
-    )
-    def get_reports_details(current_user=Depends(auth.claim())):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        reports = select.reports(user)
-        report_stats = []
-        for rep in reports:
-            report_stats.append(select.report_stats(rep.id, user.id))
-        return [
-            ReportDetails(report=rep, statistics=report_stats[i])
-            for i, rep in enumerate(reports)
-        ]
-
-    @api_app.get(
-        "/public-reports-details",
-        response_model=list[ReportDetails],
-        tags=["zeno"],
-    )
-    def get_public_reports_details(req: Request):
+    def get_projects(projects_request: ProjectsRequest, req: Request):
         user = util.get_user_from_token(req)
-        reports = select.public_reports()
-        report_stats = []
-        for rep in reports:
-            report_stats.append(select.report_stats(rep.id, user.id if user else None))
-        return [
-            ReportDetails(report=rep, statistics=report_stats[i])
-            for i, rep in enumerate(reports)
-        ]
+        if projects_request.user is None:
+            return select.public_projects(projects_request)
 
-    @api_app.get(
+        if user is None or projects_request.user != user.name:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        return select.projects(user, projects_request)
+
+    @api_app.post(
         "/reports",
         response_model=list[Report],
         tags=["zeno"],
     )
-    def get_reports(current_user=Depends(auth.claim())):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.reports(user)
+    def get_reports(reports_request: ReportsRequest, req: Request):
+        user = util.get_user_from_token(req)
+        if reports_request.user is None:
+            return select.public_reports(reports_request)
+
+        if user is None or reports_request.user != user.name:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        return select.reports(user, reports_request)
+
+    @api_app.get("/homepage/", response_model=HomepageData, tags=["zeno"])
+    def get_public_homepage_data(req: Request):
+        projects = select.public_projects(ProjectsRequest(limit=6))
+        reports = select.public_reports(ReportsRequest(limit=6))
+        return HomepageData(
+            projects=projects,
+            reports=reports,
+            num_projects=select.project_count(),
+            num_reports=select.report_count(),
+        )
+
+    @api_app.get("/homepage/{user}", response_model=HomepageData, tags=["zeno"])
+    def get_homepage_data(user: str, req: Request):
+        user_obj = util.get_user_from_token(req)
+        if user_obj is None or user_obj.name != user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        projects = select.projects(user_obj, ProjectsRequest(limit=6))
+        reports = select.reports(user_obj, ReportsRequest(limit=6))
+        return HomepageData(
+            projects=projects,
+            reports=reports,
+            num_projects=select.project_count(user_obj),
+            num_reports=select.report_count(user_obj),
+        )
 
     @api_app.post("/like-report/{report_id}", tags=["zeno"])
     def like_report(report_id: int, current_user=Depends(auth.claim())):

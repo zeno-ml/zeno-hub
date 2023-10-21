@@ -1,13 +1,16 @@
-import type { AuthUser } from '$lib/auth/types';
-import { redirect } from '@sveltejs/kit';
+import { getClient } from '$lib/api/client';
 
-export async function load({ cookies }) {
-	const userCookie = cookies.get('loggedIn');
+export async function load({ cookies, url, depends }) {
+	depends('app:projects');
+	depends('app:reports');
 
-	if (!userCookie) {
-		throw redirect(303, '/projects');
-	} else {
-		const cognitoUser = JSON.parse(userCookie) as AuthUser;
-		throw redirect(303, '/' + cognitoUser.name + '/projects');
-	}
+	const zenoClient = await getClient(cookies, url);
+	const homepageData = await zenoClient.getPublicHomepageData();
+
+	return {
+		projects: homepageData.projects,
+		reports: homepageData.reports,
+		numProjects: homepageData.numProjects,
+		numReports: homepageData.numReports
+	};
 }
