@@ -931,16 +931,26 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
         ProjectStats | None: statistics of the specified project.
     """
     with Database() as db:
-        num_instances = db.execute_return(
-            sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project_uuid))
+        has_data = db.execute_return(
+            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
+            "table_schema = 'public' AND table_name = %s);",
+            [project_uuid],
         )
+        if len(has_data) > 0 and has_data[0][0]:
+            num_instances = db.execute_return(
+                sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project_uuid))
+            )[0][0]
+            num_models = db.execute_return(
+                sql.SQL("SELECT COUNT(DISTINCT model) FROM {};").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
+                )
+            )[0][0]
+        else:
+            num_instances = 0
+            num_models = 0
+
         num_charts = db.execute_return(
             "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project_uuid]
-        )
-        num_models = db.execute_return(
-            sql.SQL("SELECT COUNT(DISTINCT model) " "FROM {};").format(
-                sql.Identifier(f"{project_uuid}_column_map")
-            )
         )
         num_likes = db.execute_return(
             "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
@@ -958,18 +968,12 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
             else:
                 user_liked = False
 
-        return (
-            ProjectStats(
-                num_instances=num_instances[0][0]
-                if isinstance(num_instances[0][0], int)
-                else 0,
-                num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
-                num_models=num_models[0][0] if isinstance(num_models[0][0], int) else 0,
-                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
-                user_liked=user_liked,
-            )
-            if len(num_charts) > 0 and len(num_instances) > 0 and len(num_models) > 0
-            else None
+        return ProjectStats(
+            num_instances=num_instances,
+            num_models=num_models,
+            num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
+            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+            user_liked=user_liked,
         )
 
 
