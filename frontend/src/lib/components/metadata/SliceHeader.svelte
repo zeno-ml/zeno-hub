@@ -31,8 +31,8 @@
 {/if}
 <div
 	class="sticky {$models.length > 0
-		? 'top-14'
-		: '-top-5'} bg-yellowish-light flex items-center justify-between z-10 min-h-[40px]"
+		? 'top-16'
+		: '-top-2'} bg-yellowish-light flex items-center justify-between z-10 min-h-[40px]"
 >
 	<div class="flex items-center justify-between">
 		<h4>Slices</h4>

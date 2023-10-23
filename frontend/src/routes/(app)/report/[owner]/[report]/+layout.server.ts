@@ -10,7 +10,9 @@ export async function load({ cookies, params, url }) {
 		return {
 			report: reportResponse.report,
 			reportElements: reportResponse.reportElements,
-			cognitoUser: cognitoUser
+			cognitoUser: cognitoUser,
+			numLikes: reportResponse.numLikes,
+			userLiked: reportResponse.userLiked
 		};
 	} catch (e: unknown) {
 		if ((e as ApiError).status === 401) {

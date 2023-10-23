@@ -22,6 +22,8 @@ import type { ZenoColumn } from './ZenoColumn';
  * tags (list[Tag]): tags in the project.
  * folders (list[Folder]): folders in the project.
  * has_data (bool): whether the project has data instances.
+ * num_likes (int): number of likes the report has.
+ * user_liked (bool): whether the current user has liked the report.
  */
 export type ProjectState = {
 	project: Project;
@@ -32,4 +34,6 @@ export type ProjectState = {
 	tags: Array<Tag>;
 	folders: Array<Folder>;
 	hasData: boolean;
+	numLikes: number;
+	userLiked: boolean;
 };

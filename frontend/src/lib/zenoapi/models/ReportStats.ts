@@ -16,5 +16,5 @@ export type ReportStats = {
 	numProjects: number;
 	numElements: number;
 	numLikes: number;
-	userLiked?: boolean;
+	userLiked: boolean;
 };

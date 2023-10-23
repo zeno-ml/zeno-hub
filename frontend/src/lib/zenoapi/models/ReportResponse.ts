@@ -12,8 +12,12 @@ import type { ReportElement } from './ReportElement';
  * Attributes:
  * report (Report): the report itself.
  * report_elements (list[ReportElement]): all elements of the report.
+ * num_likes (int): number of likes the report has.
+ * user_liked (bool): whether the current user has liked the report.
  */
 export type ReportResponse = {
 	report: Report;
 	reportElements: Array<ReportElement>;
+	numLikes: number;
+	userLiked: boolean;
 };

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import LikeButton from '$lib/components/general/LikeButton.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
@@ -14,6 +15,8 @@
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let dragEnabled = false;
+	let likes = data.numLikes;
+	let liked = data.userLiked;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -82,6 +85,13 @@
 			<h1 class="text-5xl mr-6 text-grey-darkest">
 				{data.report.name}
 			</h1>
+			<LikeButton
+				on:like={() => zenoClient.likeReport(data.report.id)}
+				user={data.user}
+				bind:likes
+				bind:liked
+				report
+			/>
 		</div>
 		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
 		<hr class="mt-4 bg-grey-dark" />
