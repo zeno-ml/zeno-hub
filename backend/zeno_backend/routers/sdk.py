@@ -348,6 +348,27 @@ async def upload_system(
         )
 
 
+@router.delete("/system/{project_uuid}/{system_name}")
+async def delete_system(project_uuid: str, system_name: str):
+    """Delete a system from a Zeno project.
+
+    Args:
+        project_uuid (str): the UUID of the project to delete the system from.
+        system_name (str): the name of the system.
+    """
+    await delete.system(project_uuid, system_name)
+
+
+@router.delete("/systems/{project_uuid}")
+async def delete_all_systems(project_uuid: str):
+    """Delete all systems from a Zeno project.
+
+    Args:
+        project_uuid (str): the UUID of the project to delete systems from.
+    """
+    await delete.systems(project_uuid)
+
+
 @router.get("/min-client-version")
 def min_client_version():
     """Get the minimum client version required to use the server."""
