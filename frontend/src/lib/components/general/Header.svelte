@@ -63,7 +63,7 @@
 						icon={mdiCompassOutline}
 						on:click={() => goto(getProjectRouteFromURL($page.url))}
 					/>
-					{#if $models.length > 1}
+					{#if $models.length > 1 && $project.view !== 'tabular'}
 						<HeaderIcon
 							pageName={'compare'}
 							tooltipContent={'Qualitatively compare system outputs'}

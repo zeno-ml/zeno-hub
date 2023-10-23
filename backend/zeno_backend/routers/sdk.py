@@ -22,6 +22,7 @@ from zeno_backend.database import delete, insert, select, update
 
 # MUST reflect views in frontend/src/lib/components/instance-views/views/viewMap.ts
 VIEWS = [
+    "tabular",
     "audio-transcription",
     "chatbot",
     "code-generation",
@@ -160,7 +161,7 @@ def create_project(
 async def upload_dataset_schema(
     project_uuid=Form(...),
     id_column=Form(...),
-    data_column=Form(...),
+    data_column=Form(None),
     label_column=Form(None),
     file: UploadFile = File(...),
     api_key=Depends(APIKeyBearer()),
