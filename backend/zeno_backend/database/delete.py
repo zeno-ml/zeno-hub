@@ -265,3 +265,33 @@ async def system(project_uuid: str, system_name: str):
                     [column[0]],
                 )
             await conn.commit()
+
+
+async def systems(project_uuid: str):
+    """Delete all systems from a project.
+
+    Args:
+        project_uuid (str): id of the project to delete all systems from.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT column_id FROM {} WHERE model IS NOT NULL;").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
+                )
+            )
+            columns = await cur.fetchall()
+            for column in columns:
+                await cur.execute(
+                    sql.SQL("ALTER TABLE {} DROP COLUMN IF EXISTS {};").format(
+                        sql.Identifier(project_uuid),
+                        sql.Identifier(column[0]),
+                    )
+                )
+                await cur.execute(
+                    sql.SQL("DELETE FROM {} WHERE column_id = %s;").format(
+                        sql.Identifier(f"{project_uuid}_column_map")
+                    ),
+                    [column[0]],
+                )
+            await conn.commit()
