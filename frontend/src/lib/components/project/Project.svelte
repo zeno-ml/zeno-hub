@@ -73,7 +73,7 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md"
+	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md max-h-60"
 >
 	<div class="flex flex-col w-full">
 		<div class="flex justify-between items-center">
@@ -135,7 +135,7 @@
 		</div>
 	</div>
 	<p class="mr-2 text-base truncate flex-shrink-0">{project.ownerName}</p>
-	<p class="my-2 mr-2 text-sm text-left overflow-y-auto flex-grow">
+	<p class="my-2 mr-2 text-sm text-left flex-grow text-ellipsis w-full line-clamp-4">
 		{project.description}
 	</p>
 	{#if stats !== null && stats !== undefined}
