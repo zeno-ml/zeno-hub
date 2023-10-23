@@ -40,7 +40,7 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         db.execute(
             "INSERT INTO projects (uuid, name, owner_id, view, "
             + "samples_per_page, public, description) "
-            + "VALUES (%s,%s,%s,%s,%s,,%s,%s);",
+            + "VALUES (%s,%s,%s,%s,%s,%s,%s);",
             [
                 new_uuid,
                 copy_spec.name,
