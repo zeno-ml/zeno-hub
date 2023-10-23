@@ -20,7 +20,7 @@
 	</Banner>
 	<br />
 {/if}
-<div class="flex flex-wrap mb-6 h-full content-start">
+<div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
 	{#each ownProjects as project}
 		<Project project={project.project} stats={project.statistics} user={data.user} deletable />
 	{/each}
