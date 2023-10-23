@@ -17,6 +17,7 @@
 	export let updatePredicates: (predicates: FilterPredicate[]) => void;
 
 	let view: View;
+	let timer: ReturnType<typeof setTimeout>;
 
 	$: if (view) {
 		view.removeSignalListener('brush', setSelection);
@@ -26,7 +27,6 @@
 		view.addSignalListener('brush', setSelection);
 	}
 
-	let timer: ReturnType<typeof setTimeout>;
 	function setSelection(_: string, entry: Record<string, [number, number]>) {
 		clearTimeout(timer);
 		if (entry.bucket === undefined) {
@@ -57,16 +57,14 @@
 </script>
 
 <!-- We shallow copy histogram to remove the vega identifiers and force it to update the chart when new data is passed in. -->
-<div id="histogram">
-	<VegaLite
-		bind:view
-		spec={continuousVegaSpec($metricRange)}
-		data={{ table: histogram.map((h) => Object.assign({}, h)) }}
-		options={{
-			tooltip: true,
-			actions: false,
-			theme: 'vox',
-			renderer: 'svg'
-		}}
-	/>
-</div>
+<VegaLite
+	bind:view
+	spec={continuousVegaSpec($metricRange)}
+	data={{ table: histogram.map((h) => Object.assign({}, h)) }}
+	options={{
+		tooltip: true,
+		actions: false,
+		theme: 'vox',
+		renderer: 'svg'
+	}}
+/>
