@@ -20,8 +20,8 @@
 	let localSelection: number[] = [];
 	let localSelectionX: number[] = [];
 
-	function updateSel() {
-		if (filterPredicates.length !== 0) {
+	function updateSel(filterPreds: FilterPredicate[]) {
+		if (filterPreds.length !== 0) {
 			view.signal('brush', { bucket: localSelection });
 			view.signal('brush_x', localSelectionX);
 		} else {
@@ -31,13 +31,13 @@
 		view.runAsync();
 	}
 
-	$: if (view && filterPredicates) {
-		updateSel();
-	}
-
 	$: if (view) {
 		view.addSignalListener('brush', (...s) => (localSelection = s[1].bucket ? s[1].bucket : []));
 		view.addSignalListener('brush_x', (...s) => (localSelectionX = s[1]));
+	}
+
+	$: if (view) {
+		updateSel(filterPredicates);
 	}
 
 	function setSelection() {
@@ -57,13 +57,17 @@
 		} else {
 			filterPredicates = [];
 		}
-		window.removeEventListener('mouseup', setSelection);
 		updatePredicates(filterPredicates);
 	}
+
+	const endDrag = () => {
+		window.removeEventListener('mouseup', endDrag);
+		setSelection();
+	};
 </script>
 
 <!-- We shallow copy histogram to remove the vega identifiers and force it to update the chart when new data is passed in. -->
-<div id="histogram" on:mousedown={() => window.addEventListener('mouseup', setSelection)}>
+<div id="histogram" on:mousedown={() => window.addEventListener('mouseup', endDrag)}>
 	<VegaLite
 		bind:view
 		spec={continuousVegaSpec($metricRange)}
