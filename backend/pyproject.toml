@@ -10,7 +10,7 @@ homepage = "https://zenoml.com"
 [tool.poetry.dependencies]
 aiofiles = "^23.2.1"
 cognitojwt = "^1.4.1"
-fastapi = "^0.103.2"
+fastapi = "^0.104.0"
 fastapi-cloudauth = "^0.4.3"
 inquirer = "^3.1.2"
 nest-asyncio = "^1.5.8"
