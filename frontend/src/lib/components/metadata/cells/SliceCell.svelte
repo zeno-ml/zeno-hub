@@ -152,6 +152,7 @@
 	{/if}
 	<div class="flex items-center w-full justify-between">
 		<span
+			role="tooltip"
 			on:mouseover={() => (showTooltip = true)}
 			on:mouseout={() => (showTooltip = false)}
 			on:focus={() => (showTooltip = true)}

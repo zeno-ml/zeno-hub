@@ -31,14 +31,13 @@
 	};
 </script>
 
-<div
+<button
 	class="flex flex-col border-2 border-grey-light rounded-lg bg-background h-20 w-[105px] items-center p-2 m-1 hover:bg-primary-light cursor-pointer {chart.type ===
 	type
 		? 'bg-primary-light'
 		: ''}"
-	on:keydown={() => ({})}
 	on:click={() => updateChartType(type)}
 >
 	<svelte:component this={iconMap[type]} />
 	<h4 class="mt-1">{titleMap[type]}</h4>
-</div>
+</button>

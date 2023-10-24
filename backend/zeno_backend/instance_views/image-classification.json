@@ -1,0 +1,5 @@
+{
+  "data": { "type": "image" },
+  "label": { "type": "text" },
+  "output": { "type": "text" }
+}

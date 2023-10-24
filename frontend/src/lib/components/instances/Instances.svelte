@@ -19,11 +19,9 @@
 		type Slice
 	} from '$lib/zenoapi';
 	import { getContext, onMount } from 'svelte';
-	import SelectionBar from '../metadata/SelectionBar.svelte';
 	import ComparisonView from './ComparisonView.svelte';
 	import ListView from './ListView.svelte';
 	import TableView from './TableView.svelte';
-	import { optionsMap } from './views/viewMap';
 
 	export let compare: boolean;
 
@@ -34,7 +32,6 @@
 	let modelAResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let modelBResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let numberOfInstances = 0;
-	let viewOptions: Record<string, unknown> | undefined = undefined;
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
 	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
@@ -105,24 +102,17 @@
 	});
 </script>
 
-<div class="flex justify-between align-center">
-	<SelectionBar bind:selected {currentResult}>
-		{#if optionsMap[$project.view] !== undefined}
-			<svelte:component this={optionsMap[$project.view]} bind:viewOptions />
-		{/if}
-	</SelectionBar>
-</div>
 {#if compare && $metric && $model}
 	{#if $comparisonModel !== undefined}
-		<ComparisonView {modelAResult} {modelBResult} {viewOptions} />
+		<ComparisonView {modelAResult} {modelBResult} />
 	{/if}
 {:else if $editTag !== undefined}
-	<TableView {numberOfInstances} {viewOptions} />
+	<TableView {numberOfInstances} />
 {:else}
 	{#if selected === 'list'}
-		<ListView {numberOfInstances} {viewOptions} />
+		<ListView {numberOfInstances} />
 	{/if}
 	{#if selected === 'table'}
-		<TableView {numberOfInstances} {viewOptions} />
+		<TableView {numberOfInstances} />
 	{/if}
 {/if}

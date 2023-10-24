@@ -96,7 +96,7 @@
 		</div>
 	</Confirm>
 {/if}
-<div
+<button
 	class="relative flex justify-between px-2.5 mt-1 rounded h-9 bg-grey-lighter {dragOver
 		? 'bg-grey-light'
 		: ''} {expandFolder ? 'mb-0' : ''}"
@@ -110,7 +110,7 @@
 	on:drop={dragDropped}
 >
 	<div class="flex items-center">
-		<div
+		<button
 			style="width: 24px; height: 24px; cursor: pointer; margin-right: 10px;"
 			on:keydown={() => ({})}
 			on:click={() => (expandFolder = !expandFolder)}
@@ -118,7 +118,7 @@
 			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={expandFolder ? mdiChevronDown : mdiChevronRight} />
 			</Icon>
-		</div>
+		</button>
 		{folder.name}
 	</div>
 	<div class="flex items-center" use:clickOutside={() => (showOptions = false)}>
@@ -126,7 +126,7 @@
 			<div class="top-0 right-0 absolute mt-9 z-10">
 				<Paper style="padding: 3px 0px;" elevation={7}>
 					<Content>
-						<div
+						<button
 							class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 							on:keydown={() => ({})}
 							on:click={(e) => {
@@ -137,8 +137,8 @@
 						>
 							<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;
 							<span class="text-xs">Edit</span>
-						</div>
-						<div
+						</button>
+						<button
 							class="flex items-center cursor-pointer w-20 py px-2 hover:bg-grey-lighter"
 							on:keydown={() => ({})}
 							on:click={(e) => {
@@ -149,7 +149,7 @@
 						>
 							<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
 							<span class="text-xs">Remove</span>
-						</div>
+						</button>
 					</Content>
 				</Paper>
 			</div>
@@ -176,7 +176,7 @@
 			</div>
 		</div>
 	</div>
-</div>
+</button>
 {#if expandFolder}
 	<div transition:slide class="ml-9">
 		{#each sls as s}

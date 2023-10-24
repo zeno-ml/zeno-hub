@@ -15,20 +15,15 @@
 </script>
 
 <div class="flex items-center cursor-pointer ml-5 mt-5">
-	<div
+	<button
 		class="flex items-center cursor-pointer"
-		on:keydown={() => ({})}
 		on:click={() => {
 			goto($page.url.href.split('?')[0].substring(0, $page.url.href.lastIndexOf('/')));
 		}}
-		on:focus={() => ({})}
-		on:mouseover={() => {
-			ishover = true;
-		}}
-		on:blur={() => ({})}
-		on:mouseout={() => {
-			ishover = false;
-		}}
+		on:focus={() => (ishover = true)}
+		on:mouseover={() => (ishover = true)}
+		on:blur={() => (ishover = false)}
+		on:mouseout={() => (ishover = false)}
 	>
 		<SmuiElement
 			tag="svg"
@@ -38,7 +33,7 @@
 			<path class="fill-{ishover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
 		</SmuiElement>
 		<h4 class="text-grey-dark hover:text-black mr-4">Back to Chart Home</h4>
-	</div>
+	</button>
 	{#if $project.editor}
 		<Button
 			variant="raised"

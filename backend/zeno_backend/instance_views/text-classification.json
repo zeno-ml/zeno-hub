@@ -1,0 +1,5 @@
+{
+  "data": { "type": "text" },
+  "label": { "type": "text" },
+  "output": { "type": "text" }
+}

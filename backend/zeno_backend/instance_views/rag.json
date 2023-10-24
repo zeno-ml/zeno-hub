@@ -1,0 +1,24 @@
+{
+  "data": { "type": "text" },
+  "label": { "type": "text" },
+  "output": {
+    "type": "vstack",
+    "keys": {
+      "answer": { "type": "text" },
+      "retrieved": {
+        "type": "list",
+        "elements": {
+          "type": "vstack",
+          "keys": {
+            "score": { "type": "text", "label": "score: " },
+            "reference": { "type": "text", "label": "id: " },
+            "text": { "type": "text", "label": "text: " }
+          }
+        },
+        "collapsible": "bottom",
+        "border": true,
+        "pad": true
+      }
+    }
+  }
+}

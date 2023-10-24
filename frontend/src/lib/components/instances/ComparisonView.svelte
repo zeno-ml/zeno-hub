@@ -20,10 +20,9 @@
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import Select, { Option } from '@smui/select';
+	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
-	import { viewMap } from './views/viewMap';
 
-	export let viewOptions: Record<string, unknown> | undefined;
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
 	export let modelBResult: Promise<GroupMetric[] | undefined>;
 
@@ -263,40 +262,36 @@
 				<tbody>
 					{#each table as tableContent (tableContent[idColumn])}
 						<tr>
-							{#if viewMap[$project.view] !== undefined}
-								<td class="p-3 align-baseline">
-									<p class="mb-2">
-										<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-										{modelValueAndDiff($model, tableContent)}
-									</p>
-									<div class="instance">
-										<svelte:component
-											this={viewMap[$project.view]}
-											options={viewOptions}
-											entry={tableContent}
-											{dataColumn}
-											modelColumn={modelAColumn?.id}
-											{labelColumn}
-										/>
-									</div>
-								</td>
-								<td class="p-3 align-baseline">
-									<p class="mb-2">
-										<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-										{modelValueAndDiff($comparisonModel, tableContent)}
-									</p>
-									<div class="instance">
-										<svelte:component
-											this={viewMap[$project.view]}
-											options={viewOptions}
-											entry={tableContent}
-											{dataColumn}
-											modelColumn={modelBColumn?.id}
-											{labelColumn}
-										/>
-									</div>
-								</td>
-							{/if}
+							<td class="p-3 align-baseline">
+								<p class="mb-2">
+									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+									{modelValueAndDiff($model, tableContent)}
+								</p>
+								<div class="instance">
+									<InstanceView
+										view={$project.view}
+										{dataColumn}
+										{labelColumn}
+										modelColumn={modelAColumn?.id}
+										entry={tableContent}
+									/>
+								</div>
+							</td>
+							<td class="p-3 align-baseline">
+								<p class="mb-2">
+									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+									{modelValueAndDiff($comparisonModel, tableContent)}
+								</p>
+								<div class="instance">
+									<InstanceView
+										view={$project.view}
+										{dataColumn}
+										{labelColumn}
+										modelColumn={modelBColumn?.id}
+										entry={tableContent}
+									/>
+								</div>
+							</td>
 							{#if $model !== undefined && $comparisonModel !== undefined}
 								<td class="p-3 align-text-top"
 									>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS

@@ -45,7 +45,7 @@
 {#if histogram}
 	<div class="flex px-1 w-full">
 		<div style:width="{widthScale(histogram[0].filteredSize ?? 0)}%">
-			<div
+			<button
 				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl text-background {selectedValue !==
 					null && selectedValue === true
 					? 'border-primary-mid'
@@ -55,11 +55,11 @@
 				on:keydown={() => setSelection(true)}
 			>
 				<Label>True</Label>
-			</div>
+			</button>
 			<span class="text-xs">{histogram[0].filteredSize} / {histogram[0].size}</span>
 		</div>
 		<div style:width="{widthScale(histogram[1].filteredSize ?? 0)}%">
-			<div
+			<button
 				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl text-background {selectedValue !==
 					null && selectedValue === false
 					? 'border-primary-mid'
@@ -69,7 +69,7 @@
 				on:keydown={() => setSelection(false)}
 			>
 				<Label>False</Label>
-			</div>
+			</button>
 			<span class="text-xs">{histogram[1].filteredSize} / {histogram[1].size}</span>
 		</div>
 	</div>
