@@ -9,7 +9,7 @@
 		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white overflow-y-scroll">
+<div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
@@ -88,7 +88,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="mt-6 flex flex-col">
+	<div class="mt-6 flex flex-col min-h-0">
 		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>
