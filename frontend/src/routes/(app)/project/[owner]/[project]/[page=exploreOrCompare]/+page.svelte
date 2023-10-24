@@ -33,7 +33,7 @@
 		</Banner>
 	</div>
 {:else}
-	<div class="flex flex-col w-full h-full min-h-0">
+	<div class="flex flex-col flex-grow min-w-0 h-full min-h-0">
 		<ProjectHeader
 			project={data.project}
 			likes={data.numLikes}
