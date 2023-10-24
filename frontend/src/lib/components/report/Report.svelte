@@ -23,8 +23,6 @@
 	let showOptions = false;
 	let hovering = false;
 	let showConfirmDelete = false;
-	let likes = stats.numLikes;
-	let liked = stats.userLiked;
 </script>
 
 {#if showConfirmDelete}
@@ -117,8 +115,8 @@
 		</Tooltip>
 		<LikeButton
 			on:like={() => zenoClient.likeReport(report.id)}
-			bind:likes
-			bind:liked
+			likes={stats.numLikes}
+			liked={stats.userLiked}
 			{user}
 			report
 		/>

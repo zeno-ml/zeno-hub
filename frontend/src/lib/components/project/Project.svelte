@@ -141,8 +141,8 @@
 		<LikeButton
 			on:like={() => zenoClient.likeProject(project.uuid)}
 			{user}
-			bind:likes={stats.numLikes}
-			bind:liked={stats.userLiked}
+			likes={stats.numLikes}
+			liked={stats.userLiked}
 		/>
 	</div>
 </button>

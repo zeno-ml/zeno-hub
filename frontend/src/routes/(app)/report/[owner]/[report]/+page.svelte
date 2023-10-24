@@ -15,8 +15,6 @@
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let dragEnabled = false;
-	let likes = data.numLikes;
-	let liked = data.userLiked;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -88,8 +86,8 @@
 			<LikeButton
 				on:like={() => zenoClient.likeReport(data.report.id)}
 				user={data.user}
-				bind:likes
-				bind:liked
+				likes={data.numLikes}
+				liked={data.userLiked}
 				report
 			/>
 		</div>

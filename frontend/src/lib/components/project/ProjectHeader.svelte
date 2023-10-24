@@ -16,5 +16,5 @@
 		<h1 class="text-xl font-semibold">{project.name}</h1>
 		<p>{project.description}</p>
 	</div>
-	<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} bind:likes bind:liked {user} />
+	<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} {likes} {liked} {user} />
 </div>

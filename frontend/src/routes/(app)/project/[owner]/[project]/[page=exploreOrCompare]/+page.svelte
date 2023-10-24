@@ -8,8 +8,6 @@
 
 	export let data;
 
-	let likes = data.numLikes;
-	let liked = data.userLiked;
 	let width: number;
 </script>
 
@@ -36,7 +34,12 @@
 	</div>
 {:else}
 	<div class="flex flex-col w-full h-full min-h-0">
-		<ProjectHeader project={data.project} bind:likes bind:liked user={data.user} />
+		<ProjectHeader
+			project={data.project}
+			likes={data.numLikes}
+			liked={data.userLiked}
+			user={data.user}
+		/>
 		<div class="flex h-full min-h-0">
 			<MetadataPanel compare={data.compare} />
 			<div class="mx-5 flex flex-col flex-grow w-1">
