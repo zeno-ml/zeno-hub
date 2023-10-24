@@ -10,8 +10,6 @@
 
 	$: choices = $editTag !== undefined || $project.view === '' ? ['table'] : ['list', 'table'];
 	$: selected = choices[0];
-
-	$: console.log($project.view);
 </script>
 
 <div class="w-full">
