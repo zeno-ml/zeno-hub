@@ -10,11 +10,17 @@ from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
-from zeno_backend.classes.project import Project, ProjectState, ProjectStats
+from zeno_backend.classes.project import (
+    Project,
+    ProjectsRequest,
+    ProjectState,
+    ProjectStats,
+)
 from zeno_backend.classes.report import (
     Report,
     ReportElement,
     ReportResponse,
+    ReportsRequest,
     ReportStats,
     SliceElementOptions,
     SliceElementSpec,
@@ -31,6 +37,51 @@ from zeno_backend.database.database import Database, db_pool
 from zeno_backend.database.util import hash_api_key, match_instance_view
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
+
+PROJECTS_BASE_QUERY = sql.SQL(
+    """
+    (SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+    p.public, p.description, TRUE AS editor
+    FROM projects AS p
+    WHERE p.owner_id = %s
+    UNION
+    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+        p.public, p.description, up.editor
+    FROM projects AS p
+    LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
+    WHERE up.user_id = %s
+    UNION
+    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+        p.public, p.description, op.editor
+    FROM projects AS p
+    JOIN (SELECT op.project_uuid, uo.organization_id, editor
+            FROM user_organization AS uo
+            JOIN organization_project AS op
+            ON uo.organization_id = op.organization_id
+            WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid)
+    """
+)
+
+REPORTS_BASE_QUERY = sql.SQL(
+    """
+    (SELECT r.id, r.name, r.public, r.description, TRUE AS editor
+    FROM reports AS r
+    WHERE r.owner_id = %s
+    UNION
+    SELECT r.id, r.name, r.public, r.description, ur.editor
+    FROM reports AS r
+    LEFT JOIN user_report AS ur ON r.id = ur.report_id
+    WHERE ur.user_id = %s
+    UNION
+    SELECT r.id, r.name, r.public, r.description, orr.editor
+    FROM reports AS r
+    JOIN (SELECT orr.report_id, uo.organization_id, editor
+            FROM user_organization AS uo
+            JOIN organization_report AS orr
+            ON uo.organization_id = orr.organization_id
+            WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id)
+    """
+)
 
 
 def models(project: str) -> list[str]:
@@ -51,115 +102,95 @@ def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-def projects(user: User) -> list[Project]:
+def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
         user (User): the user for which to fetch the available projects.
+        projects_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: the projects that the user can interact with.
     """
     with Database() as db:
-        own_projects_result = db.execute_return(
-            "SELECT uuid, name, view, "
-            "samples_per_page, public, description FROM projects WHERE owner_id = %s;",
-            [user.id],
+        params = [user.id, user.id, user.id]
+        likes_query = sql.SQL(
+            "SELECT project_uuid, COUNT(*) as total_likes"
+            " FROM project_like GROUP BY project_uuid "
         )
-        own_projects = list(
-            map(
-                lambda project: Project(
-                    uuid=project[0],
-                    name=project[1],
-                    owner_name=user.name,
-                    view=match_instance_view(project[2]),
-                    samples_per_page=project[3],
-                    editor=True,
-                    public=project[4],
-                    description=project[5],
-                ),
-                own_projects_result,
+        projects_query = (
+            sql.SQL("WITH LikesSummary AS (")
+            + likes_query
+            + sql.SQL("),")
+            + sql.SQL(" CombinedProjects AS (")
+            + PROJECTS_BASE_QUERY
+            + sql.SQL(") ")
+            + sql.SQL(
+                "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
+                " CombinedProjects cp LEFT JOIN LikesSummary ls "
+                " ON cp.uuid = ls.project_uuid ORDER BY total_likes DESC "
             )
         )
+        if projects_request.limit:
+            projects_query += sql.SQL(" LIMIT %s ")
+            params += [projects_request.limit, projects_request.offset]
+        else:
+            params += [projects_request.offset]
+        projects_query += sql.SQL(" OFFSET %s; ")
+        projects_result = db.execute_return(projects_query, params)
 
-        user_projects_result = db.execute_return(
-            "SELECT p.uuid, p.name, p.owner_id, p.view, "
-            "p.samples_per_page, up.editor, p.public, "
-            "p.description FROM projects AS p JOIN user_project AS up "
-            "ON p.uuid = up.project_uuid WHERE up.user_id = %s;",
-            [user.id],
-        )
-        user_projects = []
-        for res in user_projects_result:
+        projects = []
+        for res in projects_result:
             owner_name = db.execute_return(
                 "SELECT name FROM users WHERE id = %s", [res[2]]
             )
-            if len(owner_name) != 0 and owner_name[0][0] != user.name:
+            if len(owner_name) != 0:
                 owner_name = owner_name[0][0]
-                user_projects.append(
+                projects.append(
                     Project(
                         uuid=res[0],
                         name=res[1],
                         owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
+                        view=res[3],
                         samples_per_page=res[4],
-                        editor=res[5],
-                        public=res[6],
-                        description=res[7],
+                        public=res[5],
+                        description=res[6],
+                        editor=res[7],
                     )
                 )
-
-        project_org_result = db.execute_return(
-            "SELECT p.uuid, p.name, p.owner_id, p.view,"
-            " p.samples_per_page, op.editor, p.public, p.description "
-            "FROM projects AS p JOIN (SELECT op.project_uuid, uo.organization_id, "
-            "editor FROM user_organization as uo JOIN organization_project as op"
-            " ON uo.organization_id = op.organization_id "
-            "WHERE user_id = %s) AS op ON p.uuid = op.project_uuid;",
-            [user.id],
-        )
-        org_projects = []
-        for res in project_org_result:
-            owner_name = db.execute_return(
-                "SELECT name FROM users WHERE id = %s", [res[2]]
-            )
-            if len(owner_name) != 0 and owner_name[0][0] != user.name:
-                owner_name = owner_name[0][0]
-                org_projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
-                        samples_per_page=res[4],
-                        editor=res[5],
-                        public=res[6],
-                        description=res[7],
-                    )
-                )
-        org_projects = list(
-            filter(
-                lambda project: not any(p.uuid == project.uuid for p in user_projects)
-                and not any(p.uuid == project.uuid for p in own_projects),
-                org_projects,
-            )
-        )
-        return own_projects + user_projects + org_projects
+        return projects
 
 
-def public_projects() -> list[Project]:
+def public_projects(projects_request: ProjectsRequest) -> list[Project]:
     """Fetch all publicly accessible projects.
+
+    Args:
+        projects_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: all publicly accessible projects.
     """
     with Database() as db:
-        project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, "
-            "samples_per_page, description FROM projects WHERE public IS TRUE;",
+        params = [projects_request.offset]
+        projects_query = sql.SQL(
+            "SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page, "
+            "p.description, p.public, COALESCE(ls.total_likes, 0) AS total_likes "
+            "FROM projects AS p "
+            "LEFT JOIN (SELECT project_uuid, COUNT(*) as total_likes "
+            "FROM project_like GROUP BY project_uuid) AS ls "
+            "ON p.uuid = ls.project_uuid "
+            "WHERE p.public IS TRUE "
+            "ORDER BY total_likes DESC "
         )
+        if projects_request.limit:
+            projects_query += sql.SQL(" LIMIT %s ")
+            params = [projects_request.limit] + params
+        projects_query += sql.SQL(" OFFSET %s;")
+
+        projects_result = db.execute_return(projects_query, params)
+
         projects = []
-        for res in project_result:
+        for res in projects_result:
             owner_name = db.execute_return(
                 "SELECT name FROM users WHERE id = %s;", [res[2]]
             )
@@ -170,7 +201,7 @@ def public_projects() -> list[Project]:
                         uuid=res[0],
                         name=res[1],
                         owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
+                        view=res[3],
                         samples_per_page=res[4],
                         editor=False,
                         public=True,
@@ -180,130 +211,92 @@ def public_projects() -> list[Project]:
         return projects
 
 
-def reports(user: User) -> list[Report]:
+def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
         user (User): the user for which to fetch the available reports.
+        reports_request (ReportsRequest): the request object.
 
     Returns:
         list[Report]: the reports that the user can interact with.
     """
     with Database() as db:
-        own_reports_result = db.execute_return(
-            "SELECT id, name, public, description FROM reports WHERE owner_id = %s;",
-            [user.id],
+        params = [user.id, user.id, user.id]
+        likes_query = sql.SQL(
+            "SELECT report_id, COUNT(*) as total_likes"
+            " FROM report_like GROUP BY report_id "
         )
-        own_reports = []
-        if own_reports_result is not None:
-            for report in own_reports_result:
-                linked_projects = db.execute_return(
-                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-                    [report[0]],
-                )
-                own_reports.append(
-                    Report(
-                        id=report[0],
-                        name=report[1],
-                        owner_name=user.name,
-                        linked_projects=[]
-                        if len(linked_projects) == 0
-                        else list(map(lambda linked: str(linked[0]), linked_projects)),
-                        editor=True,
-                        public=report[2],
-                        description=report[3],
-                    )
-                )
-
-        user_reports_result = db.execute_return(
-            "SELECT r.id, r.name, r.owner_id, ur.editor, r.public, r.description "
-            "FROM reports AS r JOIN user_report AS ur ON r.id = ur.report_id "
-            "WHERE ur.user_id = %s;",
-            [user.id],
-        )
-        user_reports = []
-        if user_reports_result is not None:
-            for res in user_reports_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s", [res[2]]
-                )
-                linked_projects = db.execute_return(
-                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-                    [res[0]],
-                )
-                if owner_name is not None:
-                    owner_name = owner_name[0][0]
-                    user_reports.append(
-                        Report(
-                            id=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            linked_projects=[]
-                            if len(linked_projects) == 0
-                            else list(
-                                map(lambda linked: str(linked[0]), linked_projects)
-                            ),
-                            editor=res[3],
-                            public=res[4],
-                            description=res[5],
-                        )
-                    )
-
-        report_org_result = db.execute_return(
-            "SELECT r.id, r.name, r.owner_id, op.editor, r.public, r.description "
-            "FROM reports AS r JOIN (SELECT op.report_id, uo.organization_id, "
-            "op.editor FROM user_organization as uo JOIN organization_report as op"
-            " ON uo.organization_id = op.organization_id "
-            "WHERE user_id = %s) AS op ON r.id = op.report_id;",
-            [user.id],
-        )
-        org_reports = []
-        if report_org_result is not None:
-            for res in report_org_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s", [res[2]]
-                )
-                linked_projects = db.execute_return(
-                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-                    [res[0]],
-                )
-                if owner_name is not None:
-                    owner_name = owner_name[0][0]
-                    org_reports.append(
-                        Report(
-                            id=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            linked_projects=[]
-                            if len(linked_projects) == 0
-                            else list(
-                                map(lambda linked: str(linked[0]), linked_projects)
-                            ),
-                            editor=res[3],
-                            public=res[4],
-                            description=res[5],
-                        )
-                    )
-        org_reports = list(
-            filter(
-                lambda report: not any(p.id == report.id for p in user_reports)
-                and not any(p.id == report.id for p in own_reports),
-                org_reports,
+        reports_query = (
+            sql.SQL("WITH LikesSummary AS (")
+            + likes_query
+            + sql.SQL("),")
+            + sql.SQL(" CombinedReports AS (")
+            + REPORTS_BASE_QUERY
+            + sql.SQL(") ")
+            + sql.SQL(
+                "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
+                " CombinedReports cp LEFT JOIN LikesSummary ls "
+                " ON cp.id = ls.report_id ORDER BY total_likes DESC "
             )
         )
-        return own_reports + user_reports + org_reports
+        if reports_request.limit:
+            reports_query += sql.SQL(" LIMIT %s ")
+            params += [reports_request.limit, reports_request.offset]
+        else:
+            params += [reports_request.offset]
+        reports_query += sql.SQL(" OFFSET %s; ")
+        reports_result = db.execute_return(reports_query, params)
+
+        reports = []
+        for report in reports_result:
+            linked_projects = db.execute_return(
+                "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                [report[0]],
+            )
+            reports.append(
+                Report(
+                    id=report[0],
+                    name=report[1],
+                    owner_name=user.name,
+                    linked_projects=[]
+                    if len(linked_projects) == 0
+                    else list(map(lambda linked: str(linked[0]), linked_projects)),
+                    editor=True,
+                    public=report[2],
+                    description=report[3],
+                )
+            )
+        return reports
 
 
-def public_reports() -> list[Report]:
+def public_reports(reports_request: ReportsRequest) -> list[Report]:
     """Fetch all publicly accessible reports.
+
+    Args:
+        reports_request (ReportsRequest): the request object.
 
     Returns:
         list[Report]: all publicly accessible reports.
     """
     with Database() as db:
-        report_result = db.execute_return(
-            "SELECT id, name, owner_id, description FROM reports WHERE public IS TRUE;",
+        params = [reports_request.offset]
+        reports_query = sql.SQL(
+            "SELECT r.id, r.name, r.owner_id, r.description, r.public,"
+            " COALESCE(ls.total_likes, 0) AS total_likes "
+            "FROM reports AS r "
+            "LEFT JOIN (SELECT report_id, COUNT(*) as total_likes "
+            "FROM report_like GROUP BY report_id) AS ls "
+            "ON r.id = ls.report_id "
+            "WHERE r.public IS TRUE "
+            "ORDER BY total_likes DESC "
         )
+        if reports_request.limit:
+            reports_query += sql.SQL(" LIMIT %s ")
+            params = [reports_request.limit] + params
+        reports_query += sql.SQL(" OFFSET %s; ")
+        report_result = db.execute_return(reports_query, params)
+
         reports = []
         if report_result is not None:
             for res in report_result:
@@ -332,6 +325,55 @@ def public_reports() -> list[Report]:
                         )
                     )
         return reports
+
+
+def project_count(user: User | None = None) -> int:
+    """Get the number of projects.
+
+    Args:
+        user (User | None): the user making the request.
+
+    Returns:
+        int: the number of projects.
+    """
+    db = Database()
+    if user is None:
+        res = db.connect_execute_return(
+            "SELECT COUNT(*) FROM projects WHERE public = TRUE;"
+        )
+    else:
+        res = db.connect_execute_return(
+            sql.SQL("SELECT COUNT(*) FROM") + PROJECTS_BASE_QUERY + sql.SQL(";"),
+            [user.id, user.id, user.id],
+        )
+
+    if len(res) > 0:
+        return res[0][0]
+    return 0
+
+
+def report_count(user: User | None = None) -> int:
+    """Get the number of reports.
+
+    Args:
+        user (User | None): the user making the request.
+
+    Returns:
+        int: the number of reports.
+    """
+    db = Database()
+    if user is None:
+        res = db.connect_execute_return(
+            "SELECT COUNT(*) FROM reports WHERE public = TRUE;"
+        )
+    else:
+        res = db.connect_execute_return(
+            sql.SQL("SELECT COUNT(*) FROM") + REPORTS_BASE_QUERY + sql.SQL(";"),
+            [user.id, user.id, user.id],
+        )
+    if len(res) > 0:
+        return res[0][0]
+    return 0
 
 
 def project_uuid(owner_name: str, project_name: str) -> str | None:
@@ -920,7 +962,7 @@ def project_state(
         )
 
 
-def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats | None:
+def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats:
     """Get statistics for a specified project.
 
     Args:
@@ -950,7 +992,7 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
             num_models = 0
 
         num_charts = db.execute_return(
-            "SELECT COUNT(*) FROM charts " "WHERE project_uuid = %s;", [project_uuid]
+            "SELECT COUNT(*) FROM charts WHERE project_uuid = %s;", [project_uuid]
         )
         num_likes = db.execute_return(
             "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
@@ -971,13 +1013,13 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
         return ProjectStats(
             num_instances=num_instances,
             num_models=num_models,
-            num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
-            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+            num_charts=num_charts[0][0],
+            num_likes=num_likes[0][0],
             user_liked=user_liked,
         )
 
 
-def report_stats(report_id: int, user_id: int | None = None) -> ReportStats | None:
+def report_stats(report_id: int, user_id: int | None = None) -> ReportStats:
     """Get statistics for a specified report.
 
     Args:
@@ -1011,19 +1053,11 @@ def report_stats(report_id: int, user_id: int | None = None) -> ReportStats | No
             else:
                 user_liked = False
 
-        return (
-            ReportStats(
-                num_projects=num_projects[0][0]
-                if isinstance(num_projects[0][0], int)
-                else 0,
-                num_elements=num_elements[0][0]
-                if isinstance(num_elements[0][0], int)
-                else 0,
-                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
-                user_liked=user_liked,
-            )
-            if len(num_projects) > 0 and len(num_elements) > 0
-            else None
+        return ReportStats(
+            num_projects=num_projects[0][0],
+            num_elements=num_elements[0][0],
+            num_likes=num_likes[0][0],
+            user_liked=user_liked,
         )
 
 

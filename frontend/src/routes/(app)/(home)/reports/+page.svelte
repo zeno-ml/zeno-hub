@@ -5,11 +5,7 @@
 </script>
 
 <div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
-	{#each data.publicReportDetails as reportDetail}
-		<Report
-			report={reportDetail.report}
-			stats={reportDetail.statistics}
-			loggedIn={data.user !== null}
-		/>
+	{#each data.reports as report, i}
+		<Report {report} stats={data.statistics[i]} loggedIn={data.user !== null} />
 	{/each}
 </div>
