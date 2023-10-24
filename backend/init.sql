@@ -12,7 +12,9 @@ CREATE TABLE projects (
     view text NOT NULL,
     samples_per_page integer NOT NULL DEFAULT 10,
     public boolean NOT NULL DEFAULT false,
-    description text NOT NULL DEFAULT ''
+    description text NOT NULL DEFAULT '',
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE charts (
@@ -20,7 +22,9 @@ CREATE TABLE charts (
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
     name text NOT NULL,
     type text NOT NULL,
-    parameters text NOT NULL
+    parameters text NOT NULL,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE reports (
@@ -28,7 +32,9 @@ CREATE TABLE reports (
     name text NOT NULL,
     owner_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     public boolean NOT NULL DEFAULT false,
-    description text NOT NULL DEFAULT ''
+    description text NOT NULL DEFAULT '',
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE report_elements (
@@ -117,11 +123,13 @@ CREATE TABLE organization_report (
 CREATE TABLE report_like (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE project_like (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
