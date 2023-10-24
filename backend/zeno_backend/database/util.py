@@ -63,4 +63,4 @@ def match_instance_view(view: str) -> str:
         return json.dumps(
             json.load(Path(f"zeno_backend/instance_views/{view}.json").open("r"))
         )
-    return json.dumps({"data": "text"})
+    return json.dumps({"data": {"type": "text"}})
