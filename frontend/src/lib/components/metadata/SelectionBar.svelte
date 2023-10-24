@@ -6,12 +6,12 @@
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
 	export let currentResult: Promise<GroupMetric[] | undefined>;
-	export let selected = 'list';
+	export let selected: string;
 
-	let CHOICES: string[];
+	$: choices = $editTag !== undefined || $project.view === '' ? ['table'] : ['list', 'table'];
+	$: selected = choices[0];
 
-	$: CHOICES =
-		$editTag === undefined ? ($project.view !== '' ? ['list', 'table'] : ['table']) : ['table'];
+	$: console.log($project.view);
 </script>
 
 <div class="w-full">
@@ -43,7 +43,7 @@
 				{#if $editTag === undefined}
 					<slot />
 					<Group>
-						{#each CHOICES as choice}
+						{#each choices as choice}
 							<Button
 								style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
 								variant="outlined"

@@ -27,7 +27,7 @@ class Project(CamelModel):
     description: str = ""
     metrics: list[Metric] = []
     owner_name: str
-    view: str
+    view: str = ""
     editor: bool
     samples_per_page: int = 10
     public: bool = False

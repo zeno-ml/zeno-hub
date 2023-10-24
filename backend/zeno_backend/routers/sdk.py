@@ -137,7 +137,7 @@ def create_project(
 async def upload_dataset_schema(
     project_uuid=Form(...),
     id_column=Form(...),
-    data_column=Form(...),
+    data_column=Form(None),
     label_column=Form(None),
     file: UploadFile = File(...),
     api_key=Depends(APIKeyBearer()),

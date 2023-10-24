@@ -132,15 +132,17 @@
 				{#if $editTag !== undefined}
 					<th class="p-3 font-semibold font-grey">Included</th>
 				{/if}
-				<th
-					class="p-3 font-semibold font-grey whitespace-nowrap"
-					on:click={() => (instanceHidden = !instanceHidden)}
-				>
-					instance
-					{#if instanceHidden}
-						<span class="ml-2 text-grey-darker">hidden</span>
-					{/if}
-				</th>
+				{#if $project.view}
+					<th
+						class="p-3 font-semibold font-grey whitespace-nowrap"
+						on:click={() => (instanceHidden = !instanceHidden)}
+					>
+						instance
+						{#if instanceHidden}
+							<span class="ml-2 text-grey-darker">hidden</span>
+						{/if}
+					</th>
+				{/if}
 				{#each columnHeader as header}
 					{#if header.id !== idColumn}
 						<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
@@ -172,21 +174,23 @@
 									<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
 								</td>
 							{/if}
-							<td class="p-3">
-								{#if instanceHidden}
-									<p class="text-center">...</p>
-								{:else}
-									<div class="instance">
-										<InstanceView
-											view={$project.view}
-											{dataColumn}
-											{labelColumn}
-											modelColumn={modelColumn?.id}
-											entry={tableContent}
-										/>
-									</div>
-								{/if}
-							</td>
+							{#if $project.view}
+								<td class="p-3">
+									{#if instanceHidden}
+										<p class="text-center">...</p>
+									{:else}
+										<div class="instance">
+											<InstanceView
+												view={$project.view}
+												{dataColumn}
+												{labelColumn}
+												modelColumn={modelColumn?.id}
+												entry={tableContent}
+											/>
+										</div>
+									{/if}
+								</td>
+							{/if}
 							{#each columnHeader as header}
 								{#if header.dataType === MetadataType.CONTINUOUS}
 									<td class="p-3 border border-grey-lighter align-top">

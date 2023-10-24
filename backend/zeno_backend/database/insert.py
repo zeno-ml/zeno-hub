@@ -108,8 +108,8 @@ def project(project_config: Project, owner_id: int):
 async def dataset_schema(
     project_uuid: str,
     id_column: str,
-    data_column: str,
-    label_column: str,
+    data_column: str | None,
+    label_column: str | None,
     pa_schema: Schema,
 ) -> list[str]:
     """Adding a dataset schema column_map to an existing project.
@@ -117,8 +117,8 @@ async def dataset_schema(
     Args:
         project_uuid (str): the project the user is currently working with.
         id_column (str): the column of the dataset that contains the ids.
-        data_column (str): the column of the dataset that contains the data.
-        label_column (str): the column of the dataset that contains the labels.
+        data_column (str | None): the column of the dataset that contains the data.
+        label_column (str | None): the column of the dataset that contains the labels.
         pa_schema (Schema): the PyArrow schema of the dataset to be added.
 
     Returns:
