@@ -41,22 +41,6 @@ class Report(CamelModel):
     description: str = ""
 
 
-class ReportStats(CamelModel):
-    """Statistics for a Zeno report.
-
-    Attributes:
-        num_projects (int): number of projects that are linked to the report.
-        num_elements (int): number of elements in the report.
-        num_likes (int): number of likes the report has.
-        user_liked (bool): whether the current user has liked the report.
-    """
-
-    num_projects: int
-    num_elements: int
-    num_likes: int
-    user_liked: bool
-
-
 class ReportElement(CamelModel):
     """Representation of an element of a Zeno report.
 
@@ -81,6 +65,22 @@ class ReportResponse(CamelModel):
 
     report: Report
     report_elements: list[ReportElement]
+
+
+class ReportStats(CamelModel):
+    """Statistics for a Zeno report.
+
+    Attributes:
+        num_projects (int): number of projects that are linked to the report.
+        num_elements (int): number of elements in the report.
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
+    """
+
+    num_projects: int
+    num_elements: int
+    num_likes: int
+    user_liked: bool
 
 
 class SliceElementSpec(CamelModel):
