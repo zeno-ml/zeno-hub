@@ -13,7 +13,7 @@
 	import Confirm from '../popups/Confirm.svelte';
 
 	export let report: Report;
-	export let stats: ReportStats | null | undefined;
+	export let stats: ReportStats;
 	export let loggedIn = false;
 	export let deletable = false;
 
@@ -24,7 +24,6 @@
 	let showConfirmDelete = false;
 
 	function updateLikes(id: number) {
-		if (stats === null || stats === undefined) return;
 		if (stats.userLiked) {
 			stats.userLiked = false;
 			stats.numLikes = Math.max(0, stats.numLikes - 1);
@@ -105,56 +104,54 @@
 	<p class="my-2 mr-2 text-sm text-left overflow-y-auto flex-grow">
 		{report.description}
 	</p>
-	{#if stats !== null && stats !== undefined}
-		<div class="flex items-center mb-2 mt-3 w-full">
-			<Tooltip
-				content={`This report has ${shortenNumber(stats.numProjects, 1)} project${
-					stats.numProjects !== 1 ? 's' : ''
-				} linked to it.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiFileTree} text={stats.numProjects} />
-			</Tooltip>
-			<Tooltip
-				content={`This report has ${shortenNumber(stats.numElements, 1)} element${
-					stats.numElements !== 1 ? 's' : ''
-				}.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<ProjectStat icon={mdiSitemap} text={stats.numElements} />
-			</Tooltip>
-			<div class="flex ml-auto">
-				<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
-				{#if loggedIn}
-					<button
-						class=" w-6 h-6 fill-primary"
-						on:click={(e) => {
-							e.stopPropagation();
-							updateLikes(report.id);
-						}}
+	<div class="flex items-center mb-2 mt-3 w-full">
+		<Tooltip
+			content={`This report has ${shortenNumber(stats.numProjects, 1)} project${
+				stats.numProjects !== 1 ? 's' : ''
+			} linked to it.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiFileTree} text={stats.numProjects} />
+		</Tooltip>
+		<Tooltip
+			content={`This report has ${shortenNumber(stats.numElements, 1)} element${
+				stats.numElements !== 1 ? 's' : ''
+			}.`}
+			theme={'zeno-tooltip'}
+			position="bottom"
+		>
+			<ProjectStat icon={mdiSitemap} text={stats.numElements} />
+		</Tooltip>
+		<div class="flex ml-auto">
+			<p class="mr-2 text-base font-semibold text-primary">{stats.numLikes}</p>
+			{#if loggedIn}
+				<button
+					class=" w-6 h-6 fill-primary"
+					on:click={(e) => {
+						e.stopPropagation();
+						updateLikes(report.id);
+					}}
+				>
+					<Tooltip content={`Like this report!`} theme={'zeno-tooltip'} position="bottom">
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{:else}
+				<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
+					<Tooltip
+						content={`Report likes. Log in to like.`}
+						theme={'zeno-tooltip'}
+						position="bottom"
 					>
-						<Tooltip content={`Like this report!`} theme={'zeno-tooltip'} position="bottom">
-							<Icon tag="svg" viewBox="0 0 24 24">
-								<path d={stats.userLiked ? mdiHeart : mdiHeartOutline} />
-							</Icon>
-						</Tooltip>
-					</button>
-				{:else}
-					<button class=" w-6 h-6 fill-primary" on:click={() => goto('/login')}>
-						<Tooltip
-							content={`Report likes. Log in to like.`}
-							theme={'zeno-tooltip'}
-							position="bottom"
-						>
-							<Icon tag="svg" viewBox="0 0 24 24">
-								<path d={mdiHeart} />
-							</Icon>
-						</Tooltip>
-					</button>
-				{/if}
-			</div>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path d={mdiHeart} />
+						</Icon>
+					</Tooltip>
+				</button>
+			{/if}
 		</div>
-	{/if}
+	</div>
 </button>
