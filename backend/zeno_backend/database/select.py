@@ -974,7 +974,7 @@ def project_state(
         )
 
 
-def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats | None:
+def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats:
     """Get statistics for a specified project.
 
     Args:
@@ -1025,13 +1025,13 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
         return ProjectStats(
             num_instances=num_instances,
             num_models=num_models,
-            num_charts=num_charts[0][0] if isinstance(num_charts[0][0], int) else 0,
-            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+            num_charts=num_charts[0][0],
+            num_likes=num_likes[0][0],
             user_liked=user_liked,
         )
 
 
-def report_stats(report_id: int, user_id: int | None = None) -> ReportStats | None:
+def report_stats(report_id: int, user_id: int | None = None) -> ReportStats:
     """Get statistics for a specified report.
 
     Args:
@@ -1065,19 +1065,11 @@ def report_stats(report_id: int, user_id: int | None = None) -> ReportStats | No
             else:
                 user_liked = False
 
-        return (
-            ReportStats(
-                num_projects=num_projects[0][0]
-                if isinstance(num_projects[0][0], int)
-                else 0,
-                num_elements=num_elements[0][0]
-                if isinstance(num_elements[0][0], int)
-                else 0,
-                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
-                user_liked=user_liked,
-            )
-            if len(num_projects) > 0 and len(num_elements) > 0
-            else None
+        return ReportStats(
+            num_projects=num_projects[0][0],
+            num_elements=num_elements[0][0],
+            num_likes=num_likes[0][0],
+            user_liked=user_liked,
         )
 
 

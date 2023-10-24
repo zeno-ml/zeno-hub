@@ -4,7 +4,6 @@
 /* eslint-disable */
 
 import type { Metric } from './Metric';
-import type { ProjectStats } from './ProjectStats';
 
 /**
  * Projects with datasets & models.
@@ -30,5 +29,4 @@ export type Project = {
 	editor: boolean;
 	samplesPerPage?: number;
 	public?: boolean;
-	stats?: ProjectStats | null;
 };

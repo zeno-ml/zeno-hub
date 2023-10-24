@@ -57,9 +57,9 @@
 		<a class="text-primary" href="http://zenoml.com">Learn more!</a>
 	</p>
 </div>
-<div class="h-full home-grid">
-	{#each data.projects as project}
-		<Project {project} stats={project.stats} user={data.user} />
+<div class="h-full grid-cols-home grid gap-3">
+	{#each data.projects as project, i}
+		<Project {project} stats={data.projectsStats[i]} user={data.user} />
 	{/each}
 </div>
 <Pagination slot="paginate" class="pagination">
@@ -113,9 +113,9 @@
 		<a class="text-primary" href="http://zenoml.com">Learn more!</a>
 	</p>
 </div>
-<div class="h-full home-grid">
-	{#each data.reports as report}
-		<Report {report} stats={report.stats} loggedIn={data.user !== null} />
+<div class="h-full grid-cols-home grid gap-3">
+	{#each data.reports as report, i}
+		<Report {report} stats={data.reportsStats[i]} loggedIn={data.user !== null} />
 	{/each}
 </div>
 <Pagination slot="paginate" class="pagination">

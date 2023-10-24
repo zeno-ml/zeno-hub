@@ -481,9 +481,13 @@ def get_server() -> FastAPI:
     def get_public_homepage_data(req: Request):
         projects = select.public_projects(ProjectsRequest(limit=6))
         reports = select.public_reports(ReportsRequest(limit=6))
+        projects_stats = [select.project_stats(p.uuid, None) for p in projects]
+        reports_stats = [select.report_stats(r.id, None) for r in reports]
         return HomepageData(
             projects=projects,
             reports=reports,
+            projects_stats=projects_stats,
+            reports_stats=reports_stats,
             num_projects=select.project_count(),
             num_reports=select.report_count(),
         )
@@ -495,11 +499,16 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
             )
+
         projects = select.projects(user_obj, ProjectsRequest(limit=6))
         reports = select.reports(user_obj, ReportsRequest(limit=6))
+        projects_stats = [select.project_stats(p.uuid, user_obj.id) for p in projects]
+        reports_stats = [select.report_stats(r.id, user_obj.id) for r in reports]
         return HomepageData(
             projects=projects,
             reports=reports,
+            projects_stats=projects_stats,
+            reports_stats=reports_stats,
             num_projects=select.project_count(user_obj),
             num_reports=select.report_count(user_obj),
         )

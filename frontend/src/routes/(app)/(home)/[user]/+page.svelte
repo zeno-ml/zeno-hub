@@ -89,12 +89,12 @@
 	</Banner>
 	<br />
 {/if}
-<div class="mb-6 h-full home-grid">
-	{#each ownProjects as project}
-		<Project {project} stats={project.stats} user={data.user} deletable />
+<div class="mb-6 h-full grid-cols-home grid gap-3">
+	{#each ownProjects as project, i}
+		<Project {project} stats={data.projectsStats[i]} user={data.user} deletable />
 	{/each}
-	{#each sharedProjects as project}
-		<Project {project} stats={project.stats} user={data.user} />
+	{#each sharedProjects as project, i}
+		<Project {project} stats={data.projectsStats[i]} user={data.user} />
 	{/each}
 </div>
 
@@ -165,12 +165,12 @@
 		reports.
 	</Banner>
 {/if}
-<div class="h-full home-grid">
-	{#each ownReports as report}
-		<Report {report} stats={report.stats} loggedIn deletable />
+<div class="h-full grid-cols-home grid gap-3">
+	{#each ownReports as report, i}
+		<Report {report} stats={data.reportsStats[i]} loggedIn deletable />
 	{/each}
-	{#each sharedReports as report}
-		<Report {report} stats={report.stats} loggedIn />
+	{#each sharedReports as report, i}
+		<Report {report} stats={data.reportsStats[i]} loggedIn />
 	{/each}
 </div>
 <Pagination slot="paginate" class="pagination">

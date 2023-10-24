@@ -10,6 +10,8 @@ export async function load({ cookies, url, depends }) {
 	return {
 		projects: homepageData.projects,
 		reports: homepageData.reports,
+		projectsStats: homepageData.projectsStats,
+		reportsStats: homepageData.reportsStats,
 		numProjects: homepageData.numProjects,
 		numReports: homepageData.numReports
 	};

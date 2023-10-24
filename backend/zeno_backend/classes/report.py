@@ -55,7 +55,6 @@ class Report(CamelModel):
     editor: bool
     public: bool = False
     description: str = ""
-    stats: ReportStats | None = None
 
 
 class ReportElement(CamelModel):

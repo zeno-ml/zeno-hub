@@ -186,6 +186,55 @@ export class ZenoService {
 	}
 
 	/**
+	 * Delete System
+	 * Delete a system from a Zeno project.
+	 *
+	 * Args:
+	 * project_uuid (str): the UUID of the project to delete the system from.
+	 * system_name (str): the name of the system.
+	 * @param projectUuid
+	 * @param systemName
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteSystem(projectUuid: string, systemName: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/system/{project_uuid}/{system_name}',
+			path: {
+				project_uuid: projectUuid,
+				system_name: systemName
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete All Systems
+	 * Delete all systems from a Zeno project.
+	 *
+	 * Args:
+	 * project_uuid (str): the UUID of the project to delete systems from.
+	 * @param projectUuid
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteAllSystems(projectUuid: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/systems/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Min Client Version
 	 * Get the minimum client version required to use the server.
 	 * @returns any Successful Response

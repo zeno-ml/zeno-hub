@@ -49,7 +49,6 @@ class Project(CamelModel):
     editor: bool
     samples_per_page: int = 10
     public: bool = False
-    stats: ProjectStats | None = None
 
 
 class ProjectState(CamelModel):
