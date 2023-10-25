@@ -12,11 +12,15 @@
 </script>
 
 <div class="flex p-4 bg-yellowish-light border-b border-b-grey-lighter items-center min-w-0 w-full">
-	<h1 class="text-xl font-semibold">{project.name}</h1>
-	<div class="pl-4">
-		<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} {likes} {liked} {user} />
-	</div>
-	<p class="pl-4 text-grey-dark text-ellipsis overflow-hidden whitespace-nowrap">
+	<h1 class="text-xl font-semibold shrink-0">{project.name}</h1>
+	<p class="px-4 pt-1 text-grey-dark text-ellipsis overflow-hidden whitespace-nowrap">
 		{project.description}
 	</p>
+	<LikeButton
+		on:like={() => zenoClient.likeProject(project.uuid)}
+		{likes}
+		{liked}
+		{user}
+		tooltipPos="left"
+	/>
 </div>

@@ -11,51 +11,48 @@
 	export let liked: boolean;
 	export let user: User | null;
 	export let report = false;
+	export let tooltipPos = 'bottom';
 
 	const dispatch = createEventDispatcher();
 </script>
 
 <div class="flex ml-auto">
-	<p class="mr-2 text-base font-semibold text-primary">{likes}</p>
-	{#if user}
-		<button
-			class=" w-6 h-6 fill-primary"
-			on:click={(e) => {
-				e.stopPropagation();
-				if (liked) {
-					liked = false;
-					likes = Math.max(0, likes - 1);
-				} else {
-					liked = true;
-					likes++;
-				}
-				dispatch('like');
-			}}
-		>
-			<Tooltip
-				content={`Like this ${report ? 'report' : 'project'}!`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					<path d={liked ? mdiHeart : mdiHeartOutline} />
-				</Icon>
-			</Tooltip>
-		</button>
-	{:else}
-		<button
-			class=" w-6 h-6 fill-primary"
-			on:click={() => goto(`/login?redirectTo=${$page.url.pathname}`)}
-		>
-			<Tooltip
-				content={`${report ? 'Report' : 'Project'} likes. Log in to like.`}
-				theme={'zeno-tooltip'}
-				position="bottom"
-			>
-				<Icon tag="svg" viewBox="0 0 24 24">
-					<path d={mdiHeart} />
-				</Icon>
-			</Tooltip>
-		</button>
-	{/if}
+	<Tooltip
+		content={`Like this ${report ? 'report' : 'project'}!`}
+		theme={'zeno-tooltip'}
+		position={tooltipPos}
+	>
+		<div class="flex">
+			<p class="mr-2 text-base font-semibold text-primary">{likes}</p>
+			{#if user}
+				<button
+					class=" w-6 h-6 fill-primary"
+					on:click={(e) => {
+						e.stopPropagation();
+						if (liked) {
+							liked = false;
+							likes = Math.max(0, likes - 1);
+						} else {
+							liked = true;
+							likes++;
+						}
+						dispatch('like');
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						<path d={liked ? mdiHeart : mdiHeartOutline} />
+					</Icon>
+				</button>
+			{:else}
+				<button
+					class=" w-6 h-6 fill-primary"
+					on:click={() => goto(`/login?redirectTo=${$page.url.pathname}`)}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						<path d={mdiHeart} />
+					</Icon>
+				</button>
+			{/if}
+		</div>
+	</Tooltip>
 </div>
