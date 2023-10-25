@@ -92,7 +92,7 @@
 			/>
 		</div>
 		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
-		<hr class="mt-4 bg-grey-dark" />
+		<hr class="mt-4 text-grey-light" />
 
 		{#if data.report.editor}
 			<p class="mt-4 mb-2">Associated Projects</p>
@@ -107,7 +107,7 @@
 					options={projects}
 				/>
 			{/await}
-			<hr class="mt-4 mb-4 bg-grey-dark" />
+			<hr class="mt-4 mb-4 text-grey-light" />
 			<AddElementButton
 				position={0}
 				{addElement}

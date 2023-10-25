@@ -12,7 +12,7 @@
 	on:click={() => addElement(position)}
 >
 	<div
-		class="justify-center items-center h-1 w-full bg-primary-dark
+		class="justify-center items-center h-0.5 w-full bg-primary-dark
         {!alwaysShow ? 'group-hover:flex hidden' : 'flex'}
     "
 	>
