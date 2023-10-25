@@ -268,7 +268,7 @@
 								</p>
 								<div class="instance">
 									<InstanceView
-										view={$project.view}
+										view={$project.view ?? ''}
 										{dataColumn}
 										{labelColumn}
 										modelColumn={modelAColumn?.id}
@@ -283,7 +283,7 @@
 								</p>
 								<div class="instance">
 									<InstanceView
-										view={$project.view}
+										view={$project.view ?? ''}
 										{dataColumn}
 										{labelColumn}
 										modelColumn={modelBColumn?.id}
