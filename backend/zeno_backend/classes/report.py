@@ -89,6 +89,7 @@ class ReportsDetails(CamelModel):
     Attributes:
         reports (list[Report]): report object with report metadata.
         statistics (list[ReportStats]): report statistics.
+        num_reports (int): total number of reports.
     """
 
     reports: list[Report]
