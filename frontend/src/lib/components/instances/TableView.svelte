@@ -20,7 +20,6 @@
 	import Checkbox from '@smui/checkbox';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
-	import Select, { Option } from '@smui/select';
 	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
 
@@ -214,11 +213,11 @@
 <Pagination slot="paginate" class="pagination">
 	<svelte:fragment slot="rowsPerPage">
 		<Label>Rows Per Page</Label>
-		<Select variant="outlined" bind:value={$rowsPerPage} noLabel>
+		<select class="ml-2" bind:value={$rowsPerPage}>
 			{#each sampleOptions as option}
-				<Option value={option}>{option}</Option>
+				<option value={option}>{option}</option>
 			{/each}
-		</Select>
+		</select>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
 		{start + 1} -

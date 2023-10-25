@@ -25,22 +25,17 @@ jobs:
       - name: Svelte check
         run: cd frontend && PUBLIC_AMPLITUDE_API_KEY="" npm run check
 
-  format-backend:
+  backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: psf/black@stable
+      - uses: chartboost/ruff-action@v1
         with:
-          options: "--check --verbose"
           src: "backend/zeno_backend/"
-
-  lint-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jpetrucciani/ruff-check@main
+      - uses: chartboost/ruff-action@v1
         with:
-          path: "backend/zeno_backend/"
+          args: "format --check"
+          src: "backend/zeno_backend/"
 
   typecheck-python:
     runs-on: ubuntu-latest

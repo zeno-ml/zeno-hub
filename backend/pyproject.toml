@@ -8,33 +8,27 @@ packages = [{ include = "zeno_backend" }]
 homepage = "https://zenoml.com"
 
 [tool.poetry.dependencies]
-aiofiles = "^23.2.1"
+amplitude-analytics = "^1.1.3"
 cognitojwt = "^1.4.1"
 fastapi = "^0.104.0"
 fastapi-cloudauth = "^0.4.3"
-inquirer = "^3.1.2"
-nest-asyncio = "^1.5.8"
 pandas = "^2.1.0"
-pathos = "^0.3.1"
+pgpq = "^0.9.0"
 psycopg = "^3.1.12"
+psycopg-pool = "^3.1.8"
+pyarrow = "^13.0.0"
 python = "^3.11"
 python-dotenv = "^1.0.0"
 python-multipart = "^0.0.6"
 requests = "^2.28.1"
 uvicorn = "^0.23.2"
 zeno-sliceline = "^0.0.1"
-pyarrow = "^13.0.0"
-sqlalchemy = "^2.0.22"
-amplitude-analytics = "^1.1.3"
-psycopg-pool = "^3.1.8"
-pgpq = "^0.9.0"
 
 [tool.poetry.dev-dependencies]
-black = "^23.10.0"
 pre-commit = "^3.5.0"
 pyright = "^1.1.332"
 pytest = "^7.4.1"
-ruff = "^0.1.1"
+ruff = "^0.1.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -48,6 +42,8 @@ include = ["zeno_backend"]
 
 [tool.ruff]
 select = ["E", "F", "I", "PD", "N", "D", "T20"]
+# Ignore conflicting specs between linter and formatter. Formatter will catch line length.
+ignore = ["D206", "E501"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

@@ -67,9 +67,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
         )
 
     unique_cols = set(not_cont_search_col_ids + [metric_col])
-    updated_df = pd.concat(
-        [filt_df[list(unique_cols)], cont_df], axis=1
-    ).dropna()  # type: ignore
+    updated_df = pd.concat([filt_df[list(unique_cols)], cont_df], axis=1).dropna()  # type: ignore
 
     normalized_metric_col = np.array(updated_df[metric_col], dtype=float)
 

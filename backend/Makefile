@@ -2,7 +2,7 @@
 lint:
 	@echo "==> 👕 Linting"
 	@poetry check
-	@poetry run black --check .
+	@poetry run ruff format ./zeno_backend
 	@poetry run ruff check .
 
 .PHONY: typecheck
