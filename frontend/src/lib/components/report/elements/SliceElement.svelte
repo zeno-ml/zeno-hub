@@ -21,10 +21,12 @@
 	let sliceElementOptions: SliceElementOptions | undefined;
 	let table: Record<string, string | number | boolean>[] | undefined = [];
 	let page = 0;
+	let view = '';
 
 	$: updateSliceElementSpec(element.data as string);
 
-	$: if (sliceElementSpec) {
+	$: if (sliceElementSpec && sliceElementOptions) {
+		zenoClient.matchInstanceView(sliceElementOptions.project.view ?? '').then((r) => (view = r));
 		zenoClient
 			.getSliceTable({
 				sliceId: sliceElementSpec.sliceId,
@@ -101,7 +103,7 @@
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0">
 							<InstanceView
-								view={sliceElementOptions.project.view}
+								{view}
 								dataColumn={sliceElementOptions.dataColumn}
 								modelColumn={sliceElementOptions.modelColumn}
 								labelColumn={sliceElementOptions.labelColumn}

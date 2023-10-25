@@ -25,7 +25,7 @@ export type Project = {
 	description?: string;
 	metrics?: Array<Metric>;
 	ownerName: string;
-	view: string;
+	view?: string;
 	editor: boolean;
 	samplesPerPage?: number;
 	public?: boolean;

@@ -27,8 +27,8 @@
 	let showConfirmDelete = false;
 
 	function getProjectIcon() {
-		if (project.view.includes('image')) return mdiImage;
-		if (project.view.includes('chat') || project.view.includes('text')) return mdiText;
+		if (project.view?.includes('image')) return mdiImage;
+		if (project.view?.includes('chat') || project.view?.includes('text')) return mdiText;
 		else return mdiTag;
 	}
 </script>

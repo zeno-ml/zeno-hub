@@ -851,6 +851,25 @@ export class ZenoService {
 	}
 
 	/**
+	 * Match Instance View
+	 * @param req
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public matchInstanceView(req: string): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/match-instance-view/',
+			query: {
+				req: req
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Metrics For Slices
 	 * @param project
 	 * @param requestBody
