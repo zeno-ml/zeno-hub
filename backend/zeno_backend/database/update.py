@@ -59,8 +59,8 @@ def chart(chart: Chart, project: str):
     """
     db = Database()
     db.connect_execute(
-        "UPDATE charts SET project_uuid = %s, name = %s, type = %s, parameters = %s "
-        "WHERE id = %s;",
+        "UPDATE charts SET project_uuid = %s, name = %s, type = %s, parameters = %s, "
+        "updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
         [
             project,
             chart.name,
@@ -206,7 +206,7 @@ def project(project_config: Project):
         db.execute(
             "UPDATE projects SET name = %s, "
             "view = %s, samples_per_page = %s, public = %s, "
-            "description = %s WHERE uuid = %s;",
+            "description = %s, updated_at = CURRENT_TIMESTAMP WHERE uuid = %s;",
             [
                 project_config.name,
                 project_config.view,
@@ -250,8 +250,8 @@ def report(report: Report):
         return
     db = Database()
     db.connect_execute(
-        "UPDATE reports SET name = %s, owner_id = %s, public = %s, description = %s "
-        "WHERE id = %s;",
+        "UPDATE reports SET name = %s, owner_id = %s, public = %s, description = %s, "
+        "updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
         [report.name, owner_id.id, report.public, report.description, report.id],
     )
 
@@ -311,17 +311,22 @@ def report_element(element: ReportElement):
     Args:
         element (ReportElement): the element to be updated.
     """
-    db = Database()
-    db.connect_execute(
-        "UPDATE report_elements SET type = %s, data = %s, position = %s"
-        " WHERE id = %s;",
-        [
-            element.type,
-            element.data,
-            element.position,
-            element.id,
-        ],
-    )
+    with Database() as db:
+        report_id = db.execute_return(
+            "UPDATE report_elements SET type = %s, data = %s, position = %s"
+            " WHERE id = %s RETURNING report_id;",
+            [
+                element.type,
+                element.data,
+                element.position,
+                element.id,
+            ],
+        )
+        db.execute(
+            "UPDATE reports SET updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
+            [report_id[0][0]],
+        )
+        db.commit()
 
 
 def report_user(report_id: int, user: User):
