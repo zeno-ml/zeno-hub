@@ -590,6 +590,10 @@ def get_server() -> FastAPI:
     def get_slices_for_projects(req: list[str]):
         return select.slices_for_projects(req)
 
+    @api_app.post("/match-instance-view/", response_model=str, tags=["zeno"])
+    def match_instance_view(req: str):
+        return select.match_instance_view(req)
+
     @api_app.post(
         "/slice-metrics/{project}",
         response_model=list[GroupMetric],
