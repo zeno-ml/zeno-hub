@@ -593,11 +593,27 @@ def report(
             [id],
         )
 
-        element_result = db.connect_execute_return(
+        element_result = db.execute_return(
             "SELECT id, type, data, position FROM report_elements "
             "WHERE report_id = %s ORDER BY position;",
             [id],
         )
+
+        num_likes = db.execute_return(
+            "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [id]
+        )
+
+        user_liked = False
+        if user is not None:
+            user_liked = db.execute_return(
+                "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
+                "user_id = %s);",
+                [id, user.id],
+            )
+            if len(user_liked) > 0:
+                user_liked = bool(user_liked[0][0])
+            else:
+                user_liked = False
 
         return ReportResponse(
             report=Report(
@@ -622,6 +638,8 @@ def report(
                     element_result,
                 )
             ),
+            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+            user_liked=user_liked,
         )
 
 
@@ -950,6 +968,22 @@ def project_state(
         else:
             has_data = False
 
+        num_likes = db.execute_return(
+            "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
+        )
+
+        user_liked = False
+        if user is not None:
+            user_liked = db.execute_return(
+                "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s AND "
+                "user_id = %s);",
+                [project_uuid, user.id],
+            )
+            if len(user_liked) > 0:
+                user_liked = bool(user_liked[0][0])
+            else:
+                user_liked = False
+
         return ProjectState(
             project=project,
             metrics=metrics,
@@ -959,6 +993,8 @@ def project_state(
             tags=tags,
             models=models,
             has_data=has_data,
+            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+            user_liked=user_liked,
         )
 
 

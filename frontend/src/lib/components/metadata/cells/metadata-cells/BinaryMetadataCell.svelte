@@ -46,7 +46,7 @@
 	<div class="flex px-1 w-full">
 		<div style:width="{widthScale(histogram[0].filteredSize ?? 0)}%">
 			<button
-				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl text-background {selectedValue !==
+				class="w-full flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl text-background {selectedValue !==
 					null && selectedValue === true
 					? 'border-primary-mid'
 					: 'border-yellowish-light'}"
@@ -60,7 +60,7 @@
 		</div>
 		<div style:width="{widthScale(histogram[1].filteredSize ?? 0)}%">
 			<button
-				class="flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl text-background {selectedValue !==
+				class="w-full flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl text-background {selectedValue !==
 					null && selectedValue === false
 					? 'border-primary-mid'
 					: 'border-yellowish-light'}"

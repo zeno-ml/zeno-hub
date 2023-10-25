@@ -6,6 +6,6 @@
 
 <div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
 	{#each data.reports as report, i}
-		<Report {report} stats={data.statistics[i]} loggedIn={data.user !== null} />
+		<Report {report} stats={data.statistics[i]} user={data.user} />
 	{/each}
 </div>

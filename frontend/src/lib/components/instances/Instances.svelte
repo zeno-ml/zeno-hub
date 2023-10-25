@@ -1,4 +1,5 @@
 <script lang="ts">
+	import SelectionBar from '$lib/components/metadata/SelectionBar.svelte';
 	import {
 		comparisonModel,
 		editTag,
@@ -102,6 +103,7 @@
 	});
 </script>
 
+<SelectionBar {currentResult} bind:selected />
 {#if compare && $metric && $model}
 	{#if $comparisonModel !== undefined}
 		<ComparisonView {modelAResult} {modelBResult} />

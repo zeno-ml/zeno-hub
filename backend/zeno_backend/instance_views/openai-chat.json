@@ -1,0 +1,22 @@
+{
+  "data": {
+    "type": "list",
+    "elements": {
+      "type": "message",
+      "content": {
+        "type": "text"
+      }
+    },
+    "collapsible": "top"
+  },
+  "label": { "type": "text" },
+  "output": {
+    "type": "message",
+    "plain": true,
+    "role": "assistant",
+    "highlight": true,
+    "content": {
+      "type": "text"
+    }
+  }
+}
