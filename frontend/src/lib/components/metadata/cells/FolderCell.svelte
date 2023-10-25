@@ -98,7 +98,7 @@
 {/if}
 <button
 	class="relative flex justify-between px-2.5 mt-1 rounded h-9 bg-grey-lighter {dragOver
-		? 'bg-grey-light'
+		? 'bg-grey-light w-full'
 		: ''} {expandFolder ? 'mb-0' : ''}"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
