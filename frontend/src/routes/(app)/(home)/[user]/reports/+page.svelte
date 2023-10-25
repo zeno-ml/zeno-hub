@@ -27,9 +27,9 @@
 {/if}
 <div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
 	{#each ownReports as report}
-		<Report report={report.report} stats={report.statistics} loggedIn deletable />
+		<Report report={report.report} stats={report.statistics} deletable user={data.user} />
 	{/each}
 	{#each sharedReports as report}
-		<Report report={report.report} stats={report.statistics} loggedIn />
+		<Report report={report.report} stats={report.statistics} user={data.user} />
 	{/each}
 </div>

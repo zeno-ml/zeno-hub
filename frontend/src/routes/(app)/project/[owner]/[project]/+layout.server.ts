@@ -117,6 +117,8 @@ export async function load({ cookies, params, url }) {
 		compareSort: compareSort,
 		metricRange: metricRange,
 		selections: selections,
-		cognitoUser: cognitoUser
+		cognitoUser: cognitoUser,
+		numLikes: project_result.numLikes,
+		userLiked: project_result.userLiked
 	};
 }

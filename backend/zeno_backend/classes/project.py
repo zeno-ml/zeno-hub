@@ -75,6 +75,8 @@ class ProjectState(CamelModel):
         tags (list[Tag]): tags in the project.
         folders (list[Folder]): folders in the project.
         has_data (bool): whether the project has data instances.
+        num_likes (int): number of likes the report has.
+        user_liked (bool): whether the current user has liked the report.
     """
 
     project: Project
@@ -85,6 +87,8 @@ class ProjectState(CamelModel):
     tags: list[Tag]
     folders: list[Folder]
     has_data: bool
+    num_likes: int
+    user_liked: bool
 
 
 class ProjectCopy(CamelModel):
