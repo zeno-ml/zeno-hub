@@ -52,7 +52,9 @@
 	$: columnHeader = $columns.filter(
 		(c) =>
 			(c.model === undefined || c.model === null || c.model === $model) &&
-			c.columnType === ZenoColumnType.FEATURE
+			(c.columnType === ZenoColumnType.FEATURE ||
+				((c.columnType === ZenoColumnType.LABEL || c.columnType === ZenoColumnType.OUTPUT) &&
+					$project.view == ''))
 	);
 	$: start = currentPage * $rowsPerPage;
 	$: end = start + $rowsPerPage;
@@ -131,6 +133,7 @@
 				{#if $editTag !== undefined}
 					<th class="p-3 font-semibold font-grey">Included</th>
 				{/if}
+				<th class="p-3 font-semibold font-grey">ID</th>
 				{#if $project.view}
 					<th
 						class="p-3 font-semibold font-grey whitespace-nowrap"
@@ -173,6 +176,9 @@
 									<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
 								</td>
 							{/if}
+							<td class="p-3 border border-grey-lighter align-top">
+								{tableContent[idColumn]}
+							</td>
 							{#if $project.view}
 								<td class="p-3">
 									{#if instanceHidden}

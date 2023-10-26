@@ -83,8 +83,12 @@ async def calculate_histogram_bucket(
                 # Replicate the numpy histogram binning, max of Sturges and FD
                 # https://numpy.org/doc/stable/reference/generated/numpy.histogram_bin_edges.html
                 buckets_sturges = 1 + math.ceil(math.log2(res[3]))
-                buckets_fd = math.ceil(2 * res[2] / res[3] ** (1 / 3))
-                buckets = max(buckets_sturges, buckets_fd)
+                buckets_fd_width = math.ceil(2 * res[2] / res[3] ** (1 / 3))
+                if buckets_fd_width == 0:
+                    buckets = buckets_sturges
+                else:
+                    buckets_fd = math.ceil((res[1] - res[0]) / buckets_fd_width)
+                    buckets = max(buckets_sturges, buckets_fd)
                 step = (res[1] - res[0]) / buckets
 
                 return [
