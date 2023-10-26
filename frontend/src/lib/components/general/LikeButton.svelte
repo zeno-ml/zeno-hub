@@ -17,17 +17,17 @@
 </script>
 
 <div class="flex ml-auto">
-	<Tooltip
-		content={`Like this ${report ? 'report' : 'project'}!`}
-		theme={'zeno-tooltip'}
-		position={tooltipPos}
-	>
-		<div class="flex">
-			<p class="mr-2 text-base font-semibold text-primary">{likes}</p>
-			{#if user}
-				<button
-					class=" w-6 h-6 fill-primary"
-					on:click={(e) => {
+	<div class="flex">
+		<p class="mr-2 text-base font-semibold text-primary">{likes}</p>
+		<Tooltip
+			content={`${user === null ? 'Login to l' : 'L'}ike this ${report ? 'report' : 'project'}!`}
+			theme={'zeno-tooltip'}
+			position={tooltipPos}
+		>
+			<button
+				class=" w-6 h-6 fill-primary"
+				on:click={(e) => {
+					if (user) {
 						e.stopPropagation();
 						if (liked) {
 							liked = false;
@@ -37,22 +37,15 @@
 							likes++;
 						}
 						dispatch('like');
-					}}
-				>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path d={liked ? mdiHeart : mdiHeartOutline} />
-					</Icon>
-				</button>
-			{:else}
-				<button
-					class=" w-6 h-6 fill-primary"
-					on:click={() => goto(`/login?redirectTo=${$page.url.pathname}`)}
-				>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path d={mdiHeart} />
-					</Icon>
-				</button>
-			{/if}
-		</div>
-	</Tooltip>
+					} else {
+						goto(`/login?redirectTo=${$page.url.pathname}`);
+					}
+				}}
+			>
+				<Icon tag="svg" viewBox="0 0 24 24">
+					<path d={user === null || liked ? mdiHeart : mdiHeartOutline} />
+				</Icon>
+			</button>
+		</Tooltip>
+	</div>
 </div>
