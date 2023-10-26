@@ -32,12 +32,12 @@
 
 <h4 class="m-0">{getFixedName()}</h4>
 <Vega
-	spec={generateSpec(parameters, width, height)}
+	spec={generateSpec(parameters, Math.min(height, width), Math.min(height, width))}
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: width,
-		height: height,
+		width: Math.min(height, width),
+		height: Math.min(height, width),
 		scaleFactor: {
 			png: 3
 		},

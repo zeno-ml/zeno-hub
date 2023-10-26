@@ -120,7 +120,7 @@
 			)}
 			options={{
 				actions: false,
-				width: width,
+				width: width - 200,
 				height: 80,
 				scaleFactor: {
 					png: 3

@@ -11,7 +11,7 @@ export default function generateSpec(
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
 		random_id: Date.now(), // used to force re-rendering of the chart
 		autosize: { type: 'fit', contains: 'padding' },
-		padding: { left: 80, right: 200, top: 60, bottom: 50 },
+		padding: { left: 5, right: 5, top: 5, bottom: 5 },
 		width: width,
 		height: height,
 
@@ -84,7 +84,7 @@ export default function generateSpec(
 				orient: 'none',
 				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
 				encode: {
-					legend: { update: { x: { value: 300 }, y: { value: -250 } } }
+					legend: { update: { x: { value: -width / 2 }, y: { value: -height / 2 } } }
 				}
 			}
 		],
