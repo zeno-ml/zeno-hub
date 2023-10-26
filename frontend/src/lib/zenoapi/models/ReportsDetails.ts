@@ -12,6 +12,7 @@ import type { ReportStats } from './ReportStats';
  * Attributes:
  * reports (list[Report]): report object with report metadata.
  * statistics (list[ReportStats]): report statistics.
+ * num_reports (int): total number of reports.
  */
 export type ReportsDetails = {
 	reports: Array<Report>;

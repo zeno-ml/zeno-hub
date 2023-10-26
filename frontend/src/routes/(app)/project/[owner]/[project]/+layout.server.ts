@@ -62,7 +62,6 @@ export async function load({ cookies, params, url }) {
 
 	if (urlParams !== undefined) {
 		if (urlParams.metric !== undefined) {
-			urlParams.metric;
 			const foundMetric = project_result.metrics.find((m) => m.id === urlParams?.metric?.id);
 			if (foundMetric) {
 				metric = foundMetric;
