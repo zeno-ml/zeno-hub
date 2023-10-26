@@ -97,8 +97,8 @@
 	</Confirm>
 {/if}
 <button
-	class="relative flex justify-between px-2.5 mt-1 rounded h-9 bg-grey-lighter {dragOver
-		? 'bg-grey-light w-full'
+	class="relative flex justify-between items-center px-2.5 mt-1 rounded h-9 bg-grey-lighter w-full {dragOver
+		? 'bg-grey-light'
 		: ''} {expandFolder ? 'mb-0' : ''}"
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
