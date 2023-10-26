@@ -16,7 +16,6 @@ export default function generateSpec(
 		height: 100,
 		random_id: Date.now(), // used to force re-rendering of the chart
 		padding: { left: 5, right: 5, top: 0, bottom: 20 },
-		autosize: 'fit',
 		signals: [
 			{ name: 'cx', update: 'width / 2' },
 			{ name: 'cy', update: 'height / 2' },
