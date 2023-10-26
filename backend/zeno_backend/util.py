@@ -5,6 +5,8 @@ import cognitojwt
 from fastapi import Request
 
 from zeno_backend import util
+from zeno_backend.classes.project import ProjectsRequest
+from zeno_backend.classes.report import ReportsRequest
 from zeno_backend.classes.user import User
 from zeno_backend.database import select
 
@@ -45,7 +47,9 @@ def project_access_valid(project: str, request: Request) -> bool:
         user = util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
             return False
-        available_project_ids = map(lambda x: x.uuid, select.projects(user))
+        available_project_ids = map(
+            lambda x: x.uuid, select.projects(user, ProjectsRequest())
+        )
         if project not in available_project_ids:
             return False
 
@@ -67,7 +71,9 @@ def report_access_valid(report: int, request: Request) -> bool:
         user = util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
             return False
-        available_report_ids = map(lambda x: x.id, select.reports(user))
+        available_report_ids = map(
+            lambda x: x.id, select.reports(user, ReportsRequest())
+        )
         if report not in available_report_ids:
             return False
 
