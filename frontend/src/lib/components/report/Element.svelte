@@ -23,7 +23,7 @@
 	<div class="flex items-center my-2 ml-2" bind:clientWidth={width}>
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
-		{:else if element.type === ReportElementType.CHART}
+		{:else if element.type === ReportElementType.CHART && chartOptions.length > 0}
 			<ChartElement chart={chartOptions.filter((c) => c.id === chartId)[0]} {width} />
 		{:else if element.type === ReportElementType.SLICE}
 			<SliceElement {element} />
