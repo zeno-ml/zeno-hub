@@ -103,7 +103,7 @@
 			{#each table as inst (inst[idColumn])}
 				<div class="mr-2 mt-2">
 					<InstanceView
-						view={$project.view ?? ''}
+						view={$project.view}
 						{dataColumn}
 						{labelColumn}
 						modelColumn={modelColumn?.id}

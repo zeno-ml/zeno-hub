@@ -186,7 +186,7 @@
 									{:else}
 										<div class="instance">
 											<InstanceView
-												view={$project.view ?? ''}
+												view={$project.view}
 												{dataColumn}
 												{labelColumn}
 												modelColumn={modelColumn?.id}
