@@ -97,7 +97,10 @@
 	}
 </script>
 
-<div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
+<div
+	class="overflow-y-auto w-full h-full grid"
+	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr))"
+>
 	{#await tablePromise then table}
 		{#if idColumn !== undefined}
 			{#each table as inst (inst[idColumn])}

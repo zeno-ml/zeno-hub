@@ -10,6 +10,9 @@ export default defineConfig({
 				secure: false,
 				rewrite: (path) => path.replace(/^\/dockerzeno/, '')
 			}
+		},
+		fs: {
+			allow: ['.yalc']
 		}
 	},
 	plugins: [sveltekit()],
