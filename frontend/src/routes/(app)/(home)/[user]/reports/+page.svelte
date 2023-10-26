@@ -5,9 +5,6 @@
 	import { showNewReport } from '$lib/stores.js';
 
 	export let data;
-
-	$: ownReports = data.reports.filter((rep) => rep.ownerName === data.user?.name);
-	$: sharedReports = data.reports.filter((rep) => rep.ownerName !== data.user?.name);
 </script>
 
 {#if $showNewReport && data.user !== null}
@@ -16,20 +13,17 @@
 			showNewReport.set(false);
 		}}
 		user={data.user.name}
-		reports={ownReports}
+		reports={data.reports}
 	/>
 {/if}
-{#if ownReports.length === 0}
+{#if data.reports.length === 0}
 	<Banner>
 		You haven't created any reports yet. Use charts from your projects to create interactive
 		reports.
 	</Banner>
 {/if}
-<div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
-	{#each ownReports as report, i}
+<div class="h-full overflow-y-auto grid grid-cols-home gap-4">
+	{#each data.reports as report, i}
 		<Report {report} stats={data.statistics[i]} user={data.user} deletable />
-	{/each}
-	{#each sharedReports as report, i}
-		<Report {report} stats={data.statistics[i]} user={data.user} />
 	{/each}
 </div>

@@ -4,7 +4,7 @@
 	export let data;
 </script>
 
-<div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
+<div class="h-full overflow-y-auto grid grid-cols-home gap-4">
 	{#each data.reports as report, i}
 		<Report {report} stats={data.statistics[i]} user={data.user} />
 	{/each}

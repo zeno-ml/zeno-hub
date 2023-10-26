@@ -9,7 +9,7 @@
 		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
+<div class="flex flex-col w-full h-full p-8 pt-5 bg-white max-w-7xl m-auto">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<a
@@ -29,7 +29,7 @@
 		</div>
 	{:else}
 		<div
-			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 sm:h-60 flex-col sm:flex-row"
+			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 flex-col sm:flex-row"
 		>
 			<div>
 				<h1 class="text-5xl font-header ml-6">Welcome to Zeno</h1>
