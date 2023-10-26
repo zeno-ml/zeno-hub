@@ -23,12 +23,6 @@
 	let sliceElementSpec: SliceElementSpec | null =
 		element.type === ReportElementType.SLICE ? JSON.parse(element.data as string) : null;
 
-	// If there are no charts, then users should not be able to add a chart element
-	$: elementOptions =
-		chartOptions.length > 0
-			? Object.values(ReportElementType)
-			: Object.values(ReportElementType).filter((e) => e !== ReportElementType.CHART);
-
 	async function updateType(e: CustomEvent) {
 		let data = null;
 
@@ -55,7 +49,7 @@
 			style="margin-bottom: 10px;"
 			value={element.type}
 			labelAsValue={true}
-			options={elementOptions}
+			options={Object.values(ReportElementType)}
 			on:change={updateType}
 		/>
 		{#if element.type === ReportElementType.CHART}
