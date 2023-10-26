@@ -87,16 +87,18 @@ class ReportStats(CamelModel):
     user_liked: bool
 
 
-class ReportDetails(CamelModel):
-    """Report and details for homepage rendering.
+class ReportsDetails(CamelModel):
+    """Reports and details for homepage rendering.
 
     Attributes:
-        report (Report): report object with report metadata.
-        statistics (ReportStats): report statistics.
+        reports (list[Report]): report object with report metadata.
+        statistics (list[ReportStats]): report statistics.
+        num_reports (int): total number of reports.
     """
 
-    report: Report
-    statistics: ReportStats
+    reports: list[Report]
+    statistics: list[ReportStats]
+    num_reports: int
 
 
 class SliceElementSpec(CamelModel):
@@ -126,3 +128,17 @@ class SliceElementOptions(CamelModel):
     data_column: str | None = None
     label_column: str | None = None
     model_column: str | None = None
+
+
+class ReportsRequest(CamelModel):
+    """Request for reports in Zeno.
+
+    Attributes:
+        offset (int): offset of the first report to get.
+        limit (int): number of reports to get.
+        order (str): order of the reports.
+    """
+
+    offset: int = 0
+    limit: int | None = None
+    order: str | None = None

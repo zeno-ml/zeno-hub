@@ -5,7 +5,7 @@
 </script>
 
 <div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
-	{#each data.publicProjectDetails as projectDetails}
-		<Project project={projectDetails.project} stats={projectDetails.statistics} user={data.user} />
+	{#each data.projects as project, i}
+		<Project {project} stats={data.statistics[i]} user={data.user} />
 	{/each}
 </div>

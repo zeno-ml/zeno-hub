@@ -51,16 +51,18 @@ class ProjectStats(CamelModel):
     user_liked: bool
 
 
-class ProjectDetails(CamelModel):
-    """Project and details for homepage rendering.
+class ProjectsDetails(CamelModel):
+    """Projects and details for homepage rendering.
 
     Attributes:
-        project (Project): project object with project metadata.
-        statistics (ProjectStats): project statistics.
+        projects (list[Project]): project object with project metadata.
+        statistics (list[ProjectStats]): project statistics.
+        num_projects (int): number of projects.
     """
 
-    project: Project
-    statistics: ProjectStats
+    projects: list[Project]
+    statistics: list[ProjectStats]
+    num_projects: int
 
 
 class ProjectState(CamelModel):
@@ -107,3 +109,17 @@ class ProjectCopy(CamelModel):
     copy_systems: bool
     copy_slices: bool
     copy_charts: bool
+
+
+class ProjectsRequest(CamelModel):
+    """Request for a list of projects.
+
+    Attributes:
+        offset (int): offset to query projects table.
+        limit (int): limit to query projects table.
+        order (str): order to sort query with.
+    """
+
+    offset: int = 0
+    limit: int | None = None
+    order: str | None = None

@@ -4,9 +4,11 @@ export async function load({ depends, cookies, url }) {
 	depends('app:projects');
 
 	const zenoClient = await getClient(cookies, url);
-	const publicProjectDetails = await zenoClient.getPublicProjectsDetails();
+	const publicProjectsDetails = await zenoClient.getPublicProjectsDetails({});
 
 	return {
-		publicProjectDetails
+		projects: publicProjectsDetails.projects,
+		statistics: publicProjectsDetails.statistics,
+		numProjects: publicProjectsDetails.numProjects
 	};
 }

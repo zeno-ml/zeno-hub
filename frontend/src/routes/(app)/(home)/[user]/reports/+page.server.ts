@@ -1,20 +1,22 @@
 import { getClient } from '$lib/api/client';
-import type { ReportDetails } from '$lib/zenoapi';
+import type { ReportsDetails } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, depends, url }) {
 	depends('app:reports');
 
 	const zenoClient = await getClient(cookies, url);
-	let reportDetails: ReportDetails[] = [];
 
+	let reportsDetails: ReportsDetails;
 	try {
-		reportDetails = await zenoClient.getReportsDetails();
+		reportsDetails = await zenoClient.getReportsDetails({});
 	} catch {
 		throw redirect(303, `/login?redirectTo=${url.pathname}`);
 	}
 
 	return {
-		reportDetails
+		reports: reportsDetails.reports,
+		statistics: reportsDetails.statistics,
+		numReports: reportsDetails.numReports
 	};
 }

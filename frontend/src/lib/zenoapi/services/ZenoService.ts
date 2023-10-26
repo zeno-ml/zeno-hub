@@ -18,12 +18,14 @@ import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectCopy } from '../models/ProjectCopy';
-import type { ProjectDetails } from '../models/ProjectDetails';
+import type { ProjectsDetails } from '../models/ProjectsDetails';
+import type { ProjectsRequest } from '../models/ProjectsRequest';
 import type { ProjectState } from '../models/ProjectState';
 import type { Report } from '../models/Report';
-import type { ReportDetails } from '../models/ReportDetails';
 import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
+import type { ReportsDetails } from '../models/ReportsDetails';
+import type { ReportsRequest } from '../models/ReportsRequest';
 import type { Slice } from '../models/Slice';
 import type { SliceElementOptions } from '../models/SliceElementOptions';
 import type { SliceElementSpec } from '../models/SliceElementSpec';
@@ -267,29 +269,6 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/organization-names'
-		});
-	}
-
-	/**
-	 * Get Data
-	 * @param project
-	 * @param dataId
-	 * @returns binary Successful Response
-	 * @throws ApiError
-	 */
-	public getData(project: string, dataId: string): CancelablePromise<Blob> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/data/{project}',
-			path: {
-				project: project
-			},
-			query: {
-				data_id: dataId
-			},
-			errors: {
-				422: `Validation Error`
-			}
 		});
 	}
 
@@ -706,25 +685,39 @@ export class ZenoService {
 
 	/**
 	 * Get Projects Details
-	 * @returns ProjectDetails Successful Response
+	 * @param requestBody
+	 * @returns ProjectsDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
+	public getProjectsDetails(requestBody: ProjectsRequest): CancelablePromise<ProjectsDetails> {
 		return this.httpRequest.request({
-			method: 'GET',
-			url: '/projects-details'
+			method: 'POST',
+			url: '/projects-details',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
 	/**
 	 * Get Public Projects Details
-	 * @returns ProjectDetails Successful Response
+	 * @param requestBody
+	 * @returns ProjectsDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getPublicProjectsDetails(): CancelablePromise<Array<ProjectDetails>> {
+	public getPublicProjectsDetails(
+		requestBody: ProjectsRequest
+	): CancelablePromise<ProjectsDetails> {
 		return this.httpRequest.request({
-			method: 'GET',
-			url: '/public-projects-details'
+			method: 'POST',
+			url: '/public-projects-details',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
@@ -742,25 +735,37 @@ export class ZenoService {
 
 	/**
 	 * Get Reports Details
-	 * @returns ReportDetails Successful Response
+	 * @param requestBody
+	 * @returns ReportsDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getReportsDetails(): CancelablePromise<Array<ReportDetails>> {
+	public getReportsDetails(requestBody: ReportsRequest): CancelablePromise<ReportsDetails> {
 		return this.httpRequest.request({
-			method: 'GET',
-			url: '/reports-details'
+			method: 'POST',
+			url: '/reports-details',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
 	/**
 	 * Get Public Reports Details
-	 * @returns ReportDetails Successful Response
+	 * @param requestBody
+	 * @returns ReportsDetails Successful Response
 	 * @throws ApiError
 	 */
-	public getPublicReportsDetails(): CancelablePromise<Array<ReportDetails>> {
+	public getPublicReportsDetails(requestBody: ReportsRequest): CancelablePromise<ReportsDetails> {
 		return this.httpRequest.request({
-			method: 'GET',
-			url: '/public-reports-details'
+			method: 'POST',
+			url: '/public-reports-details',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 
