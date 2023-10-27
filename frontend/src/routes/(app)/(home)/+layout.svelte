@@ -9,7 +9,7 @@
 		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white max-w-7xl m-auto">
+<div class="flex flex-col w-full h-full p-8 pt-5 bg-white m-auto">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<a
