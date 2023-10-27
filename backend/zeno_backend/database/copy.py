@@ -110,11 +110,25 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         # Copy slices.
         db.execute(
             sql.SQL(
-                "INSERT INTO slices (name, filter, project_uuid) (SELECT "
-                "name, filter, {} as uuid FROM slices WHERE project_uuid = %s);"
+                "INSERT INTO slices (name, folder_id, filter, project_uuid) (SELECT "
+                "name, folder_id, filter, {} as uuid FROM slices WHERE project_uuid = %s);"
             ).format(sql.Literal(new_uuid)),
             [project_uuid],
         )
+
+        # Copy folders and add slices.
+        folders = db.execute_return(
+            "SELECT id, name FROM folders WHERE project_uuid = %s;", [project_uuid]
+        )
+        for folder in folders:
+            id = db.execute_return(
+                "INSERT INTO folders (name, project_uuid) VALUES (%s, %s) RETURNING id;",
+                [folder[1], new_uuid],
+            )
+            db.execute(
+                "UPDATE slices SET folder_id = %s WHERE folder_id = %s AND project_uuid = %s;",
+                [id[0][0], folder[0], new_uuid],
+            )
 
         if not copy_spec.copy_charts:
             copy_data(db, project_uuid, new_uuid)
