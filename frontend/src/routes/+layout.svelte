@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
+	import { onNavigate } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
 	import { featureFlags } from '$lib/stores';
 	import { zenoFeatureFlags } from '$lib/util/features';
@@ -14,6 +15,17 @@
 		amplitude.init(env.PUBLIC_AMPLITUDE_API_KEY, {
 			defaultTracking: true
 		});
+
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 </script>
 
 <div class="w-full h-full overflow-hidden">
