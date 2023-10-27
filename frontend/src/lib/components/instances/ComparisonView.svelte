@@ -175,7 +175,12 @@
 </script>
 
 <div class="w-full h-full overflow-auto" bind:this={instanceContainer}>
-	<table class="mt-2">
+	<table class="mt-2 w-full table-fixed">
+		<colgroup>
+			<col style="width: 45%;" />
+			<col style="width: 45%;" />
+			<col style="width: 10%;" />
+		</colgroup>
 		<thead
 			class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
 		>
