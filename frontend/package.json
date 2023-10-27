@@ -59,7 +59,7 @@
 		"@auth/core": "^0.18.0",
 		"@auth/sveltekit": "^0.3.11",
 		"@mdi/js": "^7.3.67",
-		"@zeno-ml/zeno-instance-views": "^0.0.7",
+		"@zeno-ml/zeno-instance-views": "^0.0.8",
 		"amazon-cognito-identity-js": "^6.3.6",
 		"d3-array": "^3.2.4",
 		"d3-interpolate": "^3.0.1",
