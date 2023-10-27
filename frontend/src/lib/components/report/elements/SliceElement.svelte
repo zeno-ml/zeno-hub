@@ -99,7 +99,7 @@
 			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
 				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
-						<div class="m-auto mt-0">
+						<div class="m-auto mt-0 w-1/2 px-1">
 							<InstanceView
 								view={sliceElementOptions.project.view}
 								dataColumn={sliceElementOptions.dataColumn}
