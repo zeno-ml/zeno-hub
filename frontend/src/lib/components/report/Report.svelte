@@ -90,8 +90,13 @@
 			{/if}
 		</div>
 	</div>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
-		{report.description}
+	<p class="mt-4 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
+		{#if report.description}
+			{report.description.slice(0, 160)}
+			{#if report.description.length > 160}
+				...
+			{/if}
+		{/if}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
 		<ProjectStat

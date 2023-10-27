@@ -115,8 +115,13 @@
 		</div>
 	</div>
 	<p class="mr-2 text-base truncate flex-shrink-0">{project.ownerName}</p>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
-		{project.description}
+	<p class="mt-4 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
+		{#if project.description}
+			{project.description.slice(0, 160)}
+			{#if project.description.length > 160}
+				...
+			{/if}
+		{/if}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
 		<ProjectStat
