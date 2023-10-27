@@ -36,11 +36,11 @@
 				{options}
 				{dndzone}
 				multiple
-				placeholder="Select Slices..."
+				placeholder="Select Systems..."
 			/>
 		{/if}
 		<div class="flex items-center ml-auto">
-			<span>All Models</span>
+			<span>All Systems</span>
 			<Checkbox
 				checked={value[0] == 'all_zeno_project_models'}
 				on:click={() =>
