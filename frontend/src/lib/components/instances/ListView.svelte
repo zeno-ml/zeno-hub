@@ -99,7 +99,7 @@
 
 <div
 	class="overflow-y-auto w-full h-full grid"
-	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr))"
+	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); grid-auto-rows: min-content;"
 >
 	{#await tablePromise then table}
 		{#if idColumn !== undefined}
