@@ -29,7 +29,7 @@
 
 <EncodingContainer>
 	<div class="flex flex-col">
-		{#if value[0] != 'all_zeno_project_models'}
+		{#if value[0] != ''}
 			<Svelecte
 				style="width: 280px; flex:none;"
 				bind:value
@@ -42,11 +42,8 @@
 		<div class="flex items-center ml-auto">
 			<span>All Systems</span>
 			<Checkbox
-				checked={value[0] == 'all_zeno_project_models'}
-				on:click={() =>
-					value[0] === 'all_zeno_project_models'
-						? (value = [])
-						: (value = ['all_zeno_project_models'])}
+				checked={value[0] == ''}
+				on:click={() => (value[0] === '' ? (value = []) : (value = ['']))}
 			/>
 		</div>
 	</div>

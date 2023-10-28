@@ -1,6 +1,5 @@
 """Functions for extracting chart data from SQL."""
 import json
-from functools import lru_cache
 from typing import Any
 
 from zeno_backend.classes.chart import (
@@ -80,7 +79,7 @@ def get_selected_models(chart_models: list[str], project: str) -> list[str]:
     Returns:
         list[str]: list of models of the chart.
     """
-    if "all_zeno_project_models" in chart_models:  # all models should be selected
+    if "" in chart_models:  # all models should be selected
         return models(project)
     return chart_models
 
@@ -336,7 +335,6 @@ def heatmap_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-@lru_cache(4096)
 def chart_data(chart: Chart, project: str) -> str:
     """Extract the chart data for a specific chart that the user created.
 
