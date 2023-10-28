@@ -9,7 +9,7 @@
 		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white m-auto">
+<div class="flex flex-col flex-grow h-full pl-8 pt-5 bg-white">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
 			<a
@@ -86,7 +86,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="mt-6 flex flex-col min-h-0">
+	<div class="mt-6 flex flex-col min-h-0 h-full">
 		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>

@@ -42,7 +42,7 @@
 		/>
 		<div class="flex h-full min-h-0">
 			<MetadataPanel compare={data.compare} />
-			<div class="mx-5 flex flex-col flex-grow w-1">
+			<div class="mx-5 flex flex-col flex-grow">
 				<Instances compare={data.compare} />
 			</div>
 		</div>

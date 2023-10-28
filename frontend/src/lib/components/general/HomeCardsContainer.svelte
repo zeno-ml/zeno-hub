@@ -1,3 +1,3 @@
-<div class="h-full overflow-y-auto grid gap-4 grid-cols-home">
+<div class="grid gap-4 grid-cols-home pr-4 pb-4 overflow-y-auto">
 	<slot />
 </div>
