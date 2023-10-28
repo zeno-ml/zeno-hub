@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { models } from '$lib/stores';
+	import Checkbox from '@smui/checkbox';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -27,12 +28,23 @@
 </script>
 
 <EncodingContainer>
-	<Svelecte
-		style="width: 280px; flex:none;"
-		bind:value
-		{options}
-		{dndzone}
-		multiple
-		placeholder="Select Slices..."
-	/>
+	<div class="flex flex-col">
+		{#if value[0] != ''}
+			<Svelecte
+				style="width: 280px; flex:none;"
+				bind:value
+				{options}
+				{dndzone}
+				multiple
+				placeholder="Select Systems..."
+			/>
+		{/if}
+		<div class="flex items-center ml-auto">
+			<span>All Systems</span>
+			<Checkbox
+				checked={value[0] == ''}
+				on:click={() => (value[0] === '' ? (value = []) : (value = ['']))}
+			/>
+		</div>
+	</div>
 </EncodingContainer>

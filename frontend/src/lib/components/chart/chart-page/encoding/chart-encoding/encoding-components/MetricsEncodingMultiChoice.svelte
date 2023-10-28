@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { metrics } from '$lib/stores';
+	import Checkbox from '@smui/checkbox';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -30,12 +31,23 @@
 </script>
 
 <EncodingContainer>
-	<Svelecte
-		style="width: 280px; flex:none;"
-		bind:value
-		{options}
-		{dndzone}
-		multiple={true}
-		placeholder="Select Metrics..."
-	/>
+	<div class="flex flex-col">
+		{#if value[0] != -2}
+			<Svelecte
+				style="width: 280px; flex:none;"
+				bind:value
+				{options}
+				{dndzone}
+				multiple={true}
+				placeholder="Select Metrics..."
+			/>
+		{/if}
+		<div class="flex items-center ml-auto">
+			<span>All Metrics</span>
+			<Checkbox
+				checked={value[0] == -2}
+				on:click={() => (value[0] === -2 ? (value = []) : (value = [-2]))}
+			/>
+		</div>
+	</div>
 </EncodingContainer>
