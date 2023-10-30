@@ -1,10 +1,10 @@
 <script lang="ts">
 	import MetricRange from '$lib/components/metadata/MetricRange.svelte';
 	import { requestingHistogramCounts } from '$lib/stores';
+	import { tooltip } from '$lib/util/tooltip';
 	import { mdiInformationOutline } from '@mdi/js';
 	import CircularProgress from '@smui/circular-progress';
 	import { Icon } from '@smui/icon-button';
-	import { tooltip } from '@svelte-plugins/tooltips';
 </script>
 
 <div
@@ -15,10 +15,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-dark"
 			use:tooltip={{
-				content:
-					'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data',
-				position: 'right',
-				theme: 'zeno-tooltip'
+				text: 'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data'
 			}}
 		>
 			<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">

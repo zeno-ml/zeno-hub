@@ -111,3 +111,15 @@ export const featureFlags: Writable<Record<string, boolean>> = writable({});
 
 // Whether the new report popup should be displayed on the reports page
 export const showNewReport = writable(false);
+
+export interface TooltipSpec {
+	hover: boolean;
+	mousePos: { x: number; y: number };
+	text: undefined | string;
+}
+
+export const tooltipState = writable<TooltipSpec>({
+	hover: false,
+	mousePos: { x: 0, y: 0 },
+	text: undefined
+});

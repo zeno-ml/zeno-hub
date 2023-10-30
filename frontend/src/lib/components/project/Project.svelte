@@ -7,7 +7,6 @@
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
-	import { Tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
 	import Confirm from '../popups/Confirm.svelte';
@@ -120,24 +119,20 @@
 		{project.description}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
+		<ProjectStat
+			icon={getProjectIcon()}
+			text={stats.numInstances}
+			tooltipContent={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
 				stats.numInstances !== 1 ? 's' : ''
 			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
-		</Tooltip>
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numModels, 1)} system${
+		/>
+		<ProjectStat
+			icon={mdiLayersTriple}
+			text={stats.numModels}
+			tooltipContent={`This project has ${shortenNumber(stats.numModels, 1)} system${
 				stats.numModels !== 1 ? 's' : ''
 			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
-		</Tooltip>
+		/>
 		<LikeButton
 			on:like={() => zenoClient.likeProject(project.uuid)}
 			{user}

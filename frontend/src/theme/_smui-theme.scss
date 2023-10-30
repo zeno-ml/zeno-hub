@@ -140,13 +140,6 @@ body {
 	cursor: pointer;
 }
 
-.tooltip.zeno-tooltip {
-	--tooltip-background-color: var(--Y2);
-	--tooltip-color: var(--G1);
-	--tooltip-font-family: 'Open Sans', 'Roboto', sans-serif;
-	--tooltip-box-shadow: 2px 2px 2px 2px rgb(0 0 0 / 0.1);
-}
-
 /* Fix: smui + tailwind adds left & right borders within textfields */
 .mdc-text-field--outlined .mdc-notched-outline--notched .mdc-notched-outline__notch {
 	border-left: 0;

@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { onNavigate } from '$app/navigation';
 	import { env } from '$env/dynamic/public';
+	import Tooltip from '$lib/components/general/Tooltip.svelte';
 	import { featureFlags } from '$lib/stores';
 	import { zenoFeatureFlags } from '$lib/util/features';
 	import * as amplitude from '@amplitude/analytics-browser';
@@ -30,4 +31,5 @@
 
 <div class="w-full h-full overflow-hidden">
 	<slot />
+	<Tooltip />
 </div>

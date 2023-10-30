@@ -16,11 +16,5 @@
 	<p class="px-4 pt-1 text-grey-dark text-ellipsis overflow-hidden whitespace-nowrap">
 		{project.description}
 	</p>
-	<LikeButton
-		on:like={() => zenoClient.likeProject(project.uuid)}
-		{likes}
-		{liked}
-		{user}
-		tooltipPos="left"
-	/>
+	<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} {likes} {liked} {user} />
 </div>
