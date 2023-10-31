@@ -53,11 +53,11 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-full sm:w-80 h-60"
+	class="border-solid rounded-lg border-grey-light border shadow-sm py-3 px-5 hover:shadow-md flex flex-col"
 >
 	<div class="flex flex-col w-full">
 		<div class="flex justify-between items-center">
-			<p class="mr-2 truncate text-black text-lg">{project.name}</p>
+			<p class="pr-2 truncate text-black text-lg">{project.name}</p>
 			<div
 				class="w-9 h-9 relative"
 				use:clickOutside={() => {
@@ -115,8 +115,13 @@
 		</div>
 	</div>
 	<p class="mr-2 text-base truncate flex-shrink-0">{project.ownerName}</p>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
-		{project.description}
+	<p class="mt-4 text-sm w-full text-left overflow-y-auto flex-grow">
+		{#if project.description}
+			{project.description.slice(0, 160)}
+			{#if project.description.length > 160}
+				...
+			{/if}
+		{/if}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
 		<ProjectStat
