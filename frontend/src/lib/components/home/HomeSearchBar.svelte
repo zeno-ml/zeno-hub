@@ -70,6 +70,7 @@
 				projects
 			</Button>
 			<Button
+				class="bg-primary-light"
 				variant={typeFilter === HomeTypeFilter.REPORT ? 'raised' : 'outlined'}
 				on:click={() => updateTypeFilter(HomeTypeFilter.REPORT)}
 			>
