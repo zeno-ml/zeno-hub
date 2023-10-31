@@ -221,7 +221,6 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
         projects_query += sql.SQL(" OFFSET %s;")
 
         projects_result = db.execute_return(projects_query, params)
-        print(projects_result)
 
         projects = []
         for res in projects_result:

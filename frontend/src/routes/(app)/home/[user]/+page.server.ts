@@ -3,7 +3,10 @@ import type { AuthUser } from '$lib/auth/types';
 import { HomeSort, type HomeEntry } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url }) {
+export async function load({ cookies, url, depends }) {
+	depends('app:reports');
+	depends('app:projects');
+
 	const userCookie = cookies.get('loggedIn');
 
 	let cognitoUser: AuthUser;
