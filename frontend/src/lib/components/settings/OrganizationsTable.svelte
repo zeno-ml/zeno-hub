@@ -1,9 +1,9 @@
 <script lang="ts">
+	import { tooltip } from '$lib/util/tooltip';
 	import type { Organization, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose, mdiCog, mdiLogout, mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
-	import { tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
 	import Confirm from '../popups/Confirm.svelte';
 	import OrganizationPopup from '../popups/OrganizationPopup.svelte';
@@ -94,9 +94,7 @@
 							<div class="flex items-center justify-end">
 								<div
 									use:tooltip={{
-										content: 'Manage this organization. You can only do this if you are an admin',
-										position: 'left',
-										theme: 'zeno-tooltip'
+										text: 'Manage this organization. You can only do this if you are an admin'
 									}}
 								>
 									<IconButton
@@ -112,10 +110,7 @@
 								</div>
 								<div
 									use:tooltip={{
-										content:
-											'Leave this organization. You can only do this if there is an admin left',
-										position: 'left',
-										theme: 'zeno-tooltip'
+										text: 'Leave this organization. You can only do this if there is an admin left'
 									}}
 								>
 									<IconButton
@@ -151,9 +146,7 @@
 								</div>
 								<div
 									use:tooltip={{
-										content: 'Delete this organization. You can only do this if you are an admin',
-										position: 'left',
-										theme: 'zeno-tooltip'
+										text: 'Delete this organization. You can only do this if you are an admin'
 									}}
 								>
 									<IconButton

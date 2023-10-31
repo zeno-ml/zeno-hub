@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import HomeHeader from '$lib/components/general/HomeHeader.svelte';
-	import { Tooltip } from '@svelte-plugins/tooltips';
+	import { tooltip } from '$lib/util/tooltip';
 
 	export let data;
 
@@ -12,22 +12,20 @@
 <div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div class="flex text-3xl">
-			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
-				<a
-					href={'/' + data.cognitoUser.name + '/projects'}
-					class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
-				>
-					My Hub
-				</a>
-			</Tooltip>
-			<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
-				<a
-					href="/projects"
-					class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
-				>
-					Discover
-				</a>
-			</Tooltip>
+			<a
+				href={'/' + data.cognitoUser.name + '/projects'}
+				class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+				use:tooltip={{ text: 'Your projects and reports' }}
+			>
+				My Hub
+			</a>
+			<a
+				href="/projects"
+				class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+				use:tooltip={{ text: 'Public projects and reports' }}
+			>
+				Discover
+			</a>
 		</div>
 	{:else}
 		<div

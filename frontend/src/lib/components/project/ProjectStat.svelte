@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { tooltip } from '$lib/util/tooltip';
 	import { shortenNumber } from '$lib/util/util';
 	import { Icon } from '@smui/button';
 
 	export let icon: string;
 	export let text: string | number;
+	export let tooltipContent: string;
 </script>
 
-<div class="flex items-center mr-8">
+<div class="flex items-center mr-8" use:tooltip={{ text: tooltipContent }}>
 	<div class="w-6 h-6 fill-grey-dark mr-2">
 		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 			<path d={icon} />

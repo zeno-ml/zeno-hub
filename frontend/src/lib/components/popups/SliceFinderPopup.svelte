@@ -10,6 +10,7 @@
 		selections,
 		tagIds
 	} from '$lib/stores';
+	import { tooltip } from '$lib/util/tooltip';
 	import { columnSort } from '$lib/util/util';
 	import {
 		MetadataType,
@@ -21,7 +22,6 @@
 	import { mdiClose, mdiInformationOutline } from '@mdi/js';
 	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
-	import { tooltip } from '@svelte-plugins/tooltips';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher, getContext } from 'svelte';
 	import ChipsWrapper from '../metadata/ChipsWrapper.svelte';
@@ -141,12 +141,9 @@
 			<div
 				class="w-6 h-6 cursor-help fill-grey-dark"
 				use:tooltip={{
-					content: $page.url.href.includes('compare')
+					text: $page.url.href.includes('compare')
 						? 'Run the SliceLine algorithm to find slices with the largest or smallest average difference in a difference column between two systems'
-						: 'Run the SliceLine algorithm to find slices of data with high or low metrics',
-					position: 'right',
-					theme: 'zeno-tooltip',
-					maxWidth: '350'
+						: 'Run the SliceLine algorithm to find slices of data with high or low metrics'
 				}}
 			>
 				<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -170,12 +167,9 @@
 					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
-						content: $page.url.href.includes('compare')
+						text: $page.url.href.includes('compare')
 							? 'The column on which to measure system disagreement'
-							: 'The continuous column to compare slices across',
-						position: 'right',
-						theme: 'zeno-tooltip',
-						maxWidth: '450'
+							: 'The continuous column to compare slices across'
 					}}
 				>
 					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -200,10 +194,7 @@
 					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
-						content: 'Metadata columns used to create slices',
-						position: 'top',
-						theme: 'zeno-tooltip',
-						maxWidth: '450'
+						text: 'Metadata columns used to create slices'
 					}}
 				>
 					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -229,11 +220,7 @@
 					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
-						content:
-							'Weight parameter for the average slice metric. Increase it to find more slices',
-						theme: 'zeno-tooltip',
-						maxWidth: '195',
-						position: 'left'
+						text: 'Weight parameter for the average slice metric. Increase it to find more slices'
 					}}
 				>
 					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -256,9 +243,7 @@
 					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
-						content: 'Maximum number of predicates',
-						theme: 'zeno-tooltip',
-						maxWidth: '270'
+						text: 'Maximum number of predicates'
 					}}
 				>
 					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -280,12 +265,9 @@
 					class="w-6 h-6 cursor-help fill-grey-dark"
 					style="margin-top: 3px;"
 					use:tooltip={{
-						content: $page.url.href.includes('compare')
+						text: $page.url.href.includes('compare')
 							? 'Order by slice score, a combination of system difference and size'
-							: 'Order by slice score, a combination of size and metric',
-						theme: 'zeno-tooltip',
-						position: 'left',
-						maxWidth: '250'
+							: 'Order by slice score, a combination of size and metric'
 					}}
 				>
 					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
