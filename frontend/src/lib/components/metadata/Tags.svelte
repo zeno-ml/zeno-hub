@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
+	import { tooltip } from '$lib/util/tooltip';
 	import type { Tag, ZenoService } from '$lib/zenoapi';
 	import { mdiInformationOutline, mdiPlus, mdiPlusCircle } from '@mdi/js';
 	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
-	import { tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
 	import TagPopup from '../popups/TagPopup.svelte';
 	import TagCell from './cells/TagCell.svelte';
@@ -50,9 +50,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-darker"
 			use:tooltip={{
-				content: 'Tags are named sets of data instances',
-				position: 'right',
-				theme: 'zeno-tooltip'
+				text: 'Tags are named sets of data instances'
 			}}
 		>
 			<Icon tag="svg" viewBox="-6 -6 36 36">
@@ -64,9 +62,7 @@
 		<div class="flex items-center justify-between">
 			<div
 				use:tooltip={{
-					content: 'Create a new tag',
-					position: 'left',
-					theme: 'zeno-tooltip'
+					text: 'Create a new tag'
 				}}
 			>
 				<IconButton on:click={() => (showNewTag = true)}>

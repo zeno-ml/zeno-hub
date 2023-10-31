@@ -108,3 +108,15 @@ export const metricRangeColorScale: Readable<(n: number) => string> = derived(
 
 // Store the current state of feature flags
 export const featureFlags: Writable<Record<string, boolean>> = writable({});
+
+export interface TooltipSpec {
+	hover: boolean;
+	mousePos: { x: number; y: number };
+	text: undefined | string;
+}
+
+export const tooltipState = writable<TooltipSpec>({
+	hover: false,
+	mousePos: { x: 0, y: 0 },
+	text: undefined
+});

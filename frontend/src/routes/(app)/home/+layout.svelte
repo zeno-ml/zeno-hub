@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { Tooltip } from '@svelte-plugins/tooltips';
+	import { tooltip } from '$lib/util/tooltip';
 
 	export let data;
 
@@ -8,34 +8,28 @@
 	let loggedIn = data.cognitoUser && data.cognitoUser !== null;
 </script>
 
-<div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
-	<div
-		class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center flex-col sm:flex-row p-6 sm:h-40"
-	>
-		{#if loggedIn}
-			<div class="flex text-3xl">
-				<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
-					<a
-						href={'/home/' + data.cognitoUser?.name}
-						class={`mr-6 ${
-							isExplore ? 'text-grey-lighter no-underline' : ''
-						} hover:text-primary uppercase font-bold underline`}
-					>
-						My Hub
-					</a>
-				</Tooltip>
-				<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
-					<a
-						href="/home"
-						class={`${
-							!isExplore ? 'text-grey-lighter no-underline' : ''
-						} hover:text-primary uppercase font-bold underline`}
-					>
-						Discover
-					</a>
-				</Tooltip>
-			</div>
-		{:else}
+<div class="flex flex-col flex-grow h-full pl-8 pt-5 bg-white">
+	{#if data.cognitoUser && data.cognitoUser !== null}
+		<div class="flex text-3xl">
+			<a
+				href={'/' + data.cognitoUser.name + '/projects'}
+				class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+				use:tooltip={{ text: 'Your projects and reports' }}
+			>
+				My Hub
+			</a>
+			<a
+				href="/projects"
+				class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
+				use:tooltip={{ text: 'Public projects and reports' }}
+			>
+				Discover
+			</a>
+		</div>
+	{:else}
+		<div
+			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 flex-col sm:flex-row"
+		>
 			<div>
 				<h1 class="text-5xl font-header">Welcome to Zeno</h1>
 				<p class="text-xl">
@@ -89,8 +83,8 @@
 					</path>
 				</svg>
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 	<div class="mt-6 flex flex-col min-h-0">
 		<slot />
 	</div>

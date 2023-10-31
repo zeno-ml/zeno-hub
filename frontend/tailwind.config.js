@@ -5,7 +5,6 @@ export default {
 		'./node_modules/@zeno-ml/zeno-instance-views/**/*.{html,js,svelte,ts}'
 	],
 	theme: {
-		extend: {},
 		fontFamily: {
 			header: ['"Hammersmith One"', 'sans-serif']
 		},
@@ -40,6 +39,9 @@ export default {
 			white: {
 				DEFAULT: '#ffffff'
 			}
+		},
+		gridTemplateColumns: {
+			home: 'repeat(auto-fill, minmax(275px, 1fr))'
 		}
 	},
 	plugins: [require('@tailwindcss/typography')]

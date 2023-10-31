@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tooltip } from '@svelte-plugins/tooltips';
+	import { tooltip } from '$lib/util/tooltip';
 
 	export let highlighted: boolean;
 	export let id: string;
@@ -13,9 +13,7 @@
 	}`}
 	on:click
 	use:tooltip={{
-		content: tooltipContent,
-		theme: 'zeno-tooltip',
-		autoPosition: true
+		text: tooltipContent
 	}}
 >
 	<slot />

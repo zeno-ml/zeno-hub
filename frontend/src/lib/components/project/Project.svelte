@@ -7,7 +7,6 @@
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
-	import { Tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
 	import Confirm from '../popups/Confirm.svelte';
@@ -48,11 +47,11 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-full sm:w-80 h-60"
+	class="border-solid rounded-lg border-grey-light border shadow-sm py-3 px-5 hover:shadow-md flex flex-col"
 >
 	<div class="flex flex-col w-full">
 		<div class="flex justify-between items-center">
-			<p class="mr-2 truncate text-black text-lg">{project.name}</p>
+			<p class="pr-2 truncate text-black text-lg">{project.name}</p>
 			<div
 				class="w-9 h-9 relative"
 				use:clickOutside={() => {
@@ -110,28 +109,29 @@
 		</div>
 	</div>
 	<p class="mr-2 text-base truncate flex-shrink-0">{project.ownerName}</p>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
-		{project.description}
+	<p class="mt-4 text-sm w-full text-left overflow-y-auto flex-grow">
+		{#if project.description}
+			{project.description.slice(0, 160)}
+			{#if project.description.length > 160}
+				...
+			{/if}
+		{/if}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
+		<ProjectStat
+			icon={mdiDatabaseOutline}
+			text={stats.numInstances}
+			tooltipContent={`This project has ${shortenNumber(stats.numInstances, 1)} data point${
 				stats.numInstances !== 1 ? 's' : ''
 			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiDatabaseOutline} text={stats.numInstances} />
-		</Tooltip>
-		<Tooltip
-			content={`This project has ${shortenNumber(stats.numModels, 1)} system${
+		/>
+		<ProjectStat
+			icon={mdiRobotOutline}
+			text={stats.numModels}
+			tooltipContent={`This project has ${shortenNumber(stats.numModels, 1)} system${
 				stats.numModels !== 1 ? 's' : ''
 			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiRobotOutline} text={stats.numModels} />
-		</Tooltip>
+		/>
 		<LikeButton
 			on:like={() => zenoClient.likeProject(project.uuid)}
 			{user}

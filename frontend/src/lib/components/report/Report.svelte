@@ -8,7 +8,6 @@
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
-	import { Tooltip } from '@svelte-plugins/tooltips';
 	import { getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
 	import Confirm from '../popups/Confirm.svelte';
@@ -91,28 +90,29 @@
 			{/if}
 		</div>
 	</div>
-	<p class="my-2 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
-		{report.description}
+	<p class="mt-4 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
+		{#if report.description}
+			{report.description.slice(0, 160)}
+			{#if report.description.length > 160}
+				...
+			{/if}
+		{/if}
 	</p>
 	<div class="flex items-center w-full mb-2 mt-3">
-		<Tooltip
-			content={`This report has ${shortenNumber(stats.numProjects, 1)} project${
+		<ProjectStat
+			icon={mdiFileTree}
+			text={stats.numProjects}
+			tooltipContent={`This report has ${shortenNumber(stats.numProjects, 1)} project${
 				stats.numProjects !== 1 ? 's' : ''
 			} linked to it.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiFileTree} text={stats.numProjects} />
-		</Tooltip>
-		<Tooltip
-			content={`This report has ${shortenNumber(stats.numElements, 1)} element${
+		/>
+		<ProjectStat
+			icon={mdiSitemap}
+			text={stats.numElements}
+			tooltipContent={`This report has ${shortenNumber(stats.numElements, 1)} element${
 				stats.numElements !== 1 ? 's' : ''
 			}.`}
-			theme={'zeno-tooltip'}
-			position="bottom"
-		>
-			<ProjectStat icon={mdiSitemap} text={stats.numElements} />
-		</Tooltip>
+		/>
 		<LikeButton
 			on:like={() => zenoClient.likeReport(report.id)}
 			likes={stats.numLikes}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { models, project, selectionIds, selectionPredicates, selections } from '$lib/stores';
+	import { tooltip } from '$lib/util/tooltip';
 	import {
 		mdiCreation,
 		mdiCreationOutline,
@@ -10,7 +11,6 @@
 		mdiPlusCircle
 	} from '@mdi/js';
 	import IconButton, { Icon } from '@smui/icon-button';
-	import { tooltip } from '@svelte-plugins/tooltips';
 	import FolderPopup from '../popups/FolderPopup.svelte';
 	import SliceFinderPopup from '../popups/SliceFinderPopup.svelte';
 	import SlicePopup from '../popups/SlicePopup.svelte';
@@ -39,9 +39,7 @@
 		<div
 			class="w-6 h-6 cursor-help fill-grey-dark"
 			use:tooltip={{
-				content: 'Slices are named combinations of filters',
-				position: 'right',
-				theme: 'zeno-tooltip'
+				text: 'Slices are named combinations of filters'
 			}}
 		>
 			<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
@@ -53,12 +51,9 @@
 		<div class="flex items-center justify-between">
 			<div
 				use:tooltip={{
-					content: !$page.url.href.includes('compare')
+					text: !$page.url.href.includes('compare')
 						? 'Find underperforming slices'
-						: 'Find slices with the largest output differences between systems',
-					position: 'left',
-					theme: 'zeno-tooltip',
-					maxWidth: '150'
+						: 'Find slices with the largest output differences between systems'
 				}}
 			>
 				<IconButton
@@ -77,9 +72,7 @@
 			</div>
 			<div
 				use:tooltip={{
-					content: 'Create a new folder',
-					position: 'left',
-					theme: 'zeno-tooltip'
+					text: 'Create a new folder'
 				}}
 			>
 				<IconButton
@@ -94,9 +87,7 @@
 			</div>
 			<div
 				use:tooltip={{
-					content: 'Create a new slice',
-					position: 'left',
-					theme: 'zeno-tooltip'
+					text: 'Create a new slice'
 				}}
 			>
 				<IconButton
