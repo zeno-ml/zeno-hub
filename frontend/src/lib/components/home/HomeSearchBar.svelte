@@ -43,8 +43,8 @@
 	function doSearch() {}
 </script>
 
-<div class="flex mb-6 mt-4 md:items-center justify-between md:flex-row flex-col">
-	<div class="flex md:items-center md:flex-row flex-col">
+<div class="flex mt-4 md:items-center justify-between md:flex-row flex-col">
+	<div class="flex md:items-center md:flex-row flex-col h-full">
 		<div
 			class="h-12 w-96 px-4 py-3 flex justify-center items-center border-solid rounded-lg border-grey-light border focus-within:shadow-md"
 		>
@@ -61,35 +61,36 @@
 				</Fab>
 			{/if}
 		</div>
-		<div class="flex mt-2 md:mt-0">
+		<div class="flex items-center mt-4 md:mt-0 md:ml-4 h-full">
 			<Button
-				class="md:ml-4 mr-2"
+				class="mr-2 h-full"
 				variant={typeFilter === HomeTypeFilter.PROJECT ? 'raised' : 'outlined'}
 				on:click={() => updateTypeFilter(HomeTypeFilter.PROJECT)}
 			>
 				projects
 			</Button>
 			<Button
-				class="bg-primary-light"
+				class="h-full"
 				variant={typeFilter === HomeTypeFilter.REPORT ? 'raised' : 'outlined'}
 				on:click={() => updateTypeFilter(HomeTypeFilter.REPORT)}
 			>
 				reports
 			</Button>
-			{#if myHub}
-				<Button class="ml-2" on:click={() => (showNewReport = true)}>
-					<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
-						<path d={mdiPlus} />
-					</Icon>
-					New Report
-				</Button>
-			{/if}
+			<select class="ml-4 mr-2 h-full w-28 px-2" bind:value={sort}>
+				<option value={HomeSort.RECENT}>Recent</option>
+				<option value={HomeSort.POPULAR}>Popular</option>
+			</select>
 		</div>
 	</div>
-	<div class="mt-2 md:mt-0">
-		<select class="md:ml-4 mr-2" bind:value={sort}>
-			<option value={HomeSort.RECENT}>Recent</option>
-			<option value={HomeSort.POPULAR}>Popular</option>
-		</select>
-	</div>
+	{#if myHub}
+		<div class="flex mt-4 md:ml-2 md:mt-0 h-full">
+			<Button class="h-full" on:click={() => (showNewReport = true)}>
+				<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
+					<path d={mdiPlus} />
+				</Icon>
+				New Report
+			</Button>
+		</div>
+	{/if}
 </div>
+<div class="flex mt-2 mb-4 items-center"></div>

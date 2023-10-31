@@ -7,7 +7,7 @@
 	let isExplore = $page.route.id === '/(app)/home';
 </script>
 
-<div class="flex flex-col flex-grow h-full m-8 bg-white">
+<div class="flex flex-col flex-grow h-full mx-8 my-5 bg-white">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div
 			class="bg-primary w-full rounded-md text-white flex flex-col items-center sm:flex-row md:h-28"

@@ -27,7 +27,7 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.homepage import HomeEntry, HomeRequest
+from zeno_backend.classes.homepage import HomeEntry, HomeRequest, HomeTypeFilter
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import (
@@ -464,7 +464,12 @@ def get_server() -> FastAPI:
         if user is None and home_request.user_name is not None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
 
-        if user and home_request.user_name is not None:
+        if (
+            home_request.type_filter != HomeTypeFilter.PROJECT
+            or home_request.type_filter != HomeTypeFilter.ALL
+        ):
+            projects = []
+        elif user and home_request.user_name is not None:
             projects = select.projects(user, home_request)
         else:
             projects = select.public_projects(home_request)
@@ -473,6 +478,11 @@ def get_server() -> FastAPI:
             stats = select.project_stats(proj.uuid, user.id if user else None)
             project_ret.append(HomeEntry(entry=proj, stats=stats))
 
+        if (
+            home_request.type_filter != HomeTypeFilter.REPORT
+            or home_request.type_filter != HomeTypeFilter.ALL
+        ):
+            reports = []
         if user and home_request.user_name is not None:
             reports = select.reports(user, home_request)
         else:
@@ -482,12 +492,7 @@ def get_server() -> FastAPI:
             stats = select.report_stats(rep.id, user.id if user else None)
             report_ret.append(HomeEntry(entry=rep, stats=stats))
 
-        if home_request.type_filter == "PROJECT":
-            return_entries = project_ret
-        elif home_request.type_filter == "REPORT":
-            return_entries = report_ret
-        else:
-            return_entries = project_ret + report_ret
+        return_entries = project_ret + report_ret
 
         if home_request.sort == "POPULAR":
             return_entries.sort(key=lambda x: x.stats.num_likes, reverse=True)
@@ -509,17 +514,6 @@ def get_server() -> FastAPI:
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
         return select.projects(user, HomeRequest())
-
-    @api_app.get(
-        "/reports",
-        response_model=list[Report],
-        tags=["zeno"],
-    )
-    def get_reports(current_user=Depends(auth.claim())):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.reports(user, HomeRequest())
 
     @api_app.post("/like-report/{report_id}", tags=["zeno"])
     def like_report(report_id: int, current_user=Depends(auth.claim())):
@@ -804,11 +798,12 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        res = insert.report(name, user)
-        if not res:
+        try:
+            insert.report(name, user)
+        except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Report with that name already exists",
+                detail=str(exc),
             )
         AmplitudeHandler().track(
             BaseEvent(

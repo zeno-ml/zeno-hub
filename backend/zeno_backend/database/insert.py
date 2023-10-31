@@ -409,7 +409,8 @@ def report(name: str, user: User) -> bool:
             [name, user.id],
         )
         if len(res) > 0:
-            return False
+            raise Exception("Report with this name already exists.")
+
         db.execute(
             "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
             [name, user.id, False],
