@@ -1,48 +1,51 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import HomeHeader from '$lib/components/general/HomeHeader.svelte';
 	import { Tooltip } from '@svelte-plugins/tooltips';
 
 	export let data;
 
-	let isExplore =
-		$page.route.id === '/(app)/(home)/reports' || $page.route.id === '/(app)/(home)/projects';
+	let isExplore = $page.route.id === '/(app)/home';
+	let loggedIn = data.cognitoUser && data.cognitoUser !== null;
 </script>
 
 <div class="flex flex-col w-full h-full p-8 pt-5 bg-white">
-	{#if data.cognitoUser && data.cognitoUser !== null}
-		<div class="flex text-3xl">
-			<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
-				<a
-					href={'/' + data.cognitoUser.name + '/projects'}
-					class={`mr-6 ${isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
-				>
-					My Hub
-				</a>
-			</Tooltip>
-			<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
-				<a
-					href="/projects"
-					class={`${!isExplore ? 'text-grey-dark' : ''} hover:text-primary uppercase font-bold`}
-				>
-					Discover
-				</a>
-			</Tooltip>
-		</div>
-	{:else}
-		<div
-			class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center pt-10 sm:pt-0 sm:h-60 flex-col sm:flex-row"
-		>
+	<div
+		class="bg-[#9F55CD] w-full rounded-md text-white flex justify-center items-center flex-col sm:flex-row p-6 sm:h-40"
+	>
+		{#if loggedIn}
+			<div class="flex text-3xl">
+				<Tooltip content={'Your projects and reports'} theme={'zeno-tooltip'} position="bottom">
+					<a
+						href={'/home/' + data.cognitoUser?.name}
+						class={`mr-6 ${
+							isExplore ? 'text-grey-lighter no-underline' : ''
+						} hover:text-primary uppercase font-bold underline`}
+					>
+						My Hub
+					</a>
+				</Tooltip>
+				<Tooltip content={'Public projects and reports'} theme={'zeno-tooltip'} position="bottom">
+					<a
+						href="/home"
+						class={`${
+							!isExplore ? 'text-grey-lighter no-underline' : ''
+						} hover:text-primary uppercase font-bold underline`}
+					>
+						Discover
+					</a>
+				</Tooltip>
+			</div>
+		{:else}
 			<div>
-				<h1 class="text-5xl font-header ml-6">Welcome to Zeno</h1>
-				<p class="ml-6 text-xl mt-6">
+				<h1 class="text-5xl font-header">Welcome to Zeno</h1>
+				<p class="text-xl">
 					<a class="font-bold hover:text-primary" href="/login">Sign in </a>
 					or <a class="font-bold hover:text-primary" href="/signup">sign up</a> to create and see your
 					projects and reports.
 				</p>
 			</div>
 
-			<div class="ml-auto mr-10 mt-4">
+			<div class="ml-auto mr-10">
 				<svg
 					width="300"
 					height="150"
@@ -86,10 +89,9 @@
 					</path>
 				</svg>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</div>
 	<div class="mt-6 flex flex-col min-h-0">
-		<HomeHeader user={isExplore ? '' : data.cognitoUser?.name} />
 		<slot />
 	</div>
 </div>

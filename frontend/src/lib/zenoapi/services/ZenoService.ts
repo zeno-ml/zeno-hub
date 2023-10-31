@@ -13,19 +13,17 @@ import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
 import type { HistogramRequest } from '../models/HistogramRequest';
+import type { HomeEntry } from '../models/HomeEntry';
+import type { HomeRequest } from '../models/HomeRequest';
 import type { Metric } from '../models/Metric';
 import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectCopy } from '../models/ProjectCopy';
-import type { ProjectsDetails } from '../models/ProjectsDetails';
-import type { ProjectsRequest } from '../models/ProjectsRequest';
 import type { ProjectState } from '../models/ProjectState';
 import type { Report } from '../models/Report';
 import type { ReportElement } from '../models/ReportElement';
 import type { ReportResponse } from '../models/ReportResponse';
-import type { ReportsDetails } from '../models/ReportsDetails';
-import type { ReportsRequest } from '../models/ReportsRequest';
 import type { Slice } from '../models/Slice';
 import type { SliceElementOptions } from '../models/SliceElementOptions';
 import type { SliceElementSpec } from '../models/SliceElementSpec';
@@ -684,35 +682,15 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Projects Details
+	 * Get Home Details
 	 * @param requestBody
-	 * @returns ProjectsDetails Successful Response
+	 * @returns HomeEntry Successful Response
 	 * @throws ApiError
 	 */
-	public getProjectsDetails(requestBody: ProjectsRequest): CancelablePromise<ProjectsDetails> {
+	public getHomeDetails(requestBody: HomeRequest): CancelablePromise<Array<HomeEntry>> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/projects-details',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Public Projects Details
-	 * @param requestBody
-	 * @returns ProjectsDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getPublicProjectsDetails(
-		requestBody: ProjectsRequest
-	): CancelablePromise<ProjectsDetails> {
-		return this.httpRequest.request({
-			method: 'POST',
-			url: '/public-projects-details',
+			url: '/home-details',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -730,42 +708,6 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/projects'
-		});
-	}
-
-	/**
-	 * Get Reports Details
-	 * @param requestBody
-	 * @returns ReportsDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getReportsDetails(requestBody: ReportsRequest): CancelablePromise<ReportsDetails> {
-		return this.httpRequest.request({
-			method: 'POST',
-			url: '/reports-details',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Public Reports Details
-	 * @param requestBody
-	 * @returns ReportsDetails Successful Response
-	 * @throws ApiError
-	 */
-	public getPublicReportsDetails(requestBody: ReportsRequest): CancelablePromise<ReportsDetails> {
-		return this.httpRequest.request({
-			method: 'POST',
-			url: '/public-reports-details',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
 		});
 	}
 

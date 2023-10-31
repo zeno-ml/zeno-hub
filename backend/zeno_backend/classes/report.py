@@ -30,6 +30,9 @@ class Report(CamelModel):
         editor (bool): whether the current user can edit the report.
         public (bool): whether the report is publically visible.
         description (str): description of the report. Default "".
+        created_at (str): ISO-format string time the report was created. Default "".
+        updated_at (str): ISO-format string time the report was last updated.
+            Default "".
     """
 
     id: int
@@ -39,6 +42,8 @@ class Report(CamelModel):
     editor: bool
     public: bool = False
     description: str = ""
+    created_at: str = ""
+    updated_at: str = ""
 
 
 class ReportElement(CamelModel):

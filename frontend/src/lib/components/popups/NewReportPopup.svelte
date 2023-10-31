@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { showNewReport } from '$lib/stores';
-	import type { Report, ZenoService } from '$lib/zenoapi';
+	import type { ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
@@ -9,7 +8,7 @@
 	import Popup from './Popup.svelte';
 
 	export let user: string;
-	export let reports: Report[];
+	export let showNewReport: boolean;
 
 	const dispatch = createEventDispatcher();
 	const zenoClient = getContext('zenoClient') as ZenoService;
@@ -17,15 +16,14 @@
 	let reportName = '';
 	let input: Textfield;
 
-	$: invalidName =
-		reports.filter((rep) => rep.name === reportName).length > 0 ||
-		reportName.match(/[/]/g) !== null;
+	// TODO: endpoint to check report name
+	$: invalidName = reportName.match(/[/]/g) !== null;
 	$: if (input) {
 		input.getElement().focus();
 	}
 
 	function addReport() {
-		showNewReport.set(false);
+		showNewReport = false;
 		zenoClient
 			.addReport(reportName)
 			.then(() => goto(`/report/${user}/${encodeURIComponent(reportName)}`));

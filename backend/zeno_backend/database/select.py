@@ -8,11 +8,11 @@ from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.homepage import HomeRequest, HomeSort
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
     Project,
-    ProjectsRequest,
     ProjectState,
     ProjectStats,
 )
@@ -20,7 +20,6 @@ from zeno_backend.classes.report import (
     Report,
     ReportElement,
     ReportResponse,
-    ReportsRequest,
     ReportStats,
     SliceElementOptions,
     SliceElementSpec,
@@ -41,18 +40,18 @@ from zeno_backend.processing.histogram_processing import calculate_histogram_buc
 PROJECTS_BASE_QUERY = sql.SQL(
     """
     (SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-    p.public, p.description, TRUE AS editor
+    p.public, p.description, TRUE AS editor, p.created_at, p.updated_at
     FROM projects AS p
     WHERE p.owner_id = %s
     UNION
     SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, up.editor
+        p.public, p.description, up.editor, p.created_at, p.updated_at
     FROM projects AS p
     LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
     WHERE up.user_id = %s
     UNION
     SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, op.editor
+        p.public, p.description, op.editor, p.created_at, p.updated_at
     FROM projects AS p
     JOIN (SELECT op.project_uuid, uo.organization_id, editor
             FROM user_organization AS uo
@@ -64,16 +63,16 @@ PROJECTS_BASE_QUERY = sql.SQL(
 
 REPORTS_BASE_QUERY = sql.SQL(
     """
-    (SELECT r.id, r.name, r.public, r.description, TRUE AS editor
-    FROM reports AS r
+    (SELECT r.id, r.name, r.public, r.description, TRUE AS editor,
+     r.created_at, r.updated_at FROM reports AS r
     WHERE r.owner_id = %s
     UNION
-    SELECT r.id, r.name, r.public, r.description, ur.editor
+    SELECT r.id, r.name, r.public, r.description, ur.editor, r.created_at, r.updated_at
     FROM reports AS r
     LEFT JOIN user_report AS ur ON r.id = ur.report_id
     WHERE ur.user_id = %s
     UNION
-    SELECT r.id, r.name, r.public, r.description, orr.editor
+    SELECT r.id, r.name, r.public, r.description, orr.editor, r.created_at, r.updated_at
     FROM reports AS r
     JOIN (SELECT orr.report_id, uo.organization_id, editor
             FROM user_organization AS uo
@@ -102,7 +101,7 @@ def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
+def projects(user: User, projects_request: HomeRequest) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
@@ -128,9 +127,25 @@ def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
             + sql.SQL(
                 "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
                 " CombinedProjects cp LEFT JOIN LikesSummary ls "
-                " ON cp.uuid = ls.project_uuid ORDER BY total_likes DESC "
+                " ON cp.uuid = ls.project_uuid "
             )
         )
+
+        if projects_request.search_string:
+            projects_query += sql.SQL(
+                "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s) "
+            )
+            params += [
+                "%" + projects_request.search_string + "%",
+                "%" + projects_request.search_string + "%",
+            ]
+
+        if projects_request.sort == HomeSort.POPULAR:
+            projects_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif projects_request.sort == HomeSort.RECENT:
+            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+
         if projects_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
             params += [projects_request.limit, projects_request.offset]
@@ -156,12 +171,14 @@ def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
                         public=res[5],
                         description=res[6],
                         editor=res[7],
+                        created_at=res[8].isoformat(),
+                        updated_at=res[9].isoformat(),
                     )
                 )
         return projects
 
 
-def public_projects(projects_request: ProjectsRequest) -> list[Project]:
+def public_projects(projects_request: HomeRequest) -> list[Project]:
     """Fetch all publicly accessible projects.
 
     Args:
@@ -171,20 +188,36 @@ def public_projects(projects_request: ProjectsRequest) -> list[Project]:
         list[Project]: all publicly accessible projects.
     """
     with Database() as db:
-        params = [projects_request.offset]
+        params = []
         projects_query = sql.SQL(
             "SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page, "
-            "p.description, p.public, COALESCE(ls.total_likes, 0) AS total_likes "
+            "p.description, p.public, p.created_at, p.updated_at, "
+            "COALESCE(ls.total_likes, 0) AS total_likes "
             "FROM projects AS p "
             "LEFT JOIN (SELECT project_uuid, COUNT(*) as total_likes "
             "FROM project_like GROUP BY project_uuid) AS ls "
             "ON p.uuid = ls.project_uuid "
             "WHERE p.public IS TRUE "
-            "ORDER BY total_likes DESC "
         )
+        if projects_request.search_string:
+            projects_query += sql.SQL(
+                "AND LOWER(p.name) LIKE LOWER(%s) OR "
+                "LOWER(p.description) LIKE LOWER(%s) "
+            )
+            params += [
+                "%" + projects_request.search_string + "%",
+                "%" + projects_request.search_string + "%",
+            ]
+
+        if projects_request.sort == HomeSort.POPULAR:
+            projects_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif projects_request.sort == HomeSort.RECENT:
+            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+
         if projects_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
             params = [projects_request.limit] + params
+        params += [projects_request.offset]
         projects_query += sql.SQL(" OFFSET %s;")
 
         projects_result = db.execute_return(projects_query, params)
@@ -206,12 +239,14 @@ def public_projects(projects_request: ProjectsRequest) -> list[Project]:
                         editor=False,
                         public=True,
                         description=res[5],
+                        created_at=res[7].isoformat(),
+                        updated_at=res[8].isoformat(),
                     )
                 )
         return projects
 
 
-def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
+def reports(user: User, reports_request: HomeRequest) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
@@ -237,14 +272,31 @@ def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
             + sql.SQL(
                 "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
                 " CombinedReports cp LEFT JOIN LikesSummary ls "
-                " ON cp.id = ls.report_id ORDER BY total_likes DESC "
+                " ON cp.id = ls.report_id "
             )
         )
+
+        if reports_request.search_string:
+            reports_query += sql.SQL(
+                "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s) "
+            )
+            params += [
+                "%" + reports_request.search_string + "%",
+                "%" + reports_request.search_string + "%",
+            ]
+
+        if reports_request.sort == HomeSort.POPULAR:
+            reports_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif reports_request.sort == HomeSort.RECENT:
+            reports_query += sql.SQL(" ORDER BY updated_at DESC ")
+
         if reports_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
             params += [reports_request.limit, reports_request.offset]
         else:
             params += [reports_request.offset]
+
         reports_query += sql.SQL(" OFFSET %s; ")
         reports_result = db.execute_return(reports_query, params)
 
@@ -265,12 +317,14 @@ def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
                     editor=True,
                     public=report[2],
                     description=report[3],
+                    created_at=report[5].isoformat(),
+                    updated_at=report[6].isoformat(),
                 )
             )
         return reports
 
 
-def public_reports(reports_request: ReportsRequest) -> list[Report]:
+def public_reports(reports_request: HomeRequest) -> list[Report]:
     """Fetch all publicly accessible reports.
 
     Args:
@@ -280,20 +334,35 @@ def public_reports(reports_request: ReportsRequest) -> list[Report]:
         list[Report]: all publicly accessible reports.
     """
     with Database() as db:
-        params = [reports_request.offset]
+        params = []
         reports_query = sql.SQL(
             "SELECT r.id, r.name, r.owner_id, r.description, r.public,"
-            " COALESCE(ls.total_likes, 0) AS total_likes "
+            " r.created_at, r.updated_at, COALESCE(ls.total_likes, 0) AS total_likes "
             "FROM reports AS r "
             "LEFT JOIN (SELECT report_id, COUNT(*) as total_likes "
             "FROM report_like GROUP BY report_id) AS ls "
             "ON r.id = ls.report_id "
             "WHERE r.public IS TRUE "
-            "ORDER BY total_likes DESC "
         )
+        if reports_request.search_string:
+            reports_query += sql.SQL(
+                "AND LOWER(r.name) LIKE LOWER(%s) OR "
+                "LOWER(r.description) LIKE LOWER(%s) "
+            )
+            params += [
+                "%" + reports_request.search_string + "%",
+                "%" + reports_request.search_string + "%",
+            ]
+
+        if reports_request.sort == HomeSort.POPULAR:
+            reports_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif reports_request.sort == HomeSort.RECENT:
+            reports_query += sql.SQL(" ORDER BY r.updated_at DESC ")
+
         if reports_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
             params = [reports_request.limit] + params
+        params += [reports_request.offset]
         reports_query += sql.SQL(" OFFSET %s; ")
         report_result = db.execute_return(reports_query, params)
 
@@ -322,6 +391,8 @@ def public_reports(reports_request: ReportsRequest) -> list[Report]:
                             editor=False,
                             public=True,
                             description=res[3],
+                            created_at=res[5].isoformat(),
+                            updated_at=res[6].isoformat(),
                         )
                     )
         return reports

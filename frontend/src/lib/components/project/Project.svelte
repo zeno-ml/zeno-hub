@@ -3,7 +3,7 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
 	import type { Project, ProjectStats, User, ZenoService } from '$lib/zenoapi';
-	import { mdiDotsHorizontal, mdiImage, mdiLayersTriple, mdiTag, mdiText } from '@mdi/js';
+	import { mdiDatabaseOutline, mdiDotsHorizontal, mdiRobotOutline } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
@@ -25,12 +25,6 @@
 	let hovering = false;
 	let showCopy = false;
 	let showConfirmDelete = false;
-
-	function getProjectIcon() {
-		if (project.view.includes('image')) return mdiImage;
-		if (project.view.includes('chat') || project.view.includes('text')) return mdiText;
-		else return mdiTag;
-	}
 </script>
 
 {#if showCopy && user !== null}
@@ -127,7 +121,7 @@
 			theme={'zeno-tooltip'}
 			position="bottom"
 		>
-			<ProjectStat icon={getProjectIcon()} text={stats.numInstances} />
+			<ProjectStat icon={mdiDatabaseOutline} text={stats.numInstances} />
 		</Tooltip>
 		<Tooltip
 			content={`This project has ${shortenNumber(stats.numModels, 1)} system${
@@ -136,7 +130,7 @@
 			theme={'zeno-tooltip'}
 			position="bottom"
 		>
-			<ProjectStat icon={mdiLayersTriple} text={stats.numModels} />
+			<ProjectStat icon={mdiRobotOutline} text={stats.numModels} />
 		</Tooltip>
 		<LikeButton
 			on:like={() => zenoClient.likeProject(project.uuid)}

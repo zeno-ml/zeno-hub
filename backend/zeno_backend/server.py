@@ -1,5 +1,6 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import asyncio
+import datetime
 import json
 import logging
 import os
@@ -26,21 +27,18 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.homepage import HomeEntry, HomeRequest
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
-    ProjectsDetails,
-    ProjectsRequest,
     ProjectState,
 )
 from zeno_backend.classes.report import (
     Report,
     ReportElement,
     ReportResponse,
-    ReportsDetails,
-    ReportsRequest,
     SliceElementOptions,
     SliceElementSpec,
 )
@@ -457,44 +455,49 @@ def get_server() -> FastAPI:
         return uuid
 
     @api_app.post(
-        "/projects-details",
-        response_model=ProjectsDetails,
+        "/home-details",
+        response_model=list[HomeEntry],
         tags=["zeno"],
     )
-    def get_projects_details(
-        project_request: ProjectsRequest, current_user=Depends(auth.claim())
-    ):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        projects = select.projects(user, project_request)
-        project_stats = []
-        for proj in projects:
-            project_stats.append(select.project_stats(proj.uuid, user.id))
-        return ProjectsDetails(
-            projects=projects,
-            statistics=project_stats,
-            num_projects=select.project_count(),
-        )
-
-    @api_app.post(
-        "/public-projects-details",
-        response_model=ProjectsDetails,
-        tags=["zeno"],
-    )
-    def get_public_projects_details(project_request: ProjectsRequest, req: Request):
+    def get_home_details(home_request: HomeRequest, req: Request):
         user = util.get_user_from_token(req)
-        projects = select.public_projects(project_request)
-        project_stats = []
+        if user is None and home_request.user_name is not None:
+            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+
+        if user and home_request.user_name is not None:
+            projects = select.projects(user, home_request)
+        else:
+            projects = select.public_projects(home_request)
+        project_ret: list[HomeEntry] = []
         for proj in projects:
-            project_stats.append(
-                select.project_stats(proj.uuid, user.id if user else None)
+            stats = select.project_stats(proj.uuid, user.id if user else None)
+            project_ret.append(HomeEntry(entry=proj, stats=stats))
+
+        if user and home_request.user_name is not None:
+            reports = select.reports(user, home_request)
+        else:
+            reports = select.public_reports(home_request)
+        report_ret: list[HomeEntry] = []
+        for rep in reports:
+            stats = select.report_stats(rep.id, user.id if user else None)
+            report_ret.append(HomeEntry(entry=rep, stats=stats))
+
+        if home_request.type_filter == "PROJECT":
+            return_entries = project_ret
+        elif home_request.type_filter == "REPORT":
+            return_entries = report_ret
+        else:
+            return_entries = project_ret + report_ret
+
+        if home_request.sort == "POPULAR":
+            return_entries.sort(key=lambda x: x.stats.num_likes, reverse=True)
+        elif home_request.sort == "RECENT":
+            return_entries.sort(
+                key=lambda x: datetime.datetime.fromisoformat(x.entry.updated_at),
+                reverse=True,
             )
-        return ProjectsDetails(
-            projects=projects,
-            statistics=project_stats,
-            num_projects=select.project_count(),
-        )
+
+        return return_entries
 
     @api_app.get(
         "/projects",
@@ -505,41 +508,7 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.projects(user, ProjectsRequest())
-
-    @api_app.post(
-        "/reports-details",
-        response_model=ReportsDetails,
-        tags=["zeno"],
-    )
-    def get_reports_details(
-        reports_request: ReportsRequest, current_user=Depends(auth.claim())
-    ):
-        user = select.user(current_user["username"])
-        if user is None:
-            return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        reports = select.reports(user, reports_request)
-        report_stats = []
-        for rep in reports:
-            report_stats.append(select.report_stats(rep.id, user.id))
-        return ReportsDetails(
-            reports=reports, statistics=report_stats, num_reports=select.report_count()
-        )
-
-    @api_app.post(
-        "/public-reports-details",
-        response_model=ReportsDetails,
-        tags=["zeno"],
-    )
-    def get_public_reports_details(reports_request: ReportsRequest, req: Request):
-        user = util.get_user_from_token(req)
-        reports = select.public_reports(reports_request)
-        report_stats = []
-        for rep in reports:
-            report_stats.append(select.report_stats(rep.id, user.id if user else None))
-        return ReportsDetails(
-            reports=reports, statistics=report_stats, num_reports=select.report_count()
-        )
+        return select.projects(user, HomeRequest())
 
     @api_app.get(
         "/reports",
@@ -550,7 +519,7 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
-        return select.reports(user, ReportsRequest())
+        return select.reports(user, HomeRequest())
 
     @api_app.post("/like-report/{report_id}", tags=["zeno"])
     def like_report(report_id: int, current_user=Depends(auth.claim())):
