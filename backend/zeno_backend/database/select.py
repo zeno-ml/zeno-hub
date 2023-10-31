@@ -39,7 +39,8 @@ from zeno_backend.processing.histogram_processing import calculate_histogram_buc
 
 PROJECTS_BASE_QUERY = sql.SQL(
     """
-    (SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+    (SELECT main.*, u.name AS owner_name FROM (
+    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
     p.public, p.description, TRUE AS editor, p.created_at, p.updated_at
     FROM projects AS p
     WHERE p.owner_id = %s
@@ -57,28 +58,33 @@ PROJECTS_BASE_QUERY = sql.SQL(
             FROM user_organization AS uo
             JOIN organization_project AS op
             ON uo.organization_id = op.organization_id
-            WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid)
+            WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid
+    ) AS main
+    LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
 
 REPORTS_BASE_QUERY = sql.SQL(
     """
-    (SELECT r.id, r.name, r.public, r.description, TRUE AS editor,
+    (SELECT main.*, u.name AS owner_name FROM (
+    SELECT r.id, r.name, r.owner_id, r.public, r.description, TRUE AS editor,
      r.created_at, r.updated_at FROM reports AS r
     WHERE r.owner_id = %s
     UNION
-    SELECT r.id, r.name, r.public, r.description, ur.editor, r.created_at, r.updated_at
-    FROM reports AS r
+    SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor, r.created_at,
+    r.updated_at FROM reports AS r
     LEFT JOIN user_report AS ur ON r.id = ur.report_id
     WHERE ur.user_id = %s
     UNION
-    SELECT r.id, r.name, r.public, r.description, orr.editor, r.created_at, r.updated_at
-    FROM reports AS r
+    SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor, r.created_at,
+    r.updated_at FROM reports AS r
     JOIN (SELECT orr.report_id, uo.organization_id, editor
             FROM user_organization AS uo
             JOIN organization_report AS orr
             ON uo.organization_id = orr.organization_id
-            WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id)
+            WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id
+    ) AS main
+    LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
 
@@ -156,25 +162,20 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
 
         projects = []
         for res in projects_result:
-            owner_name = db.execute_return(
-                "SELECT name FROM users WHERE id = %s", [res[2]]
-            )
-            if len(owner_name) != 0:
-                owner_name = owner_name[0][0]
-                projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
-                        samples_per_page=res[4],
-                        public=res[5],
-                        description=res[6],
-                        editor=res[7],
-                        created_at=res[8].isoformat(),
-                        updated_at=res[9].isoformat(),
-                    )
+            projects.append(
+                Project(
+                    uuid=res[0],
+                    name=res[1],
+                    view=match_instance_view(res[3]),
+                    samples_per_page=res[4],
+                    public=res[5],
+                    description=res[6],
+                    editor=res[7],
+                    created_at=res[8].isoformat(),
+                    updated_at=res[9].isoformat(),
+                    owner_name=res[10],
                 )
+            )
         return projects
 
 
@@ -218,31 +219,32 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
             projects_query += sql.SQL(" LIMIT %s ")
             params = [home_request.limit] + params
         params += [home_request.offset]
-        projects_query += sql.SQL(" OFFSET %s;")
+        projects_query += sql.SQL(" OFFSET %s")
+
+        projects_query = (
+            sql.SQL("(SELECT main.*, u.name AS owner_name FROM (")
+            + projects_query
+            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id)")
+        )
 
         projects_result = db.execute_return(projects_query, params)
 
         projects = []
         for res in projects_result:
-            owner_name = db.execute_return(
-                "SELECT name FROM users WHERE id = %s;", [res[2]]
-            )
-            if owner_name is not None:
-                owner_name = owner_name[0][0]
-                projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
-                        samples_per_page=res[4],
-                        editor=False,
-                        public=True,
-                        description=res[5],
-                        created_at=res[7].isoformat(),
-                        updated_at=res[8].isoformat(),
-                    )
+            projects.append(
+                Project(
+                    uuid=res[0],
+                    name=res[1],
+                    view=match_instance_view(res[3]),
+                    samples_per_page=res[4],
+                    editor=False,
+                    public=True,
+                    description=res[5],
+                    created_at=res[7].isoformat(),
+                    updated_at=res[8].isoformat(),
+                    owner_name=res[10],
                 )
+            )
         return projects
 
 
@@ -310,15 +312,15 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
                 Report(
                     id=report[0],
                     name=report[1],
-                    owner_name=user.name,
                     linked_projects=[]
                     if len(linked_projects) == 0
                     else list(map(lambda linked: str(linked[0]), linked_projects)),
-                    editor=True,
-                    public=report[2],
-                    description=report[3],
-                    created_at=report[5].isoformat(),
-                    updated_at=report[6].isoformat(),
+                    public=report[3],
+                    description=report[4],
+                    editor=report[5],
+                    created_at=report[6].isoformat(),
+                    updated_at=report[7].isoformat(),
+                    owner_name=report[8],
                 )
             )
         return reports
@@ -363,38 +365,37 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
             reports_query += sql.SQL(" LIMIT %s ")
             params = [home_request.limit] + params
         params += [home_request.offset]
-        reports_query += sql.SQL(" OFFSET %s; ")
+        reports_query += sql.SQL(" OFFSET %s")
+
+        reports_query = (
+            sql.SQL("SELECT main.*, u.name AS owner_name FROM (")
+            + reports_query
+            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id")
+        )
         report_result = db.execute_return(reports_query, params)
 
         reports = []
         if report_result is not None:
             for res in report_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s;", [res[2]]
-                )
                 linked_projects = db.execute_return(
                     "SELECT project_uuid FROM report_project WHERE report_id = %s;",
                     [res[0]],
                 )
-                if owner_name is not None:
-                    owner_name = owner_name[0][0]
-                    reports.append(
-                        Report(
-                            id=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            linked_projects=[]
-                            if len(linked_projects) == 0
-                            else list(
-                                map(lambda linked: str(linked[0]), linked_projects)
-                            ),
-                            editor=False,
-                            public=True,
-                            description=res[3],
-                            created_at=res[5].isoformat(),
-                            updated_at=res[6].isoformat(),
-                        )
+                reports.append(
+                    Report(
+                        id=res[0],
+                        name=res[1],
+                        linked_projects=[]
+                        if len(linked_projects) == 0
+                        else list(map(lambda linked: str(linked[0]), linked_projects)),
+                        editor=False,
+                        public=True,
+                        description=res[3],
+                        created_at=res[5].isoformat(),
+                        updated_at=res[6].isoformat(),
+                        owner_name=res[8],
                     )
+                )
         return reports
 
 

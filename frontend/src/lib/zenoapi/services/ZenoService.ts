@@ -712,18 +712,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Reports
-	 * @returns Report Successful Response
-	 * @throws ApiError
-	 */
-	public getReports(): CancelablePromise<Array<Report>> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/reports'
-		});
-	}
-
-	/**
 	 * Like Report
 	 * @param reportId
 	 * @returns any Successful Response

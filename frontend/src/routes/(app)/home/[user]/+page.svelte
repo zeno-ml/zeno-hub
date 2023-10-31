@@ -40,7 +40,7 @@
 {/if}
 
 <HomeSearchBar bind:typeFilter bind:searchText bind:sort bind:showNewReport myHub={true} />
-<div class="pb-6 h-full content-start overflow-y-auto grid grid-cols-home gap-5">
+<div class="h-full content-start overflow-y-auto grid grid-cols-home gap-5">
 	{#each data.entries as entry (entry.entry.name || entry.entry.name)}
 		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 	{/each}

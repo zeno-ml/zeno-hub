@@ -466,7 +466,7 @@ def get_server() -> FastAPI:
 
         if (
             home_request.type_filter != HomeTypeFilter.PROJECT
-            or home_request.type_filter != HomeTypeFilter.ALL
+            and home_request.type_filter != HomeTypeFilter.ALL
         ):
             projects = []
         elif user and home_request.user_name is not None:
@@ -480,10 +480,10 @@ def get_server() -> FastAPI:
 
         if (
             home_request.type_filter != HomeTypeFilter.REPORT
-            or home_request.type_filter != HomeTypeFilter.ALL
+            and home_request.type_filter != HomeTypeFilter.ALL
         ):
             reports = []
-        if user and home_request.user_name is not None:
+        elif user and home_request.user_name is not None:
             reports = select.reports(user, home_request)
         else:
             reports = select.public_reports(home_request)
