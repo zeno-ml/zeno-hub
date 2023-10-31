@@ -56,20 +56,6 @@ class ProjectStats(CamelModel):
     user_liked: bool
 
 
-class ProjectsDetails(CamelModel):
-    """Projects and details for homepage rendering.
-
-    Attributes:
-        projects (list[Project]): project object with project metadata.
-        statistics (list[ProjectStats]): project statistics.
-        num_projects (int): number of projects.
-    """
-
-    projects: list[Project]
-    statistics: list[ProjectStats]
-    num_projects: int
-
-
 class ProjectState(CamelModel):
     """State variables for a Zeno project.
 
@@ -114,17 +100,3 @@ class ProjectCopy(CamelModel):
     copy_systems: bool
     copy_slices: bool
     copy_charts: bool
-
-
-class ProjectsRequest(CamelModel):
-    """Request for a list of projects.
-
-    Attributes:
-        offset (int): offset to query projects table.
-        limit (int): limit to query projects table.
-        order (str): order to sort query with.
-    """
-
-    offset: int = 0
-    limit: int | None = None
-    order: str | None = None

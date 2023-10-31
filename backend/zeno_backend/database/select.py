@@ -101,12 +101,12 @@ def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-def projects(user: User, projects_request: HomeRequest) -> list[Project]:
+def projects(user: User, home_request: HomeRequest) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
         user (User): the user for which to fetch the available projects.
-        projects_request (ProjectsRequest): the request object.
+        home_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: the projects that the user can interact with.
@@ -131,26 +131,26 @@ def projects(user: User, projects_request: HomeRequest) -> list[Project]:
             )
         )
 
-        if projects_request.search_string:
+        if home_request.search_string:
             projects_query += sql.SQL(
                 "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
                 "LOWER(cp.description) LIKE LOWER(%s) "
             )
             params += [
-                "%" + projects_request.search_string + "%",
-                "%" + projects_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
             ]
 
-        if projects_request.sort == HomeSort.POPULAR:
+        if home_request.sort == HomeSort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif projects_request.sort == HomeSort.RECENT:
+        elif home_request.sort == HomeSort.RECENT:
             projects_query += sql.SQL(" ORDER BY updated_at DESC ")
 
-        if projects_request.limit:
+        if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params += [projects_request.limit, projects_request.offset]
+            params += [home_request.limit, home_request.offset]
         else:
-            params += [projects_request.offset]
+            params += [home_request.offset]
         projects_query += sql.SQL(" OFFSET %s; ")
         projects_result = db.execute_return(projects_query, params)
 
@@ -178,11 +178,11 @@ def projects(user: User, projects_request: HomeRequest) -> list[Project]:
         return projects
 
 
-def public_projects(projects_request: HomeRequest) -> list[Project]:
+def public_projects(home_request: HomeRequest) -> list[Project]:
     """Fetch all publicly accessible projects.
 
     Args:
-        projects_request (ProjectsRequest): the request object.
+        home_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: all publicly accessible projects.
@@ -199,25 +199,25 @@ def public_projects(projects_request: HomeRequest) -> list[Project]:
             "ON p.uuid = ls.project_uuid "
             "WHERE p.public IS TRUE "
         )
-        if projects_request.search_string:
+        if home_request.search_string:
             projects_query += sql.SQL(
                 "AND LOWER(p.name) LIKE LOWER(%s) OR "
                 "LOWER(p.description) LIKE LOWER(%s) "
             )
             params += [
-                "%" + projects_request.search_string + "%",
-                "%" + projects_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
             ]
 
-        if projects_request.sort == HomeSort.POPULAR:
+        if home_request.sort == HomeSort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif projects_request.sort == HomeSort.RECENT:
+        elif home_request.sort == HomeSort.RECENT:
             projects_query += sql.SQL(" ORDER BY updated_at DESC ")
 
-        if projects_request.limit:
+        if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params = [projects_request.limit] + params
-        params += [projects_request.offset]
+            params = [home_request.limit] + params
+        params += [home_request.offset]
         projects_query += sql.SQL(" OFFSET %s;")
 
         projects_result = db.execute_return(projects_query, params)
@@ -246,12 +246,12 @@ def public_projects(projects_request: HomeRequest) -> list[Project]:
         return projects
 
 
-def reports(user: User, reports_request: HomeRequest) -> list[Report]:
+def reports(user: User, home_request: HomeRequest) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
         user (User): the user for which to fetch the available reports.
-        reports_request (ReportsRequest): the request object.
+        home_request (HomeRequest): the request object.
 
     Returns:
         list[Report]: the reports that the user can interact with.
@@ -276,26 +276,26 @@ def reports(user: User, reports_request: HomeRequest) -> list[Report]:
             )
         )
 
-        if reports_request.search_string:
+        if home_request.search_string:
             reports_query += sql.SQL(
                 "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
                 "LOWER(cp.description) LIKE LOWER(%s) "
             )
             params += [
-                "%" + reports_request.search_string + "%",
-                "%" + reports_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
             ]
 
-        if reports_request.sort == HomeSort.POPULAR:
+        if home_request.sort == HomeSort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif reports_request.sort == HomeSort.RECENT:
+        elif home_request.sort == HomeSort.RECENT:
             reports_query += sql.SQL(" ORDER BY updated_at DESC ")
 
-        if reports_request.limit:
+        if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params += [reports_request.limit, reports_request.offset]
+            params += [home_request.limit, home_request.offset]
         else:
-            params += [reports_request.offset]
+            params += [home_request.offset]
 
         reports_query += sql.SQL(" OFFSET %s; ")
         reports_result = db.execute_return(reports_query, params)
@@ -324,11 +324,11 @@ def reports(user: User, reports_request: HomeRequest) -> list[Report]:
         return reports
 
 
-def public_reports(reports_request: HomeRequest) -> list[Report]:
+def public_reports(home_request: HomeRequest) -> list[Report]:
     """Fetch all publicly accessible reports.
 
     Args:
-        reports_request (ReportsRequest): the request object.
+        home_request (HomeRequest): the request object.
 
     Returns:
         list[Report]: all publicly accessible reports.
@@ -344,25 +344,25 @@ def public_reports(reports_request: HomeRequest) -> list[Report]:
             "ON r.id = ls.report_id "
             "WHERE r.public IS TRUE "
         )
-        if reports_request.search_string:
+        if home_request.search_string:
             reports_query += sql.SQL(
                 "AND LOWER(r.name) LIKE LOWER(%s) OR "
                 "LOWER(r.description) LIKE LOWER(%s) "
             )
             params += [
-                "%" + reports_request.search_string + "%",
-                "%" + reports_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
             ]
 
-        if reports_request.sort == HomeSort.POPULAR:
+        if home_request.sort == HomeSort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif reports_request.sort == HomeSort.RECENT:
+        elif home_request.sort == HomeSort.RECENT:
             reports_query += sql.SQL(" ORDER BY r.updated_at DESC ")
 
-        if reports_request.limit:
+        if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params = [reports_request.limit] + params
-        params += [reports_request.offset]
+            params = [home_request.limit] + params
+        params += [home_request.offset]
         reports_query += sql.SQL(" OFFSET %s; ")
         report_result = db.execute_return(reports_query, params)
 
