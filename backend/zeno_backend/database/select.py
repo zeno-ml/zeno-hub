@@ -133,8 +133,8 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
 
         if home_request.search_string:
             projects_query += sql.SQL(
-                "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
-                "LOWER(cp.description) LIKE LOWER(%s) "
+                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s)) "
             )
             params += [
                 "%" + home_request.search_string + "%",
@@ -201,8 +201,8 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
         )
         if home_request.search_string:
             projects_query += sql.SQL(
-                "AND LOWER(p.name) LIKE LOWER(%s) OR "
-                "LOWER(p.description) LIKE LOWER(%s) "
+                "AND (LOWER(p.name) LIKE LOWER(%s) OR "
+                "LOWER(p.description) LIKE LOWER(%s)) "
             )
             params += [
                 "%" + home_request.search_string + "%",
@@ -221,6 +221,7 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
         projects_query += sql.SQL(" OFFSET %s;")
 
         projects_result = db.execute_return(projects_query, params)
+        print(projects_result)
 
         projects = []
         for res in projects_result:
@@ -278,8 +279,8 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
 
         if home_request.search_string:
             reports_query += sql.SQL(
-                "WHERE LOWER(cp.name) LIKE LOWER(%s) OR "
-                "LOWER(cp.description) LIKE LOWER(%s) "
+                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s)) "
             )
             params += [
                 "%" + home_request.search_string + "%",
@@ -346,8 +347,8 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
         )
         if home_request.search_string:
             reports_query += sql.SQL(
-                "AND LOWER(r.name) LIKE LOWER(%s) OR "
-                "LOWER(r.description) LIKE LOWER(%s) "
+                "AND (LOWER(r.name) LIKE LOWER(%s) OR "
+                "LOWER(r.description) LIKE LOWER(%s)) "
             )
             params += [
                 "%" + home_request.search_string + "%",

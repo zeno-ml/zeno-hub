@@ -804,7 +804,12 @@ def get_server() -> FastAPI:
         user = select.user(current_user["username"])
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        insert.report(name, user)
+        res = insert.report(name, user)
+        if not res:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Report with that name already exists",
+            )
         AmplitudeHandler().track(
             BaseEvent(
                 event_type="Report Created",

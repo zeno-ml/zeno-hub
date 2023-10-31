@@ -393,18 +393,29 @@ async def system(
         await conn.commit()
 
 
-def report(name: str, user: User):
+def report(name: str, user: User) -> bool:
     """Adding a report to Zeno.
 
     Args:
         name (str): how the report is called.
         user (User): user who created the report.
+
+    Returns:
+        bool: whether the report was created successfully.
     """
-    db = Database()
-    db.connect_execute(
-        "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
-        [name, user.id, False],
-    )
+    with Database() as db:
+        res = db.execute_return(
+            "SELECT id FROM reports WHERE name = %s AND owner_id = %s;",
+            [name, user.id],
+        )
+        if len(res) > 0:
+            return False
+        db.execute(
+            "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
+            [name, user.id, False],
+        )
+        db.commit()
+        return True
 
 
 def report_element(report_id: int, element: ReportElement) -> int | None:

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import ProjectStat from '$lib/components/project/ProjectStat.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
@@ -15,10 +16,10 @@
 	export let report: Report;
 	export let stats: ReportStats;
 	export let user: User | null = null;
-	export let deletable = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let deletable = user && $page.route.id === '/(app)/home/[user]';
 	let showOptions = false;
 	let hovering = false;
 	let showConfirmDelete = false;
@@ -42,7 +43,7 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid mr-2 mb-2 rounded-lg border-grey-light border shadow-sm flex flex-col p-3 px-5 hover:shadow-md w-full sm:w-80 h-60 bg-primary-ligther"
+	class="border-solid rounded-lg border-grey-light border shadow-sm py-2 px-4 hover:shadow-md flex flex-col bg-primary-light"
 >
 	<div class="flex justify-between w-full">
 		<div class={deletable ? 'mr-5' : ''}>
@@ -92,8 +93,8 @@
 	</div>
 	<p class="mt-4 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
 		{#if report.description}
-			{report.description.slice(0, 160)}
-			{#if report.description.length > 160}
+			{report.description.slice(0, 100)}
+			{#if report.description.length > 100}
 				...
 			{/if}
 		{/if}

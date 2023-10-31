@@ -1,12 +1,9 @@
 <script lang="ts">
 	import Banner from '$lib/components/general/Banner.svelte';
-	import HomeCard from '$lib/components/general/HomeCard.svelte';
-	import HomeSearchBar from '$lib/components/general/HomeSearchBar.svelte';
+	import HomeCard from '$lib/components/home/HomeCard.svelte';
+	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import NewReportPopup from '$lib/components/popups/NewReportPopup.svelte';
 	import { HomeSort, HomeTypeFilter, ZenoService } from '$lib/zenoapi/index.js';
-	import { mdiPlus } from '@mdi/js';
-	import { Icon } from '@smui/button';
-	import Button from '@smui/button/src/Button.svelte';
 	import { getContext } from 'svelte';
 
 	export let data;
@@ -42,14 +39,8 @@
 	/>
 {/if}
 
-<HomeSearchBar bind:typeFilter bind:searchText bind:sort />
-<Button on:click={() => (showNewReport = true)}>
-	<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
-		<path d={mdiPlus} />
-	</Icon>
-	New Report
-</Button>
-<div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
+<HomeSearchBar bind:typeFilter bind:searchText bind:sort bind:showNewReport myHub={true} />
+<div class="pb-6 h-full content-start overflow-y-auto grid grid-cols-home gap-5">
 	{#each data.entries as entry (entry.entry.name || entry.entry.name)}
 		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 	{/each}

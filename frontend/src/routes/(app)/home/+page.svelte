@@ -1,6 +1,6 @@
 <script lang="ts">
-	import HomeCard from '$lib/components/general/HomeCard.svelte';
-	import HomeSearchBar from '$lib/components/general/HomeSearchBar.svelte';
+	import HomeCard from '$lib/components/home/HomeCard.svelte';
+	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 
 	import { HomeSort, HomeTypeFilter, type ZenoService } from '$lib/zenoapi/index.js';
 	import { getContext } from 'svelte';
@@ -29,7 +29,7 @@
 </script>
 
 <HomeSearchBar bind:searchText bind:typeFilter bind:sort />
-<div class="flex flex-wrap pb-6 h-full content-start overflow-y-auto">
+<div class="h-full content-start overflow-y-auto grid grid-cols-home gap-5">
 	{#each data.entries as entry (entry.entry.name || entry.entry.name)}
 		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 	{/each}
