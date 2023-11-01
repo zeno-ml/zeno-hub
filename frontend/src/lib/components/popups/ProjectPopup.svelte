@@ -80,12 +80,12 @@
 	<Content
 		style="display: flex; flex-direction: column; width: 800px; max-height: 80vh; overflow-y: scroll"
 	>
-		<h2 class="text-xl mb-4">Project Settings</h2>
+		<h2 class="mb-4 text-xl">Project Settings</h2>
 		<!--Project Settings-->
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex flex-col">
-			<div class="flex mb-6">
-				<div class="flex flex-col mr-8 w-1/2">
+			<div class="mb-6 flex">
+				<div class="mr-8 flex w-1/2 flex-col">
 					<div>
 						<Textfield
 							bind:value={config.name}
@@ -109,6 +109,8 @@
 						<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
 						<span>Public visibility</span>
 					</div>
+					<span>Created: {new Date(config.createdAt).toLocaleString()}</span>
+					<span>Updated: {new Date(config.updatedAt).toLocaleString()}</span>
 				</div>
 			</div>
 			<div>
@@ -120,12 +122,12 @@
 				/>
 			</div>
 			<!--Visibility Settings-->
-			<div class="mb-5 flex flex-col mt-12" transition:fade>
-				<h3 class="text-lg mb-2">Viewers</h3>
+			<div class="mb-5 mt-12 flex flex-col" transition:fade>
+				<h3 class="mb-2 text-lg">Viewers</h3>
 				{#if projectUsers.length > 0}
 					<table>
 						<thead
-							class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+							class="border-grey-lighter bg-background sticky left-0 top-0 border-b pb-1 font-semibold"
 						>
 							<th>Email</th>
 							<th class="w-1">Editor</th>
@@ -200,7 +202,7 @@
 				)}
 				{#if availableOrgs.length > 0 || projectOrganizations.length > 0}
 					<div class="mb-5 flex flex-col" transition:fade>
-						<h3 class="text-lg mb-2">Organizations</h3>
+						<h3 class="mb-2 text-lg">Organizations</h3>
 						{#if projectOrganizations.length > 0}
 							<table>
 								<thead>

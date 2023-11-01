@@ -101,6 +101,8 @@
 						<Checkbox checked={report.public} on:click={() => (report.public = !report.public)} />
 						<span>Public visibility</span>
 					</div>
+					<span>Created: {new Date(report.createdAt).toLocaleString()}</span>
+					<span>Updated: {new Date(report.updatedAt).toLocaleString()}</span>
 				</div>
 			</div>
 			<Textfield textarea bind:value={report.description} label="Description" style="width: 100%" />

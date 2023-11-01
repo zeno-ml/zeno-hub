@@ -111,7 +111,8 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         db.execute(
             sql.SQL(
                 "INSERT INTO slices (name, folder_id, filter, project_uuid) (SELECT "
-                "name, folder_id, filter, {} as uuid FROM slices WHERE project_uuid = %s);"
+                "name, folder_id, filter, {} as uuid FROM slices "
+                "WHERE project_uuid = %s);"
             ).format(sql.Literal(new_uuid)),
             [project_uuid],
         )
@@ -122,11 +123,13 @@ def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         )
         for folder in folders:
             id = db.execute_return(
-                "INSERT INTO folders (name, project_uuid) VALUES (%s, %s) RETURNING id;",
+                "INSERT INTO folders (name, project_uuid) VALUES (%s, %s) "
+                "RETURNING id;",
                 [folder[1], new_uuid],
             )
             db.execute(
-                "UPDATE slices SET folder_id = %s WHERE folder_id = %s AND project_uuid = %s;",
+                "UPDATE slices SET folder_id = %s WHERE folder_id = %s "
+                "AND project_uuid = %s;",
                 [id[0][0], folder[0], new_uuid],
             )
 

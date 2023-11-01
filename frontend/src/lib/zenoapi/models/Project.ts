@@ -32,6 +32,6 @@ export type Project = {
 	editor: boolean;
 	samplesPerPage?: number;
 	public?: boolean;
-	createdAt?: string;
-	updatedAt?: string;
+	createdAt: string;
+	updatedAt: string;
 };

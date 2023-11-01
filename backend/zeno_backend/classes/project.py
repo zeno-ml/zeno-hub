@@ -34,8 +34,8 @@ class Project(CamelModel):
     editor: bool
     samples_per_page: int = 10
     public: bool = False
-    created_at: str = ""
-    updated_at: str = ""
+    created_at: str
+    updated_at: str
 
 
 class ProjectStats(CamelModel):
