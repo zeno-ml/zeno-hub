@@ -109,8 +109,9 @@
 	on:dragleave={() => (dragOver = false)}
 	on:drop={dragDropped}
 >
-	<div class="flex items-center">
+	<div class="flex items-center min-w-0">
 		<button
+			class="shrink-0"
 			style="width: 24px; height: 24px; cursor: pointer; margin-right: 10px;"
 			on:keydown={() => ({})}
 			on:click={() => (expandFolder = !expandFolder)}
@@ -119,9 +120,11 @@
 				<path fill="black" d={expandFolder ? mdiChevronDown : mdiChevronRight} />
 			</Icon>
 		</button>
-		{folder.name}
+		<span class="truncate">
+			{folder.name}
+		</span>
 	</div>
-	<div class="flex items-center" use:clickOutside={() => (showOptions = false)}>
+	<div class="flex items-center shrink-0 pl-2" use:clickOutside={() => (showOptions = false)}>
 		{#if showOptions}
 			<div class="top-0 right-0 absolute mt-9 z-10">
 				<Paper style="padding: 3px 0px;" elevation={7}>
