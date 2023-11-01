@@ -77,15 +77,15 @@ REPORTS_BASE_QUERY = sql.SQL(
 
         UNION
 
-        SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor, r.created_at,
-        r.updated_at FROM reports AS r
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor,
+        r.created_at, r.updated_at FROM reports AS r
         LEFT JOIN user_report AS ur ON r.id = ur.report_id
         WHERE ur.user_id = %s
 
         UNION
 
-        SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor, r.created_at,
-        r.updated_at FROM reports AS r
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor,
+        r.created_at, r.updated_at FROM reports AS r
         JOIN (SELECT orr.report_id, uo.organization_id, editor
                 FROM user_organization AS uo
                 JOIN organization_report AS orr
@@ -638,8 +638,8 @@ def report(
             owner_id = owner_id[0][0]
 
         report_result = db.execute_return(
-            "SELECT id, name, owner_id, public, description FROM reports "
-            "WHERE name = %s AND owner_id = %s;",
+            "SELECT id, name, owner_id, public, description, created_at, updated_at "
+            "FROM reports WHERE name = %s AND owner_id = %s;",
             [report_name, owner_id],
         )
         if len(report_result) == 0:
@@ -706,6 +706,8 @@ def report(
                 editor=editor,
                 public=bool(report_result[0][3]),
                 description=str(report_result[0][4]),
+                created_at=report_result[0][5].isoformat(),
+                updated_at=report_result[0][6].isoformat(),
             ),
             report_elements=list(
                 map(
@@ -808,7 +810,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
     with Database() as db:
         project_result = db.execute_return(
             "SELECT uuid, name, owner_id, view, "
-            "samples_per_page, public, description "
+            "samples_per_page, public, description, created_at, updated_at "
             "FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
@@ -830,6 +832,8 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 else 10,
                 public=bool(project_result[5]),
                 description=str(project_result[6]),
+                created_at=project_result[7].isoformat(),
+                updated_at=project_result[8].isoformat(),
             )
 
 
@@ -844,7 +848,7 @@ def report_from_id(report_id: int) -> Report | None:
     """
     with Database() as db:
         report_result = db.execute_return(
-            "SELECT id, name, owner_id, public, description "
+            "SELECT id, name, owner_id, public, description, created_at, updated_at "
             "FROM reports WHERE id = %s;",
             [report_id],
         )
@@ -872,6 +876,8 @@ def report_from_id(report_id: int) -> Report | None:
                 editor=False,
                 public=bool(report_result[3]),
                 description=str(report_result[4]),
+                created_at=report_result[5].isoformat(),
+                updated_at=report_result[6].isoformat(),
             )
 
 
@@ -1596,8 +1602,8 @@ def slice_element_options(
             return None
 
         project = db.execute_return(
-            "SELECT uuid, name, view, samples_per_page, public, description, owner_id "
-            "FROM projects WHERE uuid = %s;",
+            "SELECT uuid, name, view, samples_per_page, public, description, owner_id, "
+            "created_at, updated_at FROM projects WHERE uuid = %s;",
             [project_uuid],
         )
         owner_name = db.execute_return(
@@ -1657,6 +1663,8 @@ def slice_element_options(
                 owner_name=owner_name[0][0],
                 view=match_instance_view(project[0][2]),
                 editor=False,
+                created_at=project[0][7].isoformat(),
+                updated_at=project[0][8].isoformat(),
             ),
         )
 

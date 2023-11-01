@@ -75,12 +75,12 @@
 		}}
 	/>
 {/if}
-<div class="w-full h-full bg-yellowish overflow-scroll">
+<div class="bg-yellowish h-full w-full overflow-scroll">
 	<div
-		class="flex flex-col max-w-4xl m-auto bg-background px-10 pb-20 md:mt-6 md:mb-6 sm:mt-0 sm:mb-0 rounded shadow"
+		class="bg-background m-auto flex max-w-4xl flex-col rounded px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
 	>
-		<div class="flex items-center mt-12 justify-between">
-			<h1 class="text-5xl mr-6 text-grey-darkest">
+		<div class="mt-12 flex items-center justify-between">
+			<h1 class="text-grey-darkest mr-6 text-5xl">
 				{data.report.name}
 			</h1>
 			<LikeButton
@@ -91,11 +91,13 @@
 				report
 			/>
 		</div>
-		<h5 class="mt-4 ml-1 text-lg">Author: {data.report.ownerName}</h5>
-		<hr class="mt-4 text-grey-light" />
+		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
+		<span class="text-grey-darker mt-2">{new Date(data.report.updatedAt).toLocaleDateString()}</span
+		>
+		<hr class="text-grey-light mt-4" />
 
 		{#if data.report.editor}
-			<p class="mt-4 mb-2">Associated Projects</p>
+			<p class="mb-2 mt-4">Associated Projects</p>
 			{#await zenoClient.getProjects() then projects}
 				<Svelecte
 					bind:value={selectedProjects}
@@ -107,7 +109,7 @@
 					options={projects}
 				/>
 			{/await}
-			<hr class="mt-4 mb-4 text-grey-light" />
+			<hr class="text-grey-light mb-4 mt-4" />
 			<AddElementButton
 				position={0}
 				{addElement}
@@ -115,7 +117,7 @@
 			/>
 		{/if}
 		<div
-			class="flex flex-col mt-2"
+			class="mt-2 flex flex-col"
 			use:dndzone={{
 				items: elements,
 				dragDisabled: !dragEnabled,
