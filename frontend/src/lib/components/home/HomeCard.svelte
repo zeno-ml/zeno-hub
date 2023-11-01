@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import CopyProjectPopup from '$lib/components/popups/CopyProjectPopup.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
 	import type { Project, ProjectStats, Report, ReportStats, User, ZenoService } from '$lib/zenoapi';
@@ -33,6 +35,17 @@
 
 	let showOptions = false;
 	let hovering = false;
+	let showCopy = false;
+	let showConfirmDelete = false;
+
+	function deleteEntry() {
+		if (project !== null) {
+			zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+		} else if (report !== null) {
+			zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
+		}
+		showConfirmDelete = false;
+	}
 
 	function likeEntry() {
 		if (project !== null) {
@@ -43,6 +56,18 @@
 	}
 </script>
 
+{#if showCopy && user !== null && project !== null}
+	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
+{/if}
+{#if showConfirmDelete}
+	<Confirm
+		message={`Are you sure you want to delete this ${project ? 'project' : 'report'}?`}
+		on:cancel={() => {
+			showConfirmDelete = false;
+		}}
+		on:confirm={() => deleteEntry()}
+	/>
+{/if}
 <button
 	on:click={() =>
 		goto(`/${project ? 'project' : 'report'}/${entry.ownerName}/${encodeURIComponent(entry.name)}`)}
@@ -76,7 +101,14 @@
 					</IconButton>
 				{/if}
 				{#if showOptions}
-					<EntryOptions bind:showOptions {report} {project} {user} />
+					<EntryOptions
+						bind:showOptions
+						bind:showConfirmDelete
+						bind:showCopy
+						{report}
+						{project}
+						{user}
+					/>
 				{/if}
 			</div>
 			<LikeButton
