@@ -109,7 +109,7 @@
 	on:dragleave={() => (dragOver = false)}
 	on:drop={dragDropped}
 >
-	<div class="flex items-center min-w-0">
+	<div class="flex min-w-0 items-center">
 		<button
 			class="shrink-0"
 			style="width: 24px; height: 24px; cursor: pointer; margin-right: 10px;"
@@ -124,7 +124,7 @@
 			{folder.name}
 		</span>
 	</div>
-	<div class="flex items-center shrink-0 pl-2" use:clickOutside={() => (showOptions = false)}>
+	<div class="flex shrink-0 items-center pl-2" use:clickOutside={() => (showOptions = false)}>
 		{#if showOptions}
 			<div class="absolute right-0 top-0 z-10 mt-9">
 				<Paper style="padding: 3px 0px;" elevation={7}>
