@@ -1,6 +1,6 @@
 import { getClient } from '$lib/api/client';
 import type { AuthUser } from '$lib/auth/types';
-import { HomeSort, type HomeEntry } from '$lib/zenoapi';
+import { EntrySort, type HomeEntry } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ cookies, url, depends }) {
@@ -26,7 +26,7 @@ export async function load({ cookies, url, depends }) {
 	try {
 		homeResponse = await zenoClient.getHomeDetails({
 			userName: cognitoUser.name,
-			sort: HomeSort.RECENT
+			sort: EntrySort.RECENT
 		});
 	} catch (e) {
 		throw redirect(303, `/login?redirectto=${url.pathname}`);

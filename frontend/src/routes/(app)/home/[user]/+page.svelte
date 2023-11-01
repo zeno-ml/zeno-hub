@@ -3,7 +3,7 @@
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import NewReportPopup from '$lib/components/popups/NewReportPopup.svelte';
-	import { HomeSort, HomeTypeFilter, ZenoService } from '$lib/zenoapi/index.js';
+	import { EntrySort, EntryTypeFilter, ZenoService } from '$lib/zenoapi/index.js';
 	import { getContext } from 'svelte';
 
 	export let data;
@@ -12,12 +12,12 @@
 
 	let showNewReport = false;
 	let searchText = '';
-	let typeFilter: HomeTypeFilter = HomeTypeFilter.ALL;
-	let sort: HomeSort = HomeSort.RECENT;
+	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
+	let sort: EntrySort = EntrySort.RECENT;
 
 	$: updateEntries(searchText, typeFilter, sort);
 
-	function updateEntries(searchString: string, typeFilter: HomeTypeFilter, sort: HomeSort) {
+	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		zenoClient
 			.getHomeDetails({
 				userName: data.cognitoUser.name,

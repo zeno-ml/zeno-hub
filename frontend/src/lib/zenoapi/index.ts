@@ -19,6 +19,8 @@ export type { Body_upload_system_schema } from './models/Body_upload_system_sche
 export type { Chart } from './models/Chart';
 export type { ChartResponse } from './models/ChartResponse';
 export { ChartType } from './models/ChartType';
+export { EntrySort } from './models/EntrySort';
+export { EntryTypeFilter } from './models/EntryTypeFilter';
 export type { FilterPredicate } from './models/FilterPredicate';
 export type { FilterPredicateGroup } from './models/FilterPredicateGroup';
 export type { Folder } from './models/Folder';
@@ -28,8 +30,6 @@ export type { HistogramBucket } from './models/HistogramBucket';
 export type { HistogramRequest } from './models/HistogramRequest';
 export type { HomeEntry } from './models/HomeEntry';
 export type { HomeRequest } from './models/HomeRequest';
-export { HomeSort } from './models/HomeSort';
-export { HomeTypeFilter } from './models/HomeTypeFilter';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export { Join } from './models/Join';
 export { MetadataType } from './models/MetadataType';

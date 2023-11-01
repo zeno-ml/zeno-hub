@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { shortenNumber } from '$lib/util/util';
@@ -14,12 +14,10 @@
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
-	import Paper, { Content } from '@smui/paper';
 	import { getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
-	import Confirm from '../popups/Confirm.svelte';
-	import CopyProjectPopup from '../popups/CopyProjectPopup.svelte';
-	import ElementStat from './ElementStat.svelte';
+	import EntryOptions from './EntryOptions.svelte';
+	import EntryStat from './EntryStat.svelte';
 
 	export let entry: Project | Report;
 	export let stats: ProjectStats | ReportStats;
@@ -27,72 +25,60 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	const entryType = 'uuid' in entry ? 'project' : 'report';
-	const project = entryType === 'project' ? (entry as Project) : null;
-	const report = entryType === 'report' ? (entry as Report) : null;
-	const projectStats = entryType === 'project' ? (stats as ProjectStats) : null;
-	const reportStats = entryType === 'report' ? (stats as ReportStats) : null;
+	const project = 'uuid' in entry ? (entry as Project) : null;
+	const report = 'id' in entry ? (entry as Report) : null;
+	const projectStats = 'uuid' in entry ? (stats as ProjectStats) : null;
+	const reportStats = 'id' in entry ? (stats as ReportStats) : null;
+	const exploreTab = $page.route.id === '/(app)/home';
 
-	let deletable = user && $page.route.id === '/(app)/home/[user]';
-	let showCopy = false;
 	let showOptions = false;
 	let hovering = false;
-	let showConfirmDelete = false;
-
-	function deleteEntry() {
-		if (project !== null) {
-			zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
-		} else if (report !== null) {
-			zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
-		}
-		showConfirmDelete = false;
-	}
 
 	function likeEntry() {
 		if (project !== null) {
-			zenoClient.likeProject(project.uuid).then(() => invalidate('app:projects'));
+			zenoClient.likeProject(project.uuid);
 		} else if (report !== null) {
-			zenoClient.likeReport(report.id).then(() => invalidate('app:reports'));
+			zenoClient.likeReport(report.id);
 		}
 	}
 </script>
 
-{#if showCopy && user !== null && project !== null}
-	<CopyProjectPopup config={project} on:close={() => (showCopy = false)} {user} />
-{/if}
-{#if showConfirmDelete}
-	<Confirm
-		message={`Are you sure you want to delete this ${entryType}?`}
-		on:cancel={() => {
-			showConfirmDelete = false;
-		}}
-		on:confirm={() => deleteEntry()}
-	/>
-{/if}
 <button
-	on:click={() => goto(`/${entryType}/${entry.ownerName}/${encodeURIComponent(entry.name)}`)}
+	on:click={() =>
+		goto(`/${project ? 'project' : 'report'}/${entry.ownerName}/${encodeURIComponent(entry.name)}`)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
 	class="border-solid rounded-lg border-grey-light border shadow-sm py-2 px-4 hover:shadow-md flex flex-col"
 >
-	<div class="flex justify-between w-full mb-2">
-		<div class={deletable ? 'mr-5' : ''}>
-			<p class="text-black text-lg text-left">{entry.name}</p>
-			<div class="flex items-center mt-1">
-				<Icon class="w-6 h-6 mr-2" tag="svg" viewBox="0 0 24 24">
-					<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
-				</Icon>
-				<p class="text-base truncate flex-shrink-0 text-grey-dark">{entry.ownerName}</p>
+	<div class="flex justify-between items-center w-full">
+		<p class="text-black text-lg text-left">{entry.name}</p>
+		<div class="flex items-center">
+			<div
+				class="w-9 h-9 relative mr-2"
+				use:clickOutside={() => {
+					showOptions = false;
+				}}
+			>
+				{#if hovering && (project || (project && !exploreTab) || (report && !exploreTab && user?.name === entry.ownerName))}
+					<IconButton
+						size="button"
+						style="padding: 0px"
+						on:click={(e) => {
+							e.stopPropagation();
+							showOptions = !showOptions;
+						}}
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path fill="black" d={mdiDotsHorizontal} />
+						</Icon>
+					</IconButton>
+				{/if}
+				{#if showOptions}
+					<EntryOptions bind:showOptions {report} {project} {user} />
+				{/if}
 			</div>
-		</div>
-		<div
-			class="w-9 h-9 relative"
-			use:clickOutside={() => {
-				showOptions = false;
-			}}
-		>
 			<LikeButton
 				on:like={likeEntry}
 				likes={stats.numLikes}
@@ -100,57 +86,15 @@
 				{user}
 				report
 			/>
-			{#if hovering}
-				<IconButton
-					size="button"
-					style="padding: 0px"
-					on:click={(e) => {
-						e.stopPropagation();
-						showOptions = !showOptions;
-					}}
-				>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path fill="black" d={mdiDotsHorizontal} />
-					</Icon>
-				</IconButton>
-			{/if}
-			{#if showOptions}
-				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
-					<Paper style="padding: 3px 0px;" elevation={7}>
-						<Content>
-							{#if project}
-								<button
-									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = false;
-										showCopy = true;
-									}}
-								>
-									<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
-									<span class="text-xs">Copy</span>
-								</button>
-							{/if}
-							{#if deletable}
-								<button
-									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
-									on:click={(e) => {
-										e.stopPropagation();
-										showOptions = false;
-										showConfirmDelete = true;
-									}}
-								>
-									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-									<span class="text-xs">Remove</span>
-								</button>
-							{/if}
-						</Content>
-					</Paper>
-				</div>
-			{/if}
 		</div>
 	</div>
-	<p class="mb-2 text-sm w-full text-left overflow-y-auto flex-grow">
+	<div class="flex items-center mb-2">
+		<Icon class="w-6 h-6 mr-2" tag="svg" viewBox="0 0 24 24">
+			<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
+		</Icon>
+		<p class="text-base truncate flex-shrink-0 text-grey-dark">{entry.ownerName}</p>
+	</div>
+	<p class="text-sm w-full text-left overflow-y-auto flex-grow">
 		{#if entry.description}
 			{entry.description.slice(0, 100)}
 			{#if entry.description.length > 100}
@@ -159,15 +103,17 @@
 		{/if}
 	</p>
 	<div
-		class="flex items-center justify-between w-full py-2 px-4 mb-2 rounded-md {report
+		class="flex items-center justify-between w-full py-2 px-4 my-2 rounded-md {report
 			? 'bg-primary'
 			: 'bg-primary-light'}"
 	>
-		<div class="font-semibold {report ? 'text-white' : ''}">{entryType}</div>
+		<div class="font-semibold {report ? 'text-white' : ''}">
+			{project ? 'project' : 'report'}
+		</div>
 		<div class="flex items-center">
 			{#if projectStats !== null}
-				<ElementStat
-					{entryType}
+				<EntryStat
+					entryType={project ? 'project' : 'report'}
 					icon={mdiDatabaseOutline}
 					text={projectStats.numInstances}
 					tooltipContent={`This project has ${shortenNumber(
@@ -175,8 +121,8 @@
 						1
 					)} data point${projectStats.numInstances !== 1 ? 's' : ''}.`}
 				/>
-				<ElementStat
-					{entryType}
+				<EntryStat
+					entryType={project ? 'project' : 'report'}
 					icon={mdiRobotOutline}
 					text={projectStats.numModels}
 					tooltipContent={`This project has ${shortenNumber(projectStats.numModels, 1)} system${
@@ -184,16 +130,16 @@
 					}.`}
 				/>
 			{:else if reportStats !== null}
-				<ElementStat
-					{entryType}
+				<EntryStat
+					entryType={project ? 'project' : 'report'}
 					icon={mdiFileTree}
 					text={reportStats.numProjects}
 					tooltipContent={`This report has ${shortenNumber(reportStats.numProjects, 1)} project${
 						reportStats.numProjects !== 1 ? 's' : ''
 					} linked to it.`}
 				/>
-				<ElementStat
-					{entryType}
+				<EntryStat
+					entryType={project ? 'project' : 'report'}
 					icon={mdiSitemap}
 					text={reportStats.numElements}
 					tooltipContent={`This report has ${shortenNumber(reportStats.numElements, 1)} element${

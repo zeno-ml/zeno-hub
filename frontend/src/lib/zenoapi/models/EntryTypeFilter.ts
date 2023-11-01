@@ -6,7 +6,7 @@
 /**
  * Type of entry to filter by.
  */
-export enum HomeTypeFilter {
+export enum EntryTypeFilter {
 	ALL = 'ALL',
 	PROJECT = 'PROJECT',
 	REPORT = 'REPORT'

@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { HomeSort } from './HomeSort';
-import type { HomeTypeFilter } from './HomeTypeFilter';
+import type { EntrySort } from './EntrySort';
+import type { EntryTypeFilter } from './EntryTypeFilter';
 
 /**
  * Request for homepage entries.
@@ -22,6 +22,6 @@ export type HomeRequest = {
 	offset?: number;
 	limit?: number | null;
 	searchString?: string;
-	typeFilter?: HomeTypeFilter;
-	sort?: HomeSort;
+	typeFilter?: EntryTypeFilter;
+	sort?: EntrySort;
 };

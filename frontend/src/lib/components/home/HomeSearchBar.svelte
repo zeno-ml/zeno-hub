@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { HomeSort, HomeTypeFilter } from '$lib/zenoapi';
+	import { EntrySort, EntryTypeFilter } from '$lib/zenoapi';
 	import { mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/src/Button.svelte';
@@ -7,8 +7,8 @@
 	import { Input } from '@smui/textfield';
 
 	export let searchText;
-	export let typeFilter: HomeTypeFilter;
-	export let sort: HomeSort;
+	export let typeFilter: EntryTypeFilter;
+	export let sort: EntrySort;
 	export let showNewReport = false;
 	export let myHub = false;
 
@@ -24,9 +24,9 @@
 		}, 200);
 	}
 
-	function updateTypeFilter(type: HomeTypeFilter) {
+	function updateTypeFilter(type: EntryTypeFilter) {
 		if (typeFilter === type) {
-			typeFilter = HomeTypeFilter.ALL;
+			typeFilter = EntryTypeFilter.ALL;
 		} else {
 			typeFilter = type;
 		}
@@ -49,21 +49,21 @@
 		<div class="flex items-center mt-4 md:mt-0 md:ml-4 h-full">
 			<Button
 				class="mr-2 h-full"
-				variant={typeFilter === HomeTypeFilter.PROJECT ? 'raised' : 'outlined'}
-				on:click={() => updateTypeFilter(HomeTypeFilter.PROJECT)}
+				variant={typeFilter === EntryTypeFilter.PROJECT ? 'raised' : 'outlined'}
+				on:click={() => updateTypeFilter(EntryTypeFilter.PROJECT)}
 			>
 				projects
 			</Button>
 			<Button
 				class="h-full"
-				variant={typeFilter === HomeTypeFilter.REPORT ? 'raised' : 'outlined'}
-				on:click={() => updateTypeFilter(HomeTypeFilter.REPORT)}
+				variant={typeFilter === EntryTypeFilter.REPORT ? 'raised' : 'outlined'}
+				on:click={() => updateTypeFilter(EntryTypeFilter.REPORT)}
 			>
 				reports
 			</Button>
 			<select class="ml-4 mr-2 h-full w-28 px-2" bind:value={sort}>
-				<option value={HomeSort.RECENT}>Recent</option>
-				<option value={HomeSort.POPULAR}>Popular</option>
+				<option value={EntrySort.RECENT}>Recent</option>
+				<option value={EntrySort.POPULAR}>Popular</option>
 			</select>
 		</div>
 	</div>

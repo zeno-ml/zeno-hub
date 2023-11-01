@@ -6,7 +6,7 @@
 /**
  * Sort order for entries.
  */
-export enum HomeSort {
+export enum EntrySort {
 	POPULAR = 'POPULAR',
 	RECENT = 'RECENT'
 }

@@ -27,7 +27,7 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.chart import Chart, ChartResponse
 from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.homepage import HomeEntry, HomeRequest, HomeTypeFilter
+from zeno_backend.classes.homepage import EntryTypeFilter, HomeEntry, HomeRequest
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric, MetricRequest
 from zeno_backend.classes.project import (
@@ -465,8 +465,8 @@ def get_server() -> FastAPI:
             return Response(status_code=status.HTTP_401_UNAUTHORIZED)
 
         if (
-            home_request.type_filter != HomeTypeFilter.PROJECT
-            and home_request.type_filter != HomeTypeFilter.ALL
+            home_request.type_filter != EntryTypeFilter.PROJECT
+            and home_request.type_filter != EntryTypeFilter.ALL
         ):
             projects = []
         elif user and home_request.user_name is not None:
@@ -479,8 +479,8 @@ def get_server() -> FastAPI:
             project_ret.append(HomeEntry(entry=proj, stats=stats))
 
         if (
-            home_request.type_filter != HomeTypeFilter.REPORT
-            and home_request.type_filter != HomeTypeFilter.ALL
+            home_request.type_filter != EntryTypeFilter.REPORT
+            and home_request.type_filter != EntryTypeFilter.ALL
         ):
             reports = []
         elif user and home_request.user_name is not None:

@@ -8,7 +8,7 @@ from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.homepage import HomeRequest, HomeSort
+from zeno_backend.classes.homepage import EntrySort, HomeRequest
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
@@ -40,26 +40,30 @@ from zeno_backend.processing.histogram_processing import calculate_histogram_buc
 PROJECTS_BASE_QUERY = sql.SQL(
     """
     (SELECT main.*, u.name AS owner_name FROM (
-    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-    p.public, p.description, TRUE AS editor, p.created_at, p.updated_at
-    FROM projects AS p
-    WHERE p.owner_id = %s
-    UNION
-    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, up.editor, p.created_at, p.updated_at
-    FROM projects AS p
-    LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
-    WHERE up.user_id = %s
-    UNION
-    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, op.editor, p.created_at, p.updated_at
-    FROM projects AS p
-    JOIN (SELECT op.project_uuid, uo.organization_id, editor
-            FROM user_organization AS uo
-            JOIN organization_project AS op
-            ON uo.organization_id = op.organization_id
-            WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid
-    ) AS main
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+        p.public, p.description, TRUE AS editor, p.created_at, p.updated_at
+        FROM projects AS p
+        WHERE p.owner_id = %s
+        
+        UNION
+
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+            p.public, p.description, up.editor, p.created_at, p.updated_at
+        FROM projects AS p
+        LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
+        WHERE up.user_id = %s
+
+        UNION
+
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+            p.public, p.description, op.editor, p.created_at, p.updated_at
+        FROM projects AS p
+        JOIN (SELECT op.project_uuid, uo.organization_id, editor
+                FROM user_organization AS uo
+                JOIN organization_project AS op
+                ON uo.organization_id = op.organization_id
+                WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid
+        ) AS main
     LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
@@ -67,23 +71,27 @@ PROJECTS_BASE_QUERY = sql.SQL(
 REPORTS_BASE_QUERY = sql.SQL(
     """
     (SELECT main.*, u.name AS owner_name FROM (
-    SELECT r.id, r.name, r.owner_id, r.public, r.description, TRUE AS editor,
-     r.created_at, r.updated_at FROM reports AS r
-    WHERE r.owner_id = %s
-    UNION
-    SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor, r.created_at,
-    r.updated_at FROM reports AS r
-    LEFT JOIN user_report AS ur ON r.id = ur.report_id
-    WHERE ur.user_id = %s
-    UNION
-    SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor, r.created_at,
-    r.updated_at FROM reports AS r
-    JOIN (SELECT orr.report_id, uo.organization_id, editor
-            FROM user_organization AS uo
-            JOIN organization_report AS orr
-            ON uo.organization_id = orr.organization_id
-            WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id
-    ) AS main
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, TRUE AS editor,
+        r.created_at, r.updated_at FROM reports AS r
+        WHERE r.owner_id = %s
+
+        UNION
+
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor, r.created_at,
+        r.updated_at FROM reports AS r
+        LEFT JOIN user_report AS ur ON r.id = ur.report_id
+        WHERE ur.user_id = %s
+
+        UNION
+
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor, r.created_at,
+        r.updated_at FROM reports AS r
+        JOIN (SELECT orr.report_id, uo.organization_id, editor
+                FROM user_organization AS uo
+                JOIN organization_report AS orr
+                ON uo.organization_id = orr.organization_id
+                WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id
+        ) AS main
     LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
@@ -147,9 +155,9 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
                 "%" + home_request.search_string + "%",
             ]
 
-        if home_request.sort == HomeSort.POPULAR:
+        if home_request.sort == EntrySort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif home_request.sort == HomeSort.RECENT:
+        elif home_request.sort == EntrySort.RECENT:
             projects_query += sql.SQL(" ORDER BY updated_at DESC ")
 
         if home_request.limit:
@@ -210,9 +218,9 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
                 "%" + home_request.search_string + "%",
             ]
 
-        if home_request.sort == HomeSort.POPULAR:
+        if home_request.sort == EntrySort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif home_request.sort == HomeSort.RECENT:
+        elif home_request.sort == EntrySort.RECENT:
             projects_query += sql.SQL(" ORDER BY updated_at DESC ")
 
         if home_request.limit:
@@ -288,9 +296,9 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
                 "%" + home_request.search_string + "%",
             ]
 
-        if home_request.sort == HomeSort.POPULAR:
+        if home_request.sort == EntrySort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif home_request.sort == HomeSort.RECENT:
+        elif home_request.sort == EntrySort.RECENT:
             reports_query += sql.SQL(" ORDER BY updated_at DESC ")
 
         if home_request.limit:
@@ -356,9 +364,9 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
                 "%" + home_request.search_string + "%",
             ]
 
-        if home_request.sort == HomeSort.POPULAR:
+        if home_request.sort == EntrySort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC ")
-        elif home_request.sort == HomeSort.RECENT:
+        elif home_request.sort == EntrySort.RECENT:
             reports_query += sql.SQL(" ORDER BY r.updated_at DESC ")
 
         if home_request.limit:

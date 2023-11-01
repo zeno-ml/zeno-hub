@@ -7,7 +7,7 @@ from zeno_backend.classes.project import Project, ProjectStats
 from zeno_backend.classes.report import Report, ReportStats
 
 
-class HomeTypeFilter(str, Enum):
+class EntryTypeFilter(str, Enum):
     """Type of entry to filter by."""
 
     ALL = "ALL"
@@ -15,7 +15,7 @@ class HomeTypeFilter(str, Enum):
     REPORT = "REPORT"
 
 
-class HomeSort(str, Enum):
+class EntrySort(str, Enum):
     """Sort order for entries."""
 
     POPULAR = "POPULAR"
@@ -38,8 +38,8 @@ class HomeRequest(CamelModel):
     offset: int = 0
     limit: int | None = None
     search_string: str = ""
-    type_filter: HomeTypeFilter = HomeTypeFilter.ALL
-    sort: HomeSort = HomeSort.POPULAR
+    type_filter: EntryTypeFilter = EntryTypeFilter.ALL
+    sort: EntrySort = EntrySort.POPULAR
 
 
 class HomeEntry(CamelModel):

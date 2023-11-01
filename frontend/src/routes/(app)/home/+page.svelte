@@ -2,7 +2,7 @@
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 
-	import { HomeSort, HomeTypeFilter, type ZenoService } from '$lib/zenoapi/index.js';
+	import { EntrySort, EntryTypeFilter, type ZenoService } from '$lib/zenoapi/index.js';
 	import { getContext } from 'svelte';
 
 	export let data;
@@ -10,12 +10,12 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let searchText = '';
-	let typeFilter: HomeTypeFilter = HomeTypeFilter.ALL;
-	let sort: HomeSort = HomeSort.POPULAR;
+	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
+	let sort: EntrySort = EntrySort.POPULAR;
 
 	$: updateEntries(searchText, typeFilter, sort);
 
-	function updateEntries(searchString: string, typeFilter: HomeTypeFilter, sort: HomeSort) {
+	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		zenoClient
 			.getHomeDetails({
 				searchString,

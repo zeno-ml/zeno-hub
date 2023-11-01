@@ -399,6 +399,9 @@ def report(name: str, user: User):
     Args:
         name (str): how the report is called.
         user (User): user who created the report.
+
+    Raises:
+        Exception: a report with the same name already exists.
     """
     with Database() as db:
         res = db.execute_return(
