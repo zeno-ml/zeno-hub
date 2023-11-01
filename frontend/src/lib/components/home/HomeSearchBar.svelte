@@ -69,6 +69,14 @@
 	</div>
 	{#if myHub}
 		<div class="flex mt-4 md:ml-2 md:mt-0 h-full">
+			<a href="https://zenoml.com/docs/intro#creating-a-project" target="_blank">
+				<Button class="h-full">
+					<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
+						<path d={mdiPlus} />
+					</Icon>
+					New Project
+				</Button>
+			</a>
 			<Button class="h-full" on:click={() => (showNewReport = true)}>
 				<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
 					<path d={mdiPlus} />
