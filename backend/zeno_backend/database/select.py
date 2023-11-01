@@ -8,11 +8,11 @@ from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.homepage import EntrySort, HomeRequest
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
     Project,
-    ProjectsRequest,
     ProjectState,
     ProjectStats,
 )
@@ -20,7 +20,6 @@ from zeno_backend.classes.report import (
     Report,
     ReportElement,
     ReportResponse,
-    ReportsRequest,
     ReportStats,
     SliceElementOptions,
     SliceElementSpec,
@@ -40,46 +39,60 @@ from zeno_backend.processing.histogram_processing import calculate_histogram_buc
 
 PROJECTS_BASE_QUERY = sql.SQL(
     """
-    (SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-    p.public, p.description, TRUE AS editor
-    FROM projects AS p
-    WHERE p.owner_id = %s
-    UNION
-    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, up.editor
-    FROM projects AS p
-    LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
-    WHERE up.user_id = %s
-    UNION
-    SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
-        p.public, p.description, op.editor
-    FROM projects AS p
-    JOIN (SELECT op.project_uuid, uo.organization_id, editor
-            FROM user_organization AS uo
-            JOIN organization_project AS op
-            ON uo.organization_id = op.organization_id
-            WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid)
+    (SELECT main.*, u.name AS owner_name FROM (
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+        p.public, p.description, TRUE AS editor, p.created_at, p.updated_at
+        FROM projects AS p
+        WHERE p.owner_id = %s
+        
+        UNION
+
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+            p.public, p.description, up.editor, p.created_at, p.updated_at
+        FROM projects AS p
+        LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
+        WHERE up.user_id = %s
+
+        UNION
+
+        SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
+            p.public, p.description, op.editor, p.created_at, p.updated_at
+        FROM projects AS p
+        JOIN (SELECT op.project_uuid, uo.organization_id, editor
+                FROM user_organization AS uo
+                JOIN organization_project AS op
+                ON uo.organization_id = op.organization_id
+                WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid
+        ) AS main
+    LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
 
 REPORTS_BASE_QUERY = sql.SQL(
     """
-    (SELECT r.id, r.name, r.public, r.description, TRUE AS editor
-    FROM reports AS r
-    WHERE r.owner_id = %s
-    UNION
-    SELECT r.id, r.name, r.public, r.description, ur.editor
-    FROM reports AS r
-    LEFT JOIN user_report AS ur ON r.id = ur.report_id
-    WHERE ur.user_id = %s
-    UNION
-    SELECT r.id, r.name, r.public, r.description, orr.editor
-    FROM reports AS r
-    JOIN (SELECT orr.report_id, uo.organization_id, editor
-            FROM user_organization AS uo
-            JOIN organization_report AS orr
-            ON uo.organization_id = orr.organization_id
-            WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id)
+    (SELECT main.*, u.name AS owner_name FROM (
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, TRUE AS editor,
+        r.created_at, r.updated_at FROM reports AS r
+        WHERE r.owner_id = %s
+
+        UNION
+
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor, r.created_at,
+        r.updated_at FROM reports AS r
+        LEFT JOIN user_report AS ur ON r.id = ur.report_id
+        WHERE ur.user_id = %s
+
+        UNION
+
+        SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor, r.created_at,
+        r.updated_at FROM reports AS r
+        JOIN (SELECT orr.report_id, uo.organization_id, editor
+                FROM user_organization AS uo
+                JOIN organization_report AS orr
+                ON uo.organization_id = orr.organization_id
+                WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id
+        ) AS main
+    LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
 
@@ -102,12 +115,12 @@ def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
+def projects(user: User, home_request: HomeRequest) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
         user (User): the user for which to fetch the available projects.
-        projects_request (ProjectsRequest): the request object.
+        home_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: the projects that the user can interact with.
@@ -128,95 +141,127 @@ def projects(user: User, projects_request: ProjectsRequest) -> list[Project]:
             + sql.SQL(
                 "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
                 " CombinedProjects cp LEFT JOIN LikesSummary ls "
-                " ON cp.uuid = ls.project_uuid ORDER BY total_likes DESC "
+                " ON cp.uuid = ls.project_uuid "
             )
         )
-        if projects_request.limit:
+
+        if home_request.search_string:
+            projects_query += sql.SQL(
+                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s)) "
+            )
+            params += [
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+            ]
+
+        if home_request.sort == EntrySort.POPULAR:
+            projects_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif home_request.sort == EntrySort.RECENT:
+            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+
+        if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params += [projects_request.limit, projects_request.offset]
+            params += [home_request.limit, home_request.offset]
         else:
-            params += [projects_request.offset]
+            params += [home_request.offset]
         projects_query += sql.SQL(" OFFSET %s; ")
         projects_result = db.execute_return(projects_query, params)
 
         projects = []
         for res in projects_result:
-            owner_name = db.execute_return(
-                "SELECT name FROM users WHERE id = %s", [res[2]]
-            )
-            if len(owner_name) != 0:
-                owner_name = owner_name[0][0]
-                projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
-                        samples_per_page=res[4],
-                        public=res[5],
-                        description=res[6],
-                        editor=res[7],
-                    )
+            projects.append(
+                Project(
+                    uuid=res[0],
+                    name=res[1],
+                    view=match_instance_view(res[3]),
+                    samples_per_page=res[4],
+                    public=res[5],
+                    description=res[6],
+                    editor=res[7],
+                    created_at=res[8].isoformat(),
+                    updated_at=res[9].isoformat(),
+                    owner_name=res[10],
                 )
+            )
         return projects
 
 
-def public_projects(projects_request: ProjectsRequest) -> list[Project]:
+def public_projects(home_request: HomeRequest) -> list[Project]:
     """Fetch all publicly accessible projects.
 
     Args:
-        projects_request (ProjectsRequest): the request object.
+        home_request (ProjectsRequest): the request object.
 
     Returns:
         list[Project]: all publicly accessible projects.
     """
     with Database() as db:
-        params = [projects_request.offset]
+        params = []
         projects_query = sql.SQL(
             "SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page, "
-            "p.description, p.public, COALESCE(ls.total_likes, 0) AS total_likes "
+            "p.description, p.public, p.created_at, p.updated_at, "
+            "COALESCE(ls.total_likes, 0) AS total_likes "
             "FROM projects AS p "
             "LEFT JOIN (SELECT project_uuid, COUNT(*) as total_likes "
             "FROM project_like GROUP BY project_uuid) AS ls "
             "ON p.uuid = ls.project_uuid "
             "WHERE p.public IS TRUE "
-            "ORDER BY total_likes DESC "
         )
-        if projects_request.limit:
+        if home_request.search_string:
+            projects_query += sql.SQL(
+                "AND (LOWER(p.name) LIKE LOWER(%s) OR "
+                "LOWER(p.description) LIKE LOWER(%s)) "
+            )
+            params += [
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+            ]
+
+        if home_request.sort == EntrySort.POPULAR:
+            projects_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif home_request.sort == EntrySort.RECENT:
+            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+
+        if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params = [projects_request.limit] + params
-        projects_query += sql.SQL(" OFFSET %s;")
+            params = [home_request.limit] + params
+        params += [home_request.offset]
+        projects_query += sql.SQL(" OFFSET %s")
+
+        projects_query = (
+            sql.SQL("(SELECT main.*, u.name AS owner_name FROM (")
+            + projects_query
+            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id)")
+        )
 
         projects_result = db.execute_return(projects_query, params)
 
         projects = []
         for res in projects_result:
-            owner_name = db.execute_return(
-                "SELECT name FROM users WHERE id = %s;", [res[2]]
-            )
-            if owner_name is not None:
-                owner_name = owner_name[0][0]
-                projects.append(
-                    Project(
-                        uuid=res[0],
-                        name=res[1],
-                        owner_name=str(owner_name),
-                        view=match_instance_view(res[3]),
-                        samples_per_page=res[4],
-                        editor=False,
-                        public=True,
-                        description=res[5],
-                    )
+            projects.append(
+                Project(
+                    uuid=res[0],
+                    name=res[1],
+                    view=match_instance_view(res[3]),
+                    samples_per_page=res[4],
+                    editor=False,
+                    public=True,
+                    description=res[5],
+                    created_at=res[7].isoformat(),
+                    updated_at=res[8].isoformat(),
+                    owner_name=res[10],
                 )
+            )
         return projects
 
 
-def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
+def reports(user: User, home_request: HomeRequest) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
         user (User): the user for which to fetch the available reports.
-        reports_request (ReportsRequest): the request object.
+        home_request (HomeRequest): the request object.
 
     Returns:
         list[Report]: the reports that the user can interact with.
@@ -237,14 +282,31 @@ def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
             + sql.SQL(
                 "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
                 " CombinedReports cp LEFT JOIN LikesSummary ls "
-                " ON cp.id = ls.report_id ORDER BY total_likes DESC "
+                " ON cp.id = ls.report_id "
             )
         )
-        if reports_request.limit:
+
+        if home_request.search_string:
+            reports_query += sql.SQL(
+                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+                "LOWER(cp.description) LIKE LOWER(%s)) "
+            )
+            params += [
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+            ]
+
+        if home_request.sort == EntrySort.POPULAR:
+            reports_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif home_request.sort == EntrySort.RECENT:
+            reports_query += sql.SQL(" ORDER BY updated_at DESC ")
+
+        if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params += [reports_request.limit, reports_request.offset]
+            params += [home_request.limit, home_request.offset]
         else:
-            params += [reports_request.offset]
+            params += [home_request.offset]
+
         reports_query += sql.SQL(" OFFSET %s; ")
         reports_result = db.execute_return(reports_query, params)
 
@@ -258,72 +320,90 @@ def reports(user: User, reports_request: ReportsRequest) -> list[Report]:
                 Report(
                     id=report[0],
                     name=report[1],
-                    owner_name=user.name,
                     linked_projects=[]
                     if len(linked_projects) == 0
                     else list(map(lambda linked: str(linked[0]), linked_projects)),
-                    editor=True,
-                    public=report[2],
-                    description=report[3],
+                    public=report[3],
+                    description=report[4],
+                    editor=report[5],
+                    created_at=report[6].isoformat(),
+                    updated_at=report[7].isoformat(),
+                    owner_name=report[8],
                 )
             )
         return reports
 
 
-def public_reports(reports_request: ReportsRequest) -> list[Report]:
+def public_reports(home_request: HomeRequest) -> list[Report]:
     """Fetch all publicly accessible reports.
 
     Args:
-        reports_request (ReportsRequest): the request object.
+        home_request (HomeRequest): the request object.
 
     Returns:
         list[Report]: all publicly accessible reports.
     """
     with Database() as db:
-        params = [reports_request.offset]
+        params = []
         reports_query = sql.SQL(
             "SELECT r.id, r.name, r.owner_id, r.description, r.public,"
-            " COALESCE(ls.total_likes, 0) AS total_likes "
+            " r.created_at, r.updated_at, COALESCE(ls.total_likes, 0) AS total_likes "
             "FROM reports AS r "
             "LEFT JOIN (SELECT report_id, COUNT(*) as total_likes "
             "FROM report_like GROUP BY report_id) AS ls "
             "ON r.id = ls.report_id "
             "WHERE r.public IS TRUE "
-            "ORDER BY total_likes DESC "
         )
-        if reports_request.limit:
+        if home_request.search_string:
+            reports_query += sql.SQL(
+                "AND (LOWER(r.name) LIKE LOWER(%s) OR "
+                "LOWER(r.description) LIKE LOWER(%s)) "
+            )
+            params += [
+                "%" + home_request.search_string + "%",
+                "%" + home_request.search_string + "%",
+            ]
+
+        if home_request.sort == EntrySort.POPULAR:
+            reports_query += sql.SQL(" ORDER BY total_likes DESC ")
+        elif home_request.sort == EntrySort.RECENT:
+            reports_query += sql.SQL(" ORDER BY r.updated_at DESC ")
+
+        if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params = [reports_request.limit] + params
-        reports_query += sql.SQL(" OFFSET %s; ")
+            params = [home_request.limit] + params
+        params += [home_request.offset]
+        reports_query += sql.SQL(" OFFSET %s")
+
+        reports_query = (
+            sql.SQL("SELECT main.*, u.name AS owner_name FROM (")
+            + reports_query
+            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id")
+        )
         report_result = db.execute_return(reports_query, params)
 
         reports = []
         if report_result is not None:
             for res in report_result:
-                owner_name = db.execute_return(
-                    "SELECT name FROM users WHERE id = %s;", [res[2]]
-                )
                 linked_projects = db.execute_return(
                     "SELECT project_uuid FROM report_project WHERE report_id = %s;",
                     [res[0]],
                 )
-                if owner_name is not None:
-                    owner_name = owner_name[0][0]
-                    reports.append(
-                        Report(
-                            id=res[0],
-                            name=res[1],
-                            owner_name=str(owner_name),
-                            linked_projects=[]
-                            if len(linked_projects) == 0
-                            else list(
-                                map(lambda linked: str(linked[0]), linked_projects)
-                            ),
-                            editor=False,
-                            public=True,
-                            description=res[3],
-                        )
+                reports.append(
+                    Report(
+                        id=res[0],
+                        name=res[1],
+                        linked_projects=[]
+                        if len(linked_projects) == 0
+                        else list(map(lambda linked: str(linked[0]), linked_projects)),
+                        editor=False,
+                        public=True,
+                        description=res[3],
+                        created_at=res[5].isoformat(),
+                        updated_at=res[6].isoformat(),
+                        owner_name=res[8],
                     )
+                )
         return reports
 
 

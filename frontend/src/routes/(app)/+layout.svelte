@@ -27,7 +27,7 @@
 	}
 </script>
 
-<main class="flex sm:flex text-left w-full h-full">
+<main class="md:flex text-left w-full h-full">
 	<Header user={data.user} />
 	{#if Boolean($navigating)}
 		<div class="w-full h-full flex items-center justify-center">

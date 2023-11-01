@@ -399,12 +399,23 @@ def report(name: str, user: User):
     Args:
         name (str): how the report is called.
         user (User): user who created the report.
+
+    Raises:
+        Exception: a report with the same name already exists.
     """
-    db = Database()
-    db.connect_execute(
-        "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
-        [name, user.id, False],
-    )
+    with Database() as db:
+        res = db.execute_return(
+            "SELECT id FROM reports WHERE name = %s AND owner_id = %s;",
+            [name, user.id],
+        )
+        if len(res) > 0:
+            raise Exception("Report with this name already exists.")
+
+        db.execute(
+            "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
+            [name, user.id, False],
+        )
+        db.commit()
 
 
 def report_element(report_id: int, element: ReportElement) -> int | None:

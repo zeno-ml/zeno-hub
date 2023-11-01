@@ -6,11 +6,11 @@
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
-		mdiAccount,
+		mdiAccountCogOutline,
 		mdiArrowCollapseLeft,
 		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
-		mdiCog,
+		mdiCogOutline,
 		mdiCompare,
 		mdiCompassOutline,
 		mdiLogin,
@@ -38,7 +38,7 @@
 {#if reportEdit && user !== null}
 	<ReportPopup on:close={() => (reportEdit = false)} {user} />
 {/if}
-<nav class="z-20 flex sm:hidden">
+<nav class="z-20 flex md:hidden">
 	<header
 		class="w-full flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
 	>
@@ -47,7 +47,7 @@
 		</a>
 	</header>
 </nav>
-<nav class="z-20 hidden sm:flex">
+<nav class="z-20 hidden md:flex">
 	<header
 		class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
 	>
@@ -95,14 +95,14 @@
 				<HeaderIcon
 					pageName={'editProject'}
 					tooltipContent={"Edit your project's configuration"}
-					icon={mdiCog}
+					icon={mdiCogOutline}
 					on:click={() => (projectEdit = true)}
 				/>
 			{:else if $page.url.pathname.startsWith('/report/') && $page.data.report.editor}
 				<HeaderIcon
 					pageName={'editReport'}
 					tooltipContent={"Edit your report's configuration"}
-					icon={mdiCog}
+					icon={mdiCogOutline}
 					on:click={() => (reportEdit = true)}
 				/>
 			{/if}
@@ -110,7 +110,7 @@
 				<HeaderIcon
 					pageName={'account'}
 					tooltipContent={'Manage your account'}
-					icon={mdiAccount}
+					icon={mdiAccountCogOutline}
 					on:click={() => goto(`/account`)}
 				/>
 				<HeaderIcon
