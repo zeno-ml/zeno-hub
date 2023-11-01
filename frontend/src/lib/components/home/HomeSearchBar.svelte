@@ -13,10 +13,10 @@
 	export let myHub = false;
 
 	let tempSearchText = searchText;
+	let timer: ReturnType<typeof setTimeout>;
 
 	$: updateSearchText(tempSearchText);
 
-	let timer: ReturnType<typeof setTimeout>;
 	function updateSearchText(text: string) {
 		clearTimeout(timer);
 		timer = setTimeout(() => {
@@ -31,16 +31,6 @@
 			typeFilter = type;
 		}
 	}
-
-	function handleKeyDown(e: unknown) {
-		const keyboardEvent = e as KeyboardEvent;
-		// run doSearch on enter
-		if (keyboardEvent.key === 'Enter') {
-			doSearch();
-		}
-	}
-
-	function doSearch() {}
 </script>
 
 <div class="flex mt-4 md:items-center justify-between md:flex-row flex-col">
@@ -49,12 +39,7 @@
 			class="h-12 w-96 px-4 py-3 flex justify-center items-center border-solid rounded-lg border-grey-light border focus-within:shadow-md"
 		>
 			<Icon class="material-icons">search</Icon>
-			<Input
-				bind:value={tempSearchText}
-				on:keydown={handleKeyDown}
-				placeholder="Search"
-				class="ml-4"
-			/>
+			<Input bind:value={tempSearchText} placeholder="Search" class="ml-4" />
 			{#if tempSearchText !== ''}
 				<Fab class="ml-4 h-12" on:click={() => (tempSearchText = '')}>
 					<Icon class="material-icons">clear</Icon>

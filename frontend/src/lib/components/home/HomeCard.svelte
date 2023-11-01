@@ -77,12 +77,12 @@
 	on:blur={() => (hovering = false)}
 	class="border-solid rounded-lg border-grey-light border shadow-sm py-2 px-4 hover:shadow-md flex flex-col"
 >
-	<div class="flex justify-between w-full">
+	<div class="flex justify-between w-full mb-2">
 		<div class={deletable ? 'mr-5' : ''}>
 			<p class="text-black text-lg text-left">{entry.name}</p>
 			<div class="flex items-center mt-1">
 				<Icon class="w-6 h-6 mr-2" tag="svg" viewBox="0 0 24 24">
-					<path class="fill-primary" d={mdiAccountCircleOutline} />
+					<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
 				</Icon>
 				<p class="text-base truncate flex-shrink-0 text-grey-dark">{entry.ownerName}</p>
 			</div>
@@ -118,24 +118,39 @@
 				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
-							<button
-								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
-								on:click={(e) => {
-									e.stopPropagation();
-									showOptions = false;
-									showConfirmDelete = true;
-								}}
-							>
-								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
-								<span class="text-xs">Remove</span>
-							</button>
+							{#if project}
+								<button
+									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+									on:click={(e) => {
+										e.stopPropagation();
+										showOptions = false;
+										showCopy = true;
+									}}
+								>
+									<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
+									<span class="text-xs">Copy</span>
+								</button>
+							{/if}
+							{#if deletable}
+								<button
+									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+									on:click={(e) => {
+										e.stopPropagation();
+										showOptions = false;
+										showConfirmDelete = true;
+									}}
+								>
+									<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+									<span class="text-xs">Remove</span>
+								</button>
+							{/if}
 						</Content>
 					</Paper>
 				</div>
 			{/if}
 		</div>
 	</div>
-	<p class="mt-4 mr-2 text-sm w-full text-left overflow-y-auto flex-grow">
+	<p class="mb-2 text-sm w-full text-left overflow-y-auto flex-grow">
 		{#if entry.description}
 			{entry.description.slice(0, 100)}
 			{#if entry.description.length > 100}
@@ -144,7 +159,7 @@
 		{/if}
 	</p>
 	<div
-		class="flex items-center justify-between w-full py-2 px-4 mt-3 rounded-md {report
+		class="flex items-center justify-between w-full py-2 px-4 mb-2 rounded-md {report
 			? 'bg-primary'
 			: 'bg-primary-light'}"
 	>
