@@ -53,7 +53,7 @@
 	class="border-solid rounded-lg border-grey-light border shadow-sm py-2 px-4 hover:shadow-md flex flex-col"
 >
 	<div class="flex justify-between items-center w-full">
-		<p class="text-black text-lg text-left">{entry.name}</p>
+		<p class="text-black text-lg text-left truncate">{entry.name}</p>
 		<div class="flex items-center">
 			<div
 				class="w-9 h-9 relative mr-2"
