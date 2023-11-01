@@ -1,5 +1,5 @@
-<div class="rounded-lg flex items-center w-full bg-yellowish">
-	<p class="text-lg m-4">
+<div class="bg-yellowish flex w-full items-center rounded-lg">
+	<p class="m-4 text-lg">
 		<slot />
 	</p>
 </div>

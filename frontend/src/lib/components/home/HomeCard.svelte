@@ -50,13 +50,13 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="border-solid rounded-lg border-grey-light border shadow-sm py-2 px-4 hover:shadow-md flex flex-col"
+	class="border-grey-light flex flex-col rounded-lg border border-solid px-4 py-2 shadow-sm hover:shadow-md"
 >
-	<div class="flex justify-between items-center w-full">
-		<p class="text-black text-lg text-left truncate">{entry.name}</p>
+	<div class="flex w-full items-center justify-between">
+		<p class="truncate text-left text-lg text-black">{entry.name}</p>
 		<div class="flex items-center">
 			<div
-				class="w-9 h-9 relative mr-2"
+				class="relative mr-2 h-9 w-9"
 				use:clickOutside={() => {
 					showOptions = false;
 				}}
@@ -88,13 +88,13 @@
 			/>
 		</div>
 	</div>
-	<div class="flex items-center mb-2">
-		<Icon class="w-6 h-6 mr-2" tag="svg" viewBox="0 0 24 24">
+	<div class="mb-2 flex items-center">
+		<Icon class="mr-2 h-6 w-6" tag="svg" viewBox="0 0 24 24">
 			<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
 		</Icon>
-		<p class="text-base truncate flex-shrink-0 text-grey-dark">{entry.ownerName}</p>
+		<p class="text-grey-dark flex-shrink-0 truncate text-base">{entry.ownerName}</p>
 	</div>
-	<p class="text-sm w-full text-left overflow-y-auto flex-grow">
+	<p class="w-full flex-grow overflow-y-auto text-left text-sm">
 		{#if entry.description}
 			{entry.description.slice(0, 100)}
 			{#if entry.description.length > 100}
@@ -103,7 +103,7 @@
 		{/if}
 	</p>
 	<div
-		class="flex items-center justify-between w-full py-2 px-4 my-2 rounded-md {report
+		class="my-2 flex w-full items-center justify-between rounded-md px-4 py-2 {report
 			? 'bg-primary'
 			: 'bg-primary-light'}"
 	>

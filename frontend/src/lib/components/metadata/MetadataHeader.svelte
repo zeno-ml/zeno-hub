@@ -20,14 +20,14 @@
 	$: sortedMetrics = $metrics.sort((a, b) => a.name.localeCompare(b.name));
 </script>
 
-<div class="sticky bg-yellowish-light -top-2 flex items-center pb-2.5 z-10 pt-1">
+<div class="sticky -top-2 z-10 flex items-center bg-yellowish-light pb-2.5 pt-1">
 	{#if $model !== undefined && $models.length > 0}
-		<div class="mr-2.5 flex flex-col w-1/2">
-			<span class="my-1 text-grey-dark w-fit">
+		<div class="mr-2.5 flex w-1/2 flex-col">
+			<span class="my-1 w-fit text-grey-dark">
 				{$page.url.href.includes('compare') ? 'System A' : 'System'}
 			</span>
 			<select
-				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+				class="h-9 w-full rounded border border-grey-light text-sm text-grey"
 				bind:value={$model}
 			>
 				{#each sortedModels as mod}
@@ -37,10 +37,10 @@
 		</div>
 	{/if}
 	{#if !$page.url.href.includes('compare') && $metrics.length > 0 && $metric !== undefined}
-		<div class="flex flex-col w-1/2">
+		<div class="flex w-1/2 flex-col">
 			<span class="my-1 text-grey-dark">Metric</span>
 			<select
-				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+				class="h-9 w-full rounded border border-grey-light text-sm text-grey"
 				name="metric-select"
 				required
 				bind:value={$metric}
@@ -52,10 +52,10 @@
 		</div>
 	{/if}
 	{#if $page.url.href.includes('compare')}
-		<div class="flex flex-col w-1/2">
+		<div class="flex w-1/2 flex-col">
 			<span class="my-1 text-grey-dark">System B</span>
 			<select
-				class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+				class="h-9 w-full rounded border border-grey-light text-sm text-grey"
 				bind:value={$comparisonModel}
 			>
 				{#each excludeModels as mod}
@@ -67,10 +67,10 @@
 </div>
 
 {#if $page.url.href.includes('compare') && comparisonColumnOptions.length > 0}
-	<div class="mt-3 mb-3">
+	<div class="mb-3 mt-3">
 		<h4 class="mb-1">Comparison Feature</h4>
 		<select
-			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+			class="h-9 w-full rounded border border-grey-light text-sm text-grey"
 			bind:value={$comparisonColumn}
 		>
 			{#each comparisonColumnOptions as col (col.id)}
@@ -81,10 +81,10 @@
 {/if}
 
 {#if $page.url.href.includes('compare') && $metric !== undefined && $metrics.length > 0}
-	<div class="flex flex-col w-full mt-3 mb-3">
+	<div class="mb-3 mt-3 flex w-full flex-col">
 		<span class="my-1 text-grey-dark">Metric</span>
 		<select
-			class="w-full h-9 border border-grey-light rounded text-sm text-grey"
+			class="h-9 w-full rounded border border-grey-light text-sm text-grey"
 			bind:value={$metric}
 		>
 			{#each sortedMetrics as met}

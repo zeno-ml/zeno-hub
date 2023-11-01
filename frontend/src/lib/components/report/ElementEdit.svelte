@@ -43,8 +43,8 @@
 	}
 </script>
 
-<div class="flex p-3 h-full">
-	<div class="flex flex-col w-full">
+<div class="flex h-full p-3">
+	<div class="flex w-full flex-col">
 		<Svelecte
 			style="margin-bottom: 10px;"
 			value={element.type}

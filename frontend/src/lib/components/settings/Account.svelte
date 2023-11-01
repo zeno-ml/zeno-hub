@@ -36,7 +36,7 @@
 		<Button variant="raised" class="mb-2" on:click={() => (showFeatureFlags = true)}>
 			Configure feature flags
 		</Button>
-		<p class="italic mb-4">
+		<p class="mb-4 italic">
 			Note: Feature flags are saved as browser cookies. If you clear your cookies or switch
 			browsers, your settings will be lost.
 		</p>
@@ -48,14 +48,14 @@
 	>
 		Generate new API key
 	</Button>
-	<p class="italic mb-2">
+	<p class="mb-2 italic">
 		Note: You can only have one API key at a time. Generating a new key will overwrite your existing
 		key.
 	</p>
-	<div class="flex mb-4">
+	<div class="mb-4 flex">
 		{#if api_key}
 			<p class="mr-3">API Key:</p>
-			<button on:click={copyKey} on:keypress={copyKey} class="hover:text-primary cursor-pointer">
+			<button on:click={copyKey} on:keypress={copyKey} class="cursor-pointer hover:text-primary">
 				{api_key}
 			</button>
 			{#if copied}

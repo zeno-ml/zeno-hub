@@ -46,7 +46,7 @@
 		}}
 	/>
 {/if}
-<div class="flex flex-col mt-7">
+<div class="mt-7 flex flex-col">
 	<div class="flex items-center">
 		<h2 class="mr-2.5 text-lg">Organizations ({organizations.length})</h2>
 		<IconButton
@@ -70,7 +70,7 @@
 	</div>
 	{#if organizations.length > 0}
 		<table class="mt-1">
-			<thead class="border-b border-grey-lighter pb-2 top-0 left-0 sticky bg-background">
+			<thead class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-2">
 				<th>Name</th>
 				<th># Members</th>
 			</thead>

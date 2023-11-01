@@ -16,9 +16,9 @@
 	$: charts.set(data.charts);
 </script>
 
-<div class="flex flex-col w-full p-8 pt-5">
-	<div class="flex items-center h-12 mb-1">
-		<h3 class="text-2xl mr-4">Charts</h3>
+<div class="flex w-full flex-col p-8 pt-5">
+	<div class="mb-1 flex h-12 items-center">
+		<h3 class="mr-4 text-2xl">Charts</h3>
 		{#if $project.editor}
 			<Button
 				on:click={() => {
@@ -40,7 +40,7 @@
 			</Button>
 		{/if}
 	</div>
-	<div class="w-full mb-6 h-0.5 bg-grey-light rounded-full" />
+	<div class="mb-6 h-0.5 w-full rounded-full bg-grey-light" />
 	<div class="flex flex-wrap overflow-y-auto">
 		{#each $charts.sort((a, b) => a.id - b.id) as chart}
 			<ChartHomeBlock {chart} />

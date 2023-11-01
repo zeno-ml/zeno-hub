@@ -126,17 +126,17 @@
 	}
 </script>
 
-<div class="overflow-y-auto flex flex-wrap content-start w-full h-full">
+<div class="flex h-full w-full flex-wrap content-start overflow-y-auto">
 	<table>
-		<thead class="text-left sticky top-0 bg-background cursor-pointer z-10">
+		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
 			<tr class="border-b border-grey-lighter bg-background">
 				{#if $editTag !== undefined}
-					<th class="p-3 font-semibold font-grey">Included</th>
+					<th class="font-grey p-3 font-semibold">Included</th>
 				{/if}
-				<th class="p-3 font-semibold font-grey">ID</th>
+				<th class="font-grey p-3 font-semibold">ID</th>
 				{#if $project.view}
 					<th
-						class="p-3 font-semibold font-grey whitespace-nowrap"
+						class="font-grey whitespace-nowrap p-3 font-semibold"
 						on:click={() => (instanceHidden = !instanceHidden)}
 					>
 						instance
@@ -147,7 +147,7 @@
 				{/if}
 				{#each columnHeader as header}
 					{#if header.id !== idColumn}
-						<th class="p-3 font-semibold font-grey" on:click={() => updateSort(header)}>
+						<th class="font-grey p-3 font-semibold" on:click={() => updateSort(header)}>
 							<div class="flex">
 								{header.name}
 								<Icon
@@ -176,7 +176,7 @@
 									<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
 								</td>
 							{/if}
-							<td class="p-3 border border-grey-lighter align-top">
+							<td class="border border-grey-lighter p-3 align-top">
 								{tableContent[idColumn]}
 							</td>
 							{#if $project.view}
@@ -198,11 +198,11 @@
 							{/if}
 							{#each columnHeader as header}
 								{#if header.dataType === MetadataType.CONTINUOUS}
-									<td class="p-3 border border-grey-lighter align-top">
+									<td class="border border-grey-lighter p-3 align-top">
 										{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
 									</td>
 								{:else}
-									<td class="p-3 border border-grey-lighter align-top">
+									<td class="border border-grey-lighter p-3 align-top">
 										{tableContent[header.id]}
 									</td>
 								{/if}

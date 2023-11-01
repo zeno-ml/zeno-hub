@@ -8,7 +8,7 @@
 </script>
 
 <form
-	class="flex flex-col items-center justify-center bg-background p-12 rounded-xl"
+	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	method="POST"
 	action="?/verify"
 	use:enhance
@@ -24,7 +24,7 @@
 			input$name="code"
 			label="Verification Code"
 			value={form ? `${form.code}` : ''}
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Button type="submit" variant="raised" class="mt-3">Verify Account</Button>
 	</div>

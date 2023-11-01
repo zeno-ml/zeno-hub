@@ -18,7 +18,7 @@
 {#if showNewSlice}
 	<SlicePopup on:close={() => (showNewSlice = false)} />
 {/if}
-<div class="flex flex-wrap height-fit items-center py-1">
+<div class="height-fit flex flex-wrap items-center py-1">
 	{#if $selections.slices.length + $selections.tags.length + filters.length === 0 && $selectionIds === undefined}
 		<p style="margin: 0px">
 			Filter by selecting slices or interacting with the feature distribution charts.

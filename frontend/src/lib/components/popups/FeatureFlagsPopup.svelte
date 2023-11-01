@@ -33,7 +33,7 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 400px;">
-		<h2 class="text-xl mb-4">Feature Flags</h2>
+		<h2 class="mb-4 text-xl">Feature Flags</h2>
 		{#each Object.keys($featureFlags).filter( (key) => Object.keys(zenoFeatureFlags).includes(key) ) as flag}
 			<div class="flex items-center">
 				<Checkbox checked={$featureFlags[flag]} on:change={() => updateFlag(flag)} />

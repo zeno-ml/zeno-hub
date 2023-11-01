@@ -61,7 +61,7 @@
 
 {#if sliceElementOptions !== undefined && sliceElementSpec && table}
 	<div class="w-full">
-		<div class="flex items-center mb-2">
+		<div class="mb-2 flex items-center">
 			<h3 class="text-lg">
 				Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
 				{#if sliceElementSpec.modelName}
@@ -82,7 +82,7 @@
 				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
 			</p>
 		</div>
-		<div class="flex items-stretch w-full justify-between">
+		<div class="flex w-full items-stretch justify-between">
 			<button
 				class="mr-2 hover:bg-yellowish-light {page === 0
 					? 'bg-yellowish-light'
@@ -90,13 +90,13 @@
 				disabled={page === 0}
 				on:click={() => page--}
 			>
-				<div class="w-6 h-6 align-middle">
+				<div class="h-6 w-6 align-middle">
 					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 						<path fill={page === 0 ? 'grey' : 'black'} d={mdiChevronLeft} />
 					</Icon>
 				</div>
 			</button>
-			<div class="overflow-x-scroll flex flex-wrap content-start w-full h-full">
+			<div class="flex h-full w-full flex-wrap content-start overflow-x-scroll">
 				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0 w-1/2 px-1">
@@ -112,12 +112,12 @@
 				{/if}
 			</div>
 			<button
-				class="hover:bg-yellowish-light flex items-center
+				class="flex items-center hover:bg-yellowish-light
 				{page * 2 + 2 >= sliceElementOptions.sliceSize ? 'bg-yellowish-light' : ''}"
 				disabled={page * 2 + 2 >= sliceElementOptions.sliceSize}
 				on:click={() => page++}
 			>
-				<div class="w-6 h-6">
+				<div class="h-6 w-6">
 					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 						<path fill="black" d={mdiChevronRight} />
 					</Icon>
