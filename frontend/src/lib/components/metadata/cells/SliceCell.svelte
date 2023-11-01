@@ -131,9 +131,9 @@
 	/>
 {/if}
 <button
-	class="border border-grey-lighter rounded mt-1 flex items-center w-full px-2.5 justify-between text-grey overflow-visible relative
+	class="relative mt-1 flex w-full items-center justify-between overflow-visible rounded border border-grey-lighter px-2.5 text-grey
 	{selected ? ' bg-primary-light' : ''} 
-	{compare ? ' py-1 h-11' : 'h-9'}"
+	{compare ? ' h-11 py-1' : 'h-9'}"
 	on:click={(e) => selectSliceCell(e, slice)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
@@ -145,12 +145,12 @@
 >
 	{#if showTooltip}
 		<div
-			class="bg-background absolute w-fit z-10 left-0 top-full p-2 rounded border border-grey-lighter shadow-xl"
+			class="absolute left-0 top-full z-10 w-fit rounded border border-grey-lighter bg-background p-2 shadow-xl"
 		>
 			<SliceDetails predicateGroup={slice.filterPredicates} />
 		</div>
 	{/if}
-	<div class="flex items-center w-full justify-between">
+	<div class="flex w-full items-center justify-between">
 		<span
 			role="tooltip"
 			on:mouseover={() => (showTooltip = true)}
@@ -167,11 +167,11 @@
 			}}
 		>
 			{#if showOptions}
-				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+				<div class="absolute right-0 top-0 z-30 mt-9 hover:bg-grey-lighter">
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
 							<button
-								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
@@ -182,7 +182,7 @@
 								<span class="text-xs">Edit</span>
 							</button>
 							<button
-								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;

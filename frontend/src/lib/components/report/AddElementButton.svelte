@@ -8,12 +8,12 @@
 </script>
 
 <button
-	class="transition w-full h-6 justify-center items-center group"
+	class="group h-6 w-full items-center justify-center transition"
 	on:click={() => addElement(position)}
 >
 	<div
-		class="justify-center items-center h-0.5 w-full bg-primary-dark
-        {!alwaysShow ? 'group-hover:flex hidden' : 'flex'}
+		class="h-0.5 w-full items-center justify-center bg-primary-dark
+        {!alwaysShow ? 'hidden group-hover:flex' : 'flex'}
     "
 	>
 		<div class="bg-white">

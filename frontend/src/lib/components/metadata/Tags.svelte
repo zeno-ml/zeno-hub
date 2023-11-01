@@ -44,11 +44,11 @@
 {#if showNewTag}
 	<TagPopup on:close={() => (showNewTag = false)} />
 {/if}
-<div class="flex items-center justify-between mt-4">
+<div class="mt-4 flex items-center justify-between">
 	<div class="flex items-center justify-between">
 		<h4>Tags</h4>
 		<div
-			class="w-6 h-6 cursor-help fill-grey-darker"
+			class="h-6 w-6 cursor-help fill-grey-darker"
 			use:tooltip={{
 				text: 'Tags are named sets of data instances'
 			}}

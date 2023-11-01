@@ -18,7 +18,7 @@
 
 {#await result then res}
 	{#if res !== null}
-		<button class={compare ? 'flex flex-col items-center mr-2.5 text-xs ' : 'flex items-center'}>
+		<button class={compare ? 'mr-2.5 flex flex-col items-center text-xs ' : 'flex items-center'}>
 			<span class="{!compare ? 'mr-2.5' : ''} text-right">
 				{res[0].metric !== undefined && res[0].metric !== null ? res[0].metric.toFixed(2) : ''}
 			</span>

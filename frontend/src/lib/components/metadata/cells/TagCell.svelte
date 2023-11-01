@@ -151,7 +151,7 @@
 	/>
 {/if}
 <button
-	class="relative border border-grey-lighter rounded-2xl mt-1 flex items-center justify-between px-2.5 parent h-9 overflow-visible w-full {selected
+	class="parent relative mt-1 flex h-9 w-full items-center justify-between overflow-visible rounded-2xl border border-grey-lighter px-2.5 {selected
 		? 'bg-greenish-light'
 		: ''}"
 	on:click={setSelected}
@@ -162,23 +162,23 @@
 	on:blur={() => (hovering = false)}
 	on:dragstart={dragStart}
 >
-	<div class="flex justify-between items-center w-full">
+	<div class="flex w-full items-center justify-between">
 		<span>
 			{tag.tagName}
 		</span>
 		<div
-			class="flex justify-between items-center"
+			class="flex items-center justify-between"
 			use:clickOutside={() => {
 				showOptions = false;
 			}}
 		>
 			{#if showOptions}
-				<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+				<div class="absolute right-0 top-0 z-30 mt-9 hover:bg-grey-lighter">
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
 							{#if $editTag === undefined}
 								<button
-									class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+									class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 									on:keydown={() => ({})}
 									on:click={(e) => {
 										e.stopPropagation();
@@ -191,7 +191,7 @@
 								</button>
 							{/if}
 							<button
-								class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();
@@ -211,11 +211,11 @@
 					<span class="mr-2 w-full">
 						{res.metric !== undefined && res.metric !== null ? res.metric.toFixed(2) : ''}
 					</span>
-					<span class="italic text-grey-darker mr-1">
+					<span class="mr-1 italic text-grey-darker">
 						({res.size.toLocaleString()})
 					</span>
 				{:else}
-					<span class="italic text-grey-darker mr-1"> (0) </span>
+					<span class="mr-1 italic text-grey-darker"> (0) </span>
 				{/if}
 			{/await}
 			{#if $editTag === undefined || $editTag.id !== tag.id}

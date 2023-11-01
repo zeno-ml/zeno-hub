@@ -98,7 +98,7 @@
 </script>
 
 <div
-	class="overflow-y-auto w-full h-full grid"
+	class="grid h-full w-full overflow-y-auto"
 	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); grid-auto-rows: min-content;"
 >
 	{#await tablePromise then table}

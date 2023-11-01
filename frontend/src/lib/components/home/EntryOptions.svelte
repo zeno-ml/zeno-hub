@@ -41,12 +41,12 @@
 		on:confirm={() => deleteEntry()}
 	/>
 {/if}
-<div class="top-0 right-0 absolute mt-9 hover:bg-grey-lighter z-30">
+<div class="absolute right-0 top-0 z-30 mt-9 hover:bg-grey-lighter">
 	<Paper style="padding: 3px 0px;" elevation={7}>
 		<Content>
 			{#if project}
 				<button
-					class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+					class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 					on:click={(e) => {
 						e.stopPropagation();
 						showOptions = false;
@@ -59,7 +59,7 @@
 			{/if}
 			{#if !exploreTab && ((project && project.ownerName === user?.name) || (report && report.ownerName === user?.name))}
 				<button
-					class="flex items-center w-20 py px-2 hover:bg-grey-lighter"
+					class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
 					on:click={(e) => {
 						e.stopPropagation();
 						showOptions = false;

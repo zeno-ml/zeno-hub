@@ -209,7 +209,7 @@
 	<Content>
 		<Textfield class="mb-2 ml-3" bind:value={sliceName} label="Slice Name" bind:this={nameInput} />
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
-		<div class="flex items-center flex-row-reverse">
+		<div class="flex flex-row-reverse items-center">
 			{#if checkNominalSinglePredicateNoEntry(predicateGroup)}
 				<Button
 					variant="outlined"
@@ -239,7 +239,7 @@
 			{/if}
 		</div>
 		{#if error}
-			<div class="flex items-center flex-row-reverse">
+			<div class="flex flex-row-reverse items-center">
 				<p class="mt-2">{error}</p>
 			</div>
 		{/if}

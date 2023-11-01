@@ -10,10 +10,10 @@
 </script>
 
 <div
-	class="flex items-center ml-8 {entryType === 'report' ? 'text-white' : 'text-grey'} font-semibold"
+	class="ml-8 flex items-center {entryType === 'report' ? 'text-white' : 'text-grey'} font-semibold"
 	use:tooltip={{ text: tooltipContent }}
 >
-	<div class="w-6 h-6 mr-2 {entryType === 'report' ? 'fill-white' : 'fill-grey'} ">
+	<div class="mr-2 h-6 w-6 {entryType === 'report' ? 'fill-white' : 'fill-grey'} ">
 		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 			<path d={icon} />
 		</Icon>

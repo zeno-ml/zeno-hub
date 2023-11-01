@@ -6,7 +6,7 @@
 	import { featureFlags, tooltipState } from '$lib/stores';
 	import { zenoFeatureFlags } from '$lib/util/features';
 	import * as amplitude from '@amplitude/analytics-browser';
-	import '../app.css';
+	import '../app.postcss';
 
 	export let data;
 
@@ -35,7 +35,7 @@
 	});
 </script>
 
-<div class="w-full h-full overflow-hidden">
+<div class="h-full w-full overflow-hidden">
 	<slot />
-	<Tooltip />
+	<Tooltip></Tooltip>
 </div>

@@ -12,7 +12,7 @@
 
 <form
 	method="POST"
-	class="flex flex-col items-center justify-center bg-background p-12 rounded-xl"
+	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	action="?/code"
 	use:enhance
 >
@@ -20,7 +20,7 @@
 		<a href="/">
 			<img src="/zeno-logo.png" alt="Zeno logo" width="200px" class="mb-5" />
 		</a>
-		<Textfield input$name="username" bind:value={username} label="Username" class="w-56 mb-3" />
+		<Textfield input$name="username" bind:value={username} label="Username" class="mb-3 w-56" />
 		<Button type="submit" variant="raised" disabled={username.length === 0}>Send Reset Link</Button>
 	</div>
 </form>

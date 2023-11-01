@@ -2,7 +2,7 @@
 	export let renderedText: string;
 </script>
 
-<article class="prose [&_a]:break-word [&_p]:whitespace-pre-wrap max-w-none">
+<article class="[&_a]:break-word prose max-w-none [&_p]:whitespace-pre-wrap">
 	<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 	{@html renderedText}
 </article>

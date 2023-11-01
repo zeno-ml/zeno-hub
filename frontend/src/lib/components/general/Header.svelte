@@ -40,23 +40,23 @@
 {/if}
 <nav class="z-20 flex md:hidden">
 	<header
-		class="w-full flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+		class="flex w-full flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
 	>
 		<a href="/">
-			<img class="w-8 pt-2 pb-2" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+			<img class="w-8 pb-2 pt-2" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
 		</a>
 	</header>
 </nav>
 <nav class="z-20 hidden md:flex">
 	<header
-		class="h-full w-12 flex bg-yellowish justify-between flex-col text-grey items-center border-r border-x-grey-lighter"
+		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
 	>
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
-				<img class="w-8 mt-5" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+				<img class="mt-5 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
 			</a>
 			{#if $page.url.href.includes('project/')}
-				<div class="flex flex-col mt-3">
+				<div class="mt-3 flex flex-col">
 					<HeaderIcon
 						pageName={'explore'}
 						tooltipContent={'Explore your data and system outputs'}
@@ -90,7 +90,7 @@
 				/>
 			{/if}
 		</div>
-		<div class="flex flex-col items-center justify-center mb-3">
+		<div class="mb-3 flex flex-col items-center justify-center">
 			{#if $page.url.pathname.startsWith('/project/') && $project?.ownerName === user?.name}
 				<HeaderIcon
 					pageName={'editProject'}

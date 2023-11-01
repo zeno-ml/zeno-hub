@@ -8,12 +8,12 @@
 </script>
 
 <div
-	class="flex items-center justify-between pt-2.5 border-b border-grey-lighter bg-yellowish-light pb-4"
+	class="flex items-center justify-between border-b border-grey-lighter bg-yellowish-light pb-4 pt-2.5"
 >
 	<div class="flex items-center justify-between">
 		<h4>Metadata</h4>
 		<div
-			class="w-6 h-6 cursor-help fill-grey-dark"
+			class="h-6 w-6 cursor-help fill-grey-dark"
 			use:tooltip={{
 				text: 'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data'
 			}}

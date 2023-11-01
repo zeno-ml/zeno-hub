@@ -8,7 +8,7 @@
 
 <button
 	{id}
-	class={`flex items-center pt-1 pb-1 pl-2 pr-2 h-7 cursor-pointer  ${
+	class={`flex h-7 cursor-pointer items-center pb-1 pl-2 pr-2 pt-1  ${
 		highlighted ? 'bg-primary-mid' : 'hover:bg-yellowish'
 	}`}
 	on:click

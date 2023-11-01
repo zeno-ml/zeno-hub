@@ -20,8 +20,8 @@
 	}
 </script>
 
-<div class="flex flex-col mb-5 mt-5">
-	<div class="flex items-center mb-5 align-middle">
+<div class="mb-5 mt-5 flex flex-col">
+	<div class="mb-5 flex items-center align-middle">
 		<HomeButton />
 		<Button
 			class="ml-3"

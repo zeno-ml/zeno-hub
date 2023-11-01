@@ -11,9 +11,9 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 </script>
 
-<div class="flex p-4 bg-yellowish-light border-b border-b-grey-lighter items-center min-w-0 w-full">
-	<h1 class="text-xl font-semibold shrink-0">{project.name}</h1>
-	<p class="px-4 pt-1 text-grey-dark text-ellipsis overflow-hidden whitespace-nowrap">
+<div class="flex w-full min-w-0 items-center border-b border-b-grey-lighter bg-yellowish-light p-4">
+	<h1 class="shrink-0 text-xl font-semibold">{project.name}</h1>
+	<p class="overflow-hidden text-ellipsis whitespace-nowrap px-4 pt-1 text-grey-dark">
 		{project.description}
 	</p>
 	<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} {likes} {liked} {user} />

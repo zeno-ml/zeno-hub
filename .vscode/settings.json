@@ -1,12 +1,11 @@
 {
   "python.defaultInterpreterPath": ".venv/bin/python",
-  "autoDocstring.docstringFormat": "google",
   "editor.wordWrapColumn": 100,
   "eslint.validate": ["javascript", "javascriptreact", "svelte"],
   "python.testing.pytestEnabled": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "python.analysis.typeCheckingMode": "basic",
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
