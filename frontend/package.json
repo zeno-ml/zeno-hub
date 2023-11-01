@@ -9,8 +9,8 @@
 		"test": "playwright test",
 		"check": "svelte-kit sync && svelte-check",
 		"test:unit": "vitest",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write .",
+		"lint": "prettier --check ./**/*.{js,ts,cjs,json,svelte,html,postcss,css} && eslint .",
+		"format": "prettier --write ./**/*.{js,ts,cjs,json,svelte,html,postcss,css}",
 		"smui-theme": "smui-theme compile static/smui.css -i src/theme",
 		"generate-api": "npx openapi-typescript-codegen --input http://127.0.0.1:8000/api/openapi.json --output ./src/lib/zenoapi --name ZenoClient; npx prettier -w ./src/lib/zenoapi "
 	},
