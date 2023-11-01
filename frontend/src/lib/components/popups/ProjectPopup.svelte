@@ -109,6 +109,8 @@
 						<Checkbox checked={config.public} on:click={() => (config.public = !config.public)} />
 						<span>Public visibility</span>
 					</div>
+					<span>Created: {new Date(config.createdAt ?? '').toLocaleString()}</span>
+					<span>Updated: {new Date(config.updatedAt ?? '').toLocaleString()}</span>
 				</div>
 			</div>
 			<div>

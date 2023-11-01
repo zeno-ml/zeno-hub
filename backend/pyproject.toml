@@ -42,8 +42,6 @@ include = ["zeno_backend"]
 
 [tool.ruff]
 select = ["E", "F", "I", "PD", "N", "D", "T20"]
-# Ignore conflicting specs between linter and formatter. Formatter will catch line length.
-ignore = ["D206", "E501"]
 
 [tool.ruff.pydocstyle]
 convention = "google"

@@ -91,7 +91,10 @@
 				report
 			/>
 		</div>
-		<h5 class="ml-1 mt-4 text-lg">Author: {data.report.ownerName}</h5>
+		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
+		<span class="mt-2 text-grey-darker"
+			>Updated: {new Date(data.report.updatedAt ?? '').toLocaleString()}</span
+		>
 		<hr class="mt-4 text-grey-light" />
 
 		{#if data.report.editor}
