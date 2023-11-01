@@ -93,7 +93,7 @@
 		</div>
 		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
 		<span class="text-grey-darker mt-2"
-			>Updated: {new Date(data.report.updatedAt).toLocaleString()}</span
+			>Updated: {new Date(data.report.updatedAt ?? '').toLocaleString()}</span
 		>
 		<hr class="text-grey-light mt-4" />
 

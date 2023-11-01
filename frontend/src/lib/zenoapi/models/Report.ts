@@ -26,6 +26,6 @@ export type Report = {
 	editor: boolean;
 	public?: boolean;
 	description?: string;
-	createdAt: string;
-	updatedAt: string;
+	createdAt?: string;
+	updatedAt?: string;
 };
