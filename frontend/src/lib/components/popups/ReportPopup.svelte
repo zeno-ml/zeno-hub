@@ -56,9 +56,6 @@
 		if (e.key === 'Escape') {
 			dispatch('close');
 		}
-		if (e.key === 'Enter') {
-			updateReport();
-		}
 	}
 
 	function addUser(e: CustomEvent) {

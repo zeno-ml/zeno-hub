@@ -49,9 +49,6 @@
 		if (e.key === 'Escape') {
 			dispatch('close');
 		}
-		if (e.key === 'Enter') {
-			if (!invalidName) updateProject();
-		}
 	}
 
 	function addUser(e: CustomEvent) {
