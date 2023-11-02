@@ -1,5 +1,5 @@
 <div class="mb-3">
-	<div class="flex justify-between p-3 items-center">
+	<div class="flex items-center justify-between p-3">
 		<slot name="parameters" />
 	</div>
 	<slot name="component" />

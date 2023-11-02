@@ -30,7 +30,7 @@
 </script>
 
 <div class="flex">
-	<div class="mt-1 mr-2.5">
+	<div class="mr-2.5 mt-1">
 		{#if index > 0}
 			<Svelecte
 				placeholder={''}
@@ -50,8 +50,8 @@
 			</IconButton>
 		{/if}
 	</div>
-	<div class="{index === -1 ? '' : 'border border-primary-mid p-2'} rounded mt-1">
-		<ul use:autoAnimate class="list-none mr-2.5">
+	<div class="{index === -1 ? '' : 'border border-primary-mid p-2'} mt-1 rounded">
+		<ul use:autoAnimate class="mr-2.5 list-none">
 			{#each predicateGroup.predicates as p, i}
 				{#if !('predicates' in p)}
 					<li>

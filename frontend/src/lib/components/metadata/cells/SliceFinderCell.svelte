@@ -59,7 +59,7 @@
 
 <svelte:window on:keydown={submit} />
 
-<div class="ml-5 flex mt-2.5 mb-2.5 items-center justify-between">
+<div class="mb-2.5 ml-5 mt-2.5 flex items-center justify-between">
 	<span style="display: inline-block;">
 		<SliceDetails predicateGroup={slice.filterPredicates} />
 	</span>
@@ -67,7 +67,7 @@
 		<span style="margin-right: 10px; margin-left: 10px">
 			{metric}
 		</span>
-		<span class="italic text-grey-dark mr-2.5">
+		<span class="mr-2.5 italic text-grey-dark">
 			({size})
 		</span>
 		{#if created}

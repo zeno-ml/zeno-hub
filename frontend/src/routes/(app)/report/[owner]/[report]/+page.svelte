@@ -75,9 +75,9 @@
 		}}
 	/>
 {/if}
-<div class="bg-yellowish h-full w-full overflow-scroll">
+<div class="h-full w-full overflow-scroll bg-yellowish">
 	<div
-		class="bg-background m-auto flex max-w-4xl flex-col rounded px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
+		class="m-auto flex max-w-4xl flex-col rounded bg-background px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
 	>
 		<div class="mt-12 flex items-center justify-between">
 			<h1 class="text-grey-darkest mr-6 text-5xl">
@@ -92,10 +92,10 @@
 			/>
 		</div>
 		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
-		<span class="text-grey-darker mt-2"
+		<span class="mt-2 text-grey-darker"
 			>Updated: {new Date(data.report.updatedAt ?? '').toLocaleString()}</span
 		>
-		<hr class="text-grey-light mt-4" />
+		<hr class="mt-4 text-grey-light" />
 
 		{#if data.report.editor}
 			<p class="mb-2 mt-4">Associated Projects</p>
@@ -110,7 +110,7 @@
 					options={projects}
 				/>
 			{/await}
-			<hr class="text-grey-light mb-4 mt-4" />
+			<hr class="mb-4 mt-4 text-grey-light" />
 			<AddElementButton
 				position={0}
 				{addElement}

@@ -55,8 +55,8 @@
 </script>
 
 {#if histogram}
-	<div class="border-b border-grey-lighter pb-2 pt-2 flex flex-col">
-		<div class="flex justify-between items-center ml-1 mb-2.5 text-grey-darker">
+	<div class="flex flex-col border-b border-grey-lighter pb-2 pt-2">
+		<div class="mb-2.5 ml-1 flex items-center justify-between text-grey-darker">
 			<div class="label top-text">
 				<span>
 					{col.name}

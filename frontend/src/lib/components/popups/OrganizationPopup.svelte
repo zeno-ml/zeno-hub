@@ -56,15 +56,15 @@
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column;">
 		<h2>Organization Settings</h2>
-		<div class="flex flex-col mb-5">
+		<div class="mb-5 flex flex-col">
 			<Textfield bind:value={organizationToEdit.name} label="Name" bind:this={input} />
 		</div>
-		<div class="flex flex-col mb-5">
+		<div class="mb-5 flex flex-col">
 			<h3>Members</h3>
 			{#if members.length > 0}
 				<table>
 					<thead
-						class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+						class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-1 font-semibold"
 					>
 						<th style="width: 200px;">Email</th>
 						<th>Admin</th>

@@ -9,7 +9,7 @@
 </script>
 
 <button
-	class="m-auto flex items-center cursor-pointer p-3 hover:bg-black-transparent {$page.url.href.includes(
+	class="m-auto flex cursor-pointer items-center p-3 hover:bg-black-transparent {$page.url.href.includes(
 		pageName
 	)
 		? 'font-medium'
@@ -17,7 +17,7 @@
 	on:click
 	use:tooltip={{ text: tooltipContent }}
 >
-	<div class="w-6 h-6 fill-grey">
+	<div class="h-6 w-6 fill-grey">
 		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 			<path
 				class={`${$page.url.href.includes(pageName) ? 'fill-primary' : 'fill-grey'}`}

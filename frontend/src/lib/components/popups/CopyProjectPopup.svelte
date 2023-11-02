@@ -58,7 +58,7 @@
 <svelte:window on:keydown={submit} />
 <Popup on:close>
 	<Content style="display: flex; flex-direction: column; width: 800px;">
-		<h2 class="text-xl mb-4">Copy Project</h2>
+		<h2 class="mb-4 text-xl">Copy Project</h2>
 		<div class="mb-12 flex flex-col">
 			{#if step === 1}
 				<div>
@@ -103,8 +103,8 @@
 					>
 				</div>
 			{:else}
-				<div class="flex mb-6">
-					<div class="flex flex-col mr-8">
+				<div class="mb-6 flex">
+					<div class="mr-8 flex flex-col">
 						<div class="mb-4">
 							Your Project has been copied and can be accessed at <a
 								href={`/project/${user.name}/${encodeURIComponent(config.name)}`}

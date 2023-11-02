@@ -46,11 +46,11 @@
 	/>
 {/if}
 <button
-	class="border-solid mr-4 mb-4 rounded-sm border-grey-light border shadow-sm flex flex-col py-1 px-5 hover:shadow-md"
+	class="mb-4 mr-4 flex flex-col rounded-sm border border-solid border-grey-light px-5 py-1 shadow-sm hover:shadow-md"
 	on:click={() => goto(`chart/${chart.id}?edit=false`)}
 >
-	<div class="flex justify-between items-center w-full">
-		<div class="min-w-[24px] mr-3">
+	<div class="flex w-full items-center justify-between">
+		<div class="mr-3 min-w-[24px]">
 			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
@@ -70,7 +70,7 @@
 			</IconButton>
 			{#if showOptions}
 				<button
-					class="z-10 absolute ml-5"
+					class="absolute z-10 ml-5"
 					use:clickOutside={() => (showOptions = !showOptions)}
 					on:click={(e) => e.stopPropagation()}
 					on:keydown={(e) => {
@@ -82,7 +82,7 @@
 					<Paper style="padding: 7px 0px 7px 0px;" elevation={7}>
 						<Content>
 							<button
-								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
+								class="mx-2 flex cursor-pointer items-center hover:bg-grey-lighter"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();
@@ -102,7 +102,7 @@
 								<span class="text-sm">Make a copy</span>
 							</button>
 							<button
-								class="flex items-center cursor-pointer hover:bg-grey-lighter mx-2"
+								class="mx-2 flex cursor-pointer items-center hover:bg-grey-lighter"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();

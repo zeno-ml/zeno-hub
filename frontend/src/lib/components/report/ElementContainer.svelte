@@ -37,13 +37,13 @@
 
 <div>
 	<div
-		class="border-2 relative
+		class="relative border-2
 			{editId === element.id ? 'border-primary-mid' : 'border-white'}
-			{report.editor ? 'group/edit hover:border-primary-mid rounded p-4' : 'py-2'}
-			{dragEnabled ? 'border-primary-mid border-2' : ''} transition"
+			{report.editor ? 'group/edit rounded p-4 hover:border-primary-mid' : 'py-2'}
+			{dragEnabled ? 'border-2 border-primary-mid' : ''} transition"
 	>
 		<button
-			class="group-hover/edit:block hidden p-1 bg-primary-light absolute -top-4 right-14 rounded-md hover:bg-primary-mid transition"
+			class="absolute -top-4 right-14 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
 			on:click={() => (showConfirmDelete = element.id ?? -1)}
 		>
 			<Icon
@@ -56,7 +56,7 @@
 			</Icon>
 		</button>
 		<button
-			class="group-hover/edit:block hidden p-1 absolute bg-primary-light -top-4 right-4 rounded-md hover:bg-primary-mid transition"
+			class="absolute -top-4 right-4 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
 			on:click={() =>
 				editId === element.id || element.id === null || element.id === undefined
 					? (editId = -1)
@@ -72,7 +72,7 @@
 			</Icon>
 		</button>
 		<div
-			class="group-hover/edit:flex hidden mr-2 cursor-move absolute -left-3 rounded-md bg-primary-light hover:bg-primary-mid top-1"
+			class="absolute -left-3 top-1 mr-2 hidden cursor-move rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 		>
 			<Icon
 				style="outline:none; width: 24px; height: 24px"

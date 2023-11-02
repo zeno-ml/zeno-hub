@@ -12,7 +12,7 @@
 
 <form
 	method="POST"
-	class="flex flex-col items-center justify-center bg-background p-12 rounded-xl"
+	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	action="?/reset"
 	use:enhance
 >
@@ -23,21 +23,21 @@
 			input$name="validation"
 			value={form ? `${form.validation}` : ''}
 			label="Verification code"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			input$name="password"
 			type="password"
 			value={form ? `${form.password}` : ''}
 			label="Password"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			input$name="repeatPassword"
 			type="password"
 			value={form ? `${form.repeat}` : ''}
 			label="Confirm password"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Button type="submit" variant="raised" class="mt-5">Reset</Button>
 		{#if form?.error}

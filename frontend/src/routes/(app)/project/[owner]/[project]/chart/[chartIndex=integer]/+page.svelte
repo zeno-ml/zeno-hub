@@ -48,10 +48,10 @@
 	}
 </script>
 
-<div class={`w-full flex overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
+<div class={`flex w-full overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
 	{#if isChartEdit && $project.editor}
 		<div
-			class="border-r border-r-grey-lighter h-full pb-20 px-5 overflow-y-auto shrink-0 bg-yellowish-light w-[380px]"
+			class="h-full w-[380px] shrink-0 overflow-y-auto border-r border-r-grey-lighter bg-yellowish-light px-5 pb-20"
 		>
 			<EditHeader bind:isChartEdit bind:chart />
 			<ViewSelection bind:chart bind:unique />
@@ -69,7 +69,7 @@
 		<ViewHeader bind:isChartEdit />
 	{/if}
 	{#if chartData}
-		<div class={`overflow-auto flex flex-col pl-2 h-full`}>
+		<div class={`flex h-full flex-col overflow-auto pl-2`}>
 			<ChartContainer chartName={chart.name}>
 				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
 			</ChartContainer>

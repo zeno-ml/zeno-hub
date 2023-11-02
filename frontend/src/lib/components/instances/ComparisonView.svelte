@@ -174,7 +174,7 @@
 	}
 </script>
 
-<div class="w-full h-full overflow-auto" bind:this={instanceContainer}>
+<div class="h-full w-full overflow-auto" bind:this={instanceContainer}>
 	<table class="mt-2 w-full table-fixed">
 		<colgroup>
 			<col style="width: 45%;" />
@@ -182,9 +182,9 @@
 			<col style="width: 10%;" />
 		</colgroup>
 		<thead
-			class="sticky border-b border-grey-lighter font-semibold top-0 left-0 text-left align-top bg-background z-10"
+			class="sticky left-0 top-0 z-10 border-b border-grey-lighter bg-background text-left align-top font-semibold"
 		>
-			<th class="p-3 cursor-pointer hover:text-primary" on:click={() => updateSort($model)}>
+			<th class="cursor-pointer p-3 hover:text-primary" on:click={() => updateSort($model)}>
 				<div class="flex">
 					<p>A: {$model}</p>
 					{#if sortModel === $model}
@@ -198,10 +198,10 @@
 					{/if}
 				</div>
 				<div>
-					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+					<span class="mr-3.5 text-sm font-normal text-grey-dark">
 						{$metric ? $metric.name + ':' : ''}
 					</span>
-					<span class="font-normal mr-3.5 text-primary">
+					<span class="mr-3.5 font-normal text-primary">
 						{#await modelAResult then res}
 							{#if res !== undefined && res.length > 0}
 								{#if res[0].metric !== undefined && res[0].metric !== null}
@@ -213,7 +213,7 @@
 				</div>
 			</th>
 			<th
-				class="p-3 cursor-pointer hover:text-primary"
+				class="cursor-pointer p-3 hover:text-primary"
 				on:click={() => updateSort($comparisonModel)}
 			>
 				<div class="flex">
@@ -229,10 +229,10 @@
 					{/if}
 				</div>
 				<div>
-					<span class="font-normal text-sm mr-3.5 text-grey-dark">
+					<span class="mr-3.5 text-sm font-normal text-grey-dark">
 						{$metric ? $metric.name + ':' : ''}
 					</span>
-					<span class="font-normal mr-3.5 text-primary">
+					<span class="mr-3.5 font-normal text-primary">
 						{#await modelBResult then res}
 							{#if res !== undefined && res.length > 0}
 								{#if res[0].metric !== undefined && res[0].metric !== null}
@@ -243,11 +243,11 @@
 					</span>
 				</div>
 			</th>
-			<th class="p-3 cursor-pointer hover:text-primary" on:click={() => updateSort('')}>
+			<th class="cursor-pointer p-3 hover:text-primary" on:click={() => updateSort('')}>
 				<div class="flex">
 					<div>
 						<span class="whitespace-nowrap">Difference in</span>
-						<span class="text-grey-dark whitespace-nowrap">{$comparisonColumn?.name}</span>
+						<span class="whitespace-nowrap text-grey-dark">{$comparisonColumn?.name}</span>
 					</div>
 					{#if sortModel === ''}
 						<Icon class="material-icons">

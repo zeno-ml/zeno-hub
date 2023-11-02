@@ -124,7 +124,7 @@
 				{#if projectUsers.length > 0}
 					<table>
 						<thead
-							class="border-grey-lighter bg-background sticky left-0 top-0 border-b pb-1 font-semibold"
+							class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-1 font-semibold"
 						>
 							<th>Email</th>
 							<th class="w-1">Editor</th>

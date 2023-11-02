@@ -33,10 +33,10 @@
 	}
 </script>
 
-<div class="flex mt-4 md:items-center justify-between md:flex-row flex-col">
-	<div class="flex md:items-center md:flex-row flex-col h-full">
+<div class="mt-4 flex flex-col justify-between md:flex-row md:items-center">
+	<div class="flex h-full flex-col md:flex-row md:items-center">
 		<div
-			class="h-12 w-96 px-4 py-3 flex justify-center items-center border-solid rounded-lg border-grey-light border focus-within:shadow-md"
+			class="flex h-12 w-96 items-center justify-center rounded-lg border border-solid border-grey-light px-4 py-3 focus-within:shadow-md"
 		>
 			<Icon class="material-icons">search</Icon>
 			<Input bind:value={tempSearchText} placeholder="Search" class="ml-4" />
@@ -46,7 +46,7 @@
 				</Fab>
 			{/if}
 		</div>
-		<div class="flex items-center mt-4 md:mt-0 md:ml-4 h-full">
+		<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
 			<Button
 				class="mr-2 h-full"
 				variant={typeFilter === EntryTypeFilter.PROJECT ? 'raised' : 'outlined'}
@@ -68,7 +68,7 @@
 		</div>
 	</div>
 	{#if myHub}
-		<div class="flex mt-4 md:ml-2 md:mt-0 h-full">
+		<div class="mt-4 flex h-full md:ml-2 md:mt-0">
 			<Button class="h-full" on:click={() => (showNewReport = true)}>
 				<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
 					<path d={mdiPlus} />
@@ -78,4 +78,4 @@
 		</div>
 	{/if}
 </div>
-<div class="flex mt-2 mb-4 items-center"></div>
+<div class="mb-4 mt-2 flex items-center"></div>
