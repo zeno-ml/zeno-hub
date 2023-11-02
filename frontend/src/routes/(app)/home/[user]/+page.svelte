@@ -41,7 +41,7 @@
 
 <HomeSearchBar bind:typeFilter bind:searchText bind:sort bind:showNewReport myHub={true} />
 <div class="grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
-	{#each data.entries as entry (entry.entry.name || entry.entry.name)}
+	{#each data.entries as entry ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
 		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 	{/each}
 </div>
