@@ -32,7 +32,6 @@ class ZenoColumnType(str, Enum):
         LABEL: ground truth label.
         OUTPUT: model output.
         FEATURE: metadata feature for data instance.
-        EMBEDDING: vector embedding representing a data instance or output.
     """
 
     ID = "ID"
@@ -40,7 +39,6 @@ class ZenoColumnType(str, Enum):
     LABEL = "LABEL"
     OUTPUT = "OUTPUT"
     FEATURE = "FEATURE"
-    EMBEDDING = "EMBEDDING"
 
 
 class MetadataType(str, Enum):
@@ -51,6 +49,7 @@ class MetadataType(str, Enum):
         CONTINUOUS: continuous metadata type, e.g. large cardinality number.
         BOOLEAN: boolean metadata type, e.g. True or False.
         DATETIME: datetime metadata type, e.g. 2021-01-01 00:00:00.
+        EMBEDDING: vector embedding representing a data instance or output.
         OTHER: any other metadata type, e.g. strings.
     """
 
@@ -58,21 +57,8 @@ class MetadataType(str, Enum):
     CONTINUOUS = "CONTINUOUS"
     BOOLEAN = "BOOLEAN"
     DATETIME = "DATETIME"
+    EMBEDDING = "EMBEDDING"
     OTHER = "OTHER"
-
-    def __str__(self) -> str:
-        """Get a SQL representation for a metadata type.
-
-        Returns:
-            str: the sql data type corresponding to the metadata type.
-        """
-        if self == MetadataType.BOOLEAN:
-            return "BOOLEAN"
-        if self == MetadataType.CONTINUOUS:
-            return "NUMERIC"
-        if self == MetadataType.DATETIME:
-            return "DATETIME"
-        return "TEXT"
 
 
 class ZenoColumn(CamelModel):

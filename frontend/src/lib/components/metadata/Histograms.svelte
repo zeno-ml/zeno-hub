@@ -14,11 +14,14 @@
 	} from '$lib/stores';
 	import { getMetricRange } from '$lib/util/util';
 	import {
+		MetadataType,
 		ZenoColumnType,
 		ZenoService,
 		type FilterPredicateGroup,
 		type HistogramBucket,
-		type Metric
+		type Metric,
+
+		type ZenoColumn
 	} from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { derived, type Readable } from 'svelte/store';
@@ -30,7 +33,13 @@
 	};
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-
+	const histogramColumnsBaseFilter = (c: ZenoColumn) => ((
+					c.columnType === ZenoColumnType.ID ||
+					c.columnType === ZenoColumnType.DATA ||
+					c.columnType === ZenoColumnType.FEATURE ||
+					c.columnType === ZenoColumnType.LABEL ||
+					c.columnType === ZenoColumnType.OUTPUT)
+				&& c.dataType !== MetadataType.EMBEDDING)
 	let metadataHistograms: Map<string, HistogramBucket[]> = new Map();
 
 	// Derived store to only update histograms once at startup.
@@ -53,10 +62,7 @@
 		const requestColumns = $columns.filter(
 			(c) =>
 				(c.model === null || c.model === s.model) &&
-				(c.columnType === ZenoColumnType.DATA ||
-					c.columnType === ZenoColumnType.FEATURE ||
-					c.columnType === ZenoColumnType.LABEL ||
-					c.columnType === ZenoColumnType.OUTPUT)
+				histogramColumnsBaseFilter(c)	
 		);
 
 		requestingHistogramCounts.set(true);
@@ -109,33 +115,10 @@
 </script>
 
 {#if !$page.url.href.includes('compare')}
-	{#each $columns.filter((m) => m.columnType === ZenoColumnType.DATA) as col (col.id)}
+	{#each $columns.filter((c) => (c.model === undefined || c.model === null || c.model === $model) && histogramColumnsBaseFilter(c)) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
 		{#if hist}
 			<MetadataCell {col} histogram={hist} />
 		{/if}
 	{/each}
-	{#each $columns.filter((m) => m.columnType === ZenoColumnType.LABEL) as col (col.id)}
-		{@const hist = metadataHistograms.get(col.id)}
-		{#if hist}
-			<MetadataCell {col} histogram={hist} />
-		{/if}
-	{/each}
-	{#each $columns.filter((m) => m.columnType === ZenoColumnType.FEATURE && (m.model === undefined || m.model === null || m.model === $model)) as col (col.id)}
-		{@const hist = metadataHistograms.get(col.id)}
-		{#if hist}
-			<MetadataCell {col} histogram={hist} />
-		{/if}
-	{/each}
-	{#if $model}
-		{@const outputCol = $columns.filter(
-			(m) => m.columnType === ZenoColumnType.OUTPUT && m.model === $model
-		)}
-		{#if outputCol.length > 0}
-			{@const hist = metadataHistograms.get(outputCol[0].id)}
-			{#if hist}
-				<MetadataCell col={outputCol[0]} histogram={hist} />
-			{/if}
-		{/if}
-	{/if}
 {/if}

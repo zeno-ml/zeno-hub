@@ -26,6 +26,10 @@ def resolve_metadata_type(d: DataType) -> MetadataType:
         return MetadataType.DATETIME
     elif pa.types.is_string(d):
         return MetadataType.NOMINAL
+    elif pa.types.is_list(d) and (
+        pa.types.is_floating(d.value_type) or pa.types.is_integer(d.value_type)
+    ):
+        return MetadataType.EMBEDDING
     return MetadataType.OTHER
 
 

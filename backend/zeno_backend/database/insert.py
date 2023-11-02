@@ -270,7 +270,9 @@ async def system_schema(
                 )
             )
             if id_col is None or len(id_col) == 0:
-                raise Exception("ERROR: No ID column found.")
+                raise Exception(
+                    "ERROR: No ID column found. Have you uploaded a dataset?"
+                )
 
             columns.append(
                 ZenoColumn(
