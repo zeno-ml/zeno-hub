@@ -4,13 +4,14 @@
   "editor.wordWrapColumn": 100,
   "eslint.validate": ["javascript", "javascriptreact", "svelte"],
   "python.testing.pytestEnabled": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "python.analysis.typeCheckingMode": "basic",
   "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "prettier.documentSelectors": ["**/*.svelte"],
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "[json]": {
+  "[svelte]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

@@ -32,12 +32,12 @@
 <div
 	class="sticky {$models.length > 0
 		? 'top-16'
-		: '-top-2'} bg-yellowish-light flex items-center justify-between z-10 min-h-[40px]"
+		: '-top-2'} z-10 flex min-h-[40px] items-center justify-between bg-yellowish-light"
 >
 	<div class="flex items-center justify-between">
 		<h4>Slices</h4>
 		<div
-			class="w-6 h-6 cursor-help fill-grey-dark"
+			class="h-6 w-6 cursor-help fill-grey-dark"
 			use:tooltip={{
 				text: 'Slices are named combinations of filters'
 			}}

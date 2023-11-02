@@ -42,7 +42,7 @@
 				placeholder="Select Metrics..."
 			/>
 		{/if}
-		<div class="flex items-center ml-auto">
+		<div class="ml-auto flex items-center">
 			<span>All Metrics</span>
 			<Checkbox
 				checked={value[0] == -2}

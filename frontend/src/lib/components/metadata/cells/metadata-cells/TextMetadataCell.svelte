@@ -86,7 +86,7 @@
 	}
 </script>
 
-<div class="flex items-center ml-1">
+<div class="ml-1 flex items-center">
 	<AutoComplete
 		id="autoinput"
 		bind:text={searchString}
@@ -103,7 +103,7 @@
 			<span style:color={regexValid ? '' : 'red'}>{noResultsText}</span>
 		</div>
 	</AutoComplete>
-	<div class="ml-2.5 flex items-center border rounded-md border-grey-light">
+	<div class="ml-2.5 flex items-center rounded-md border border-grey-light">
 		<SearchOption
 			id={'caseMatch'}
 			highlighted={operation === Operation.LIKE}
@@ -111,7 +111,7 @@
 				operation === Operation.LIKE ? (operation = Operation.ILIKE) : (operation = Operation.LIKE)}
 			tooltipContent={'Match Case'}>Aa</SearchOption
 		>
-		<div class="w-px h-6 bg-grey-light" />
+		<div class="h-6 w-px bg-grey-light" />
 		<SearchOption
 			id={'typeSelection'}
 			highlighted={operation === Operation.REGEX}
@@ -135,9 +135,9 @@
 	</Button>
 </div>
 
-<div class="flex flex-wrap height-fit items-center py-1">
+<div class="height-fit flex flex-wrap items-center py-1">
 	{#each filterPredicates as pred}
-		<div class="px-1 py-2.5 bg-primary-light mx-1 my rouded width-fit">
+		<div class="my rouded width-fit mx-1 bg-primary-light px-1 py-2.5">
 			<span>
 				{pred.value}
 			</span>

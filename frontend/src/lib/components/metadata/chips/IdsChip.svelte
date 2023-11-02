@@ -4,7 +4,7 @@
 	import { selectionIds } from '$lib/stores';
 </script>
 
-<div class="py-1 px-2.5 border border-grey-lighter my mx-1 rounded width-fit">
+<div class="my width-fit mx-1 rounded border border-grey-lighter px-2.5 py-1">
 	<span>Scatter Selection</span>
 	<TrailingIcon class="remove material-icons" on:click={() => selectionIds.set([])}>
 		cancel

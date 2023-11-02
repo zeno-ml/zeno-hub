@@ -12,14 +12,14 @@
 </script>
 
 <div
-	class="fixed inset-0 z-20 flex justify-center items-baseline p-12 bg-grey bg-opacity-60"
+	class="fixed inset-0 z-20 flex items-baseline justify-center bg-grey bg-opacity-60 p-12"
 	transition:fade={{ duration: 200 }}
 >
-	<Paper class="p-6 flex flex-col" elevation={7}>
+	<Paper class="flex flex-col p-6" elevation={7}>
 		<Content>
 			<div class="mb-4">{message}</div>
 			<slot />
-			<div class="flex m-auto justify-end">
+			<div class="m-auto flex justify-end">
 				<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('cancel')}>
 					{cancelText}
 				</Button>

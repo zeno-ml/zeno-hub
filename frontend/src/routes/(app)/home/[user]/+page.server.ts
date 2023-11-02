@@ -1,23 +1,14 @@
 import { getClient } from '$lib/api/client';
-import type { AuthUser } from '$lib/auth/types';
 import { EntrySort, type HomeEntry } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url, depends }) {
+export async function load({ cookies, url, depends, parent }) {
 	depends('app:reports');
 	depends('app:projects');
 
-	const userCookie = cookies.get('loggedIn');
-
-	let cognitoUser: AuthUser;
-	if (userCookie) {
-		cognitoUser = JSON.parse(userCookie) as AuthUser;
-		// If the user is not authenticated, redirect to the login page
-		if (!cognitoUser || !cognitoUser.id || !cognitoUser.accessToken) {
-			throw redirect(303, `/login?redirectTo=${url.pathname}`);
-		}
-	} else {
-		throw redirect(303, `/login?redirectTo=${url.pathname}`);
+	const { cognitoUser } = await parent();
+	if (!cognitoUser) {
+		throw redirect(303, `/login?redirectto=${url.pathname}`);
 	}
 
 	const zenoClient = await getClient(cookies, url);

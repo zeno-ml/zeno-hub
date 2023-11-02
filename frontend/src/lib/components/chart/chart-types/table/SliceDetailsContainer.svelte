@@ -9,7 +9,7 @@
 
 {#if sli !== undefined}
 	<div
-		class="text-primary cursor-default"
+		class="cursor-default text-primary"
 		role="tooltip"
 		on:mouseover={() => (showTooltip = true)}
 		on:mouseout={() => (showTooltip = false)}
@@ -19,8 +19,8 @@
 		{sli.sliceName}
 	</div>
 	{#if sli.sliceName !== 'All Instances' && showTooltip}
-		<div class="z-10 absolute">
-			<div class="bg-background p-2.5 rounded-lg shadow-xl">
+		<div class="absolute z-10">
+			<div class="rounded-lg bg-background p-2.5 shadow-xl">
 				<SliceDetails predicateGroup={sli.filterPredicates} />
 			</div>
 		</div>

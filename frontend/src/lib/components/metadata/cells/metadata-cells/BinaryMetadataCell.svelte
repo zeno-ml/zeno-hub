@@ -43,10 +43,10 @@
 </script>
 
 {#if histogram}
-	<div class="flex px-1 w-full">
+	<div class="flex w-full px-1">
 		<div style:width="{widthScale(histogram[0].filteredSize ?? 0)}%">
 			<button
-				class="w-full flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-l-xl text-background {selectedValue !==
+				class="border-transparent box-border flex w-full cursor-pointer flex-col items-center rounded-l-xl border-2 px-1 py-2.5 font-bold text-background {selectedValue !==
 					null && selectedValue === true
 					? 'border-primary-mid'
 					: 'border-yellowish-light'}"
@@ -60,7 +60,7 @@
 		</div>
 		<div style:width="{widthScale(histogram[1].filteredSize ?? 0)}%">
 			<button
-				class="w-full flex px-1 py-2.5 cursor-pointer flex-col items-center box-border border-2 border-transparent font-bold rounded-r-xl text-background {selectedValue !==
+				class="border-transparent box-border flex w-full cursor-pointer flex-col items-center rounded-r-xl border-2 px-1 py-2.5 font-bold text-background {selectedValue !==
 					null && selectedValue === false
 					? 'border-primary-mid'
 					: 'border-yellowish-light'}"

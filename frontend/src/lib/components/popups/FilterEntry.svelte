@@ -34,7 +34,7 @@
 	}
 </script>
 
-<div class="flex mb-1 mt-1 items-center">
+<div class="mb-1 mt-1 flex items-center">
 	{#if index !== 0}
 		<div class="mr-2.5">
 			<Svelecte
@@ -136,7 +136,7 @@
 				<input
 					type="text"
 					bind:value={predicate.value}
-					class="h-[38px] pl-2 border border-grey-lighter rounded"
+					class="h-[38px] rounded border border-grey-lighter pl-2"
 				/>
 			{/if}
 		{:else}

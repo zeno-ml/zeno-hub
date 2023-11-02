@@ -7,25 +7,25 @@
 	let isExplore = $page.route.id === '/(app)/home';
 </script>
 
-<div class="flex flex-col flex-grow h-full mx-8 py-5 bg-white">
+<div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
 	{#if data.cognitoUser && data.cognitoUser !== null}
 		<div
-			class="bg-primary w-full rounded-md text-white flex flex-col items-center sm:flex-row md:h-28"
+			class="flex w-full flex-col items-center rounded-md bg-primary text-white sm:flex-row md:h-28"
 		>
 			<a
 				href={'/home/' + data.cognitoUser.name}
-				class={`text-3xl p-6 ${
+				class={`p-6 text-3xl ${
 					isExplore ? 'text-grey-lighter' : 'underline'
-				} hover:text-primary-mid uppercase font-bold`}
+				} font-bold uppercase hover:text-primary-mid`}
 				use:tooltip={{ text: 'Your projects and reports' }}
 			>
 				My Hub
 			</a>
 			<a
 				href="/home"
-				class={`text-3xl p-6 ${
+				class={`p-6 text-3xl ${
 					!isExplore ? 'text-grey-light' : 'underline'
-				} hover:text-primary-mid uppercase font-bold`}
+				} font-bold uppercase hover:text-primary-mid`}
 				use:tooltip={{ text: 'Public projects and reports' }}
 			>
 				Discover
@@ -77,10 +77,10 @@
 		</div>
 	{:else}
 		<div
-			class="bg-primary w-full rounded-md text-white flex justify-center items-center flex-col sm:flex-row"
+			class="flex w-full flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
 		>
 			<div class="p-6">
-				<h1 class="text-5xl font-header">Welcome to Zeno</h1>
+				<h1 class="font-header text-5xl">Welcome to Zeno</h1>
 				<p class="text-xl">
 					<a class="font-bold hover:text-primary-mid" href="https://zenoml.com">Learn about Zeno</a>
 					or
@@ -136,7 +136,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="flex flex-col min-h-0">
+	<div class="flex min-h-0 flex-col">
 		<slot />
 	</div>
 </div>

@@ -56,9 +56,6 @@
 		if (e.key === 'Escape') {
 			dispatch('close');
 		}
-		if (e.key === 'Enter') {
-			updateReport();
-		}
 	}
 
 	function addUser(e: CustomEvent) {
@@ -87,11 +84,11 @@
 	<Content
 		style="display: flex; flex-direction: column; width: 800px; max-height: 80vh; overflow-y: scroll"
 	>
-		<h2 class="text-xl mb-4">Report Settings</h2>
+		<h2 class="mb-4 text-xl">Report Settings</h2>
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex flex-col">
-			<div class="flex mb-6">
-				<div class="flex flex-col mr-8">
+			<div class="mb-6 flex">
+				<div class="mr-8 flex flex-col">
 					<div>
 						<Textfield bind:value={report.name} label="Name" bind:this={input} />
 					</div>
@@ -108,11 +105,11 @@
 			<Textfield textarea bind:value={report.description} label="Description" style="width: 100%" />
 		</div>
 		<div class="mb-5 flex flex-col" transition:fade>
-			<h3 class="text-lg mb-2">Collaborators</h3>
+			<h3 class="mb-2 text-lg">Collaborators</h3>
 			{#if reportUsers.length > 0}
 				<table>
 					<thead
-						class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+						class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-1 font-semibold"
 					>
 						<th>Email</th>
 						<th class="w-1">Editor</th>
@@ -178,11 +175,11 @@
 			{/if}
 		</div>
 		<div class="mb-5 flex flex-col" transition:fade>
-			<h3 class="text-lg mb-2">Organizations</h3>
+			<h3 class="mb-2 text-lg">Organizations</h3>
 			{#if reportOrganizations.length > 0}
 				<table>
 					<thead
-						class="border-b border-grey-lighter pb-1 top-0 left-0 sticky bg-background font-semibold"
+						class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-1 font-semibold"
 					>
 						<th>Name</th>
 						<th class="w-1">Editor</th>

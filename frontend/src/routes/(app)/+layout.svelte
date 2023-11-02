@@ -27,10 +27,10 @@
 	}
 </script>
 
-<main class="md:flex text-left w-full h-full">
+<main class="h-full w-full text-left md:flex">
 	<Header user={data.user} />
 	{#if Boolean($navigating)}
-		<div class="w-full h-full flex items-center justify-center">
+		<div class="flex h-full w-full items-center justify-center">
 			<p>Loading...</p>
 		</div>
 	{:else}

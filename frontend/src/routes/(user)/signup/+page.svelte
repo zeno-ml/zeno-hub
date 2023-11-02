@@ -14,7 +14,7 @@
 </svelte:head>
 
 <form
-	class="flex flex-col items-center justify-center bg-background p-12 rounded-xl"
+	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	method="POST"
 	action="?/signup"
 	use:enhance
@@ -28,30 +28,30 @@
 			input$name="username"
 			value={form ? `${form.name}` : ''}
 			label="User name"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			input$name="email"
 			type="email"
 			value={form ? `${form.email}` : ''}
 			label="Email address"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			input$name="password"
 			type="password"
 			value={form ? `${form.password}` : ''}
 			label="Password"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			input$name="repeatPassword"
 			type="password"
 			value={form ? `${form.repeat}` : ''}
 			label="Repeat password"
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
-		<p class="w-64 text-center mt-2">
+		<p class="mt-2 w-64 text-center">
 			Password must be at least 8 characters long and have at least one number, one special
 			character, and one uppercase letter.
 		</p>
@@ -72,7 +72,7 @@
 			>
 		</p>
 		{#if form?.error}
-			<p class="text-primary mt-4">{form.error}</p>
+			<p class="mt-4 text-primary">{form.error}</p>
 		{/if}
 	</div>
 </form>

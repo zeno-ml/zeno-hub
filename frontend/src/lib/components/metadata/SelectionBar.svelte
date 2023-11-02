@@ -13,25 +13,25 @@
 </script>
 
 <div class="w-full">
-	<div class="pt-2.5 flex justify-between w-full border-b border-grey-lighter h-[60px]">
+	<div class="flex h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
 		<ChipsWrapper />
 	</div>
 	{#if !$page.url.href.includes('compare')}
 		<div
-			class="flex flex-wrap justify-between w-full items-center py-2.5 border-b border-grey-lighter"
+			class="flex w-full flex-wrap items-center justify-between border-b border-grey-lighter py-2.5"
 		>
 			<div class="flex">
 				{#await currentResult then res}
 					{#if res !== undefined && res.length > 0}
 						{#if res[0].metric !== undefined && res[0].metric !== null}
-							<span class="text-grey-dark mr-3">
+							<span class="mr-3 text-grey-dark">
 								{$metric ? $metric.name + ':' : ''}
 							</span>
-							<span class="text-primary mr-3">
+							<span class="mr-3 text-primary">
 								{res[0].metric.toFixed(2)}
 							</span>
 						{/if}
-						<span class="italic text-grey-darker mr-2.5"
+						<span class="mr-2.5 italic text-grey-darker"
 							>({res[0].size.toLocaleString()} instances)</span
 						>
 					{/if}
@@ -52,7 +52,7 @@
 				{:else}
 					<div class="flex items-center" style="margin-right: 10px">
 						<p style="margin: auto; margin-right: 10px">Editing</p>
-						<div class="py-1 px-2.5 bg-greenish-light mx-1 my rounded width-fit margin-auto">
+						<div class="my width-fit margin-auto mx-1 rounded bg-greenish-light px-2.5 py-1">
 							{$editTag.tagName}
 						</div>
 					</div>
