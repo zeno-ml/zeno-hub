@@ -21,6 +21,7 @@
 		[MetadataType.CONTINUOUS]: ContinuousMetadataCell,
 		[MetadataType.BOOLEAN]: BinaryMetadataCell,
 		[MetadataType.DATETIME]: TextMetadataCell,
+		[MetadataType.EMBEDDING]: TextMetadataCell,
 		[MetadataType.OTHER]: TextMetadataCell
 	};
 
