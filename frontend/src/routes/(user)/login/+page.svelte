@@ -14,7 +14,7 @@
 </script>
 
 <form
-	class="flex flex-col items-center justify-center bg-background p-12 rounded-xl"
+	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	method="POST"
 	action="?/login"
 	use:enhance
@@ -28,7 +28,7 @@
 			input$name="username"
 			label="Username"
 			value={form ? form.username : ''}
-			class="w-56 mb-3"
+			class="mb-3 w-56"
 		/>
 		<Textfield
 			type="password"

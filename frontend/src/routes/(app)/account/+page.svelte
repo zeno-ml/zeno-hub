@@ -11,9 +11,9 @@
 	$: organizations = data.organizations as Organization[];
 </script>
 
-<div class="flex flex-col w-full bg-yellowish">
-	<div class="flex flex-col bg-white p-6 m-4 shadow-md rounded">
-		<h1 class="text-xl mb-3">Account management</h1>
+<div class="flex w-full flex-col bg-yellowish">
+	<div class="m-4 flex flex-col rounded bg-white p-6 shadow-md">
+		<h1 class="mb-3 text-xl">Account management</h1>
 		<Account name={cognitoUser.name} email={cognitoUser.email} />
 		<hr class="mt-5 text-grey-lighter" />
 		<OrganizationsTable {organizations} {user} />

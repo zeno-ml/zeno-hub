@@ -14,7 +14,7 @@
 <svelte:window bind:innerWidth={width} />
 
 {#if width < 600}
-	<div class="text-lg p-10 m-10 rounded-md bg-primary-dark text-white">
+	<div class="m-10 rounded-md bg-primary-dark p-10 text-lg text-white">
 		Projects are currently not supported on mobile. Please open this project on a computer, or check
 		out some of the Zeno Reports.
 	</div>
@@ -33,7 +33,7 @@
 		</Banner>
 	</div>
 {:else}
-	<div class="flex flex-col flex-grow min-w-0 h-full min-h-0">
+	<div class="flex h-full min-h-0 min-w-0 flex-grow flex-col">
 		<ProjectHeader
 			project={data.project}
 			likes={data.numLikes}
@@ -42,7 +42,7 @@
 		/>
 		<div class="flex h-full min-h-0">
 			<MetadataPanel compare={data.compare} />
-			<div class="mx-5 flex flex-col flex-grow">
+			<div class="mx-5 flex flex-grow flex-col">
 				<Instances compare={data.compare} />
 			</div>
 		</div>

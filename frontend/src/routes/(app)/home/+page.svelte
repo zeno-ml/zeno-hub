@@ -29,7 +29,7 @@
 </script>
 
 <HomeSearchBar bind:searchText bind:typeFilter bind:sort />
-<div class="h-full content-start overflow-y-auto grid grid-cols-home gap-5">
+<div class="grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
 	{#each data.entries as entry (entry.entry.name || entry.entry.name)}
 		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 	{/each}

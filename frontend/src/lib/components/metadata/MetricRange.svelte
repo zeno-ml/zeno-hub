@@ -23,8 +23,8 @@
 </script>
 
 {#if $metrics.length !== 0 && $metricRange[0] !== Infinity && $metricRange[0] !== null}
-	<div class="flex items-center justify-end mr-1 text-grey-dark w-full overflow-hidden">
-		<span class="mx-4 whitespace-nowrap overflow-hidden text-ellipsis">
+	<div class="mr-1 flex w-full items-center justify-end overflow-hidden text-grey-dark">
+		<span class="mx-4 overflow-hidden text-ellipsis whitespace-nowrap">
 			{$metric ? $metric.name : ''}
 		</span>
 		<div
@@ -42,7 +42,7 @@
 		>
 			{$metricRange[0].toFixed(2)}
 		</div>
-		<div class="w-10 h-4 mx-2.5 bg-gradient-to-r from-primary-light to-primary" />
+		<div class="mx-2.5 h-4 w-10 bg-gradient-to-r from-primary-light to-primary" />
 		<div
 			contenteditable="true"
 			role="textbox"

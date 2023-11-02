@@ -3,7 +3,7 @@
 </script>
 
 <div class="ml-5 mt-5">
-	<h2 class="mt-2 mb-3 text-grey-dark text-xl">
+	<h2 class="mb-3 mt-2 text-xl text-grey-dark">
 		{chartName}
 	</h2>
 	<div>

@@ -15,14 +15,14 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class="flex ml-auto">
+<div class="ml-auto flex">
 	<div class="flex">
 		<p class="pr-2 text-base font-semibold text-primary">{likes}</p>
 		<button
 			use:tooltip={{
 				text: `${user === null ? 'Login to l' : 'L'}ike this ${report ? 'report' : 'project'}!`
 			}}
-			class=" w-6 h-6 fill-primary"
+			class=" h-6 w-6 fill-primary"
 			on:click={(e) => {
 				if (user) {
 					e.stopPropagation();

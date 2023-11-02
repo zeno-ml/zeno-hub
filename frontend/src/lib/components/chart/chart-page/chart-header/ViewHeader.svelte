@@ -14,9 +14,9 @@
 	};
 </script>
 
-<div class="flex items-center cursor-pointer ml-5 mt-5">
+<div class="ml-5 mt-5 flex cursor-pointer items-center">
 	<button
-		class="flex items-center cursor-pointer"
+		class="flex cursor-pointer items-center"
 		on:click={() => {
 			goto($page.url.href.split('?')[0].substring(0, $page.url.href.lastIndexOf('/')));
 		}}
@@ -32,7 +32,7 @@
 		>
 			<path class="fill-{ishover ? 'black' : 'grey-dark'}" d={mdiArrowCollapseLeft} />
 		</SmuiElement>
-		<h4 class="text-grey-dark hover:text-black mr-4">Back to Chart Home</h4>
+		<h4 class="mr-4 text-grey-dark hover:text-black">Back to Chart Home</h4>
 	</button>
 	{#if $project.editor}
 		<Button

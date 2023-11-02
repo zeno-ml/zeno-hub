@@ -20,7 +20,6 @@
 		type FilterPredicateGroup,
 		type HistogramBucket,
 		type Metric,
-
 		type ZenoColumn
 	} from '$lib/zenoapi';
 	import { getContext } from 'svelte';
@@ -33,13 +32,13 @@
 	};
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-	const histogramColumnsBaseFilter = (c: ZenoColumn) => ((
-					c.columnType === ZenoColumnType.ID ||
-					c.columnType === ZenoColumnType.DATA ||
-					c.columnType === ZenoColumnType.FEATURE ||
-					c.columnType === ZenoColumnType.LABEL ||
-					c.columnType === ZenoColumnType.OUTPUT)
-				&& c.dataType !== MetadataType.EMBEDDING)
+	const histogramColumnsBaseFilter = (c: ZenoColumn) =>
+		(c.columnType === ZenoColumnType.ID ||
+			c.columnType === ZenoColumnType.DATA ||
+			c.columnType === ZenoColumnType.FEATURE ||
+			c.columnType === ZenoColumnType.LABEL ||
+			c.columnType === ZenoColumnType.OUTPUT) &&
+		c.dataType !== MetadataType.EMBEDDING;
 	let metadataHistograms: Map<string, HistogramBucket[]> = new Map();
 
 	// Derived store to only update histograms once at startup.
@@ -60,9 +59,7 @@
 
 	histogramState.subscribe((s) => {
 		const requestColumns = $columns.filter(
-			(c) =>
-				(c.model === null || c.model === s.model) &&
-				histogramColumnsBaseFilter(c)	
+			(c) => (c.model === null || c.model === s.model) && histogramColumnsBaseFilter(c)
 		);
 
 		requestingHistogramCounts.set(true);
