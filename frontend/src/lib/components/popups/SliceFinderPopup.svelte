@@ -5,7 +5,6 @@
 		comparisonModel,
 		model,
 		project,
-		selectionIds,
 		selectionPredicates,
 		selections,
 		tagIds
@@ -105,8 +104,7 @@
 		sliceFinderMessage = 'Generating Slices...';
 		if (metricColumn !== undefined) {
 			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-			const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-			const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+			const dataIds = [...new Set(secureTagIds)];
 			sliceFinderReturn = await zenoClient.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,
@@ -285,7 +283,7 @@
 			/>
 		</div>
 	</div>
-	{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || $selectionIds !== undefined}
+	{#if $selectionPredicates !== undefined || $selections.tags.length > 0}
 		<div style="margin-left: 20px;margin-right: 20px">
 			<div class="mb-2 mt-2">Search for slices in:</div>
 			<div class="flex rounded border border-grey-lighter">

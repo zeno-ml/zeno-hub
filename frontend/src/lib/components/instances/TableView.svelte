@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
-	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		editTag,
-		editedIds,
 		model,
 		project,
 		rowsPerPage,
-		selectionIds,
 		selectionPredicates,
 		selections,
 		sort,
@@ -18,10 +15,10 @@
 	import type { ZenoColumn, ZenoService } from '$lib/zenoapi';
 	import { Join, MetadataType, ZenoColumnType } from '$lib/zenoapi';
 	import { Icon, Label } from '@smui/button';
-	import Checkbox from '@smui/checkbox';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
+	import OptionsInstanceView from '../../instance-views/OptionsInstanceView.svelte';
 
 	export let numberOfInstances = 0;
 
@@ -30,7 +27,6 @@
 	let tableContainer: HTMLDivElement;
 	let table: Record<string, string | number | boolean>[] = [];
 	let columnHeader: ZenoColumn[] = [];
-	let currentTagIds: string[] = [];
 	let currentPage = 0;
 	let lastPage = 0;
 	let instanceHidden = false;
@@ -41,10 +37,6 @@
 				: [5, 15, 30, 60, 100]
 		)
 	].sort((a, b) => a - b);
-
-	if ($editTag !== undefined) {
-		currentTagIds = $editTag.dataIds;
-	}
 
 	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id || '';
 	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
@@ -62,10 +54,6 @@
 	$: lastPage = Math.max(Math.ceil(numberOfInstances / $rowsPerPage) - 1, 0);
 	$: if (currentPage > lastPage) {
 		currentPage = lastPage;
-	}
-	$: {
-		currentTagIds;
-		editedIds.set(currentTagIds);
 	}
 	// update on page, metadata selection, slice selection, or state change.
 	$: {
@@ -100,8 +88,7 @@
 			};
 		}
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		const dataIds = [...new Set(secureTagIds)];
 		getFilteredTable(
 			$project.uuid,
 			$columns,
@@ -135,9 +122,6 @@
 	<table>
 		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
 			<tr class="border-b border-grey-lighter bg-background">
-				{#if $editTag !== undefined}
-					<th class="font-grey p-3 font-semibold">Included</th>
-				{/if}
 				<th class="font-grey p-3 font-semibold">ID</th>
 				{#if $project.view}
 					<th
@@ -174,11 +158,6 @@
 		<tbody>
 			{#each table as tableContent (tableContent[idColumn])}
 				<tr class="border-b border-grey-lighter">
-					{#if $editTag !== undefined}
-						<td class="p-3">
-							<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
-						</td>
-					{/if}
 					<td class="border border-grey-lighter p-3 align-top">
 						{tableContent[idColumn]}
 					</td>
@@ -188,7 +167,7 @@
 								<p class="text-center">...</p>
 							{:else}
 								<div class="instance">
-									<InstanceView
+									<OptionsInstanceView
 										view={$project.view}
 										{dataColumn}
 										{labelColumn}

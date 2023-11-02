@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { editTag, editedIds, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
+	import { editTag, project, selectionIds, selections, tagIds, tags } from '$lib/stores';
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Tag, ZenoService } from '$lib/zenoapi';
 	import { mdiInformationOutline, mdiPlus, mdiPlusCircle } from '@mdi/js';
@@ -19,13 +19,13 @@
 		zenoClient
 			.updateTag($project.uuid, {
 				...$editTag,
-				dataIds: Array.from(new Set([...$editTag.dataIds, ...$editedIds]))
+				dataIds: $selectionIds
 			})
 			.then(() => {
 				tags.update((t) => {
 					const index = t.findIndex((tag) => tag.id === $editTag?.id);
 					if (index !== -1 && $editTag !== undefined) {
-						t[index] = { ...$editTag, dataIds: $editedIds };
+						t[index] = { ...$editTag, dataIds: $selectionIds };
 					}
 					return t;
 				});
@@ -36,7 +36,6 @@
 					tagIds.set([...s]);
 				});
 				editTag.set(undefined);
-				editedIds.set([]);
 			});
 	}
 </script>
@@ -67,7 +66,7 @@
 			>
 				<IconButton on:click={() => (showNewTag = true)}>
 					<Icon tag="svg" viewBox="0 0 24 24">
-						{#if $selectionIds !== undefined}
+						{#if $selectionIds.length > 0}
 							<path class="fill-greenish" d={mdiPlusCircle} />
 						{:else}
 							<path class="fill-grey" d={mdiPlus} />

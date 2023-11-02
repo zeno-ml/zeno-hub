@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { models, project, selectionIds, selectionPredicates, selections } from '$lib/stores';
+	import { models, project, selectionPredicates, selections } from '$lib/stores';
 	import { tooltip } from '$lib/util/tooltip';
 	import {
 		mdiCreation,
@@ -62,7 +62,7 @@
 					}}
 				>
 					<Icon tag="svg" viewBox="0 0 24 24">
-						{#if $selectionPredicates !== undefined || $selections.tags.length > 0 || ($selectionIds !== undefined && $selectionIds.length > 0)}
+						{#if $selectionPredicates !== undefined || $selections.tags.length > 0}
 							<path class="fill-primary" d={mdiCreation} />
 						{:else}
 							<path class="fill-grey" d={mdiCreationOutline} />

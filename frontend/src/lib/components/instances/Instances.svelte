@@ -6,7 +6,6 @@
 		metric,
 		model,
 		project,
-		selectionIds,
 		selectionPredicates,
 		tagIds
 	} from '$lib/stores';
@@ -35,13 +34,12 @@
 	let numberOfInstances = 0;
 
 	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
-	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
 	$: currentResult = zenoClient.getMetricsForSlices($project.uuid, {
 		metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
-		dataIds: [...new Set([...secureTagIds, ...secureSelectionIds])]
+		dataIds: [...new Set(secureTagIds)]
 	});
 
 	$: modelAResult = compare
@@ -88,8 +86,7 @@
 			return Promise.resolve(undefined);
 		}
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		const dataIds = [...new Set(secureTagIds)];
 		return zenoClient.getMetricsForSlices($project.uuid, {
 			metricKeys: getMetricKeys(model, metric, predicates),
 			dataIds

@@ -31,7 +31,7 @@
 			.addTag($project.uuid, {
 				id: 0,
 				tagName,
-				dataIds: []
+				dataIds: $selectionIds
 			})
 			.then((res) => {
 				tags.update((t) => [
@@ -39,9 +39,10 @@
 					{
 						id: res,
 						tagName,
-						dataIds: []
+						dataIds: $selectionIds
 					}
 				]);
+				selectionIds.set([]);
 				dispatch('close');
 			});
 	}
@@ -75,7 +76,7 @@
 		<p style:margin-right="10px">tag already exists</p>
 	{:else if $selectionIds !== undefined && $selectionIds.length > 0}
 		<p style:margin-right="10px">
-			{$selectionIds.length} instances selected
+			{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected
 		</p>
 	{/if}
 </Popup>

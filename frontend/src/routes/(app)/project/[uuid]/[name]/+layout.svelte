@@ -13,6 +13,7 @@
 		models,
 		project,
 		rowsPerPage,
+		selectionIds,
 		selections,
 		slices,
 		tags
@@ -38,6 +39,7 @@
 		compareSort.set(data.compareSort);
 		metricRange.set(data.metricRange);
 		selections.set(data.selections);
+		selectionIds.set([]);
 
 		model.subscribe((mod) => {
 			if ($comparisonModel && $comparisonModel === mod) {

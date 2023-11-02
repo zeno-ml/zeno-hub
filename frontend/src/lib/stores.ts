@@ -41,10 +41,9 @@ export const compareSort: Writable<[ZenoColumn | undefined, boolean]> = writable
 // The tag ids selected by the user.
 export const tagIds: Writable<string[] | undefined> = writable(undefined);
 export const editTag: Writable<Tag | undefined> = writable(undefined);
-export const editedIds: Writable<string[]> = writable([]);
 
 // The ids directly selected by the user.
-export const selectionIds: Writable<string[] | undefined> = writable(undefined);
+export const selectionIds: Writable<string[]> = writable([]);
 export const selections: Writable<{
 	metadata: Record<string, FilterPredicateGroup>;
 	slices: number[];

@@ -8,7 +8,6 @@
 		model,
 		project,
 		requestingHistogramCounts,
-		selectionIds,
 		selectionPredicates,
 		tagIds
 	} from '$lib/stores';
@@ -64,8 +63,7 @@
 
 		requestingHistogramCounts.set(true);
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		const dataIds = [...new Set(secureTagIds)];
 		zenoClient
 			.calculateHistograms($project.uuid, {
 				columns: requestColumns,
