@@ -9,7 +9,11 @@ CHUNK_SIZE = 1024 * 1024  # adjust the chunk size as desired
 
 
 def generate_diff_cols(
-    df: pd.DataFrame, diff_col_1: ZenoColumn, diff_col_2: ZenoColumn, project: str
+    df: pd.DataFrame,
+    diff_col_1: ZenoColumn,
+    diff_col_2: ZenoColumn,
+    project: str,
+    order_by: str,
 ) -> pd.DataFrame:
     """Generate new difference column based on the dataframe and specified columns.
 
@@ -18,6 +22,7 @@ def generate_diff_cols(
         diff_col_1 (ZenoColumn): first column used to calculate the difference.
         diff_col_2 (ZenoColumn): second column used to calculate the difference.
         project (str): project id for which to get the diff column.
+        order_by (str): 'ascending' or 'descending' order.
 
     Returns:
         DataFrame: new dataframe containing the diff column.
@@ -40,7 +45,12 @@ def generate_diff_cols(
 
     # various metadata type difference
     if diff_col_1.data_type == MetadataType.CONTINUOUS:
-        df.loc[:, "diff"] = df[col1_id] - df[col2_id]
+        if order_by == "descending":
+            df.loc[:, "diff"] = df[col1_id] - df[col2_id]
+        elif order_by == "ascending":
+            df.loc[:, "diff"] = df[col2_id] - df[col1_id]
+        else:
+            raise ValueError(f"Illegal value for {order_by=}")
     else:
         df.loc[:, "diff"] = df[col1_id] != df[col2_id]
     return df

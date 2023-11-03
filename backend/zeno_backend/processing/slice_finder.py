@@ -63,7 +63,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
     if req.compare_column:
         filt_df = generate_diff_cols(
-            filt_df, req.metric_column, req.compare_column, project
+            filt_df, req.metric_column, req.compare_column, project, req.order_by
         )
 
     unique_cols = set(not_cont_search_col_ids + [metric_col])
@@ -73,7 +73,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
     # Invert metric column if ascending.
     metric_max = np.max(normalized_metric_col)
-    if req.order_by == "ascending":
+    if req.order_by == "ascending" and req.compare_column is None:
         normalized_metric_col = metric_max - normalized_metric_col
 
     cont_search_col_ids = [col + "_encode" for col in cont_search_col_ids]
@@ -91,7 +91,7 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
 
     for sli_i, sli in enumerate(slice_finder.top_slices_):
         # Rescale back to original metric.
-        if req.order_by == "ascending":
+        if req.order_by == "ascending" and req.compare_column is None:
             slice_metrics.append(
                 metric_max
                 - slice_finder.top_slices_statistics_[sli_i]["slice_average_error"]
