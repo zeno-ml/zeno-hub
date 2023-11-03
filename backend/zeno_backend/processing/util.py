@@ -47,8 +47,10 @@ def generate_diff_cols(
     if diff_col_1.data_type == MetadataType.CONTINUOUS:
         if order_by == "descending":
             df.loc[:, "diff"] = df[col1_id] - df[col2_id]
-        else:
+        elif order_by == "ascending":
             df.loc[:, "diff"] = df[col2_id] - df[col1_id]
+        else:
+            raise ValueError(f"Illegal value for {order_by=}")
     else:
         df.loc[:, "diff"] = df[col1_id] != df[col2_id]
     return df
