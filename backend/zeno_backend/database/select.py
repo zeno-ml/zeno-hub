@@ -51,19 +51,19 @@ PROJECTS_BASE_QUERY = sql.SQL(
             p.public, p.description, up.editor, p.created_at, p.updated_at
         FROM projects AS p
         LEFT JOIN user_project AS up ON p.uuid = up.project_uuid
-        WHERE up.user_id = %s
+        WHERE up.user_id = %s AND p.owner_id != %s
 
         UNION
 
         SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page,
             p.public, p.description, op.editor, p.created_at, p.updated_at
-        FROM projects AS p
+        FROM projects AS p 
         JOIN (SELECT op.project_uuid, uo.organization_id, editor
                 FROM user_organization AS uo
                 JOIN organization_project AS op
                 ON uo.organization_id = op.organization_id
                 WHERE uo.user_id = %s) AS op ON p.uuid = op.project_uuid
-        ) AS main
+        WHERE p.owner_id != %s) AS main 
     LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
@@ -80,18 +80,18 @@ REPORTS_BASE_QUERY = sql.SQL(
         SELECT r.id, r.name, r.owner_id, r.public, r.description, ur.editor,
         r.created_at, r.updated_at FROM reports AS r
         LEFT JOIN user_report AS ur ON r.id = ur.report_id
-        WHERE ur.user_id = %s
+        WHERE ur.user_id = %s AND r.owner_id != %s
 
         UNION
 
         SELECT r.id, r.name, r.owner_id, r.public, r.description, orr.editor,
-        r.created_at, r.updated_at FROM reports AS r
+        r.created_at, r.updated_at FROM reports AS r 
         JOIN (SELECT orr.report_id, uo.organization_id, editor
                 FROM user_organization AS uo
                 JOIN organization_report AS orr
                 ON uo.organization_id = orr.organization_id
                 WHERE uo.user_id = %s) AS orr ON r.id = orr.report_id
-        ) AS main
+        WHERE r.owner_id != %s) AS main
     LEFT JOIN users AS u ON main.owner_id = u.id)
     """
 )
@@ -126,7 +126,7 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
         list[Project]: the projects that the user can interact with.
     """
     with Database() as db:
-        params = [user.id, user.id, user.id]
+        params = [user.id, user.id, user.id, user.id, user.id]
         likes_query = sql.SQL(
             "SELECT project_uuid, COUNT(*) as total_likes"
             " FROM project_like GROUP BY project_uuid "
@@ -267,7 +267,7 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
         list[Report]: the reports that the user can interact with.
     """
     with Database() as db:
-        params = [user.id, user.id, user.id]
+        params = [user.id, user.id, user.id, user.id, user.id]
         likes_query = sql.SQL(
             "SELECT report_id, COUNT(*) as total_likes"
             " FROM report_like GROUP BY report_id "
@@ -424,7 +424,7 @@ def project_count(user: User | None = None) -> int:
     else:
         res = db.connect_execute_return(
             sql.SQL("SELECT COUNT(*) FROM") + PROJECTS_BASE_QUERY + sql.SQL(";"),
-            [user.id, user.id, user.id],
+            [user.id, user.id, user.id, user.id, user.id],
         )
 
     if len(res) > 0:
@@ -449,7 +449,7 @@ def report_count(user: User | None = None) -> int:
     else:
         res = db.connect_execute_return(
             sql.SQL("SELECT COUNT(*) FROM") + REPORTS_BASE_QUERY + sql.SQL(";"),
-            [user.id, user.id, user.id],
+            [user.id, user.id, user.id, user.id, user.id],
         )
     if len(res) > 0:
         return res[0][0]
