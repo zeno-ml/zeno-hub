@@ -8,7 +8,8 @@
 	export let currentResult: Promise<GroupMetric[] | undefined>;
 	export let selected: string;
 
-	$: choices = $editTag !== undefined || $project.view === '' ? ['table'] : ['list', 'table'];
+	$: choices =
+		$editTag !== undefined || $project.view === '' ? ['table'] : ['list', 'table', 'scatter'];
 	$: selected = choices[0];
 </script>
 

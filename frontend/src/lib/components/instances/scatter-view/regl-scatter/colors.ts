@@ -1,17 +1,13 @@
-import { schemeCategory10, interpolateBuPu } from "d3-scale-chromatic";
-import { color } from "d3-color";
+import { color } from 'd3-color';
+import { interpolateBuPu, schemeCategory10 } from 'd3-scale-chromatic';
 
-export const OTHER_COLOR_SCALE = ["#73726E"];
+export const OTHER_COLOR_SCALE = ['#73726E'];
 
 export const NOMINAL_COLOR_SCALE = schemeCategory10 as string[];
 
-export const BOOLEAN_COLOR_SCALE = ["#FF5733", "#4168E1"];
+export const BOOLEAN_COLOR_SCALE = ['#FF5733', '#4168E1'];
 
-export const CONTINUOUS_COLOR_SCALE = interpolateToStringArray(
-	interpolateBuPu,
-	20,
-	0.1
-);
+export const CONTINUOUS_COLOR_SCALE = interpolateToStringArray(interpolateBuPu, 20, 0.1);
 
 /**
  * Takes a function that produces colors from numbers into a fixed sized array

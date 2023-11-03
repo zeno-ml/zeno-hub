@@ -1,29 +1,19 @@
 <script lang="ts">
-	import { model } from "$lib/stores";
-	import type { ZenoService } from "$lib/zenoapi";
-	import { getContext, tick } from "svelte";
-	import NoEmbed from "./NoEmbed.svelte";
-	import ScatterHelp from "./ScatterHelp.svelte";
-	import ScatterLegend from "./ScatterLegend.svelte";
-	import ScatterSettings from "./ScatterSettings.svelte";
-	import type {
-		ReglScatterPointDispatch,
-		WebGLExtentScalers,
-	} from "./regl-scatter";
-	import { createScalesWebgGLExtent } from "./regl-scatter";
-	import ReglScatter from "./regl-scatter/ReglScatter.svelte";
-	import {
-		deselectPoints,
-		getIndicesFromIds,
-		getPointOpacities,
-		selectPoints,
-	} from "./scatter";
-
-	export let autoResize = true;
+	import { model } from '$lib/stores';
+	import type { ZenoService } from '$lib/zenoapi';
+	import { getContext, tick } from 'svelte';
+	import ScatterHelp from './ScatterHelp.svelte';
+	import ScatterLegend from './ScatterLegend.svelte';
+	import ScatterSettings from './ScatterSettings.svelte';
+	import type { ReglScatterPointDispatch, WebGLExtentScalers } from './regl-scatter';
+	import { createScalesWebgGLExtent } from './regl-scatter';
+	import ReglScatter from './regl-scatter/ReglScatter.svelte';
+	import { deselectPoints, getIndicesFromIds, getPointOpacities, selectPoints } from './scatter';
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-
 	const hoverViewOffset = 10;
+
+	let autoResize = true;
 	let height = 850; // canvas dims
 	let width = 1000; // canvas dims
 	let pointSizeSlider = 3;
@@ -45,9 +35,9 @@
 	let highlightPoints;
 
 	// if no coloring, just do the first one we have
-	$: if ($scatterColorByColumn === null) {
-		scatterColorByColumn.set($status.completeColumns[0]);
-	}
+	// $: if ($scatterColorByColumn === null) {
+	// 	scatterColorByColumn.set($status.completeColumns[0]);
+	// }
 	$: project2DOnModelChange($model);
 	$: changePointsColorsOnColorChange($scatterColorByColumn);
 	$: {
@@ -60,11 +50,9 @@
 	}
 
 	$: if (points) {
-		getPointOpacities($selectionPredicates, points, $tagIds).then(
-			(filteredOpacities) => {
-				pointOpacities = filteredOpacities;
-			}
-		);
+		getPointOpacities($selectionPredicates, points, $tagIds).then((filteredOpacities) => {
+			pointOpacities = filteredOpacities;
+		});
 	}
 
 	$: if (points && !runOnce && mounted) {
@@ -84,7 +72,7 @@
 	async function changePointsColorsOnColorChange(colorByColumn: ZenoColumn) {
 		if (pointsExist(points)) {
 			const newPointColors = await zenoClient.getProjectionColors({
-				column: colorByColumn,
+				column: colorByColumn
 			});
 
 			// update the colors and leave x, y alone
@@ -108,7 +96,7 @@
 			// requests tsne from backend
 			points = await zenoClient.projectEmbedInto2D({
 				model,
-				column: $scatterColorByColumn,
+				column: $scatterColorByColumn
 			});
 
 			// simply scales the points between [-1, 1]
@@ -133,12 +121,7 @@
 		const entry = await ZenoService.getDfRowEntry({ id });
 
 		// create the data view component and replace the div with the new component
-		createViewComponent(
-			viewFunction,
-			JSON.parse(entry),
-			viewOptions,
-			hoverViewDivEl
-		);
+		createViewComponent(viewFunction, JSON.parse(entry), viewOptions, hoverViewDivEl);
 	}
 
 	function clearPointHover() {
@@ -152,83 +135,80 @@
 	}
 
 	function pointsExist(points: Points2D) {
-		return points && "ids" in points && points.ids.length > 0;
+		return points && 'ids' in points && points.ids.length > 0;
 	}
 </script>
 
 <svelte:window on:resize={resizeScatter} />
 
 <div id="scatter-view" bind:clientHeight={height}>
-	{#if embedExists}
-		<div bind:this={containerEl} id="container">
-			{#if !computingPoints}
-				<!-- highlight hovering point with circle outline  -->
-				<svg class="background" {width} {height}>
-					{#if pointHover !== undefined}
-						<circle
-							cx={pointHover.canvasX}
-							cy={pointHover.canvasY}
-							r={15}
-							fill="none"
-							stroke="lavender" />
-					{/if}
-				</svg>
-
-				<!-- Scatterplot and overlay instance on top of nearest point -->
-				{#if points}
-					<div class="overlay">
-						<ReglScatter
-							style="outline: 1px solid lavender"
-							data={{
-								...points,
-								opacity: pointOpacities,
-							}}
-							pointSize={pointSizeSlider}
-							pointColor="#6a1b9a"
-							{width}
-							{height}
-							on:pointOver={showViewOnPoint}
-							on:pointOut={clearPointHover}
-							on:select={(e) => selectPoints(e, points)}
-							on:deselect={deselectPoints}
-							on:mount={(e) => {
-								const reglScatterplot = e.detail;
-								dehighlightPoints = reglScatterplot.deselect;
-								highlightPoints = reglScatterplot.select;
-								mounted = true;
-							}} />
-					</div>
-					{#if pointHover !== undefined}
-						<div
-							id="hover-view"
-							class="no-text-highlight"
-							style:left="{pointHover.canvasX + hoverViewOffset}px"
-							style:top="{pointHover.canvasY + hoverViewOffset}px">
-							<div id="replace-view" bind:this={hoverViewDivEl} />
-						</div>
-					{/if}
+	<div bind:this={containerEl} id="container">
+		{#if !computingPoints}
+			<!-- highlight hovering point with circle outline  -->
+			<svg class="background" {width} {height}>
+				{#if pointHover !== undefined}
+					<circle
+						cx={pointHover.canvasX}
+						cy={pointHover.canvasY}
+						r={15}
+						fill="none"
+						stroke="lavender"
+					/>
 				{/if}
-			{:else}
-				<!--  Loading bar -->
-				<div id="loading-container">
-					<div id="loading-indicator" style:color="#6a1b9a">
-						<b>Computing 2D projection</b> from
-						<code>
-							{$model}
-						</code> embeddings
-					</div>
+			</svg>
+
+			<!-- Scatterplot and overlay instance on top of nearest point -->
+			{#if points}
+				<div class="overlay">
+					<ReglScatter
+						style="outline: 1px solid lavender"
+						data={{
+							...points,
+							opacity: pointOpacities
+						}}
+						pointSize={pointSizeSlider}
+						pointColor="#6a1b9a"
+						{width}
+						{height}
+						on:pointOver={showViewOnPoint}
+						on:pointOut={clearPointHover}
+						on:select={(e) => selectPoints(e, points)}
+						on:deselect={deselectPoints}
+						on:mount={(e) => {
+							const reglScatterplot = e.detail;
+							dehighlightPoints = reglScatterplot.deselect;
+							highlightPoints = reglScatterplot.select;
+							mounted = true;
+						}}
+					/>
 				</div>
+				{#if pointHover !== undefined}
+					<div
+						id="hover-view"
+						class="no-text-highlight"
+						style:left="{pointHover.canvasX + hoverViewOffset}px"
+						style:top="{pointHover.canvasY + hoverViewOffset}px"
+					>
+						<div id="replace-view" bind:this={hoverViewDivEl} />
+					</div>
+				{/if}
 			{/if}
-		</div>
-	{:else}
-		<NoEmbed />
-	{/if}
+		{:else}
+			<!--  Loading bar -->
+			<div id="loading-container">
+				<div id="loading-indicator" style:color="#6a1b9a">
+					<b>Computing 2D projection</b> from
+					<code>
+						{$model}
+					</code> embeddings
+				</div>
+			</div>
+		{/if}
+	</div>
 
 	<!-- settings/controls for the scatterplot -->
 	<div id="settings" class="frosted">
-		<ScatterSettings
-			bind:colorByColumn={$scatterColorByColumn}
-			bind:pointSizeSlider />
+		<ScatterSettings bind:colorByColumn={$scatterColorByColumn} bind:pointSizeSlider />
 	</div>
 	{#if points}
 		<div id="legend" class="frosted">

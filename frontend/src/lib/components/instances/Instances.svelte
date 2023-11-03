@@ -23,6 +23,7 @@
 	import ComparisonView from './ComparisonView.svelte';
 	import ListView from './ListView.svelte';
 	import TableView from './TableView.svelte';
+	import ScatterView from './scatter-view/ScatterView.svelte';
 
 	export let compare: boolean;
 
@@ -110,11 +111,10 @@
 	{/if}
 {:else if $editTag !== undefined}
 	<TableView {numberOfInstances} />
-{:else}
-	{#if selected === 'list'}
-		<ListView {numberOfInstances} />
-	{/if}
-	{#if selected === 'table'}
-		<TableView {numberOfInstances} />
-	{/if}
+{:else if selected === 'list'}
+	<ListView {numberOfInstances} />
+{:else if selected === 'table'}
+	<TableView {numberOfInstances} />
+{:else if selected === 'scatter'}
+	<ScatterView />
 {/if}

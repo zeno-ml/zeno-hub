@@ -1,3 +1,5 @@
+import { model, selectionIds } from '$lib/stores';
+import type { FilterPredicateGroup } from '$lib/zenoapi';
 import { get } from 'svelte/store';
 
 export function getIndicesFromIds(allIds: string[] | number[], filterIds: string[] | number[]) {
@@ -17,10 +19,10 @@ export function getIndicesFromIds(allIds: string[] | number[], filterIds: string
 export function selectPoints(e: CustomEvent, points: Points2D) {
 	const selectedIndices = e.detail;
 	const selectedIds = selectedIndices.map((index) => points.ids[index]);
-	selectionIds.set({ ids: selectedIds });
+	selectionIds.set(selectedIds);
 }
 export function deselectPoints() {
-	selectionIds.set({ ids: [] });
+	selectionIds.set([]);
 }
 /**
  * assigns ones outside of the filter predicates as partial opacity
