@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { metrics } from '$lib/stores';
+	import { svelecteRenderer } from '$lib/util/util';
 	import Checkbox from '@smui/checkbox';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
@@ -40,6 +41,7 @@
 				{dndzone}
 				multiple={true}
 				placeholder="Select Metrics..."
+				renderer={svelecteRenderer}
 			/>
 		{/if}
 		<div class="ml-auto flex items-center">

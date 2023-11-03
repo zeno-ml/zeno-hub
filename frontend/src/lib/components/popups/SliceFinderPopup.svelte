@@ -11,7 +11,7 @@
 		tagIds
 	} from '$lib/stores';
 	import { tooltip } from '$lib/util/tooltip';
-	import { columnSort } from '$lib/util/util';
+	import { columnSort, svelecteRenderer } from '$lib/util/util';
 	import {
 		MetadataType,
 		ZenoColumnType,
@@ -80,6 +80,7 @@
 	let maxlattice = ['1', '2', '3', '4', '5', '6'];
 	let maxlatticeIdx = 3;
 	let orderByOptions = ['descending', 'ascending'];
+	let compareOrderByOptions = ['(system) A > B', '(system) B > A'];
 	let orderByIdx = $page.url.href.includes('compare') ? 1 : 0;
 
 	let sliceFinderReturn = {
@@ -276,11 +277,10 @@
 				</div>
 			</div>
 			<Svelecte
-				style="width: 120px; margin-right: 20px"
+				style="width: 150px; margin-right: 20px"
 				bind:value={orderByIdx}
-				options={$page.url.href.includes('compare')
-					? ['(system) A > B', '(system) B > A']
-					: orderByOptions}
+				options={$page.url.href.includes('compare') ? compareOrderByOptions : orderByOptions}
+				renderer={svelecteRenderer}
 				placeholder="Order By"
 			/>
 		</div>

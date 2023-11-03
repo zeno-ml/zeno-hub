@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { models } from '$lib/stores';
+	import { svelecteRenderer } from '$lib/util/util';
 	import Checkbox from '@smui/checkbox';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
@@ -36,6 +37,7 @@
 				{options}
 				{dndzone}
 				multiple
+				renderer={svelecteRenderer}
 				placeholder="Select Systems..."
 			/>
 		{/if}

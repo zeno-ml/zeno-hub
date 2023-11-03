@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { columns, model } from '$lib/stores';
-	import { getOperation, inverseOperationMap } from '$lib/util/util';
+	import { getOperation, inverseOperationMap, svelecteRenderer } from '$lib/util/util';
 	import {
 		Join,
 		MetadataType,
@@ -29,8 +29,8 @@
 		predicate.value = e.detail.label;
 	}
 
-	function renderOptions(option: { label: string }) {
-		return option.label;
+	function renderOptions(option: { name: string }) {
+		return option.name;
 	}
 </script>
 
@@ -57,6 +57,7 @@
 			placeholder="Column"
 			valueAsObject
 			valueField="name"
+			renderer={renderOptions}
 			options={$columns.filter(
 				(d) =>
 					(d.columnType === ZenoColumnType.FEATURE ||
@@ -100,7 +101,7 @@
 						inverseOperationMap[Operation.GTE],
 						inverseOperationMap[Operation.LTE]
 					]}
-					renderer={renderOptions}
+					renderer={svelecteRenderer}
 				/>
 			{:else}
 				<Svelecte

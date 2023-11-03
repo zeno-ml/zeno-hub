@@ -61,6 +61,10 @@
 	function handleMoved(e: CustomEvent) {
 		elements = e.detail.items;
 	}
+
+	function optionsRenderer(o: { name: string }) {
+		return o.name;
+	}
 </script>
 
 {#if showConfirmDelete !== -1}
@@ -108,6 +112,7 @@
 					searchable={false}
 					multiple={true}
 					options={projects}
+					renderer={optionsRenderer}
 				/>
 			{/await}
 			<hr class="mb-4 mt-4 text-grey-light" />

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { svelecteRenderer } from '$lib/util/util';
 	import type { ReportElement, Slice, SliceElementSpec, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -48,6 +49,10 @@
 			data: element.data
 		});
 	}
+
+	function optionRenderer(o: { name: string }) {
+		return o.name;
+	}
 </script>
 
 {#await zenoClient.getProjects() then projects}
@@ -63,6 +68,7 @@
 		on:change={updateSliceId}
 		valueField="id"
 		labelField="name"
+		renderer={optionRenderer}
 	/>
 {/await}
 {#if models.length > 0}
@@ -72,5 +78,6 @@
 		labelAsValue={true}
 		options={models}
 		on:change={updateSliceModel}
+		renderer={svelecteRenderer}
 	/>
 {/if}

@@ -15,6 +15,10 @@
 		element.data = `${e.detail.id}`;
 		zenoClient.updateReportElement(reportId, { ...element, data: element.data });
 	}
+
+	function optionRenderer(o: { name: string }) {
+		return o.name;
+	}
 </script>
 
 {#await zenoClient.getProjects() then projects}
@@ -24,5 +28,12 @@
 			id: c.id
 		};
 	})}
-	<Svelecte value={chartId} {options} valueField="id" labelField="name" on:change={updateChartId} />
+	<Svelecte
+		value={chartId}
+		{options}
+		valueField="id"
+		labelField="name"
+		on:change={updateChartId}
+		renderer={optionRenderer}
+	/>
 {/await}

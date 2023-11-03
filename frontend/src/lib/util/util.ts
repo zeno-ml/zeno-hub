@@ -181,3 +181,7 @@ export function setURLParameters() {
 	} as URLParams;
 	window.history.replaceState(history.state, '', `?params=${btoa(JSON.stringify(params))}`);
 }
+
+export function svelecteRenderer(option: { label: string }) {
+	return option.label;
+}
