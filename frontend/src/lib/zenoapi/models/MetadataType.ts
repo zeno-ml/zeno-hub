@@ -11,6 +11,7 @@
  * CONTINUOUS: continuous metadata type, e.g. large cardinality number.
  * BOOLEAN: boolean metadata type, e.g. True or False.
  * DATETIME: datetime metadata type, e.g. 2021-01-01 00:00:00.
+ * EMBEDDING: vector embedding representing a data instance or output.
  * OTHER: any other metadata type, e.g. strings.
  */
 export enum MetadataType {
@@ -18,5 +19,6 @@ export enum MetadataType {
 	CONTINUOUS = 'CONTINUOUS',
 	BOOLEAN = 'BOOLEAN',
 	DATETIME = 'DATETIME',
+	EMBEDDING = 'EMBEDDING',
 	OTHER = 'OTHER'
 }

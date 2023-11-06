@@ -1,5 +1,9 @@
-import type { FilterPredicateGroup, ZenoColumn, ZenoService } from '$lib/zenoapi';
-import { ZenoColumnType } from '$lib/zenoapi/models/ZenoColumnType';
+import {
+	MetadataType,
+	type FilterPredicateGroup,
+	type ZenoColumn,
+	type ZenoService
+} from '$lib/zenoapi';
 
 export async function getFilteredTable(
 	project_uuid: string,
@@ -15,7 +19,7 @@ export async function getFilteredTable(
 ) {
 	const requestedColumns = completeColumns.filter(
 		(c) =>
-			c.columnType !== ZenoColumnType.EMBEDDING &&
+			c.dataType !== MetadataType.EMBEDDING &&
 			c.model !== undefined &&
 			c.model !== null &&
 			(filterModels.includes(c.model) || c.model === '')

@@ -7,6 +7,7 @@ import os
 import shutil
 from pathlib import Path
 
+import pandas as pd
 import uvicorn
 from amplitude import BaseEvent
 from dotenv import load_dotenv
@@ -266,15 +267,9 @@ def get_server() -> FastAPI:
         )
 
         sql_table = select.table_data_paginated(project_uuid, filter_sql, req)
+        table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
 
-        return_table = []
-        for row in sql_table.table:
-            return_row = {}
-            for i, col in enumerate(sql_table.columns):
-                return_row[col] = row[i]
-            return_table.append(return_row)
-
-        return json.dumps(return_table)
+        return table.to_json(orient="records")
 
     @api_app.post(
         "/slice-element-options/",

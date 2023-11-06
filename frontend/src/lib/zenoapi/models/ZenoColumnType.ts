@@ -12,13 +12,11 @@
  * LABEL: ground truth label.
  * OUTPUT: model output.
  * FEATURE: metadata feature for data instance.
- * EMBEDDING: vector embedding representing a data instance or output.
  */
 export enum ZenoColumnType {
 	ID = 'ID',
 	DATA = 'DATA',
 	LABEL = 'LABEL',
 	OUTPUT = 'OUTPUT',
-	FEATURE = 'FEATURE',
-	EMBEDDING = 'EMBEDDING'
+	FEATURE = 'FEATURE'
 }

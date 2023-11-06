@@ -49,11 +49,9 @@ function columnTypeOrder(colType: ZenoColumnType) {
 		case ZenoColumnType.DATA:
 			return 2;
 		case ZenoColumnType.LABEL:
-			return 2;
-		case ZenoColumnType.EMBEDDING:
-			return 2;
+			return 3;
 		case ZenoColumnType.ID:
-			return 2;
+			return 4;
 	}
 }
 
