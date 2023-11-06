@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { slices } from '$lib/stores';
+	import { svelecteRenderer } from '$lib/util/util';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
 	import EncodingContainer from './EncodingContainer.svelte';
@@ -27,5 +28,11 @@
 </script>
 
 <EncodingContainer>
-	<Svelecte style="width: 280px; flex:none;" bind:value {options} on:change={valueSelected} />
+	<Svelecte
+		style="width: 280px; flex:none;"
+		bind:value
+		{options}
+		on:change={valueSelected}
+		renderer={svelecteRenderer}
+	/>
 </EncodingContainer>

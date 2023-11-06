@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { svelecteRenderer, svelecteRendererName } from '$lib/util/util';
 	import type { ReportElement, Slice, SliceElementSpec, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -63,6 +64,7 @@
 		on:change={updateSliceId}
 		valueField="id"
 		labelField="name"
+		renderer={svelecteRendererName}
 	/>
 {/await}
 {#if models.length > 0}
@@ -72,5 +74,6 @@
 		labelAsValue={true}
 		options={models}
 		on:change={updateSliceModel}
+		renderer={svelecteRenderer}
 	/>
 {/if}

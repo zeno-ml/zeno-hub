@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { svelecteRendererName } from '$lib/util/util';
 	import type { Chart, ReportElement, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -24,5 +25,12 @@
 			id: c.id
 		};
 	})}
-	<Svelecte value={chartId} {options} valueField="id" labelField="name" on:change={updateChartId} />
+	<Svelecte
+		value={chartId}
+		{options}
+		valueField="id"
+		labelField="name"
+		on:change={updateChartId}
+		renderer={svelecteRendererName}
+	/>
 {/await}

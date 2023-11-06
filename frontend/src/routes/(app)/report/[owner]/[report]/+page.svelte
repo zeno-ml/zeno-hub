@@ -3,6 +3,7 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
+	import { svelecteRendererName } from '$lib/util/util.js';
 	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -108,6 +109,7 @@
 					searchable={false}
 					multiple={true}
 					options={projects}
+					renderer={svelecteRendererName}
 				/>
 			{/await}
 			<hr class="mb-4 mt-4 text-grey-light" />
