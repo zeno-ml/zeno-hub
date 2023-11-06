@@ -20,6 +20,7 @@
 	export let editId: number;
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;
+	export let printMode: boolean;
 	export let addElement: (elementIndex: number) => void;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
@@ -91,11 +92,11 @@
 					{/await}
 				</div>
 				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-					<Element {element} {chartOptions} />
+					<Element {element} {chartOptions} {printMode} />
 				</div>
 			</div>
 		{:else}
-			<Element {element} {chartOptions} />
+			<Element {element} {chartOptions} {printMode} />
 		{/if}
 	</div>
 	{#if report.editor}

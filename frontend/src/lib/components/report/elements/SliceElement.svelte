@@ -15,6 +15,7 @@
 	import { getContext } from 'svelte';
 
 	export let element: ReportElement;
+	export let printMode: boolean;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 	let sliceElementSpec: SliceElementSpec | undefined;
@@ -69,33 +70,37 @@
 					<span class="font-semibold">{sliceElementSpec.modelName}</span>
 				{/if}
 			</h3>
-			<Button
-				variant="outlined"
-				class="ml-4"
-				on:click={() =>
-					goto(
-						`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
-							encodeParams()
-					)}>Explore</Button
-			>
+			{#if !printMode}
+				<Button
+					variant="outlined"
+					class="ml-4"
+					on:click={() =>
+						goto(
+							`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
+								encodeParams()
+						)}>Explore</Button
+				>
+			{/if}
 			<p class="ml-auto">
 				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
 			</p>
 		</div>
 		<div class="flex w-full items-stretch justify-between">
-			<button
-				class="mr-2 hover:bg-yellowish-light {page === 0
-					? 'bg-yellowish-light'
-					: ''}  flex items-center"
-				disabled={page === 0}
-				on:click={() => page--}
-			>
-				<div class="h-6 w-6 align-middle">
-					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
-						<path fill={page === 0 ? 'grey' : 'black'} d={mdiChevronLeft} />
-					</Icon>
-				</div>
-			</button>
+			{#if !printMode}
+				<button
+					class="mr-2 hover:bg-yellowish-light {page === 0
+						? 'bg-yellowish-light'
+						: ''}  flex items-center"
+					disabled={page === 0}
+					on:click={() => page--}
+				>
+					<div class="h-6 w-6 align-middle">
+						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+							<path fill={page === 0 ? 'grey' : 'black'} d={mdiChevronLeft} />
+						</Icon>
+					</div>
+				</button>
+			{/if}
 			<div class="flex h-full w-full flex-wrap content-start overflow-x-scroll">
 				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
@@ -111,18 +116,20 @@
 					{/each}
 				{/if}
 			</div>
-			<button
-				class="flex items-center hover:bg-yellowish-light
+			{#if !printMode}
+				<button
+					class="flex items-center hover:bg-yellowish-light
 				{page * 2 + 2 >= sliceElementOptions.sliceSize ? 'bg-yellowish-light' : ''}"
-				disabled={page * 2 + 2 >= sliceElementOptions.sliceSize}
-				on:click={() => page++}
-			>
-				<div class="h-6 w-6">
-					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
-						<path fill="black" d={mdiChevronRight} />
-					</Icon>
-				</div>
-			</button>
+					disabled={page * 2 + 2 >= sliceElementOptions.sliceSize}
+					on:click={() => page++}
+				>
+					<div class="h-6 w-6">
+						<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+							<path fill="black" d={mdiChevronRight} />
+						</Icon>
+					</div>
+				</button>
+			{/if}
 		</div>
 	</div>
 {/if}

@@ -6,6 +6,7 @@
 
 	export let element: ReportElement;
 	export let chartOptions: Chart[];
+	export let printMode: boolean;
 
 	let width;
 
@@ -26,7 +27,7 @@
 		{:else if element.type === ReportElementType.CHART && chartOptions.length > 0}
 			<ChartElement chart={chartOptions.filter((c) => c.id === chartId)[0]} {width} />
 		{:else if element.type === ReportElementType.SLICE}
-			<SliceElement {element} />
+			<SliceElement {element} {printMode} />
 		{/if}
 	</div>
 {/if}

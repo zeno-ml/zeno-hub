@@ -3,18 +3,26 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
+	import ShareOptions from '$lib/components/report/ShareOptions.svelte';
+	import { clickOutside } from '$lib/util/clickOutside';
 	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
+	import { mdiExportVariant } from '@mdi/js';
+	import { Icon } from '@smui/button';
+	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
 
 	export let data;
 
+	let showShare = false;
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let dragEnabled = false;
+	let container: HTMLDivElement;
+	let printMode = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -78,18 +86,46 @@
 <div class="h-full w-full overflow-scroll bg-yellowish">
 	<div
 		class="m-auto flex max-w-4xl flex-col rounded bg-background px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
+		bind:this={container}
 	>
 		<div class="mt-12 flex items-center justify-between">
 			<h1 class="text-grey-darkest mr-6 text-5xl">
 				{data.report.name}
 			</h1>
-			<LikeButton
-				on:like={() => zenoClient.likeReport(data.report.id)}
-				user={data.user}
-				likes={data.numLikes}
-				liked={data.userLiked}
-				report
-			/>
+			{#if !printMode}
+				<div class="ml-auto flex items-center">
+					<div
+						class="relative mr-2 h-9 w-9"
+						use:clickOutside={() => {
+							showShare = false;
+						}}
+					>
+						<IconButton
+							size="button"
+							style="padding: 0px"
+							on:click={(e) => {
+								e.stopPropagation();
+								showShare = !showShare;
+								editId = -1;
+							}}
+						>
+							<Icon tag="svg" viewBox="0 0 24 24" class="text-primary">
+								<path d={mdiExportVariant} />
+							</Icon>
+						</IconButton>
+						{#if showShare}
+							<ShareOptions {container} report={data.report} bind:showShare bind:printMode />
+						{/if}
+					</div>
+					<LikeButton
+						on:like={() => zenoClient.likeReport(data.report.id)}
+						user={data.user}
+						likes={data.numLikes}
+						liked={data.userLiked}
+						report
+					/>
+				</div>
+			{/if}
 		</div>
 		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
 		<span class="mt-2 text-grey-darker"
@@ -97,7 +133,7 @@
 		>
 		<hr class="mt-4 text-grey-light" />
 
-		{#if data.report.editor}
+		{#if data.report.editor && !printMode}
 			<p class="mb-2 mt-4">Associated Projects</p>
 			{#await zenoClient.getProjects() then projects}
 				<Svelecte
@@ -134,6 +170,7 @@
 					bind:editId
 					bind:dragEnabled
 					bind:showConfirmDelete
+					{printMode}
 					{addElement}
 					{selectedProjects}
 					report={data.report}
