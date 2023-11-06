@@ -18,8 +18,6 @@ We’re all in this together to quickly make something great. And let’s have f
 - **Continuous Deployment:** Once code is checked in (for an already-live service), it will be considered basically production ready and may be deployed at any time. We can use feature flags to have code that is checked in but not enabled, which also enables gradual releases and A/B testing.
 - **Monorepo:** As much as possible, we will store all code in a single repo. This [removes the necessity for reconciling different versions of software](https://cacm.acm.org/magazines/2016/7/204032-why-google-stores-billions-of-lines-of-code-in-a-single-repository/fulltext), which can become a major source of overhead as things grow larger.
 
-### Infrastructure
-
 ### GitHub
 
 We use GitHub to manage our code. As mentioned above, all our code is in one single repository. This means we need some housekeeping rules to maintain a clear, understandable repository structure:
