@@ -75,7 +75,7 @@
 		}}
 	/>
 {/if}
-<div class="h-full w-full overflow-scroll bg-yellowish">
+<div class="h-full w-full overflow-auto bg-yellowish">
 	<div
 		class="m-auto flex max-w-4xl flex-col rounded bg-background px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
 	>
