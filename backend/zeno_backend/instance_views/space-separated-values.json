@@ -1,13 +1,13 @@
 {
-  "data": { "type": "separated-values", "header": "Data", "separator": " " },
+  "data": { "type": "separatedValues", "header": "Data", "separator": " " },
   "label": {
-    "type": "separated-values",
+    "type": "separatedValues",
     "header": "Label",
     "highlight": true,
     "separator": " "
   },
   "output": {
-    "type": "separated-values",
+    "type": "separatedValues",
     "header": "Output",
     "separator": " "
   },
