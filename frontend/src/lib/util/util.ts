@@ -185,3 +185,7 @@ export function setURLParameters() {
 export function svelecteRenderer(option: { label: string }) {
 	return option.label;
 }
+
+export function svelecteRendererName(o: { name: string }) {
+	return o.name;
+}

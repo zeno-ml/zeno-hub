@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { svelecteRendererName } from '$lib/util/util';
 	import type { Chart, ReportElement, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -15,10 +16,6 @@
 		element.data = `${e.detail.id}`;
 		zenoClient.updateReportElement(reportId, { ...element, data: element.data });
 	}
-
-	function optionRenderer(o: { name: string }) {
-		return o.name;
-	}
 </script>
 
 {#await zenoClient.getProjects() then projects}
@@ -34,6 +31,6 @@
 		valueField="id"
 		labelField="name"
 		on:change={updateChartId}
-		renderer={optionRenderer}
+		renderer={svelecteRendererName}
 	/>
 {/await}

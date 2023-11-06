@@ -3,6 +3,7 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
+	import { svelecteRendererName } from '$lib/util/util.js';
 	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -61,10 +62,6 @@
 	function handleMoved(e: CustomEvent) {
 		elements = e.detail.items;
 	}
-
-	function optionsRenderer(o: { name: string }) {
-		return o.name;
-	}
 </script>
 
 {#if showConfirmDelete !== -1}
@@ -112,7 +109,7 @@
 					searchable={false}
 					multiple={true}
 					options={projects}
-					renderer={optionsRenderer}
+					renderer={svelecteRendererName}
 				/>
 			{/await}
 			<hr class="mb-4 mt-4 text-grey-light" />
