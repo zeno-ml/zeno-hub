@@ -33,16 +33,16 @@
 		</Banner>
 	</div>
 {:else}
-	<div class="flex h-full min-h-0 min-w-0 flex-grow flex-col">
+	<div class="flex h-full min-h-0 w-full min-w-0 flex-grow flex-col">
 		<ProjectHeader
 			project={data.project}
 			likes={data.numLikes}
 			liked={data.userLiked}
 			user={data.user}
 		/>
-		<div class="flex h-full min-h-0">
+		<div class="flex h-full min-h-0 w-full min-w-0">
 			<MetadataPanel compare={data.compare} />
-			<div class="mx-5 flex flex-grow flex-col">
+			<div class="flex w-full flex-grow flex-col px-3" style="max-width: calc(100% - 380px);">
 				<Instances compare={data.compare} />
 			</div>
 		</div>

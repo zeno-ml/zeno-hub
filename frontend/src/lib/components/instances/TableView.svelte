@@ -126,7 +126,7 @@
 	}
 </script>
 
-<div class="flex h-full w-full flex-wrap content-start overflow-y-auto">
+<div class="w-full overflow-auto">
 	<table>
 		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
 			<tr class="border-b border-grey-lighter bg-background">
