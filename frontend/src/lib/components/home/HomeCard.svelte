@@ -75,7 +75,7 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="flex flex-col rounded-lg border border-solid border-grey-light px-4 py-2 shadow-sm hover:shadow-md"
+	class="flex h-full w-full flex-col rounded-lg border border-solid border-grey-light bg-white px-4 py-2 shadow-sm hover:shadow-md"
 >
 	<div class="flex w-full items-center justify-between">
 		<p class="truncate text-left text-lg text-black">{entry.name}</p>

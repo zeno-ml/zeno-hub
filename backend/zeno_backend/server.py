@@ -502,6 +502,10 @@ def get_server() -> FastAPI:
                 reverse=True,
             )
 
+        # Make sure the combined entries don't exceed the number of requested items
+        if home_request.limit is not None:
+            return_entries = return_entries[: home_request.limit]
+
         return return_entries
 
     @api_app.get(
