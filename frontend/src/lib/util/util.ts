@@ -42,15 +42,15 @@ export function getProjectRouteFromURL(url: URL) {
 
 function columnTypeOrder(colType: ZenoColumnType) {
 	switch (colType) {
-		case ZenoColumnType.ID:
-			return 0;
-		case ZenoColumnType.DATA:
-			return 1;
-		case ZenoColumnType.LABEL:
-			return 2;
 		case ZenoColumnType.FEATURE:
-			return 3;
+			return 0;
 		case ZenoColumnType.OUTPUT:
+			return 1;
+		case ZenoColumnType.DATA:
+			return 2;
+		case ZenoColumnType.LABEL:
+			return 3;
+		case ZenoColumnType.ID:
 			return 4;
 	}
 }
