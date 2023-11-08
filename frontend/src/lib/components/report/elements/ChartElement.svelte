@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Spinner from '$lib/components/general/Spinner.svelte';
 	import { chartMap } from '$lib/util/charts';
 	import { ChartType, type Chart, type ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
@@ -12,7 +13,9 @@
 </script>
 
 {#await chartData}
-	<p>Loading...</p>
+	<div class="m-auto w-full text-center">
+		<Spinner />
+	</div>
 {:then data}
 	<div class="w-full">
 		<h3 class="text-lg font-semibold">{chart.name}</h3>
