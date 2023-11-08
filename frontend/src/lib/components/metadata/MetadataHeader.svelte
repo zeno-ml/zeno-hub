@@ -67,7 +67,7 @@
 </div>
 
 {#if $page.url.href.includes('compare') && comparisonColumnOptions.length > 0}
-	<div class="mb-3 mt-3">
+	<div class="my-3">
 		<h4 class="mb-1">Comparison Feature</h4>
 		<select
 			class="h-9 w-full rounded border border-grey-light text-sm text-grey"
@@ -81,7 +81,7 @@
 {/if}
 
 {#if $page.url.href.includes('compare') && $metric !== undefined && $metrics.length > 0}
-	<div class="mb-3 mt-3 flex w-full flex-col">
+	<div class="my-3 flex w-full flex-col">
 		<span class="my-1 text-grey-dark">Metric</span>
 		<select
 			class="h-9 w-full rounded border border-grey-light text-sm text-grey"

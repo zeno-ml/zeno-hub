@@ -13,7 +13,8 @@
 		mdiDotsHorizontal,
 		mdiFileChartOutline,
 		mdiLandRowsHorizontal,
-		mdiRobotOutline
+		mdiRobotOutline,
+		mdiViewGridOutline
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import { getContext } from 'svelte';
@@ -78,18 +79,17 @@
 	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
 	<div
-		class="relative flex w-full flex-col rounded-t-md bg-primary-mid text-center align-middle {project
-			? 'project-background'
-			: 'report-background'}"
+		class="relative flex w-full flex-col rounded-t-md text-center align-middle"
+		style="background: {project ? '#f6f5f6' : '#f9f2ff'}"
 	>
-		<div class="flex h-9 w-full justify-between px-3 pt-3">
+		<div class="mt-2 flex h-9 w-full items-center justify-between px-3">
 			<div class="flex items-center justify-center">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
 					class="w-6 {report ? 'fill-primary-dark' : 'fill-grey-dark'}"
 				>
-					<path d={project ? mdiDatabaseOutline : mdiFileChartOutline} />
+					<path d={project ? mdiViewGridOutline : mdiFileChartOutline} />
 				</svg>
 				<div
 					class="relative ml-2"
@@ -129,7 +129,7 @@
 			<LikeButton on:like={likeEntry} likes={stats.numLikes} liked={stats.userLiked} {user} />
 		</div>
 		<div
-			class="mb-3 mt-3 flex items-center justify-center px-3"
+			class="mb-4 mt-2 flex items-center justify-center px-2"
 			style="min-height: 60px; max-height: 3rem"
 			use:tooltip={{ text: entry.name }}
 		>
@@ -181,12 +181,3 @@
 		</div>
 	{/if}
 </button>
-
-<style>
-	.project-background {
-		background: linear-gradient(135deg, #f6f5f6 0%, #ffffff 100%);
-	}
-	.report-background {
-		background: linear-gradient(135deg, #f9f2ff 0%, #ffffff 100%);
-	}
-</style>
