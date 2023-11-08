@@ -23,7 +23,8 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+	let listContainer: HTMLDivElement;
+	let table: Record<string, string | number | boolean>[] = [];
 	let currentPage = 0;
 	let lastPage = 0;
 	let sampleOptions = [
@@ -34,7 +35,7 @@
 		)
 	].sort((a, b) => a - b);
 
-	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id || '';
 	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
 	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
 
@@ -71,7 +72,7 @@
 	});
 
 	function updateTable() {
-		if (isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start || !idColumn) return;
 		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 			predicates = {
@@ -82,7 +83,7 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		tablePromise = getFilteredTable(
+		getFilteredTable(
 			$project.uuid,
 			$columns,
 			$model ? [$model] : [],
@@ -93,31 +94,29 @@
 			dataIds,
 			zenoClient,
 			predicates
-		);
+		).then((t) => {
+			table = t;
+			listContainer.scrollTop = 0;
+		});
 	}
 </script>
 
 <div
 	class="grid h-full w-full overflow-y-auto"
 	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); grid-auto-rows: min-content;"
+	bind:this={listContainer}
 >
-	{#await tablePromise then table}
-		{#if idColumn !== undefined}
-			{#each table as inst (inst[idColumn])}
-				<div class="mr-2 mt-2">
-					<InstanceView
-						view={$project.view}
-						{dataColumn}
-						{labelColumn}
-						modelColumn={modelColumn?.id}
-						entry={inst}
-					/>
-				</div>
-			{/each}
-		{/if}
-	{:catch e}
-		<p>error loading data: {e}</p>
-	{/await}
+	{#each table as inst (inst[idColumn])}
+		<div class="mr-2 mt-2">
+			<InstanceView
+				view={$project.view}
+				{dataColumn}
+				{labelColumn}
+				modelColumn={modelColumn?.id}
+				entry={inst}
+			/>
+		</div>
+	{/each}
 </div>
 <Pagination slot="paginate" class="pagination">
 	<svelte:fragment slot="rowsPerPage">

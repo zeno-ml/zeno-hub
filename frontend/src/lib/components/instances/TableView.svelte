@@ -27,7 +27,8 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+	let tableContainer: HTMLDivElement;
+	let table: Record<string, string | number | boolean>[] = [];
 	let columnHeader: ZenoColumn[] = [];
 	let currentTagIds: string[] = [];
 	let currentPage = 0;
@@ -45,7 +46,7 @@
 		currentTagIds = $editTag.dataIds;
 	}
 
-	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id || '';
 	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
 	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
 
@@ -90,7 +91,7 @@
 	});
 
 	function updateTable() {
-		if (isNaN(start) || isNaN(end) || end <= start) return;
+		if (isNaN(start) || isNaN(end) || end <= start || !idColumn) return;
 		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
 			predicates = {
@@ -101,7 +102,7 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		tablePromise = getFilteredTable(
+		getFilteredTable(
 			$project.uuid,
 			$columns,
 			$model ? [$model] : [],
@@ -112,7 +113,10 @@
 			dataIds,
 			zenoClient,
 			predicates
-		);
+		).then((t) => {
+			table = t;
+			tableContainer.scrollTop = 0;
+		});
 	}
 
 	function updateSort(column: ZenoColumn) {
@@ -123,10 +127,11 @@
 		} else {
 			sort.set([undefined, true]);
 		}
+		currentPage = 0;
 	}
 </script>
 
-<div class="w-full overflow-auto">
+<div class="w-full overflow-auto" bind:this={tableContainer}>
 	<table>
 		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
 			<tr class="border-b border-grey-lighter bg-background">
@@ -167,52 +172,46 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#await tablePromise then table}
-				{#if idColumn}
-					{#each table as tableContent (tableContent[idColumn])}
-						<tr class="border-b border-grey-lighter">
-							{#if $editTag !== undefined}
-								<td class="p-3">
-									<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
-								</td>
+			{#each table as tableContent (tableContent[idColumn])}
+				<tr class="border-b border-grey-lighter">
+					{#if $editTag !== undefined}
+						<td class="p-3">
+							<Checkbox bind:group={currentTagIds} value={String(tableContent[idColumn])} />
+						</td>
+					{/if}
+					<td class="border border-grey-lighter p-3 align-top">
+						{tableContent[idColumn]}
+					</td>
+					{#if $project.view}
+						<td class="p-3">
+							{#if instanceHidden}
+								<p class="text-center">...</p>
+							{:else}
+								<div class="instance">
+									<InstanceView
+										view={$project.view}
+										{dataColumn}
+										{labelColumn}
+										modelColumn={modelColumn?.id}
+										entry={tableContent}
+									/>
+								</div>
 							{/if}
+						</td>
+					{/if}
+					{#each columnHeader as header}
+						{#if header.dataType === MetadataType.CONTINUOUS}
 							<td class="border border-grey-lighter p-3 align-top">
-								{tableContent[idColumn]}
+								{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
 							</td>
-							{#if $project.view}
-								<td class="p-3">
-									{#if instanceHidden}
-										<p class="text-center">...</p>
-									{:else}
-										<div class="instance">
-											<InstanceView
-												view={$project.view}
-												{dataColumn}
-												{labelColumn}
-												modelColumn={modelColumn?.id}
-												entry={tableContent}
-											/>
-										</div>
-									{/if}
-								</td>
-							{/if}
-							{#each columnHeader as header}
-								{#if header.dataType === MetadataType.CONTINUOUS}
-									<td class="border border-grey-lighter p-3 align-top">
-										{parseFloat(`${tableContent[header.id]}`).toFixed(2)}
-									</td>
-								{:else}
-									<td class="border border-grey-lighter p-3 align-top">
-										{tableContent[header.id]}
-									</td>
-								{/if}
-							{/each}
-						</tr>
+						{:else}
+							<td class="border border-grey-lighter p-3 align-top">
+								{tableContent[header.id]}
+							</td>
+						{/if}
 					{/each}
-				{/if}
-			{:catch e}
-				<p>error loading data: {e}</p>
-			{/await}
+				</tr>
+			{/each}
 		</tbody>
 	</table>
 </div>
