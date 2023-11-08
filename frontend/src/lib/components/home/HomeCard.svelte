@@ -129,7 +129,7 @@
 			<LikeButton on:like={likeEntry} likes={stats.numLikes} liked={stats.userLiked} {user} />
 		</div>
 		<div
-			class="mb-4 mt-2 flex items-center justify-center px-2"
+			class="mb-4 mt-1 flex items-center justify-center px-2"
 			style="min-height: 60px; max-height: 3rem"
 			use:tooltip={{ text: entry.name }}
 		>
