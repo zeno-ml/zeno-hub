@@ -1,16 +1,12 @@
 <script lang="ts">
 	import { EntrySort, EntryTypeFilter } from '$lib/zenoapi';
-	import { mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import Button from '@smui/button/src/Button.svelte';
 	import Fab from '@smui/fab';
 	import { Input } from '@smui/textfield';
 
 	export let searchText;
 	export let typeFilter: EntryTypeFilter;
 	export let sort: EntrySort;
-	export let showNewReport = false;
-	export let myHub = false;
 
 	let tempSearchText = searchText;
 	let timer: ReturnType<typeof setTimeout>;
@@ -23,59 +19,35 @@
 			searchText = text;
 		}, 200);
 	}
-
-	function updateTypeFilter(type: EntryTypeFilter) {
-		if (typeFilter === type) {
-			typeFilter = EntryTypeFilter.ALL;
-		} else {
-			typeFilter = type;
-		}
-	}
 </script>
 
-<div class="mt-4 flex flex-col justify-between md:flex-row md:items-center">
-	<div class="flex h-full flex-col md:flex-row md:items-center">
-		<div
-			class="flex h-12 w-96 items-center justify-center rounded-lg border border-solid border-grey-light px-4 py-3 focus-within:shadow-md"
-		>
-			<Icon class="material-icons">search</Icon>
-			<Input bind:value={tempSearchText} placeholder="Search" class="ml-4" />
-			{#if tempSearchText !== ''}
-				<Fab class="ml-4 h-12" on:click={() => (tempSearchText = '')}>
-					<Icon class="material-icons">clear</Icon>
-				</Fab>
-			{/if}
+<div class="mb-4 mt-4 flex flex-col justify-between md:flex-row md:items-center">
+	<div
+		class="flex h-12 w-96 items-center justify-center rounded-lg border border-solid border-grey-light px-4 py-3 focus-within:shadow-md"
+	>
+		<Icon class="material-icons">search</Icon>
+		<Input bind:value={tempSearchText} placeholder="Search" class="ml-4" />
+		{#if tempSearchText !== ''}
+			<Fab class="ml-4 h-12" on:click={() => (tempSearchText = '')}>
+				<Icon class="material-icons">clear</Icon>
+			</Fab>
+		{/if}
+	</div>
+	<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
+		<div class="ml-4 flex items-center">
+			<p class="mr-2 text-grey-dark">Filter:</p>
+			<select class="h-full px-2" bind:value={typeFilter}>
+				<option value={EntryTypeFilter.ALL}>Projects & Reports</option>
+				<option value={EntryTypeFilter.PROJECT}>Projects</option>
+				<option value={EntryTypeFilter.REPORT}>Reports</option>
+			</select>
 		</div>
-		<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
-			<Button
-				class="mr-2 h-full"
-				variant={typeFilter === EntryTypeFilter.PROJECT ? 'raised' : 'outlined'}
-				on:click={() => updateTypeFilter(EntryTypeFilter.PROJECT)}
-			>
-				projects
-			</Button>
-			<Button
-				class="h-full"
-				variant={typeFilter === EntryTypeFilter.REPORT ? 'raised' : 'outlined'}
-				on:click={() => updateTypeFilter(EntryTypeFilter.REPORT)}
-			>
-				reports
-			</Button>
-			<select class="ml-4 mr-2 h-full w-28 px-2" bind:value={sort}>
+		<div class="ml-6 flex items-center">
+			<p class="mr-2 text-grey-dark">Sort:</p>
+			<select class="h-full px-2" bind:value={sort}>
 				<option value={EntrySort.RECENT}>Recent</option>
 				<option value={EntrySort.POPULAR}>Popular</option>
 			</select>
 		</div>
 	</div>
-	{#if myHub}
-		<div class="mt-4 flex h-full md:ml-2 md:mt-0">
-			<Button class="h-full" on:click={() => (showNewReport = true)}>
-				<Icon class="material-icons" width="24px" height="24px" tag="svg" viewBox="0 0 24 24">
-					<path d={mdiPlus} />
-				</Icon>
-				New Report
-			</Button>
-		</div>
-	{/if}
 </div>
-<div class="mb-4 mt-2 flex items-center"></div>

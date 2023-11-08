@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ProjectSidebar from '$lib/components/project/ProjectSidebar.svelte';
 	import {
 		columns,
 		compareSort,
@@ -54,4 +55,5 @@
 	}
 </script>
 
+<ProjectSidebar user={data.user} />
 <slot />

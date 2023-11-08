@@ -1,0 +1,132 @@
+<script lang="ts">
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
+	import { collapseHeader, models, project } from '$lib/stores';
+	import { getProjectRouteFromURL } from '$lib/util/util';
+	import type { User } from '$lib/zenoapi';
+	import {
+		mdiAccountCogOutline,
+		mdiArrowCollapseLeft,
+		mdiArrowCollapseRight,
+		mdiChartBoxOutline,
+		mdiCogOutline,
+		mdiCompare,
+		mdiCompassOutline,
+		mdiLogin,
+		mdiLogout
+	} from '@mdi/js';
+	import HeaderIcon from '../general/HeaderIcon.svelte';
+	import ReportPopup from '../popups/ReportPopup.svelte';
+
+	export let user: User | null;
+
+	let projectEdit = false;
+	let reportEdit = false;
+
+	$: currentTab = $page.url.href.split('/').pop();
+
+	async function logout() {
+		await fetch('/api/logout', { method: 'POST' });
+		location.reload();
+	}
+</script>
+
+{#if projectEdit && user !== null}
+	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
+{/if}
+{#if reportEdit && user !== null}
+	<ReportPopup on:close={() => (reportEdit = false)} {user} />
+{/if}
+<nav class="z-20 flex md:hidden">
+	<header
+		class="flex w-full flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
+	>
+		<a href="/">
+			<img class="w-8 pb-2 pt-2" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+		</a>
+	</header>
+</nav>
+<nav class="z-20 hidden md:flex">
+	<header
+		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
+	>
+		<div class="flex flex-col items-center justify-center">
+			<a href="/">
+				<img class="mt-5 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+			</a>
+			{#if $page.url.href.includes('project/')}
+				<div class="mt-3 flex flex-col">
+					<HeaderIcon
+						pageName={'explore'}
+						tooltipContent={'Explore your data and system outputs'}
+						icon={mdiCompassOutline}
+						on:click={() => goto(getProjectRouteFromURL($page.url))}
+					/>
+					{#if $models.length > 1 && $project.view !== ''}
+						<HeaderIcon
+							pageName={'compare'}
+							tooltipContent={'Qualitatively compare system outputs'}
+							icon={mdiCompare}
+							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
+						/>
+					{/if}
+					<HeaderIcon
+						pageName={'chart'}
+						tooltipContent={'Create charts from your slices and metrics'}
+						icon={mdiChartBoxOutline}
+						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
+					/>
+				</div>
+			{/if}
+		</div>
+		<div>
+			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
+				<HeaderIcon
+					pageName={'$collapseHeader'}
+					tooltipContent={$collapseHeader ? 'Expand sidebar' : 'Collapse sidebar'}
+					icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
+					on:click={() => collapseHeader.set(!$collapseHeader)}
+				/>
+			{/if}
+		</div>
+		<div class="mb-3 flex flex-col items-center justify-center">
+			{#if $page.url.pathname.startsWith('/project/') && $project?.ownerName === user?.name}
+				<HeaderIcon
+					pageName={'editProject'}
+					tooltipContent={"Edit your project's configuration"}
+					icon={mdiCogOutline}
+					on:click={() => (projectEdit = true)}
+				/>
+			{:else if $page.url.pathname.startsWith('/report/') && $page.data.report.editor}
+				<HeaderIcon
+					pageName={'editReport'}
+					tooltipContent={"Edit your report's configuration"}
+					icon={mdiCogOutline}
+					on:click={() => (reportEdit = true)}
+				/>
+			{/if}
+			{#if user}
+				<HeaderIcon
+					pageName={'account'}
+					tooltipContent={'Manage your account'}
+					icon={mdiAccountCogOutline}
+					on:click={() => goto(`/account`)}
+				/>
+				<HeaderIcon
+					pageName={'logout'}
+					tooltipContent={'Logout'}
+					icon={mdiLogout}
+					on:click={logout}
+				/>
+			{:else}
+				<HeaderIcon
+					pageName={'login'}
+					tooltipContent={'Login'}
+					icon={mdiLogin}
+					on:click={() => goto(`/login?redirect=${$page.url.href}`)}
+				/>
+			{/if}
+		</div>
+	</header>
+</nav>
