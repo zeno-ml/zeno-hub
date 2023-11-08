@@ -89,7 +89,6 @@
 				user={data.user}
 				likes={data.numLikes}
 				liked={data.userLiked}
-				report
 			/>
 		</div>
 		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>

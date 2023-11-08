@@ -12,7 +12,7 @@
 		mdiDatabaseOutline,
 		mdiDotsHorizontal,
 		mdiFileChartOutline,
-		mdiLandRowsVertical,
+		mdiLandRowsHorizontal,
 		mdiRobotOutline
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
@@ -126,13 +126,7 @@
 					{/if}
 				</div>
 			</div>
-			<LikeButton
-				on:like={likeEntry}
-				likes={stats.numLikes}
-				liked={stats.userLiked}
-				{user}
-				report
-			/>
+			<LikeButton on:like={likeEntry} likes={stats.numLikes} liked={stats.userLiked} {user} />
 		</div>
 		<div
 			class="mb-3 mt-3 flex items-center justify-center px-3"
@@ -170,7 +164,7 @@
 				/>
 			{:else if reportStats !== null}
 				<EntryStat
-					icon={mdiLandRowsVertical}
+					icon={mdiLandRowsHorizontal}
 					text={reportStats.numElements}
 					tooltipContent={`This report has ${shortenNumber(reportStats.numElements, 1)} element${
 						reportStats.numElements !== 1 ? 's' : ''
@@ -193,6 +187,6 @@
 		background: linear-gradient(135deg, #f6f5f6 0%, #ffffff 100%);
 	}
 	.report-background {
-		background: linear-gradient(135deg, #f8ebff 0%, #ffffff 100%);
+		background: linear-gradient(135deg, #f9f2ff 0%, #ffffff 100%);
 	}
 </style>
