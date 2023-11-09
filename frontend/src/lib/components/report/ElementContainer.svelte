@@ -28,10 +28,7 @@
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;
 	export let addElement: (elementIndex: number) => void;
-	export let updateElementPosition: (
-		elementId: number | null | undefined,
-		position: number
-	) => void;
+	export let swapElementPositions: (elementId: number | null | undefined, position: number) => void;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -96,7 +93,7 @@
 		</div>
 		<button
 			class="absolute -left-3 top-7 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
-			on:click={() => updateElementPosition(element.id, element.position - 1)}
+			on:click={() => swapElementPositions(element.id, element.position - 1)}
 		>
 			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
 				<path class="fill-primary" d={mdiChevronUp} />
@@ -104,7 +101,7 @@
 		</button>
 		<button
 			class="absolute -left-3 top-14 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
-			on:click={() => updateElementPosition(element.id, element.position + 1)}
+			on:click={() => swapElementPositions(element.id, element.position + 1)}
 		>
 			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
 				<path class="fill-primary" d={mdiChevronDown} />

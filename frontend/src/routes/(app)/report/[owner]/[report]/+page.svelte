@@ -63,7 +63,7 @@
 		elements = e.detail.items;
 	}
 
-	function updateElementPosition(elementId: number | null | undefined, position: number) {
+	function swapElementPositions(elementId: number | null | undefined, position: number) {
 		if (!elementId || position < 0 || position >= elements.length) return;
 
 		let currElement = elements.find((e) => e.id === elementId);
@@ -153,7 +153,7 @@
 					bind:editId
 					bind:dragEnabled
 					bind:showConfirmDelete
-					{updateElementPosition}
+					{swapElementPositions}
 					{addElement}
 					{selectedProjects}
 					report={data.report}
