@@ -35,7 +35,7 @@
 	</div>
 	<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
 		<div class="ml-4 flex items-center">
-			<p class="mr-2 text-grey-dark">Filter:</p>
+			<p class="mr-1 text-grey-dark">Filter:</p>
 			<select class="h-full px-2" bind:value={typeFilter}>
 				<option value={EntryTypeFilter.ALL}>Projects & Reports</option>
 				<option value={EntryTypeFilter.PROJECT}>Projects</option>
@@ -43,7 +43,7 @@
 			</select>
 		</div>
 		<div class="ml-6 flex items-center">
-			<p class="mr-2 text-grey-dark">Sort:</p>
+			<p class="mr-1 text-grey-dark">Sort:</p>
 			<select class="h-full px-2" bind:value={sort}>
 				<option value={EntrySort.RECENT}>Recent</option>
 				<option value={EntrySort.POPULAR}>Popular</option>

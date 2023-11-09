@@ -6,37 +6,24 @@
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
-		mdiAccountCogOutline,
 		mdiArrowCollapseLeft,
 		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
 		mdiCogOutline,
 		mdiCompare,
-		mdiCompassOutline,
-		mdiLogin,
-		mdiLogout
+		mdiCompassOutline
 	} from '@mdi/js';
 	import HeaderIcon from '../general/HeaderIcon.svelte';
-	import ReportPopup from '../popups/ReportPopup.svelte';
 
 	export let user: User | null;
 
 	let projectEdit = false;
-	let reportEdit = false;
 
 	$: currentTab = $page.url.href.split('/').pop();
-
-	async function logout() {
-		await fetch('/api/logout', { method: 'POST' });
-		location.reload();
-	}
 </script>
 
 {#if projectEdit && user !== null}
 	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
-{/if}
-{#if reportEdit && user !== null}
-	<ReportPopup on:close={() => (reportEdit = false)} {user} />
 {/if}
 <nav class="z-20 flex md:hidden">
 	<header
@@ -97,34 +84,6 @@
 					tooltipContent={"Edit your project's configuration"}
 					icon={mdiCogOutline}
 					on:click={() => (projectEdit = true)}
-				/>
-			{:else if $page.url.pathname.startsWith('/report/') && $page.data.report.editor}
-				<HeaderIcon
-					pageName={'editReport'}
-					tooltipContent={"Edit your report's configuration"}
-					icon={mdiCogOutline}
-					on:click={() => (reportEdit = true)}
-				/>
-			{/if}
-			{#if user}
-				<HeaderIcon
-					pageName={'account'}
-					tooltipContent={'Manage your account'}
-					icon={mdiAccountCogOutline}
-					on:click={() => goto(`/account`)}
-				/>
-				<HeaderIcon
-					pageName={'logout'}
-					tooltipContent={'Logout'}
-					icon={mdiLogout}
-					on:click={logout}
-				/>
-			{:else}
-				<HeaderIcon
-					pageName={'login'}
-					tooltipContent={'Login'}
-					icon={mdiLogin}
-					on:click={() => goto(`/login?redirect=${$page.url.href}`)}
 				/>
 			{/if}
 		</div>
