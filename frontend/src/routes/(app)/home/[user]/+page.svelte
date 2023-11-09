@@ -9,7 +9,6 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let showNewReport = false;
 	let searchText = '';
 	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
 	let sort: EntrySort = EntrySort.RECENT;
