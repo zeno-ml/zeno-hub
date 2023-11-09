@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import type { URLParams } from '$lib/util/util';
 	import type {
 		ReportElement,
@@ -11,7 +12,6 @@
 	import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Button from '@smui/button/';
-	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
 
 	export let element: ReportElement;

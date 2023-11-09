@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: [
-		'./src/**/*.{html,js,svelte,ts}',
-		'./node_modules/@zeno-ml/zeno-instance-views/**/*.{html,js,svelte,ts}'
-	],
+	content: ['./src/**/*.{html,js,svelte,ts}'],
 	theme: {
 		fontFamily: {
 			header: ['"Hammersmith One"', 'sans-serif']

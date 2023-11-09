@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		compareSort,
@@ -19,7 +20,6 @@
 	import { Icon, Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
-	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
 
 	export let modelAResult: Promise<GroupMetric[] | undefined>;

@@ -1,0 +1,40 @@
+<script lang="ts">
+	import { elementMap } from '$lib/instance-views/resolve.js';
+	import type { VStackView, View } from '$lib/instance-views/schema.js';
+	import Error from '../Error.svelte';
+
+	export let data: string;
+	export let spec: VStackView;
+
+	let jsonData: Record<string, View> | undefined = undefined;
+	let errorMessage: string | undefined = undefined;
+
+	$: keys = jsonData ? Object.keys(jsonData) : [];
+	$: try {
+		jsonData = JSON.parse(data);
+		errorMessage = undefined;
+	} catch (error) {
+		jsonData = undefined;
+		errorMessage = error as string;
+	}
+
+	function resolveElementType(key: string) {
+		return elementMap[spec.keys[key].type as string];
+	}
+</script>
+
+{#if jsonData === undefined}
+	<Error type="Incorrect Data" message={errorMessage} />
+{:else}
+	<div class="flex flex-col">
+		{#each keys as key}
+			{#if spec.keys && spec.keys[key] !== undefined && spec.keys[key].type !== undefined}
+				<svelte:component
+					this={resolveElementType(key)}
+					spec={spec.keys[key]}
+					data={typeof jsonData[key] === 'object' ? JSON.stringify(jsonData[key]) : jsonData[key]}
+				/>
+			{/if}
+		{/each}
+	</div>
+{/if}

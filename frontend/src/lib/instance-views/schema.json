@@ -1,0 +1,204 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"DisplayType": {
+			"const": "table",
+			"type": "string"
+		},
+		"ImageView": {
+			"additionalProperties": false,
+			"properties": {
+				"maxWidth": {
+					"enum": ["small", "medium", "large", "full"],
+					"type": "string"
+				},
+				"type": {
+					"const": "image",
+					"type": "string"
+				}
+			},
+			"required": ["type"],
+			"type": "object"
+		},
+		"ListView": {
+			"additionalProperties": false,
+			"properties": {
+				"border": {
+					"type": "boolean"
+				},
+				"collapsible": {
+					"type": "string"
+				},
+				"elements": {
+					"$ref": "#/definitions/ViewUnion"
+				},
+				"horizontal": {
+					"type": "boolean"
+				},
+				"pad": {
+					"type": "boolean"
+				},
+				"type": {
+					"const": "list",
+					"type": "string"
+				}
+			},
+			"required": ["elements", "type"],
+			"type": "object"
+		},
+		"MessageView": {
+			"additionalProperties": false,
+			"properties": {
+				"content": {
+					"$ref": "#/definitions/ViewUnion"
+				},
+				"highlight": {
+					"type": "boolean"
+				},
+				"ownMessage": {
+					"type": "boolean"
+				},
+				"plain": {
+					"type": "boolean"
+				},
+				"role": {
+					"type": "string"
+				},
+				"type": {
+					"const": "message",
+					"type": "string"
+				}
+			},
+			"required": ["content", "type"],
+			"type": "object"
+		},
+		"SeparatedValuesView": {
+			"additionalProperties": false,
+			"properties": {
+				"header": {
+					"type": "string"
+				},
+				"highlight": {
+					"type": "boolean"
+				},
+				"separator": {
+					"type": "string"
+				},
+				"type": {
+					"const": "separatedValues",
+					"type": "string"
+				}
+			},
+			"required": ["type"],
+			"type": "object"
+		},
+		"TextView": {
+			"additionalProperties": false,
+			"properties": {
+				"label": {
+					"type": "string"
+				},
+				"type": {
+					"const": "text",
+					"type": "string"
+				}
+			},
+			"required": ["type"],
+			"type": "object"
+		},
+		"VStackView": {
+			"additionalProperties": false,
+			"properties": {
+				"border": {
+					"type": "boolean"
+				},
+				"collapsible": {
+					"type": "string"
+				},
+				"keys": {
+					"additionalProperties": {
+						"$ref": "#/definitions/ViewUnion"
+					},
+					"type": "object"
+				},
+				"pad": {
+					"type": "boolean"
+				},
+				"type": {
+					"const": "vstack",
+					"type": "string"
+				}
+			},
+			"required": ["keys", "type"],
+			"type": "object"
+		},
+		"View": {
+			"additionalProperties": false,
+			"properties": {
+				"type": {
+					"$ref": "#/definitions/ViewType"
+				}
+			},
+			"required": ["type"],
+			"type": "object"
+		},
+		"ViewSchema": {
+			"additionalProperties": false,
+			"properties": {
+				"data": {
+					"$ref": "#/definitions/ViewUnion"
+				},
+				"displayType": {
+					"$ref": "#/definitions/DisplayType"
+				},
+				"label": {
+					"$ref": "#/definitions/ViewUnion"
+				},
+				"output": {
+					"$ref": "#/definitions/ViewUnion"
+				}
+			},
+			"required": ["data", "label", "output"],
+			"type": "object"
+		},
+		"ViewType": {
+			"enum": [
+				"text",
+				"image",
+				"audio",
+				"code",
+				"markdown",
+				"list",
+				"vstack",
+				"message",
+				"separatedValues"
+			],
+			"type": "string"
+		},
+		"ViewUnion": {
+			"anyOf": [
+				{
+					"$ref": "#/definitions/View"
+				},
+				{
+					"$ref": "#/definitions/TextView"
+				},
+				{
+					"$ref": "#/definitions/ImageView"
+				},
+				{
+					"$ref": "#/definitions/ListView"
+				},
+				{
+					"$ref": "#/definitions/MessageView"
+				},
+				{
+					"$ref": "#/definitions/VStackView"
+				},
+				{
+					"$ref": "#/definitions/SeparatedValuesView"
+				}
+			]
+		}
+	}
+}
