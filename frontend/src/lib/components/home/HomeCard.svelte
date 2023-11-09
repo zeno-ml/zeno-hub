@@ -4,18 +4,19 @@
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import CopyProjectPopup from '$lib/components/popups/CopyProjectPopup.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
+	import { tooltip } from '$lib/util/tooltip';
 	import { shortenNumber } from '$lib/util/util';
 	import type { Project, ProjectStats, Report, ReportStats, User, ZenoService } from '$lib/zenoapi';
 	import {
 		mdiAccountCircleOutline,
 		mdiDatabaseOutline,
 		mdiDotsHorizontal,
-		mdiFileTree,
+		mdiFileChartOutline,
+		mdiLandRowsHorizontal,
 		mdiRobotOutline,
-		mdiSitemap
+		mdiViewGridOutline
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
 	import EntryOptions from './EntryOptions.svelte';
@@ -75,77 +76,78 @@
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}
 	on:blur={() => (hovering = false)}
-	class="flex h-full w-full flex-col rounded-lg border border-solid border-grey-light bg-white px-4 py-2 shadow-sm hover:shadow-md"
+	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
-	<div class="flex w-full items-center justify-between">
-		<p class="truncate text-left text-lg text-black">{entry.name}</p>
-		<div class="flex items-center">
-			<div
-				class="relative mr-2 h-9 w-9"
-				use:clickOutside={() => {
-					showOptions = false;
-				}}
-			>
-				{#if hovering && (project || (project && !exploreTab) || (report && !exploreTab && user?.name === entry.ownerName))}
-					<IconButton
-						size="button"
-						style="padding: 0px"
-						on:click={(e) => {
-							e.stopPropagation();
-							showOptions = !showOptions;
-						}}
-					>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path fill="black" d={mdiDotsHorizontal} />
-						</Icon>
-					</IconButton>
-				{/if}
-				{#if showOptions}
-					<EntryOptions
-						bind:showOptions
-						bind:showConfirmDelete
-						bind:showCopy
-						{report}
-						{project}
-						{user}
-					/>
-				{/if}
-			</div>
-			<LikeButton
-				on:like={likeEntry}
-				likes={stats.numLikes}
-				liked={stats.userLiked}
-				{user}
-				report
-			/>
-		</div>
-	</div>
-	<div class="mb-2 flex items-center">
-		<Icon class="mr-2 h-6 w-6" tag="svg" viewBox="0 0 24 24">
-			<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
-		</Icon>
-		<p class="flex-shrink-0 truncate text-base text-grey-dark">{entry.ownerName}</p>
-	</div>
-	<p class="w-full flex-grow overflow-y-auto text-left text-sm">
-		{#if entry.description}
-			{entry.description.slice(0, 100)}
-			{#if entry.description.length > 100}
-				...
-			{/if}
-		{/if}
-	</p>
 	<div
-		class="my-2 flex w-full items-center justify-between rounded-md px-4 py-2 {report
-			? 'bg-primary'
-			: 'bg-primary-light'}"
+		class="relative flex w-full flex-col rounded-t-md text-center align-middle"
+		style="background: {project ? '#f6f5f6' : '#f9f2ff'}"
 	>
-		<div class="font-semibold {report ? 'text-white' : ''}">
-			{project ? 'project' : 'report'}
+		<div class="mt-2 flex h-9 w-full items-center justify-between px-3">
+			<div class="flex items-center justify-center">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 24 24"
+					class="w-6 {report ? 'fill-primary-dark' : 'fill-grey-dark'}"
+				>
+					<path d={project ? mdiViewGridOutline : mdiFileChartOutline} />
+				</svg>
+				<div
+					class="relative ml-2"
+					use:clickOutside={() => {
+						showOptions = false;
+					}}
+				>
+					{#if hovering && (project || (project && !exploreTab) || (report && !exploreTab && user?.name === entry.ownerName))}
+						<button
+							class="rounded-md hover:bg-primary-mid"
+							on:click={(e) => {
+								e.stopPropagation();
+								showOptions = !showOptions;
+							}}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								class="w-6 fill-primary-dark"
+							>
+								<path fill="black" d={mdiDotsHorizontal} />
+							</svg>
+						</button>
+					{/if}
+					{#if showOptions}
+						<EntryOptions
+							bind:showOptions
+							bind:showConfirmDelete
+							bind:showCopy
+							{report}
+							{project}
+							{user}
+						/>
+					{/if}
+				</div>
+			</div>
+			<LikeButton on:like={likeEntry} likes={stats.numLikes} liked={stats.userLiked} {user} />
 		</div>
+		<div
+			class="mb-4 mt-1 flex items-center justify-center px-2"
+			style="min-height: 60px; max-height: 3rem"
+			use:tooltip={{ text: entry.name }}
+		>
+			<p class="line-clamp-2 text-xl text-black">
+				{entry.name}
+			</p>
+		</div>
+	</div>
+	<div class="flex w-full items-center justify-between pb-3 pl-2 pt-3">
 		<div class="flex items-center">
+			<Icon class="mr-2 h-6 w-6" tag="svg" viewBox="0 0 24 24">
+				<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
+			</Icon>
+			<p class="flex-shrink-0 truncate text-base text-grey-dark">{entry.ownerName}</p>
+		</div>
+		<div class="flex items-center rounded-md">
 			{#if projectStats !== null}
 				<EntryStat
-					entryType={project ? 'project' : 'report'}
 					icon={mdiDatabaseOutline}
 					text={projectStats.numInstances}
 					tooltipContent={`This project has ${shortenNumber(
@@ -154,7 +156,6 @@
 					)} data point${projectStats.numInstances !== 1 ? 's' : ''}.`}
 				/>
 				<EntryStat
-					entryType={project ? 'project' : 'report'}
 					icon={mdiRobotOutline}
 					text={projectStats.numModels}
 					tooltipContent={`This project has ${shortenNumber(projectStats.numModels, 1)} system${
@@ -163,16 +164,7 @@
 				/>
 			{:else if reportStats !== null}
 				<EntryStat
-					entryType={project ? 'project' : 'report'}
-					icon={mdiFileTree}
-					text={reportStats.numProjects}
-					tooltipContent={`This report has ${shortenNumber(reportStats.numProjects, 1)} project${
-						reportStats.numProjects !== 1 ? 's' : ''
-					} linked to it.`}
-				/>
-				<EntryStat
-					entryType={project ? 'project' : 'report'}
-					icon={mdiSitemap}
+					icon={mdiLandRowsHorizontal}
 					text={reportStats.numElements}
 					tooltipContent={`This report has ${shortenNumber(reportStats.numElements, 1)} element${
 						reportStats.numElements !== 1 ? 's' : ''
@@ -181,4 +173,11 @@
 			{/if}
 		</div>
 	</div>
+	{#if entry.description}
+		<div class="px-3 pb-3" use:tooltip={{ text: entry.description }}>
+			<p class="line-clamp-3 w-full text-left text-sm">
+				{entry.description}
+			</p>
+		</div>
+	{/if}
 </button>
