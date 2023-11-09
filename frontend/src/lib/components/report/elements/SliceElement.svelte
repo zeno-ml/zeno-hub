@@ -96,7 +96,7 @@
 					</Icon>
 				</div>
 			</button>
-			<div class="flex h-full w-full flex-wrap content-start overflow-x-scroll">
+			<div class="flex h-full w-full flex-wrap content-start overflow-x-auto">
 				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
 						<div class="m-auto mt-0 w-1/2 px-1">
