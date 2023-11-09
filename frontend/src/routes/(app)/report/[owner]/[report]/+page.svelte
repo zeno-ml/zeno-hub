@@ -100,7 +100,6 @@
 					user={data.user}
 					likes={data.numLikes}
 					liked={data.userLiked}
-					report
 				/>
 			</div>
 			{#if data.report.editor}

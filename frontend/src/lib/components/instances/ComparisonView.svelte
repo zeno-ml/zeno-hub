@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		compareSort,
@@ -19,7 +20,6 @@
 	import { Icon, Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
-	import InstanceView from '@zeno-ml/zeno-instance-views';
 	import { getContext } from 'svelte';
 
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
@@ -27,7 +27,7 @@
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
-	let tablePromise: Promise<Record<string, string | number | boolean>[]>;
+	let table: Record<string, string | number | boolean>[] = [];
 	let instanceContainer: HTMLDivElement;
 	// Which model column to show sort for.
 	let sortModel = '';
@@ -42,7 +42,7 @@
 		)
 	].sort((a, b) => a - b);
 
-	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id;
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id || '';
 	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;
 	$: labelColumn = $columns.find((col) => col.columnType === ZenoColumnType.LABEL)?.id;
 
@@ -142,7 +142,7 @@
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
 		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
-		tablePromise = getFilteredTable(
+		getFilteredTable(
 			$project.uuid,
 			$columns,
 			[$model, $comparisonModel],
@@ -153,11 +153,10 @@
 			dataIds,
 			zenoClient,
 			predicates
-		);
-
-		if (instanceContainer) {
+		).then((t) => {
+			table = t;
 			instanceContainer.scrollTop = 0;
-		}
+		});
 	}
 
 	function modelValueAndDiff(
@@ -261,55 +260,49 @@
 				</div>
 			</th>
 		</thead>
-		{#await tablePromise then table}
-			{#if idColumn}
-				<tbody>
-					{#each table as tableContent (tableContent[idColumn])}
-						<tr>
-							<td class="p-3 align-baseline">
-								<p class="mb-2">
-									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-									{modelValueAndDiff($model, tableContent)}
-								</p>
-								<div class="instance">
-									<InstanceView
-										view={$project.view}
-										{dataColumn}
-										{labelColumn}
-										modelColumn={modelAColumn?.id}
-										entry={tableContent}
-									/>
-								</div>
-							</td>
-							<td class="p-3 align-baseline">
-								<p class="mb-2">
-									<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-									{modelValueAndDiff($comparisonModel, tableContent)}
-								</p>
-								<div class="instance">
-									<InstanceView
-										view={$project.view}
-										{dataColumn}
-										{labelColumn}
-										modelColumn={modelBColumn?.id}
-										entry={tableContent}
-									/>
-								</div>
-							</td>
-							{#if $model !== undefined && $comparisonModel !== undefined}
-								<td class="p-3 align-text-top"
-									>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
-										? Number(tableContent['diff']).toFixed(2)
-										: tableContent['diff']}
-								</td>
-							{/if}
-						</tr>
-					{/each}
-				</tbody>
-			{/if}
-		{:catch e}
-			<p>error loading data: {e}</p>
-		{/await}
+		<tbody>
+			{#each table as tableContent (tableContent[idColumn])}
+				<tr>
+					<td class="p-3 align-baseline">
+						<p class="mb-2">
+							<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+							{modelValueAndDiff($model, tableContent)}
+						</p>
+						<div class="instance">
+							<InstanceView
+								view={$project.view}
+								{dataColumn}
+								{labelColumn}
+								modelColumn={modelAColumn?.id}
+								entry={tableContent}
+							/>
+						</div>
+					</td>
+					<td class="p-3 align-baseline">
+						<p class="mb-2">
+							<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+							{modelValueAndDiff($comparisonModel, tableContent)}
+						</p>
+						<div class="instance">
+							<InstanceView
+								view={$project.view}
+								{dataColumn}
+								{labelColumn}
+								modelColumn={modelBColumn?.id}
+								entry={tableContent}
+							/>
+						</div>
+					</td>
+					{#if $model !== undefined && $comparisonModel !== undefined}
+						<td class="p-3 align-text-top"
+							>{$comparisonColumn?.dataType === MetadataType.CONTINUOUS
+								? Number(tableContent['diff']).toFixed(2)
+								: tableContent['diff']}
+						</td>
+					{/if}
+				</tr>
+			{/each}
+		</tbody>
 	</table>
 </div>
 

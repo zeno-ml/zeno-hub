@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { tooltip } from '$lib/util/tooltip';
 	import type { User } from '$lib/zenoapi';
 	import { mdiHeart, mdiHeartOutline } from '@mdi/js';
 	import { Icon } from '@smui/button';
@@ -10,19 +9,21 @@
 	export let likes: number;
 	export let liked: boolean;
 	export let user: User | null;
-	export let report = false;
+
+	let hovering = false;
 
 	const dispatch = createEventDispatcher();
 </script>
 
 <div class="flex">
 	<div class="flex">
-		<p class="pr-2 text-base font-semibold text-primary">{likes}</p>
+		<p class="pr-2 text-base font-semibold text-grey-dark">{likes}</p>
 		<button
-			use:tooltip={{
-				text: `${user === null ? 'Login to l' : 'L'}ike this ${report ? 'report' : 'project'}!`
-			}}
-			class=" h-6 w-6 fill-primary"
+			class=" h-6 w-6 fill-primary-dark"
+			on:mouseover={() => (hovering = true)}
+			on:mouseout={() => (hovering = false)}
+			on:focus={() => (hovering = true)}
+			on:blur={() => (hovering = false)}
 			on:click={(e) => {
 				if (user) {
 					e.stopPropagation();
@@ -40,7 +41,7 @@
 			}}
 		>
 			<Icon tag="svg" viewBox="0 0 24 24">
-				<path d={user === null || liked ? mdiHeart : mdiHeartOutline} />
+				<path d={user === null || liked || hovering ? mdiHeart : mdiHeartOutline} />
 			</Icon>
 		</button>
 	</div>

@@ -15,7 +15,7 @@
 		windowWidth > $tooltipState.mousePos.x + tooltipWidth + 10
 			? `left: ${$tooltipState.mousePos.x}px;`
 			: `right: 10px;`;
-	$: style = `top: ${yPos}px; ${xStyle};`;
+	$: style = `top: ${yPos}px; ${xStyle}; max-width: 50%`;
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} bind:innerHeight={windowHeight} />
