@@ -62,6 +62,23 @@
 	function handleMoved(e: CustomEvent) {
 		elements = e.detail.items;
 	}
+
+	function updateElementPosition(elementId: number | null | undefined, position: number) {
+		if (!elementId || position < 0 || position >= elements.length) return;
+
+		let currElement = elements.find((e) => e.id === elementId);
+		let oldPosition = currElement?.position ?? -1;
+		if (!currElement || oldPosition === position || oldPosition === -1) return;
+
+		elements[position].position = oldPosition;
+		currElement.position = position;
+
+		zenoClient.updateReportElement(data.report.id, elements[position]);
+		zenoClient.updateReportElement(data.report.id, currElement);
+
+		elements.sort((a, b) => a.position - b.position);
+		elements = [...elements];
+	}
 </script>
 
 {#if showConfirmDelete !== -1}
@@ -136,6 +153,7 @@
 					bind:editId
 					bind:dragEnabled
 					bind:showConfirmDelete
+					{updateElementPosition}
 					{addElement}
 					{selectedProjects}
 					report={data.report}

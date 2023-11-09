@@ -432,16 +432,16 @@ def report_element(report_id: int, element: ReportElement) -> int | None:
         int | None: the id of the newly created report element.
     """
     db = Database()
-    id = db.connect_execute_return(
-        "INSERT INTO report_elements (report_id, type, data, position)"
-        " VALUES (%s,%s,%s,%s) RETURNING id;",
-        [report_id, element.type, element.data, element.position],
-    )
-    # update position of all elements after insert
+    # make room for new element position-wise
     db.connect_execute(
         "UPDATE report_elements SET position = position + 1 WHERE report_id = %s "
         "AND position >= %s;",
         [report_id, element.position],
+    )
+    id = db.connect_execute_return(
+        "INSERT INTO report_elements (report_id, type, data, position)"
+        " VALUES (%s,%s,%s,%s) RETURNING id;",
+        [report_id, element.type, element.data, element.position],
     )
     if len(id) > 0:
         return id[0][0]

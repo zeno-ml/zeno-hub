@@ -7,7 +7,14 @@
 		type ReportElement,
 		type Slice
 	} from '$lib/zenoapi';
-	import { mdiCheckBold, mdiDrag, mdiPencilOutline, mdiTrashCanOutline } from '@mdi/js';
+	import {
+		mdiCheckBold,
+		mdiChevronDown,
+		mdiChevronUp,
+		mdiDrag,
+		mdiPencilOutline,
+		mdiTrashCanOutline
+	} from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import { getContext } from 'svelte';
 	import AddElementButton from './AddElementButton.svelte';
@@ -21,6 +28,10 @@
 	export let showConfirmDelete: number;
 	export let dragEnabled: boolean;
 	export let addElement: (elementIndex: number) => void;
+	export let updateElementPosition: (
+		elementId: number | null | undefined,
+		position: number
+	) => void;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -72,7 +83,7 @@
 			</Icon>
 		</button>
 		<div
-			class="absolute -left-3 top-1 mr-2 hidden cursor-move rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+			class="absolute -left-3 -top-1 mr-2 hidden cursor-move rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 		>
 			<Icon
 				style="outline:none; width: 24px; height: 24px"
@@ -83,6 +94,22 @@
 				<path class="fill-primary" d={mdiDrag} />
 			</Icon>
 		</div>
+		<button
+			class="absolute -left-3 top-7 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+			on:click={() => updateElementPosition(element.id, element.position - 1)}
+		>
+			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+				<path class="fill-primary" d={mdiChevronUp} />
+			</Icon>
+		</button>
+		<button
+			class="absolute -left-3 top-14 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+			on:click={() => updateElementPosition(element.id, element.position + 1)}
+		>
+			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+				<path class="fill-primary" d={mdiChevronDown} />
+			</Icon>
+		</button>
 		{#if editId === element.id}
 			<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
 				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>

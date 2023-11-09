@@ -13,7 +13,7 @@
 </script>
 
 {#await chartData}
-	<div class="m-auto w-full text-center">
+	<div class="m-auto flex w-full justify-center text-center">
 		<Spinner />
 	</div>
 {:then data}
