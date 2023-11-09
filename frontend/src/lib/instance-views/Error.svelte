@@ -3,7 +3,7 @@
 	export let message: string | undefined;
 </script>
 
-<div class="flex flex-col overflow-auto text-red">
+<div class="text-red flex flex-col overflow-auto">
 	<span class="font-bold">{type}</span>
 	{#if message}
 		<pre>
