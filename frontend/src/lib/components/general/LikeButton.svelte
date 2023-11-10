@@ -15,7 +15,7 @@
 	const dispatch = createEventDispatcher();
 </script>
 
-<div class="ml-auto flex">
+<div class="flex">
 	<div class="flex">
 		<p class="pr-2 text-base font-semibold text-grey-dark">{likes}</p>
 		<button

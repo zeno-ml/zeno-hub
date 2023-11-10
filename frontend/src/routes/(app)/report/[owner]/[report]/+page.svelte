@@ -1,16 +1,20 @@
 <script lang="ts">
+	import Header from '$lib/components/general/Header.svelte';
 	import LikeButton from '$lib/components/general/LikeButton.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
+	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import { svelecteRendererName } from '$lib/util/util.js';
 	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
+	import Button from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
 
 	export let data;
 
+	let reportEdit = false;
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
@@ -81,6 +85,9 @@
 	}
 </script>
 
+{#if reportEdit && data.user !== null}
+	<ReportPopup on:close={() => (reportEdit = false)} user={data.user} />
+{/if}
 {#if showConfirmDelete !== -1}
 	<Confirm
 		message="Are you sure you want to delete this element?"
@@ -93,20 +100,32 @@
 		}}
 	/>
 {/if}
-<div class="h-full w-full overflow-auto bg-yellowish">
+<div class="relative h-screen w-full overflow-y-auto overflow-x-visible">
+	<div class="sticky top-0 z-10 bg-white px-6 pt-6">
+		<Header user={data.user} reportTitle={data.report.name} />
+	</div>
 	<div
-		class="m-auto flex max-w-4xl flex-col rounded bg-background px-10 pb-20 shadow sm:mb-0 sm:mt-0 md:mb-6 md:mt-6"
+		class="m-auto flex max-w-4xl flex-col rounded bg-background px-6 pb-20 sm:mb-0 sm:mt-0 md:mb-6"
 	>
-		<div class="mt-12 flex items-center justify-between">
-			<h1 class="text-grey-darkest mr-6 text-5xl">
-				{data.report.name}
-			</h1>
-			<LikeButton
-				on:like={() => zenoClient.likeReport(data.report.id)}
-				user={data.user}
-				likes={data.numLikes}
-				liked={data.userLiked}
-			/>
+		<div class="mt-4 flex flex-col items-center justify-between sm:flex-row">
+			<div class="flex items-center">
+				<h1 class="text-grey-darkest mr-6 text-5xl">
+					{data.report.name}
+				</h1>
+				<LikeButton
+					on:like={() => zenoClient.likeReport(data.report.id)}
+					user={data.user}
+					likes={data.numLikes}
+					liked={data.userLiked}
+				/>
+			</div>
+			{#if data.report.editor}
+				<Button
+					class="ml-2 mt-2 shrink-0 sm:mt-0"
+					variant="raised"
+					on:click={() => (reportEdit = true)}>Settings</Button
+				>
+			{/if}
 		</div>
 		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
 		<span class="mt-2 text-grey-darker"

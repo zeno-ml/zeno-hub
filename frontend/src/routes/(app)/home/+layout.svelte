@@ -1,93 +1,43 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { tooltip } from '$lib/util/tooltip';
+	import Header from '$lib/components/general/Header.svelte';
+	import NewReportPopup from '$lib/components/popups/NewReportPopup.svelte';
 
 	export let data;
+	export let showNewReport = false;
 
 	let isExplore = $page.route.id === '/(app)/home';
 </script>
 
+{#if showNewReport && data.user !== null}
+	<NewReportPopup
+		on:close={() => (showNewReport = false)}
+		user={data.user.name}
+		bind:showNewReport
+	/>
+{/if}
+
 <div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
-	{#if data.cognitoUser && data.cognitoUser !== null}
+	<Header user={data.user} bind:showNewReport />
+	{#if isExplore}
 		<div
-			class="flex w-full flex-col items-center rounded-md bg-primary text-white sm:flex-row md:h-28"
-		>
-			<a
-				href={'/home/' + data.cognitoUser.name}
-				class={`p-6 text-3xl ${
-					isExplore ? 'text-grey-lighter' : 'underline'
-				} font-bold uppercase hover:text-primary-mid`}
-				use:tooltip={{ text: 'Your projects and reports' }}
-			>
-				My Hub
-			</a>
-			<a
-				href="/home"
-				class={`p-6 text-3xl ${
-					!isExplore ? 'text-grey-light' : 'underline'
-				} font-bold uppercase hover:text-primary-mid`}
-				use:tooltip={{ text: 'Public projects and reports' }}
-			>
-				Discover
-			</a>
-			<div class="ml-auto hidden md:flex">
-				<svg
-					width="700"
-					height="110"
-					viewBox="100 145 1200 200"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M1599.87 390.789L810.872 390.789L810.872 130.789L1208.37 130.789L1599.87 390.789Z"
-						fill="#9F55CD"
-					>
-						<animate attributeName="opacity" values=".6;1;.6" dur="5s" repeatCount="indefinite" />
-					</path>
-					<path
-						d="M775.783 391.905L381.397 130.635H775.783V391.905Z"
-						fill="#9F55CD"
-						fill-opacity="0.8"
-					>
-						<animate attributeName="opacity" values=".8;.5;.8" dur="5s" repeatCount="indefinite" />
-					</path>
-					<path
-						d="M728.872 391.789L358.872 391.789L358.872 146.789L728.872 391.789Z"
-						fill="#9F55CD"
-						fill-opacity="0.6"
-					>
-						<animate attributeName="opacity" values=".4;.8;.4" dur="5s" repeatCount="indefinite" />
-					</path>
-					<path
-						d="M326.352 391.713L158.002 280.186L327.242 168.069L326.352 391.713Z"
-						fill="#9F55CD"
-						fill-opacity="0.5"
-					>
-						<animate attributeName="opacity" values=".6;.2;.6" dur="5s" repeatCount="indefinite" />
-					</path>
-					<path
-						d="M1.67699e-05 382.642L127.561 298.136L265.742 389.676L1.67699e-05 382.642Z"
-						fill="#9F55CD"
-						fill-opacity="0.5"
-					>
-						<animate attributeName="opacity" values=".8;.5;.8" dur="5s" repeatCount="indefinite" />
-					</path>
-				</svg>
-			</div>
-		</div>
-	{:else}
-		<div
-			class="flex w-full flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
+			class="mt-4 flex w-full flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
 		>
 			<div class="p-6">
-				<h1 class="font-header text-5xl">Welcome to Zeno</h1>
-				<p class="text-xl">
-					<a class="font-bold hover:text-primary-mid" href="https://zenoml.com">Learn about Zeno</a>
-					or
-					<a class="font-bold hover:text-primary-mid" href="/login">Sign in </a>
-					or <a class="font-bold hover:text-primary-mid" href="/signup">sign up</a> to create and see
-					your projects and reports.
-				</p>
+				{#if !data.user}
+					<h1 class="font-header text-5xl">Welcome to Zeno</h1>
+					<p class="text-xl">
+						<a class="font-bold hover:text-primary-mid" href="https://zenoml.com"
+							>Learn about Zeno</a
+						>
+						or
+						<a class="font-bold hover:text-primary-mid" href="/login">sign in </a>
+						or <a class="font-bold hover:text-primary-mid" href="/signup">sign up</a> to create and see
+						your projects and reports.
+					</p>
+				{:else}
+					<h1 class="font-header text-4xl">Explore projects and reports</h1>
+				{/if}
 			</div>
 
 			<div class="ml-auto mr-10">

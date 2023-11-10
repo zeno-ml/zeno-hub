@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { navigating } from '$app/stores';
 	import { getEndpoint } from '$lib/api/util.js';
-	import Header from '$lib/components/general/Header.svelte';
 	import Spinner from '$lib/components/general/Spinner.svelte';
 	import { ZenoClient } from '$lib/zenoapi';
 	import * as amplitude from '@amplitude/analytics-browser';
@@ -29,7 +28,6 @@
 </script>
 
 <main class="h-full w-full text-left md:flex">
-	<Header user={data.user} />
 	{#if Boolean($navigating)}
 		<div class="flex h-full w-full items-center justify-center">
 			<Spinner />
