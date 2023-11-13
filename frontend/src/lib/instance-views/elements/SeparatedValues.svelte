@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { SeparatedValuesView } from '$lib/instance-views/schema.js';
+	import type { SeparatedValues } from '$lib/instance-views/schema.js';
 
 	export let data: string;
-	export let spec: SeparatedValuesView;
+	export let spec: SeparatedValues;
 
 	const values = data.split('\n').map((x) => x.split(spec.separator as string));
 </script>

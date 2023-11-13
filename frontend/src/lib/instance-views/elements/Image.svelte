@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { ImageView } from '$lib/instance-views/schema.js';
+	import type { Image } from '$lib/instance-views/schema.js';
 	import { mdiArrowExpand, mdiClose } from '@mdi/js';
 
 	export let data: string;
-	export let spec: ImageView;
+	export let spec: Image;
 
 	const widthMap = {
 		small: 'w-48',

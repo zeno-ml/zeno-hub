@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { elementMap } from '$lib/instance-views/resolve.js';
-	import type { MessageView } from '$lib/instance-views/schema.js';
+	import type { Message } from '$lib/instance-views/schema.js';
 	import Error from '../Error.svelte';
 
 	export let data: string;
-	export let spec: MessageView;
+	export let spec: Message;
 
 	const type = elementMap[spec.content.type as string];
 

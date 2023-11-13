@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { elementMap } from '$lib/instance-views/resolve.js';
-	import type { ListView, ViewUnion } from '$lib/instance-views/schema.js';
+	import type { List, ViewUnion } from '$lib/instance-views/schema.js';
 	import { mdiChevronDown, mdiChevronLeft, mdiChevronRight, mdiChevronUp } from '@mdi/js';
 	import Error from '../Error.svelte';
 
 	export let data: string;
-	export let spec: ListView;
+	export let spec: List;
 
 	let jsonData: Array<ViewUnion> | undefined = undefined;
 	let errorMessage: string | undefined = undefined;

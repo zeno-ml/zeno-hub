@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { elementMap } from '$lib/instance-views/resolve.js';
-	import type { VStackView, View } from '$lib/instance-views/schema.js';
+	import type { VStack, View } from '$lib/instance-views/schema.js';
 	import Error from '../Error.svelte';
 
 	export let data: string;
-	export let spec: VStackView;
+	export let spec: VStack;
 
 	let jsonData: Record<string, View> | undefined = undefined;
 	let errorMessage: string | undefined = undefined;

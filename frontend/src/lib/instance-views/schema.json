@@ -5,7 +5,7 @@
 			"const": "table",
 			"type": "string"
 		},
-		"ImageView": {
+		"Image": {
 			"additionalProperties": false,
 			"properties": {
 				"maxWidth": {
@@ -20,7 +20,7 @@
 			"required": ["type"],
 			"type": "object"
 		},
-		"ListView": {
+		"List": {
 			"additionalProperties": false,
 			"properties": {
 				"border": {
@@ -46,7 +46,7 @@
 			"required": ["elements", "type"],
 			"type": "object"
 		},
-		"MessageView": {
+		"Message": {
 			"additionalProperties": false,
 			"properties": {
 				"content": {
@@ -72,7 +72,7 @@
 			"required": ["content", "type"],
 			"type": "object"
 		},
-		"SeparatedValuesView": {
+		"SeparatedValues": {
 			"additionalProperties": false,
 			"properties": {
 				"header": {
@@ -92,7 +92,7 @@
 			"required": ["type"],
 			"type": "object"
 		},
-		"TextView": {
+		"Text": {
 			"additionalProperties": false,
 			"properties": {
 				"label": {
@@ -106,7 +106,7 @@
 			"required": ["type"],
 			"type": "object"
 		},
-		"VStackView": {
+		"VStack": {
 			"additionalProperties": false,
 			"properties": {
 				"border": {
@@ -181,22 +181,22 @@
 					"$ref": "#/definitions/View"
 				},
 				{
-					"$ref": "#/definitions/TextView"
+					"$ref": "#/definitions/Text"
 				},
 				{
-					"$ref": "#/definitions/ImageView"
+					"$ref": "#/definitions/Image"
 				},
 				{
-					"$ref": "#/definitions/ListView"
+					"$ref": "#/definitions/List"
 				},
 				{
-					"$ref": "#/definitions/MessageView"
+					"$ref": "#/definitions/Message"
 				},
 				{
-					"$ref": "#/definitions/VStackView"
+					"$ref": "#/definitions/VStack"
 				},
 				{
-					"$ref": "#/definitions/SeparatedValuesView"
+					"$ref": "#/definitions/SeparatedValues"
 				}
 			]
 		}
