@@ -42,7 +42,7 @@
 		/>
 		<div class="flex h-full min-h-0 w-full min-w-0">
 			<MetadataPanel compare={data.compare} />
-			<div class="flex w-full flex-grow flex-col px-3" style="max-width: calc(100% - 380px);">
+			<div class="flex w-full min-w-0 flex-col px-3">
 				<Instances compare={data.compare} />
 			</div>
 		</div>
