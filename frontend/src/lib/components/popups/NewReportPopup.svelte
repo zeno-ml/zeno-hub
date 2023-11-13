@@ -24,9 +24,9 @@
 
 	async function addReport() {
 		try {
-			await zenoClient.addReport(reportName);
+			const id = await zenoClient.addReport(reportName);
 			showNewReport = false;
-			goto(`/report/${user}/${encodeURIComponent(reportName)}`);
+			goto(`/report/${id}/${encodeURIComponent(reportName)}`);
 		} catch (e) {
 			errorMessage = (e as ApiError).body.detail;
 		}

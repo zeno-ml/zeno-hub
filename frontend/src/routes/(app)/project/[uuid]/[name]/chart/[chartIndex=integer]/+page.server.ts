@@ -8,11 +8,7 @@ export async function load({ params, depends, cookies, url }) {
 	const zenoClient = await getClient(cookies, url);
 	let chartResult: ChartResponse;
 	try {
-		chartResult = await zenoClient.getChart(
-			parseInt(params.chartIndex),
-			params.owner,
-			params.project
-		);
+		chartResult = await zenoClient.getChart(parseInt(params.chartIndex), params.uuid);
 	} catch (e) {
 		throw error(404, 'Could not load chart');
 	}

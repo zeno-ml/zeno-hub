@@ -395,12 +395,15 @@ async def system(
         await conn.commit()
 
 
-def report(name: str, user: User):
+def report(name: str, user: User) -> int:
     """Adding a report to Zeno.
 
     Args:
         name (str): how the report is called.
         user (User): user who created the report.
+
+    Returns:
+        int: the id of the newly created report.
 
     Raises:
         Exception: a report with the same name already exists.
@@ -413,11 +416,16 @@ def report(name: str, user: User):
         if len(res) > 0:
             raise Exception("Report with this name already exists.")
 
-        db.execute(
-            "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s);",
+        id = db.execute_return(
+            "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s)"
+            " RETURNING id;",
             [name, user.id, False],
         )
         db.commit()
+
+        if len(id) == 0:
+            raise Exception("Could not create report.")
+        return id[0][0]
 
 
 def report_element(report_id: int, element: ReportElement) -> int | None:

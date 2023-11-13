@@ -16,7 +16,7 @@ export async function load({ cookies, params, url }) {
 
 	let project_result: ProjectState;
 	try {
-		project_result = await zenoClient.getProjectState(params.owner, params.project);
+		project_result = await zenoClient.getProjectState(params.uuid);
 	} catch (e: unknown) {
 		if ((e as ApiError).status === 401) {
 			if (cognitoUser !== null) {
@@ -24,8 +24,23 @@ export async function load({ cookies, params, url }) {
 			} else {
 				throw redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
+		} else if ((e as ApiError).status === 404) {
+			// try to route using owner/project_name for legacy projects.
+			const project_uuid = await zenoClient.getProjectUuid(params.uuid, params.name);
+			project_result = await zenoClient.getProjectState(project_uuid);
+			throw redirect(
+				303,
+				`/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`
+			);
 		}
 		throw error(404, 'Could not load project configuration');
+	}
+
+	if (project_result.project.name !== decodeURI(params.name)) {
+		throw redirect(
+			301,
+			`/project/${params.uuid}/${encodeURIComponent(project_result.project.name)}`
+		);
 	}
 
 	// Get state from URL parameters.
