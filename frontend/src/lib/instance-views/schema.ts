@@ -16,30 +16,23 @@ export enum DisplayType {
 	'table' = 'table'
 }
 
-export type ViewUnion =
-	| View
-	| TextView
-	| ImageView
-	| ListView
-	| MessageView
-	| VStackView
-	| SeparatedValuesView;
+export type ViewUnion = View | Text | Image | List | Message | VStack | SeparatedValues;
 
 export interface View {
 	type: ViewType;
 }
 
-export interface TextView extends View {
+export interface Text extends View {
 	type: ViewType.text;
 	label?: string;
 }
 
-export interface ImageView extends View {
+export interface Image extends View {
 	type: ViewType.image;
 	maxWidth?: 'small' | 'medium' | 'large' | 'full';
 }
 
-export interface ListView extends View {
+export interface List extends View {
 	type: ViewType.list;
 	elements: ViewUnion;
 	horizontal?: boolean;
@@ -48,7 +41,7 @@ export interface ListView extends View {
 	pad?: boolean;
 }
 
-export interface MessageView extends View {
+export interface Message extends View {
 	type: ViewType.message;
 	content: ViewUnion;
 	plain?: boolean;
@@ -57,7 +50,7 @@ export interface MessageView extends View {
 	highlight?: boolean;
 }
 
-export interface VStackView extends View {
+export interface VStack extends View {
 	type: ViewType.vstack;
 	keys: Record<string, ViewUnion>;
 	collapsible?: string;
@@ -65,7 +58,7 @@ export interface VStackView extends View {
 	pad?: boolean;
 }
 
-export interface SeparatedValuesView extends View {
+export interface SeparatedValues extends View {
 	type: ViewType.separatedValues;
 	header?: string;
 	separator?: string;

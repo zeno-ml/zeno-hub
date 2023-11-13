@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { TextView } from '$lib/instance-views/schema.js';
+	import type { Text } from '$lib/instance-views/schema.js';
 
 	export let data: string;
-	export let spec: TextView;
+	export let spec: Text;
 </script>
 
 {#if spec.label !== undefined}
