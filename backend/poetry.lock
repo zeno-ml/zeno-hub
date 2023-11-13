@@ -686,13 +686,13 @@ test = ["anyio (>=3.6.2,<4.0)", "mypy (>=1.4.1)", "pproxy (>=2.7)", "pytest (>=6
 
 [[package]]
 name = "psycopg-pool"
-version = "3.1.8"
+version = "3.2.0"
 description = "Connection Pool for Psycopg"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "psycopg-pool-3.1.8.tar.gz", hash = "sha256:53d9691503b538d419bf147359028633780294976743b1654dbf5f3a85b675db"},
-    {file = "psycopg_pool-3.1.8-py3-none-any.whl", hash = "sha256:dc9b177e749aae4ad155d22f9d02ccb14fe2bf30792227fb02317361b446ee39"},
+    {file = "psycopg-pool-3.2.0.tar.gz", hash = "sha256:2e857bb6c120d012dba240e30e5dff839d2d69daf3e962127ce6b8e40594170e"},
+    {file = "psycopg_pool-3.2.0-py3-none-any.whl", hash = "sha256:73371d4e795d9363c7b496cbb2dfce94ee8fbf2dcdc384d0a937d1d9d8bdd08d"},
 ]
 
 [package.dependencies]
@@ -1384,4 +1384,4 @@ scikit-learn = ">=1.2.2,<2.0.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "aa91985e29a86db95d7994d4ae70fbe8e2bba187c20b99b6ef7d75d65f88cf23"
+content-hash = "3eea95efe0b8b8645c16f5c34e3fe66d660deaaad5613e25640cf79d289e0501"
