@@ -115,6 +115,8 @@ def table_filter(
     filter_result: sql.Composed | None = None
     if filter_predicates is not None and len(filter_predicates.predicates) > 0:
         filter_result = filter_to_sql(filter_predicates, project, model)
+        if filter_result == sql.Composed([]):
+            filter_result = None
 
     if data_ids is not None and len(data_ids) > 0:
         db = Database()
