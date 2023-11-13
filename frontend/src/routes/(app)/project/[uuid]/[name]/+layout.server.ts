@@ -26,7 +26,10 @@ export async function load({ cookies, params, url }) {
 			}
 		} else if ((e as ApiError).status === 404) {
 			// try to route using owner/project_name for legacy projects.
-			const project_uuid = await zenoClient.getProjectUuid(params.uuid, params.name);
+			const project_uuid = await zenoClient.getProjectUuid(
+				params.uuid,
+				encodeURIComponent(params.name)
+			);
 			project_result = await zenoClient.getProjectState(project_uuid);
 			throw redirect(
 				303,

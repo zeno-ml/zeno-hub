@@ -7,7 +7,6 @@
 	import { createEventDispatcher, getContext } from 'svelte';
 	import Popup from './Popup.svelte';
 
-	export let user: string;
 	export let showNewReport: boolean;
 
 	const dispatch = createEventDispatcher();

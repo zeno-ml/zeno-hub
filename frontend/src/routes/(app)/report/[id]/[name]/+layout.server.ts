@@ -16,23 +16,23 @@ export async function load({ cookies, params, url }) {
 				throw redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
 		} else {
-			// try to route using owner/report_name for legacy projects.
+			// try to route using owner/report_name for legacy reports.
 			try {
 				reportResponse = await zenoClient.getReportByName(
 					params.id,
 					encodeURIComponent(params.name)
 				);
-				console.log(reportResponse.report);
 			} catch (e: unknown) {
 				throw error(404, 'Could not load report');
 			}
+			throw redirect(
+				301,
+				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
+			);
 		}
 	}
 
-	if (
-		reportResponse.report.name !== decodeURI(params.name) ||
-		reportResponse.report.id !== parseInt(params.id)
-	) {
+	if (reportResponse.report.name !== decodeURI(params.name)) {
 		throw redirect(
 			301,
 			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`

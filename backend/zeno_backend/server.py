@@ -426,8 +426,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_project_uuid(owner_name: str, project_name: str, request: Request):
-        uuid = select.project_uuid(owner_name, project_name)
-        print(uuid)
+        uuid = select.project_uuid(owner_name, parse.unquote(project_name))
         if uuid is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
