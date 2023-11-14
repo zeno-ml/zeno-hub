@@ -5,7 +5,8 @@
 		type Chart,
 		type Report,
 		type ReportElement,
-		type Slice
+		type Slice,
+		type Tag
 	} from '$lib/zenoapi';
 	import {
 		mdiCheckBold,
@@ -34,12 +35,12 @@
 
 	let chartOptions: Chart[] = [];
 	let sliceOptions: Slice[] = [];
+	let tagOptions: Tag[] = [];
 
 	$: if (selectedProjects.length > 0) {
 		zenoClient.getChartsForProjects(selectedProjects).then((r) => (chartOptions = r));
-	}
-	$: if (selectedProjects.length > 0) {
 		zenoClient.getSlicesForProjects(selectedProjects).then((r) => (sliceOptions = r));
+		zenoClient.getTagsForProjects(selectedProjects).then((r) => (tagOptions = r));
 	}
 </script>
 
@@ -111,7 +112,13 @@
 			<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
 				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
 					{#await sliceOptions then sliceOptions}
-						<ElementEdit bind:element {chartOptions} {sliceOptions} reportId={report.id} />
+						<ElementEdit
+							bind:element
+							{chartOptions}
+							{sliceOptions}
+							{tagOptions}
+							reportId={report.id}
+						/>
 					{/await}
 				</div>
 				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>

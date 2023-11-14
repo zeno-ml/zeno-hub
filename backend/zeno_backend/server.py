@@ -1,7 +1,6 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import asyncio
 import datetime
-import json
 import logging
 import os
 import shutil
@@ -43,10 +42,12 @@ from zeno_backend.classes.report import (
     ReportResponse,
     SliceElementOptions,
     SliceElementSpec,
+    TagElementOptions,
+    TagElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
-from zeno_backend.classes.table import SliceTableRequest, TableRequest
+from zeno_backend.classes.table import SliceTableRequest, TableRequest, TagTableRequest
 from zeno_backend.classes.tag import Tag, TagMetricKey
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.processing.chart import chart_data
@@ -285,16 +286,44 @@ def get_server() -> FastAPI:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
+        if not util.project_access_valid(project_uuid, request):
+            return Response(status_code=401)
 
-        return select.slice_element_options(project_uuid, instances_element)
+        return select.slice_element_options(
+            slice, project_uuid, instances_element.model_name
+        )
+
+    @api_app.post(
+        "/tag-element-options/",
+        response_model=TagElementOptions,
+        tags=["zeno"],
+    )
+    def get_tag_element_options(tag_element_spec: TagElementSpec, request: Request):
+        tag = select.tag_by_id(tag_element_spec.tag_id)
+        if tag is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
+            )
+        project_uuid = tag.project_uuid
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        if not util.project_access_valid(project_uuid, request):
+            return Response(status_code=401)
+
+        return select.tag_element_options(
+            tag, project_uuid, tag_element_spec.model_name
+        )
 
     @api_app.post(
         "/slice-table",
         response_model=str,
         tags=["zeno"],
     )
-    def get_slice_table(req: SliceTableRequest, request: Request):
-        slice = select.slice_by_id(req.slice_id)
+    def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
+        slice = select.slice_by_id(slice_table_request.slice_id)
         if slice is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
@@ -308,18 +337,43 @@ def get_server() -> FastAPI:
         if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
 
-        filter_sql = table_filter(project_uuid, req.model, slice.filter_predicates)
+        filter_sql = table_filter(
+            project_uuid, slice_table_request.model, slice.filter_predicates
+        )
 
-        sql_table = select.slice_table(project_uuid, filter_sql, req)
+        sql_table = select.slice_table(project_uuid, filter_sql, slice_table_request)
 
-        return_table = []
-        for row in sql_table.table:
-            return_row = {}
-            for i, col in enumerate(sql_table.columns):
-                return_row[col] = row[i]
-            return_table.append(return_row)
+        table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
+        return table.to_json(orient="records")
 
-        return json.dumps(return_table)
+    @api_app.post(
+        "/tag-table",
+        response_model=str,
+        tags=["zeno"],
+    )
+    def get_tag_table(tag_table_request: TagTableRequest, request: Request):
+        tag = select.tag_by_id(tag_table_request.tag_id)
+        if tag is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
+            )
+        project_uuid = tag.project_uuid
+        if project_uuid is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+            )
+
+        if not util.project_access_valid(project_uuid, request):
+            return Response(status_code=401)
+
+        filter_sql = table_filter(
+            project_uuid, tag_table_request.model, data_ids=tag.data_ids
+        )
+
+        sql_table = select.slice_table(project_uuid, filter_sql, tag_table_request)
+
+        table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
+        return table.to_json(orient="records")
 
     @api_app.get(
         "/chart/{owner}/{project}/{chart_id}",
@@ -536,6 +590,14 @@ def get_server() -> FastAPI:
     )
     def get_slices_for_projects(req: list[str]):
         return select.slices_for_projects(req)
+
+    @api_app.post(
+        "/tags-for-projects/",
+        response_model=list[Tag],
+        tags=["zeno"],
+    )
+    def get_tags_for_projects(req: list[str]):
+        return select.tags_for_projects(req)
 
     @api_app.post(
         "/slice-metrics/{project}",

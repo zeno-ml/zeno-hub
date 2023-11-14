@@ -11,12 +11,14 @@ class Tag(CamelModel):
         tag_name (str): name of the tag.
         data_ids (list[str]): ids of the data belonging to the tag.
         folder_id (Optiona[int]): id of the folder the tag belongs to. Default None.
+        project_uuid (Optional[str]): uuid of the project the tag belongs to.
     """
 
     id: int
     tag_name: str
     data_ids: list[str]
     folder_id: int | None = None
+    project_uuid: str | None = None
 
 
 class TagMetricKey(CamelModel):

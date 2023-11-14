@@ -40,3 +40,12 @@ class SliceTableRequest(CamelModel):
     model: str | None = None
     offset: int
     limit: int
+
+
+class TagTableRequest(CamelModel):
+    """Request for a table for a given Tag in Report view."""
+
+    tag_id: int
+    model: str | None = None
+    offset: int
+    limit: int

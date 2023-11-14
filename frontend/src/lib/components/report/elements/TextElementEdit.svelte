@@ -18,8 +18,7 @@
 </script>
 
 <textarea
-	class="h-full rounded border border-grey-light p-2"
+	class="h-full min-h-[150px] w-full rounded border border-grey-light p-2"
 	on:input={updateData}
 	bind:value={element.data}
-	style="width: 100%;"
 />
