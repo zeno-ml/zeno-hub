@@ -54,7 +54,7 @@
 			comparisonColumn: undefined,
 			compareSort: undefined,
 			metricRange: undefined,
-			selections: { slices: [tagElementSpec?.tagId], tags: [], metadata: {} }
+			selections: { slices: [], tags: [tagElementSpec?.tagId], metadata: {} }
 		} as URLParams;
 		return `?params=${btoa(JSON.stringify(params))}`;
 	}

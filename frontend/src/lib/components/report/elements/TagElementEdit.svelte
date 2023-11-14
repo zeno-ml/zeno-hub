@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { svelecteRenderer, svelecteRendererName } from '$lib/util/util';
-	import type {
-		ReportElement,
-		Tag,
-		SliceElementSpec as TagElementSpec,
-		ZenoService
-	} from '$lib/zenoapi';
+	import type { ReportElement, Tag, TagElementSpec, ZenoService } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 
@@ -17,7 +12,7 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 	let models: string[] = [];
 
-	$: projectUuid = tagOptions.find((sli) => sli.id === tagElementSpec.tagId)?.projectUuid ?? null;
+	$: projectUuid = tagOptions.find((tag) => tag.id === tagElementSpec.tagId)?.projectUuid ?? null;
 	$: if (projectUuid !== null) {
 		zenoClient.getModels(projectUuid).then((modelsRequest) => {
 			models = modelsRequest;
@@ -28,8 +23,8 @@
 		tagElementSpec = {
 			tagId: e.detail.id
 		};
-		let res = tagOptions.find((sli) =>
-			sli.id === tagElementSpec?.tagId ? tagElementSpec.tagId : ''
+		let res = tagOptions.find((tag) =>
+			tag.id === tagElementSpec?.tagId ? tagElementSpec.tagId : ''
 		);
 		if (res && res.projectUuid) {
 			projectUuid = res.projectUuid;
