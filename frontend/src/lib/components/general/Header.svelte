@@ -2,14 +2,20 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { tooltip } from '$lib/util/tooltip';
-	import type { User } from '$lib/zenoapi';
+	import type { Report, User, ZenoService } from '$lib/zenoapi';
 	import { mdiFileChartOutline, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
+	import { getContext } from 'svelte';
+	import LikeButton from './LikeButton.svelte';
 
 	export let user: User | null = null;
 	export let showNewReport = false;
-	export let reportTitle = '';
+	export let report: Report;
+	export let numLikes = 0;
+	export let userLiked = false;
+	export let reportEdit = false;
 
+	const zenoClient = getContext('zenoClient') as ZenoService;
 	const exploreTab = $page.route.id === '/(app)/home';
 </script>
 
@@ -28,12 +34,18 @@
 				</Button>
 			</div>
 		{/if}
-		{#if reportTitle}
+		{#if report}
 			<div class="ml-5 hidden items-center sm:flex">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class=" w-6 fill-grey-dark">
 					<path d={mdiFileChartOutline} />
 				</svg>
-				<p class="ml-2 text-grey-dark">{reportTitle}</p>
+				<p class="ml-1 mr-6 text-grey-dark">{report.name}</p>
+				<LikeButton
+					on:like={() => zenoClient.likeReport(report.id)}
+					{user}
+					likes={numLikes}
+					liked={userLiked}
+				/>
 			</div>
 		{/if}
 	</div>
@@ -46,6 +58,13 @@
 					variant="outlined"
 					on:click={() => (exploreTab ? goto('/') : goto('/home'))}
 					>{exploreTab ? 'My Hub' : 'Explore'}</Button
+				>
+			{/if}
+			{#if report && report.editor}
+				<Button
+					class="mr-4 mt-2 shrink-0 sm:mt-0"
+					variant="raised"
+					on:click={() => (reportEdit = true)}>Settings</Button
 				>
 			{/if}
 			<button
