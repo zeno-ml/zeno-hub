@@ -12,11 +12,13 @@ class ReportElementType(Enum):
         CHART: chart element for a report.
         TEXT: text element for a report.
         SLICE: slice of instances for a report.
+        TAG: tag element for a report.
     """
 
     CHART = "CHART"
     TEXT = "TEXT"
     SLICE = "SLICE"
+    TAG = "TAG"
 
 
 class Report(CamelModel):
@@ -99,6 +101,13 @@ class SliceElementSpec(CamelModel):
     model_name: str | None = None
 
 
+class TagElementSpec(CamelModel):
+    """Specification for tag element in a Zeno report."""
+
+    tag_id: int
+    model_name: str | None = None
+
+
 class SliceElementOptions(CamelModel):
     """Necessary options to render a slice report element.
 
@@ -115,6 +124,28 @@ class SliceElementOptions(CamelModel):
     project: Project
     slice_name: str
     slice_size: int
+    id_column: str
+    data_column: str | None = None
+    label_column: str | None = None
+    model_column: str | None = None
+
+
+class TagElementOptions(CamelModel):
+    """Necessary options to render a tag report element.
+
+    Attributes:
+        tag_name (str): name of the tag to render.
+        tag_size (int): number of instances in the tag.
+        view (str): name of the instance view.
+        id_column (str): name of the column containing the instance id.
+        data_column (str | None): name of the column containing the instance data.
+        label_column (str | None): name of the column containing the instance label.
+        model_column (str | None): name of the column containing the instance model.
+    """
+
+    project: Project
+    tag_name: str
+    tag_size: int
     id_column: str
     data_column: str | None = None
     label_column: str | None = None

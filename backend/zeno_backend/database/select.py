@@ -23,12 +23,15 @@ from zeno_backend.classes.report import (
     ReportStats,
     SliceElementOptions,
     SliceElementSpec,
+    TagElementOptions,
+    TagElementSpec,
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.table import (
     SliceTableRequest,
     TableRequest,
+    TagTableRequest,
 )
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
@@ -760,6 +763,41 @@ def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     )
 
 
+def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
+    """Get all tags for a list of projects.
+
+    Args:
+        project_uuids (list[str]): the list of project uuids.
+
+
+    Returns:
+        list[Tag]: the list of tags.
+    """
+    db = Database()
+    tag_results = db.connect_execute_return(
+        sql.SQL(
+            "SELECT id, name, folder_id, project_uuid"
+            " FROM tags WHERE project_uuid IN ({})"
+        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+    )
+
+    if len(tag_results) == 0:
+        return []
+
+    return list(
+        map(
+            lambda r: Tag(
+                id=r[0],
+                tag_name=r[1],
+                data_ids=[],
+                folder_id=r[2],
+                project_uuid=r[3],
+            ),
+            tag_results,
+        )
+    )
+
+
 def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
     """Get all slices for a list of projects.
 
@@ -1270,6 +1308,44 @@ def slice_by_id(slice_id: int) -> Slice | None:
     )
 
 
+def tag_by_id(tag_id: int) -> Tag | None:
+    """Get a single tag by its ID.
+
+    Args:
+        tag_id (int): id of the tag to be fetched.
+
+    Returns:
+        Tag | None: tag as requested by the user.
+    """
+    with Database() as db:
+        tag_result = db.connect_execute_return(
+            "SELECT id, name, folder_id, project_uuid FROM tags WHERE id = %s;",
+            [tag_id],
+        )
+
+        if len(tag_result) == 0:
+            return None
+        else:
+            tag_result = tag_result[0]
+
+        data_ids = db.connect_execute_return(
+            sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                sql.Identifier(f"{tag_result[3]}_tags_datapoints")
+            ),
+            [
+                tag_result[0],
+            ],
+        )
+
+        return Tag(
+            id=tag_result[0],
+            tag_name=tag_result[1],
+            data_ids=[data_ids[0] for data_ids in data_ids],
+            folder_id=tag_result[2],
+            project_uuid=tag_result[3],
+        )
+
+
 def folders(project: str) -> list[Folder]:
     """Get a list of all folders in a project.
 
@@ -1669,6 +1745,99 @@ def slice_element_options(
         )
 
 
+def tag_element_options(
+    project_uuid: str, instances_element: TagElementSpec
+) -> TagElementOptions | None:
+    """Get options to render tag element in reports.
+
+    Args:
+        project_uuid (str): the project the user is currently working with.
+        instances_element (TagElementSpec): the tag element to get options for.
+
+    Returns:
+        TagElementOptions | None: options for the tag element.
+    """
+    with Database() as db:
+        tag = db.execute_return(
+            "SELECT name FROM tags WHERE id = %s;",
+            [instances_element.tag_id],
+        )
+        if len(tag) == 0:
+            return None
+        tag_ids = db.execute_return(
+            sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                sql.Identifier(f"{project_uuid}_tags_datapoints")
+            ),
+            [
+                instances_element.tag_id,
+            ],
+        )
+
+        project = db.execute_return(
+            "SELECT uuid, name, view, samples_per_page, public, description, owner_id, "
+            "created_at, updated_at FROM projects WHERE uuid = %s;",
+            [project_uuid],
+        )
+        owner_name = db.execute_return(
+            "SELECT name FROM users WHERE id = %s", [project[0][6]]
+        )
+
+        filter = table_filter(
+            project_uuid,
+            instances_element.model_name,
+            data_ids=[tag_id[0] for tag_id in tag_ids],
+        )
+
+        if filter is not None:
+            tag_size = db.execute_return(
+                sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
+                    sql.Identifier(project_uuid)
+                )
+                + filter
+            )
+        else:
+            tag_size = []
+
+        column_names = db.execute_return(
+            sql.SQL(
+                "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
+            ).format(sql.Identifier(f"{project_uuid}_column_map")),
+            [instances_element.model_name],
+        )
+        id_column = None
+        data_column = None
+        label_column = None
+        model_column = None
+        for col_id, col_type in column_names:
+            if col_type == ZenoColumnType.ID:
+                id_column = col_id
+            elif col_type == ZenoColumnType.DATA:
+                data_column = col_id
+            elif col_type == ZenoColumnType.LABEL:
+                label_column = col_id
+            elif col_type == ZenoColumnType.OUTPUT:
+                model_column = col_id
+
+        return TagElementOptions(
+            tag_name=tag[0][0] if len(tag) > 0 else "",
+            tag_size=tag_size[0][0] if len(tag_size) > 0 else 0,
+            id_column=id_column if id_column is not None else "",
+            data_column=data_column,
+            label_column=label_column,
+            model_column=model_column,
+            project=Project(
+                uuid=project[0][0],
+                name=project[0][1],
+                description=project[0][5],
+                owner_name=owner_name[0][0],
+                view=match_instance_view(project[0][2]),
+                editor=False,
+                created_at=project[0][7].isoformat(),
+                updated_at=project[0][8].isoformat(),
+            ),
+        )
+
+
 def slice_table(
     project_uuid: str,
     filter_sql: sql.Composed | None,
@@ -1687,6 +1856,52 @@ def slice_table(
 
     Returns:
         SQLTable: the resulting slice of the data as requested by the user.
+    """
+    with Database() as db:
+        if db.cur is None:
+            return SQLTable(table=[], columns=[])
+        filter_results = None
+        columns = []
+
+        filter = sql.SQL("")
+        if filter_sql is not None:
+            filter = sql.SQL("WHERE ") + filter_sql
+
+        final_statement = sql.SQL(" ").join(
+            [
+                sql.SQL("SELECT *"),
+                sql.SQL("FROM {}").format(sql.Identifier(project_uuid)),
+                filter,
+                sql.SQL("LIMIT {} OFFSET {};").format(
+                    sql.Literal(req.limit), sql.Literal(req.offset)
+                ),
+            ]
+        )
+        db.cur.execute(final_statement)
+
+        if db.cur.description is not None:
+            columns = [desc[0] for desc in db.cur.description]
+        filter_results = db.cur.fetchall()
+        return SQLTable(table=filter_results, columns=columns)
+
+
+def tag_table(
+    project_uuid: str,
+    filter_sql: sql.Composed | None,
+    req: TagTableRequest,
+) -> SQLTable:
+    """Get instances for a specific tag.
+
+    Args:
+        project_uuid (str): uuid of the project to the user is currently working with.
+        filter_sql (sql.Composed | None): filter for getting tag instances.
+        req (TagTableRequest): the request for the given tag.
+
+    Raises:
+        Exception: something failed while reading the data from the database.
+
+    Returns:
+        SQLTable: the resulting tag of the data as requested by the user.
     """
     with Database() as db:
         if db.cur is None:

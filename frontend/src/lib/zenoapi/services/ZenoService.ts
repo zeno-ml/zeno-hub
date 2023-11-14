@@ -33,7 +33,10 @@ import type { SliceTableRequest } from '../models/SliceTableRequest';
 import type { StringFilterRequest } from '../models/StringFilterRequest';
 import type { TableRequest } from '../models/TableRequest';
 import type { Tag } from '../models/Tag';
+import type { TagElementOptions } from '../models/TagElementOptions';
+import type { TagElementSpec } from '../models/TagElementSpec';
 import type { TagMetricKey } from '../models/TagMetricKey';
+import type { TagTableRequest } from '../models/TagTableRequest';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
@@ -501,6 +504,24 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Tag Element Options
+	 * @param requestBody
+	 * @returns TagElementOptions Successful Response
+	 * @throws ApiError
+	 */
+	public getTagElementOptions(requestBody: TagElementSpec): CancelablePromise<TagElementOptions> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/tag-element-options/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Slice Table
 	 * @param requestBody
 	 * @returns string Successful Response
@@ -510,6 +531,24 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slice-table',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Tag Table
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getTagTable(requestBody: TagTableRequest): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/tag-table',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -777,6 +816,24 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/slices-for-projects/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Tags For Projects
+	 * @param requestBody
+	 * @returns Tag Successful Response
+	 * @throws ApiError
+	 */
+	public getTagsForProjects(requestBody: Array<string>): CancelablePromise<Array<Tag>> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/tags-for-projects/',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
