@@ -43,7 +43,7 @@ class SliceTableRequest(CamelModel):
 
 
 class TagTableRequest(CamelModel):
-    """Request for a tab of a table for Report view."""
+    """Request for a table for a given Tag in Report view."""
 
     tag_id: int
     model: str | None = None

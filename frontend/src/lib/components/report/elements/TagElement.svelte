@@ -20,7 +20,7 @@
 
 	let tagElementSpec: TagElementSpec | undefined;
 	let tagElementOptions: TagElementOptions | undefined;
-	let table: Record<string, string | number | boolean>[] | undefined = [];
+	let table: Record<string, string | number | boolean>[] | undefined;
 	let page = 0;
 
 	$: updateTagElementSpec(element.data as string);

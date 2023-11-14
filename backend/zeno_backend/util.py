@@ -31,16 +31,19 @@ def verify_token(token: str) -> bool:
         return False
 
 
-def project_access_valid(project: str, request: Request) -> bool:
+def project_access_valid(project: str | None, request: Request) -> bool:
     """Check whether accessing a resource is valid.
 
     Args:
-        project (str): the project for which to access a resource.
+        project (str | None): the project for which to access a resource.
         request (Request): the request to get the access token if needed.
 
     Returns:
         bool: whether or not othe project data can be accessed.
     """
+    if project is None:
+        return False
+
     if not select.project_public(project):
         token = request.headers.get("authorization")
         user = util.get_user_from_token(request)

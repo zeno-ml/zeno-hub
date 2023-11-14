@@ -29,7 +29,7 @@
 	let tagElementSpec: TagElementSpec | null =
 		element.type === ReportElementType.TAG ? JSON.parse(element.data as string) : null;
 
-	// only add ReportElementTypes if their list isn't empty
+	// only add ReportElementTypes if they have at least one option.
 	$: reportElementOptions = [
 		...(chartOptions.length > 0 ? [ReportElementType.CHART] : []),
 		...(sliceOptions.length > 0 ? [ReportElementType.SLICE] : []),
@@ -75,9 +75,9 @@
 			<ChartElementEdit bind:element {chartOptions} {reportId} />
 		{:else if element.type === ReportElementType.TEXT}
 			<TextElementEdit bind:element {reportId} />
-		{:else if element.type === ReportElementType.SLICE && sliceElementSpec && sliceOptions.length > 0}
+		{:else if element.type === ReportElementType.SLICE && sliceElementSpec}
 			<SliceElementEdit bind:element {sliceOptions} bind:sliceElementSpec {reportId} />
-		{:else if element.type === ReportElementType.TAG && tagElementSpec && tagOptions.length > 0}
+		{:else if element.type === ReportElementType.TAG && tagElementSpec}
 			<TagElementEdit bind:element {tagOptions} bind:tagElementSpec {reportId} />
 		{/if}
 	</div>
