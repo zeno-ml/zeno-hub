@@ -9,8 +9,8 @@
 	import LikeButton from './LikeButton.svelte';
 
 	export let user: User | null = null;
+	export let report: Report | null = null;
 	export let showNewReport = false;
-	export let report: Report;
 	export let numLikes = 0;
 	export let userLiked = false;
 	export let reportEdit = false;
@@ -41,7 +41,7 @@
 				</svg>
 				<p class="ml-1 mr-6 text-grey-dark">{report.name}</p>
 				<LikeButton
-					on:like={() => zenoClient.likeReport(report.id)}
+					on:like={() => (report ? zenoClient.likeReport(report.id) : '')}
 					{user}
 					likes={numLikes}
 					liked={userLiked}
