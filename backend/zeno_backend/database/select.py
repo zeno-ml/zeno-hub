@@ -785,7 +785,6 @@ def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
     Args:
         project_uuids (list[str]): the list of project uuids.
 
-
     Returns:
         list[Tag]: the list of tags.
     """
