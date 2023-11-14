@@ -74,8 +74,9 @@
 				class="ml-4"
 				on:click={() =>
 					goto(
-						`/project/${sliceElementOptions?.project.ownerName}/${sliceElementOptions?.project.name}` +
-							encodeParams()
+						`/project/${sliceElementOptions?.project.uuid}/${encodeURIComponent(
+							sliceElementOptions?.project.name || ''
+						)}` + encodeParams()
 					)}>Explore</Button
 			>
 			<p class="ml-auto">

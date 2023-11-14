@@ -9,7 +9,7 @@ export async function load({ params, depends, cookies, url }) {
 
 	let charts: Chart[];
 	try {
-		charts = await zenoClient.getCharts(params.owner, params.project);
+		charts = await zenoClient.getCharts(params.uuid);
 	} catch (e) {
 		throw error(404, 'Could not load charts');
 	}
