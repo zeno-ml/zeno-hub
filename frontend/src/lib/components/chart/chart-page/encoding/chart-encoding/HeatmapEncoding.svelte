@@ -5,6 +5,7 @@
 	import { EncodingMap } from '../encodingUtil';
 	import EncodingSection from './EncodingSection.svelte';
 	import MetricsEncodingDropdown from './encoding-components/MetricsEncodingDropdown.svelte';
+	import ModelsEncodingDropdown from './encoding-components/ModelsEncodingDropdown.svelte';
 
 	export let chart: Chart;
 
@@ -65,6 +66,10 @@
 		}
 	}
 
+	function selectModel(e: CustomEvent) {
+		chart = { ...chart, parameters: { ...parameters, model: e.detail.value } };
+	}
+
 	function fixedSelected(e: CustomEvent<number>) {
 		chart = { ...chart, parameters: { ...parameters, metric: e.detail } };
 	}
@@ -113,6 +118,12 @@
 		numberValues={parameters.yChannel === SlicesOrModels.SLICES ? numberValues : []}
 		stringValues={parameters.yChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
+</EncodingSection>
+<EncodingSection>
+	<svelte:fragment slot="parameters">
+		<h4>system</h4>
+		<ModelsEncodingDropdown stringValue={parameters.model} on:selected={selectModel} />
+	</svelte:fragment>
 </EncodingSection>
 <EncodingSection>
 	<svelte:fragment slot="parameters">
