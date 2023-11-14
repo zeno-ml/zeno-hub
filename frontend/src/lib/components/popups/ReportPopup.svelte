@@ -48,7 +48,7 @@
 
 	async function updateReport() {
 		await zenoClient.updateReport(report);
-		goto(`/report/${report.ownerName}/${encodeURI(report.name)}`);
+		goto(`/report/${report.id}/${encodeURIComponent(report.name)}`);
 		dispatch('close');
 	}
 

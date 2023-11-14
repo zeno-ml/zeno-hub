@@ -618,40 +618,60 @@ def project_exists(owner_id: int, project_name: str) -> bool:
         raise Exception("Error while checking whether project exists.")
 
 
-def report(
-    owner_name: str, report_name: str, user: User | None
-) -> ReportResponse | None:
-    """Get the report data given an owner and report name.
+def report_id(owner: str, name: str) -> int | None:
+    """Get report ID given owner and name.
 
     Args:
-        owner_name (str): name of the report owner.
-        report_name (str): name of the report.
+        owner (str): the owner of the report.
+        name (str): the name of the report.
+
+    Returns:
+        int | None: the ID of the report.
+    """
+    with Database() as db:
+        owner_id = db.execute_return("SELECT id FROM users WHERE name = %s;", [owner])
+        if len(owner_id) == 0:
+            return
+        id = db.execute_return(
+            "SELECT id FROM reports WHERE name = %s AND owner_id = %s;",
+            [name, owner_id[0][0]],
+        )
+        if len(id) > 0:
+            return id[0][0]
+
+
+def report_response(id: int, user: User | None) -> ReportResponse | None:
+    """Get the report data given a report ID.
+
+    Args:
+        id (int): the id of the report to be fetched.
         user (User | None): user making the request.
 
     Returns:
         ReportResponse | None: the data for the requested report.
     """
     with Database() as db:
-        owner_id = db.execute_return(
-            "SELECT id FROM users WHERE name = %s;", [owner_name]
-        )
-        if len(owner_id) == 0:
-            raise Exception("Owner does not exist.")
-        else:
-            owner_id = owner_id[0][0]
-
         report_result = db.execute_return(
             "SELECT id, name, owner_id, public, description, created_at, updated_at "
-            "FROM reports WHERE name = %s AND owner_id = %s;",
-            [report_name, owner_id],
+            "FROM reports WHERE id = %s;",
+            [id],
         )
         if len(report_result) == 0:
-            raise Exception("Report does not exist.")
-        id = report_result[0][0]
+            return None
+        else:
+            report_result = report_result[0]
+
+        owner_name = db.execute_return(
+            "SELECT name FROM users WHERE id = %s;", [report_result[2]]
+        )
+        if len(owner_name) == 0:
+            return None
+        else:
+            owner_name = owner_name[0][0]
 
         if user is None:
             editor = False
-        elif owner_name == user.name:
+        elif int(report_result[2]) == user.id:
             # Owners can always edit projects
             editor = True
         else:
@@ -700,17 +720,17 @@ def report(
 
         return ReportResponse(
             report=Report(
-                id=report_result[0][0] if isinstance(report_result[0][0], int) else -1,
-                name=str(report_result[0][1]),
+                id=report_result[0],
+                name=report_result[1],
                 owner_name=owner_name,
                 linked_projects=[]
                 if len(linked_projects) == 0
                 else list(map(lambda linked: str(linked[0]), linked_projects)),
                 editor=editor,
-                public=bool(report_result[0][3]),
-                description=str(report_result[0][4]),
-                created_at=report_result[0][5].isoformat(),
-                updated_at=report_result[0][6].isoformat(),
+                public=report_result[3],
+                description=report_result[4],
+                created_at=report_result[5].isoformat(),
+                updated_at=report_result[6].isoformat(),
             ),
             report_elements=list(
                 map(
@@ -853,7 +873,7 @@ def project_from_uuid(project_uuid: str) -> Project | None:
             [project_uuid],
         )
         if len(project_result) == 0:
-            raise Exception("Project does not exist.")
+            return None
         project_result = project_result[0]
         owner_result = db.execute_return(
             "SELECT name from users WHERE id = %s;", [project_result[2]]
@@ -891,7 +911,7 @@ def report_from_id(report_id: int) -> Report | None:
             [report_id],
         )
         if len(report_result) == 0:
-            raise Exception("Project does not exist.")
+            return None
         else:
             report_result = report_result[0]
         owner_result = db.execute_return(

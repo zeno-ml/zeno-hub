@@ -6,6 +6,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
+from urllib import parse
 
 import pandas as pd
 import uvicorn
@@ -189,12 +190,7 @@ def get_server() -> FastAPI:
         response_model=list[Chart],
         tags=["zeno"],
     )
-    def get_charts(owner_name: str, project_name: str, request: Request):
-        project_uuid = select.project_uuid(owner_name, project_name)
-        if project_uuid is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-            )
+    def get_charts(project_uuid: str, request: Request):
         if not util.project_access_valid(project_uuid, request):
             return Response(status_code=401)
         return select.charts(project_uuid)
@@ -384,12 +380,7 @@ def get_server() -> FastAPI:
         response_model=ChartResponse,
         tags=["zeno"],
     )
-    def get_chart(owner_name: str, project_name: str, chart_id: int, request: Request):
-        project_uuid = select.project_uuid(owner_name, project_name)
-        if project_uuid is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-            )
+    def get_chart(project_uuid: str, chart_id: int, request: Request):
         project = select.project_from_uuid(project_uuid)
         if project is None:
             raise HTTPException(
@@ -428,20 +419,11 @@ def get_server() -> FastAPI:
     def is_project_public(project_uuid: str):
         return select.project_public(project_uuid)
 
-    @api_app.get(
-        "/project-state/{owner}/{project}", response_model=ProjectState, tags=["zeno"]
-    )
+    @api_app.get("/project-state/{uuid}", response_model=ProjectState, tags=["zeno"])
     def get_project_state(
-        owner_name: str,
-        project_name: str,
+        project_uuid: str,
         request: Request,
     ):
-        project_uuid = select.project_uuid(owner_name, project_name)
-        if project_uuid is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-            )
-
         project = select.project_from_uuid(project_uuid)
         if project is None:
             raise HTTPException(
@@ -458,10 +440,21 @@ def get_server() -> FastAPI:
         return select.project_state(project_uuid, user, project)
 
     @api_app.get(
-        "/report/{owner}/{report}", response_model=ReportResponse, tags=["zeno"]
+        "/report-name/{owner_name}/{report_name}",
+        response_model=ReportResponse,
+        tags=["zeno"],
     )
-    def get_report(owner_name: str, report_name: str, request: Request):
-        rep = select.report(owner_name, report_name, util.get_user_from_token(request))
+    def get_report_by_name(owner_name: str, report_name: str, request: Request):
+        report_id = select.report_id(owner_name, parse.unquote(report_name))
+        if report_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
+            )
+        return get_report(report_id, request)
+
+    @api_app.get("/report/{id}", response_model=ReportResponse, tags=["zeno"])
+    def get_report(id: int, request: Request):
+        rep = select.report_response(id, user=util.get_user_from_token(request))
         if not rep:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
@@ -469,7 +462,7 @@ def get_server() -> FastAPI:
         if not util.report_access_valid(rep.report.id, request):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="report is private",
+                detail="Report is private",
             )
         return rep
 
@@ -487,7 +480,7 @@ def get_server() -> FastAPI:
         tags=["zeno"],
     )
     def get_project_uuid(owner_name: str, project_name: str, request: Request):
-        uuid = select.project_uuid(owner_name, project_name)
+        uuid = select.project_uuid(owner_name, parse.unquote(project_name))
         if uuid is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -860,7 +853,7 @@ def get_server() -> FastAPI:
         if user is None:
             return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         try:
-            insert.report(name, user)
+            id = insert.report(name, user)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -872,6 +865,7 @@ def get_server() -> FastAPI:
                 user_id=current_user["sub"],
             )
         )
+        return id
 
     @api_app.post("/report-element/{id}", tags=["zeno"], dependencies=[Depends(auth)])
     def add_report_element(

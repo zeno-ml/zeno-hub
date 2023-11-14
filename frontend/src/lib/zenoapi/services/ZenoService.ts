@@ -351,18 +351,16 @@ export class ZenoService {
 
 	/**
 	 * Get Charts
-	 * @param ownerName
-	 * @param projectName
+	 * @param projectUuid
 	 * @returns Chart Successful Response
 	 * @throws ApiError
 	 */
-	public getCharts(ownerName: string, projectName: string): CancelablePromise<Array<Chart>> {
+	public getCharts(projectUuid: string): CancelablePromise<Array<Chart>> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/charts/{owner}/{project}',
 			query: {
-				owner_name: ownerName,
-				project_name: projectName
+				project_uuid: projectUuid
 			},
 			errors: {
 				422: `Validation Error`
@@ -560,16 +558,11 @@ export class ZenoService {
 	/**
 	 * Get Chart
 	 * @param chartId
-	 * @param ownerName
-	 * @param projectName
+	 * @param projectUuid
 	 * @returns ChartResponse Successful Response
 	 * @throws ApiError
 	 */
-	public getChart(
-		chartId: number,
-		ownerName: string,
-		projectName: string
-	): CancelablePromise<ChartResponse> {
+	public getChart(chartId: number, projectUuid: string): CancelablePromise<ChartResponse> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/chart/{owner}/{project}/{chart_id}',
@@ -577,8 +570,7 @@ export class ZenoService {
 				chart_id: chartId
 			},
 			query: {
-				owner_name: ownerName,
-				project_name: projectName
+				project_uuid: projectUuid
 			},
 			errors: {
 				422: `Validation Error`
@@ -640,18 +632,37 @@ export class ZenoService {
 
 	/**
 	 * Get Project State
-	 * @param ownerName
-	 * @param projectName
+	 * @param projectUuid
 	 * @returns ProjectState Successful Response
 	 * @throws ApiError
 	 */
-	public getProjectState(ownerName: string, projectName: string): CancelablePromise<ProjectState> {
+	public getProjectState(projectUuid: string): CancelablePromise<ProjectState> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/project-state/{owner}/{project}',
+			url: '/project-state/{uuid}',
 			query: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Report By Name
+	 * @param ownerName
+	 * @param reportName
+	 * @returns ReportResponse Successful Response
+	 * @throws ApiError
+	 */
+	public getReportByName(ownerName: string, reportName: string): CancelablePromise<ReportResponse> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/report-name/{owner_name}/{report_name}',
+			path: {
 				owner_name: ownerName,
-				project_name: projectName
+				report_name: reportName
 			},
 			errors: {
 				422: `Validation Error`
@@ -661,18 +672,16 @@ export class ZenoService {
 
 	/**
 	 * Get Report
-	 * @param ownerName
-	 * @param reportName
+	 * @param id
 	 * @returns ReportResponse Successful Response
 	 * @throws ApiError
 	 */
-	public getReport(ownerName: string, reportName: string): CancelablePromise<ReportResponse> {
+	public getReport(id: number): CancelablePromise<ReportResponse> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/report/{owner}/{report}',
-			query: {
-				owner_name: ownerName,
-				report_name: reportName
+			url: '/report/{id}',
+			path: {
+				id: id
 			},
 			errors: {
 				422: `Validation Error`

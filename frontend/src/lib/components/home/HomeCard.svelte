@@ -71,7 +71,11 @@
 {/if}
 <button
 	on:click={() =>
-		goto(`/${project ? 'project' : 'report'}/${entry.ownerName}/${encodeURIComponent(entry.name)}`)}
+		goto(
+			`/${project ? 'project' : 'report'}/${
+				project ? project.uuid : report?.id
+			}/${encodeURIComponent(entry.name)}`
+		)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
 	on:mouseleave={() => (hovering = false)}

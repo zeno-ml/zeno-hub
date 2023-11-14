@@ -10,11 +10,7 @@
 </script>
 
 {#if showNewReport && data.user !== null}
-	<NewReportPopup
-		on:close={() => (showNewReport = false)}
-		user={data.user.name}
-		bind:showNewReport
-	/>
+	<NewReportPopup on:close={() => (showNewReport = false)} bind:showNewReport />
 {/if}
 
 <div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
