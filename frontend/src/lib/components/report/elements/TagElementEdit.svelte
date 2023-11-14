@@ -14,8 +14,8 @@
 
 	$: projectUuid = tagOptions.find((tag) => tag.id === tagElementSpec.tagId)?.projectUuid ?? null;
 	$: if (projectUuid !== null) {
-		zenoClient.getModels(projectUuid).then((modelsRequest) => {
-			models = modelsRequest;
+		zenoClient.getModels(projectUuid).then((res) => {
+			models = res;
 		});
 	}
 

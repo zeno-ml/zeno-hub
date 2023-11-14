@@ -26,9 +26,16 @@
 
 	let sliceElementSpec: SliceElementSpec | null =
 		element.type === ReportElementType.SLICE ? JSON.parse(element.data as string) : null;
-
 	let tagElementSpec: TagElementSpec | null =
 		element.type === ReportElementType.TAG ? JSON.parse(element.data as string) : null;
+
+	// only add ReportElementTypes if their list isn't empty
+	$: reportElementOptions = [
+		...(chartOptions.length > 0 ? [ReportElementType.CHART] : []),
+		...(sliceOptions.length > 0 ? [ReportElementType.SLICE] : []),
+		...(tagOptions.length > 0 ? [ReportElementType.TAG] : []),
+		ReportElementType.TEXT
+	];
 
 	async function updateType(e: CustomEvent) {
 		let data = null;
@@ -61,16 +68,16 @@
 			style="margin-bottom: 10px; flex-grow: 0;"
 			value={element.type}
 			labelAsValue={true}
-			options={Object.values(ReportElementType)}
+			options={reportElementOptions}
 			on:change={updateType}
 		/>
 		{#if element.type === ReportElementType.CHART}
 			<ChartElementEdit bind:element {chartOptions} {reportId} />
 		{:else if element.type === ReportElementType.TEXT}
 			<TextElementEdit bind:element {reportId} />
-		{:else if element.type === ReportElementType.SLICE && sliceElementSpec}
+		{:else if element.type === ReportElementType.SLICE && sliceElementSpec && sliceOptions.length > 0}
 			<SliceElementEdit bind:element {sliceOptions} bind:sliceElementSpec {reportId} />
-		{:else if element.type === ReportElementType.TAG && tagElementSpec}
+		{:else if element.type === ReportElementType.TAG && tagElementSpec && tagOptions.length > 0}
 			<TagElementEdit bind:element {tagOptions} bind:tagElementSpec {reportId} />
 		{/if}
 	</div>
