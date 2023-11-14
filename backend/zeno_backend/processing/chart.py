@@ -296,18 +296,22 @@ def heatmap_data(chart: Chart, project: str) -> str:
         for current_y in selected_y:
             metric = {"metric": None, "size": 0}
             if x_slice and y_slice:
-                current_y.filter_predicates.join = Join.AND  # type: ignore
-                filter_sql = table_filter(
-                    project,
-                    params.model,
-                    FilterPredicateGroup(
+                if len(current_x.filter_predicates.predicates) != 0:  # type: ignore
+                    current_y.filter_predicates.join = Join.AND  # type: ignore
+                if (
+                    len(current_y.filter_predicates.predicates) == 0  # type: ignore
+                    and len(current_x.filter_predicates.predicates) == 0  # type: ignore
+                ):
+                    pred_group = None
+                else:
+                    pred_group = FilterPredicateGroup(
                         predicates=[
                             current_x.filter_predicates,  # type: ignore
                             current_y.filter_predicates,  # type: ignore
                         ],
                         join=Join.OMITTED,
-                    ),
-                )
+                    )
+                filter_sql = table_filter(project, params.model, pred_group)
                 metric = metric_map(selected_metric, project, params.model, filter_sql)
             else:
                 filter_sql = table_filter(
