@@ -37,7 +37,7 @@
 
 	// change selected to table if a tag is edited
 	$: selected = $editTag !== undefined ? 'table' : selected;
-	$: currentResult = zenoClient.getMetricsForSlices($project.uuid, {
+	$: currentResult = zenoClient.getMetricsFiltered($project.uuid, {
 		metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
 		dataIds: [...new Set(secureTagIds)]
 	});
@@ -87,7 +87,7 @@
 		}
 		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
 		const dataIds = [...new Set(secureTagIds)];
-		return zenoClient.getMetricsForSlices($project.uuid, {
+		return zenoClient.getMetricsFiltered($project.uuid, {
 			metricKeys: getMetricKeys(model, metric, predicates),
 			dataIds
 		});

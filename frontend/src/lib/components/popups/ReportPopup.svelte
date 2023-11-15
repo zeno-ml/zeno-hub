@@ -32,7 +32,7 @@
 	let reportOrganizations: Organization[] = [];
 	let allOrganizations: Organization[] = [];
 	zenoClient.getReportOrgs(report.id).then((r) => (reportOrganizations = r));
-	zenoClient.getOrganizationNames().then((r) => (allOrganizations = r));
+	zenoClient.getOrganizations().then((r) => (allOrganizations = r));
 
 	$: availableUsers = allUsers.filter(
 		(u) => u.id !== user.id && !reportUsers.some((member) => member.id === u.id)

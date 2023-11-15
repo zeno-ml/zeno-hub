@@ -29,6 +29,7 @@ from zeno_backend.classes.slice_finder import SQLTable
 from zeno_backend.classes.table import (
     SliceTableRequest,
     TableRequest,
+    TagTableRequest,
 )
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
@@ -1846,10 +1847,10 @@ def tag_element_options(
         )
 
 
-def slice_table(
+def slice_or_tag_table(
     project_uuid: str,
     filter_sql: sql.Composed | None,
-    req: SliceTableRequest,
+    req: SliceTableRequest | TagTableRequest,
 ) -> SQLTable:
     """Get a slice of the data saved in the project table.
 
@@ -1857,7 +1858,7 @@ def slice_table(
         project_uuid (str): uuid of the project to the user is currently working with.
         filter_sql (sql.Composed | None): filter to apply before fetching a slice of
             the data.
-        req (SliceTableRequest): the request for the given table slice.
+        req (SliceTableRequest | TagTableRequest): request for the given table slice.
 
     Raises:
         Exception: something failed while reading the data from the database.
@@ -2049,7 +2050,7 @@ def users() -> list[User]:
     )
 
 
-def organization_names() -> list[Organization]:
+def organizations() -> list[Organization]:
     """Get a list of all organizations.
 
     Returns:
@@ -2067,7 +2068,7 @@ def organization_names() -> list[Organization]:
     )
 
 
-def organizations(user: User) -> list[Organization]:
+def user_organizations(user: User) -> list[Organization]:
     """Get the organizations that a user is a member of.
 
     Args:
@@ -2216,7 +2217,6 @@ def filtered_short_string_column_values(
         project (str): the project for which to filter the column
         req (StringFilterRequest): the specification of the filter operation.
 
-
     Returns:
         list[str]: the filtered string column data.
     """
@@ -2260,10 +2260,8 @@ def system_exists(project_uuid: str, system_name: str) -> bool:
         project_uuid (str): ID of the project.
         system_name (str): name of the system.
 
-
     Returns:
         bool: whether the system exists.
-
 
     Raises:
         Exception: something went wrong while checking whether the system exists.
