@@ -12,7 +12,7 @@
 		selectionPredicates,
 		tagIds
 	} from '$lib/stores';
-	import { getMetricRange } from '$lib/util/util';
+	import { getMetricRange, reverseColumnSort } from '$lib/util/util';
 	import {
 		MetadataType,
 		ZenoColumnType,
@@ -112,7 +112,9 @@
 </script>
 
 {#if !$page.url.href.includes('compare')}
-	{#each $columns.filter((c) => (c.model === undefined || c.model === null || c.model === $model) && histogramColumnsBaseFilter(c)) as col (col.id)}
+	{#each $columns
+		.filter((c) => (c.model === undefined || c.model === null || c.model === $model) && histogramColumnsBaseFilter(c))
+		.sort(reverseColumnSort) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
 		{#if hist}
 			<MetadataCell {col} histogram={hist} />
