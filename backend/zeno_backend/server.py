@@ -287,7 +287,9 @@ def get_server() -> FastAPI:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
             )
         if not util.project_access_valid(project_uuid, request):
-            return Response(status_code=401)
+            raise HTTPException(
+                status_code=401, detail="Unauthorized to access project."
+            )
 
         return select.slice_element_options(
             slice, project_uuid, instances_element.model_name

@@ -39,7 +39,10 @@
 		page = 0;
 		try {
 			sliceElementSpec = JSON.parse(data) as SliceElementSpec;
-			zenoClient.getSliceElementOptions(sliceElementSpec).then((r) => (sliceElementOptions = r));
+			zenoClient
+				.getSliceElementOptions(sliceElementSpec)
+				.then((r) => (sliceElementOptions = r))
+				.catch(() => (sliceElementSpec = undefined));
 		} catch {
 			sliceElementSpec = undefined;
 		}
