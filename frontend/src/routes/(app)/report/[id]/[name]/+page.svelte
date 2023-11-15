@@ -1,13 +1,11 @@
 <script lang="ts">
 	import Header from '$lib/components/general/Header.svelte';
-	import LikeButton from '$lib/components/general/LikeButton.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import { svelecteRendererName } from '$lib/util/util.js';
 	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
-	import Button from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { dndzone } from 'svelte-dnd-action';
@@ -102,35 +100,33 @@
 {/if}
 <div class="relative h-screen w-full overflow-y-auto overflow-x-visible">
 	<div class="sticky top-0 z-10 bg-white px-6 pt-6">
-		<Header user={data.user} reportTitle={data.report.name} />
+		<Header
+			user={data.user}
+			report={data.report}
+			numLikes={data.numLikes}
+			userLiked={data.userLiked}
+			bind:reportEdit
+		/>
 	</div>
 	<div
-		class="m-auto flex max-w-4xl flex-col rounded bg-background px-6 pb-20 sm:mb-0 sm:mt-0 md:mb-6"
+		class="m-auto flex max-w-4xl flex-col rounded bg-background px-6 pb-20 pt-4 sm:mb-0 sm:mt-0 md:mb-6"
 	>
-		<div class="mt-4 flex flex-col items-center justify-between sm:flex-row">
-			<div class="flex items-center">
-				<h1 class="text-grey-darkest mr-6 text-5xl">
-					{data.report.name}
-				</h1>
-				<LikeButton
-					on:like={() => zenoClient.likeReport(data.report.id)}
-					user={data.user}
-					likes={data.numLikes}
-					liked={data.userLiked}
-				/>
-			</div>
-			{#if data.report.editor}
-				<Button
-					class="ml-2 mt-2 shrink-0 sm:mt-0"
-					variant="raised"
-					on:click={() => (reportEdit = true)}>Settings</Button
-				>
-			{/if}
+		<h1 class="text-grey-darkest mr-6 pt-4 text-5xl">
+			{data.report.name}
+		</h1>
+		<div class="mt-4 flex items-center">
+			<h5 class="text-lg">Author: {data.report.ownerName}</h5>
+			<span class="ml-4 text-grey-darker"
+				>Updated {new Date(data.report.updatedAt ?? '').toLocaleString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: 'numeric',
+					minute: 'numeric'
+				})}</span
+			>
 		</div>
-		<h5 class="mt-4 text-lg">Author: {data.report.ownerName}</h5>
-		<span class="mt-2 text-grey-darker"
-			>Updated: {new Date(data.report.updatedAt ?? '').toLocaleString()}</span
-		>
 		<hr class="mt-4 text-grey-light" />
 
 		{#if data.report.editor}
