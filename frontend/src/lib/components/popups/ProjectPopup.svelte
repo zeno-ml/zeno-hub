@@ -193,7 +193,7 @@
 					/>
 				{/if}
 			</div>
-			{#await zenoClient.getOrganizationNames() then oragnizationNames}
+			{#await zenoClient.getOrganizations() then oragnizationNames}
 				{@const availableOrgs = oragnizationNames.filter(
 					(currentOrg) => !projectOrganizations.some((org) => org.id === currentOrg.id)
 				)}

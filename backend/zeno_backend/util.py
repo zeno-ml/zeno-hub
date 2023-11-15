@@ -3,11 +3,19 @@ import os
 
 import cognitojwt
 from fastapi import Request
+from fastapi_cloudauth.cognito import Cognito
 
 from zeno_backend import util
 from zeno_backend.classes.homepage import HomeRequest
 from zeno_backend.classes.user import User
 from zeno_backend.database import select
+
+# function to get the user from cognito
+auth = Cognito(
+    region=os.environ["ZENO_USER_POOL_AUTH_REGION"],
+    userPoolId=os.environ["ZENO_USER_POOL_ID"],
+    client_id=os.environ["ZENO_USER_POOL_CLIENT_ID"],
+)
 
 
 def verify_token(token: str) -> bool:
