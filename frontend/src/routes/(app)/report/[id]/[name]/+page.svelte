@@ -167,7 +167,7 @@
 		>
 			{#each elements as element (element.id)}
 				<ElementContainer
-					bind:element
+					{element}
 					bind:editId
 					bind:dragEnabled
 					bind:showConfirmDelete
