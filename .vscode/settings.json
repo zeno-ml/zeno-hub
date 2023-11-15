@@ -1,5 +1,5 @@
 {
-  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.defaultInterpreterPath": "backend/.venv/bin/python",
   "autoDocstring.docstringFormat": "google",
   "editor.wordWrapColumn": 100,
   "eslint.validate": ["javascript", "javascriptreact", "svelte"],

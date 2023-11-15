@@ -33,7 +33,7 @@ export async function getMetricsForSlices(
 		if (!config) {
 			return Promise.reject('No project selected.');
 		}
-		const res = await zenoClient.getMetricsForSlices(config.uuid, {
+		const res = await zenoClient.getMetricsFiltered(config.uuid, {
 			metricKeys: keysToRequest
 		});
 		keysToRequest.forEach((key, i) => {
