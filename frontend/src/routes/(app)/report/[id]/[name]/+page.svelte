@@ -90,6 +90,10 @@
 		}
 	}}
 />
+<svelte:head>
+	<title>{data.report.name} | Zeno</title>
+	<meta name="description" content={data.report.description || 'Zeno Evaluation Report'} />
+</svelte:head>
 
 {#if reportEdit && data.user !== null}
 	<ReportPopup on:close={() => (reportEdit = false)} user={data.user} />

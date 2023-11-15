@@ -29,6 +29,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>My Hub | Zeno</title>
+	<meta name="description" content="Your projects and reports." />
+</svelte:head>
+
 <HomeSearchBar bind:typeFilter bind:searchText bind:sort />
 <div class="grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
 	{#each data.entries as entry ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}

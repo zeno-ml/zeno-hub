@@ -55,5 +55,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{data.project.name} | Zeno</title>
+	<meta name="description" content={data.project.description || 'Zeno Evaluation Project'} />
+</svelte:head>
+
 <ProjectSidebar user={data.user} />
 <slot />
