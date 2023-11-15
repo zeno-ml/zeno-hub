@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import (
+from zeno_backend.routers import (
     account,
     chart,
     folder,
@@ -42,11 +42,9 @@ def get_server() -> FastAPI:
     """Provide the FastAPI server and specifies its inputs.
 
     Raises:
-    ------
         HTTPException: Something goes wrong server-side.
 
     Returns:
-    -------
         FastAPI: FastAPI endpoint
     """
     app = FastAPI(title="Frontend API", separate_input_output_schemas=False)
