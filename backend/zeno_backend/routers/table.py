@@ -1,6 +1,6 @@
 """FastAPI server endpoints for data-table-related queries."""
 import pandas as pd
-from fastapi import APIRouter, HTTPException, Request, Response, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 import zeno_backend.database.select as select
 import zeno_backend.util as util
@@ -26,8 +26,7 @@ def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
     Returns:
         json: json representation of the requested data.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     filter_sql = table_filter(
         project_uuid, req.model, req.filter_predicates, req.data_ids
     )
@@ -67,8 +66,7 @@ def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
 
     filter_sql = table_filter(
         project_uuid, slice_table_request.model, slice.filter_predicates
@@ -109,8 +107,7 @@ def get_tag_table(tag_table_request: TagTableRequest, request: Request):
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
 
     filter_sql = table_filter(
         project_uuid, tag_table_request.model, data_ids=tag.data_ids

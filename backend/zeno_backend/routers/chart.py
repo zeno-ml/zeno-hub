@@ -5,7 +5,6 @@ from fastapi import (
     Depends,
     HTTPException,
     Request,
-    Response,
     status,
 )
 
@@ -36,8 +35,7 @@ def get_charts(project_uuid: str, request: Request):
     Returns:
         list[Chart]: list of all of a project's charts.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return select.charts(project_uuid)
 
 
@@ -65,8 +63,7 @@ def get_chart(project_uuid: str, chart_id: int, request: Request):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     chart = select.chart(project_uuid, chart_id)
     if chart is None:
         raise HTTPException(

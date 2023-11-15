@@ -4,8 +4,8 @@ import datetime
 
 from fastapi import (
     APIRouter,
+    HTTPException,
     Request,
-    Response,
     status,
 )
 
@@ -40,8 +40,7 @@ def get_models(project_uuid: str, request: Request):
     Returns:
         list[str]: all models associated with a project.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return select.models(project_uuid)
 
 
@@ -60,8 +59,7 @@ def get_columns(project_uuid: str, request: Request):
     Returns:
         list[ZenoColumn]: all columns associated with a project.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return select.columns(project_uuid)
 
 
@@ -82,7 +80,10 @@ def get_home_details(home_request: HomeRequest, req: Request):
     """
     user = util.get_user_from_token(req)
     if user is None and home_request.user_name is not None:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not logged in",
+        )
 
     if (
         home_request.type_filter != EntryTypeFilter.PROJECT
@@ -147,8 +148,7 @@ async def calculate_histograms(
     Returns:
         list[list[HistogramBucket]]: histogram buckets for all requested histograms.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
 
     project_obj = select.project_from_uuid(project_uuid)
     if project_obj is None:
@@ -194,6 +194,5 @@ def filter_string_metadata(project: str, req: StringFilterRequest, request: Requ
     Returns:
         list[str]: the filtered string column data.
     """
-    if not util.project_access_valid(project, request):
-        return Response(status_code=401)
+    util.project_access_valid(project, request)
     return select.filtered_short_string_column_values(project, req)

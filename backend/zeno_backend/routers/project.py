@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 from urllib import parse
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 import zeno_backend.database.copy as copy
 import zeno_backend.database.delete as delete
@@ -58,11 +58,7 @@ def get_project_state(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    if not util.project_access_valid(project_uuid, request):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Project is private",
-        )
+    util.project_access_valid(project_uuid, request)
 
     user = util.get_user_from_token(request)
     return select.project_state(project_uuid, user, project)
@@ -95,8 +91,7 @@ def get_project_uuid(owner_name: str, project_name: str, request: Request):
                 "ERROR: Project " + owner_name + "/" + project_name + " does not exist."
             ),
         )
-    if not util.project_access_valid(uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(uuid, request)
     return uuid
 
 
@@ -117,7 +112,10 @@ def get_projects(current_user=Depends(util.auth.claim())):
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("User not logged in"),
+        )
     return select.projects(user, HomeRequest())
 
 
@@ -132,7 +130,10 @@ def like_project(project_uuid: str, current_user=Depends(util.auth.claim())):
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=("User not logged in"),
+        )
     insert.like_project(user.id, project_uuid)
 
 

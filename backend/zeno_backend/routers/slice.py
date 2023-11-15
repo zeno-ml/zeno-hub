@@ -1,6 +1,6 @@
 """FastAPI server endpoints for slice-related queries."""
 from amplitude import BaseEvent
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
@@ -33,8 +33,7 @@ def get_slices(project: str, request: Request):
     Returns:
         list[Slice]: requested slices.
     """
-    if not util.project_access_valid(project, request):
-        return Response(status_code=401)
+    util.project_access_valid(project, request)
     return select.slices(project)
 
 

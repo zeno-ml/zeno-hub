@@ -2,7 +2,7 @@
 from urllib import parse
 
 from amplitude import BaseEvent
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
@@ -106,7 +106,10 @@ def like_report(report_id: int, current_user=Depends(util.auth.claim())):
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
     insert.like_report(user.id, report_id)
 
 
@@ -174,8 +177,8 @@ def get_slice_element_options(slice_element_spec: SliceElementSpec, request: Req
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+
+    util.project_access_valid(project_uuid, request)
 
     return select.slice_element_options(
         slice, project_uuid, slice_element_spec.model_name
@@ -211,8 +214,7 @@ def get_tag_element_options(tag_element_spec: TagElementSpec, request: Request):
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
 
     return select.tag_element_options(tag, project_uuid, tag_element_spec.model_name)
 
@@ -234,7 +236,10 @@ def add_report(name: str, current_user=Depends(util.auth.claim())):
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
     try:
         id = insert.report(name, user)
     except Exception as exc:
@@ -271,7 +276,10 @@ def add_report_element(
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
     id = insert.report_element(report_id, element)
     if id is None:
         raise HTTPException(

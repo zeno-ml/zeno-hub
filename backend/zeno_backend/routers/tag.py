@@ -5,7 +5,6 @@ from fastapi import (
     Depends,
     HTTPException,
     Request,
-    Response,
     status,
 )
 
@@ -35,8 +34,7 @@ def get_tags(project_uuid: str, request: Request):
     Returns:
         list[Tag]: list of all of a project's tags.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return select.tags(project_uuid)
 
 

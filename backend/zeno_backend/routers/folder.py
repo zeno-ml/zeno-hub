@@ -1,6 +1,6 @@
 """FastAPI server endpoints for folder-related queries."""
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
@@ -27,8 +27,7 @@ def get_folders(project: str, request: Request):
     Returns:
         list[Folder]: all folders for a specific project.
     """
-    if not util.project_access_valid(project, request):
-        return Response(status_code=401)
+    util.project_access_valid(project, request)
     return select.folders(project)
 
 

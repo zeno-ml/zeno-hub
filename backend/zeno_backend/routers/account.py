@@ -4,7 +4,6 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
-    Response,
     status,
 )
 
@@ -117,10 +116,16 @@ def get_user_organizations(current_user=Depends(util.auth.claim())):
 
     Returns:
         list[Organization]: all organizations the user is a member of.
+
+    Raises:
+        HTTPException: error if the user is not found.
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User not found",
+        )
     return select.user_organizations(user)
 
 
@@ -142,7 +147,10 @@ def create_api_key(current_user=Depends(util.auth.claim())):
     """
     user = select.user(current_user["username"])
     if user is None:
-        return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User not found",
+        )
     return insert.api_key(user)
 
 

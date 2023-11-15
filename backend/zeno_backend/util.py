@@ -2,7 +2,7 @@
 import os
 
 import cognitojwt
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from fastapi_cloudauth.cognito import Cognito
 
 from zeno_backend import util
@@ -39,31 +39,38 @@ def verify_token(token: str) -> bool:
         return False
 
 
-def project_access_valid(project: str | None, request: Request) -> bool:
+def project_access_valid(project: str | None, request: Request):
     """Check whether accessing a resource is valid.
 
     Args:
         project (str | None): the project for which to access a resource.
         request (Request): the request to get the access token if needed.
 
-    Returns:
-        bool: whether or not othe project data can be accessed.
+    Throws:
+        HTTPException: if the project is not found or access is not valid.
     """
     if project is None:
-        return False
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found",
+        )
 
     if not select.project_public(project):
         token = request.headers.get("authorization")
         user = util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
-            return False
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
         available_project_ids = map(
             lambda x: x.uuid, select.projects(user, HomeRequest())
         )
         if project not in available_project_ids:
-            return False
-
-    return True
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
 
 
 def report_access_valid(report: int, request: Request) -> bool:
