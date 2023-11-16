@@ -114,11 +114,11 @@ def get_user_organizations(current_user=Depends(util.auth.claim())):
         current_user (Any, optional): user making the request.
             Defaults to Depends(util.auth.claim()).
 
-    Returns:
-        list[Organization]: all organizations the user is a member of.
-
     Raises:
         HTTPException: error if the user is not found.
+
+    Returns:
+        list[Organization]: all organizations the user is a member of.
     """
     user = select.user(current_user["username"])
     if user is None:
