@@ -18,6 +18,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Account | Zeno</title>
+	<meta name="description" content="Account and organization settings." />
+</svelte:head>
+
 <div class="mx-8 flex w-full flex-col py-5">
 	<Header user={data.user} />
 	<h1 class="mb-3 mt-5 text-xl">Account management</h1>
