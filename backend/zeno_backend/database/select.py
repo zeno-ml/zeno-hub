@@ -1056,9 +1056,9 @@ def project_state(
             )
 
         column_results = db.execute_return(
-            sql.SQL("SELECT column_id, name, type, model, data_type FROM {};").format(
-                sql.Identifier(f"{project_uuid}_column_map")
-            ),
+            sql.SQL(
+                "SELECT column_id, name, type, model, data_type FROM {} ORDER BY name;"
+            ).format(sql.Identifier(f"{project_uuid}_column_map")),
         )
 
         columns = list(
@@ -1503,7 +1503,8 @@ def charts(project_uuid: str) -> list[Chart]:
     """
     db = Database()
     chart_results = db.connect_execute_return(
-        "SELECT id, name, type, parameters FROM charts WHERE project_uuid = %s;",
+        "SELECT id, name, type, parameters FROM charts WHERE project_uuid = %s"
+        " ORDER BY created_at;",
         [
             project_uuid,
         ],
@@ -1652,6 +1653,15 @@ def table_data_paginated(
                 sql.Identifier(sort),
                 sql.SQL("DESC" if req.sort[1] else "ASC"),
             )
+        else:
+            id_column = db.execute_return(
+                sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                    sql.Identifier(f"{project}_column_map")
+                ),
+            )
+            if len(id_column) > 0:
+                id_column = id_column[0][0]
+                order_sql = sql.SQL("ORDER BY {} ASC").format(sql.Identifier(id_column))
 
         final_statement = sql.SQL(" ").join(
             [
