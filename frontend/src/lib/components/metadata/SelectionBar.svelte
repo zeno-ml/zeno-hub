@@ -139,8 +139,8 @@
 					<Group>
 						{#each choices as choice}
 							<Button
-								style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
 								variant="outlined"
+								class={selected === choice ? 'bg-grey-lighter' : 'bg-white'}
 								on:click={() => (selected = choice)}>{choice}</Button
 							>
 						{/each}
