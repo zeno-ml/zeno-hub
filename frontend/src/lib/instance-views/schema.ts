@@ -5,6 +5,7 @@ export enum ViewType {
 	'audio' = 'audio',
 	'code' = 'code',
 	'markdown' = 'markdown',
+	'3D' = '3D',
 	// data containers
 	'list' = 'list',
 	'vstack' = 'vstack',
