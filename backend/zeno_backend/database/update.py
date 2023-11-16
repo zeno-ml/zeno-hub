@@ -6,6 +6,7 @@ from psycopg import sql
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
+from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
@@ -226,11 +227,47 @@ def project_metrics(project_config: Project):
         project_config (Project): the configuration of the project.
     """
     with Database() as db:
-        db.execute(
-            "DELETE FROM metrics WHERE project_uuid = %s;",
+        metric_results = db.execute_return(
+            "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
             [project_config.uuid],
         )
-        for metric in project_config.metrics:
+        metrics = list(
+            map(
+                lambda metric: Metric(
+                    id=metric[0],
+                    name=metric[1],
+                    type=metric[2],
+                    columns=metric[3],
+                ),
+                metric_results,
+            )
+        )
+        new_metrics = project_config.metrics
+
+        for metric in metrics:
+            # check if the metric matches one to be added
+            index = next(
+                (
+                    i
+                    for i, new_metric in enumerate(new_metrics)
+                    if new_metric.name == metric.name
+                    and set(new_metric.columns) == set(metric.columns)
+                    and new_metric.type == metric.type
+                ),
+                None,
+            )
+
+            # if there is no match with an existing metric, delete the metric
+            if index is None:
+                db.execute(
+                    "DELETE FROM metrics WHERE project_uuid = %s AND id = %s;",
+                    [project_config.uuid, metric.id],
+                )
+            # if there is a match, we don't have to add the metric
+            else:
+                new_metrics.pop(index)
+
+        for metric in new_metrics:
             db.execute(
                 "INSERT INTO metrics (project_uuid, name, type, columns) VALUES "
                 "(%s, %s, %s, %s);",
