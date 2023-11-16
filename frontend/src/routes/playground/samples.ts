@@ -319,5 +319,25 @@ export const samples: Record<string, { spec: string; data: string }> = {
 			null,
 			2
 		)
+	},
+	'3D-object-classification': {
+		spec: JSON.stringify(
+			{
+				data: { type: '3D' },
+				label: { type: 'text' },
+				output: { type: 'text' }
+			},
+			null,
+			2
+		),
+		data: JSON.stringify(
+			{
+				data: 'https://raw.githubusercontent.com/google/model-viewer/master/packages/shared-assets/models/NeilArmstrong.glb',
+				label: 'astronaut',
+				output: 'astronaut'
+			},
+			null,
+			2
+		)
 	}
 };

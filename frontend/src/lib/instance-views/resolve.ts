@@ -9,6 +9,7 @@ import Markdown from './elements/Markdown.svelte';
 import Message from './elements/Message.svelte';
 import SeparatedValues from './elements/SeparatedValues.svelte';
 import Text from './elements/Text.svelte';
+import ThreeD from './elements/ThreeD.svelte';
 import VStack from './elements/VStack.svelte';
 
 export const elementMap: Record<string, ComponentType> = {
@@ -20,7 +21,8 @@ export const elementMap: Record<string, ComponentType> = {
 	[ViewType.audio]: Audio,
 	[ViewType.code]: Code,
 	[ViewType.message]: Message,
-	[ViewType.separatedValues]: SeparatedValues
+	[ViewType.separatedValues]: SeparatedValues,
+	[ViewType['3D']]: ThreeD
 };
 
 export function isComplexElement(type: string) {
