@@ -29,17 +29,15 @@
 	role="button"
 	class="relative"
 >
-	{#if hovering}
-		<div class="absolute right-0 top-0 h-9 w-9">
-			{#if hovering}
-				<Checkbox
-					checked={$selectionIds?.includes(entryId)}
-					on:click={() =>
-						$selectionIds?.includes(entryId)
-							? selectionIds.set($selectionIds.filter((id) => id !== entryId))
-							: selectionIds.set([...$selectionIds, entryId])}
-				/>
-			{/if}
+	{#if hovering || $selectionIds.includes(entryId)}
+		<div class="absolute right-0 top-0 z-10">
+			<Checkbox
+				checked={$selectionIds.includes(entryId)}
+				on:click={() =>
+					$selectionIds?.includes(entryId)
+						? selectionIds.set($selectionIds.filter((id) => id !== entryId))
+						: selectionIds.set([...$selectionIds, entryId])}
+			/>
 		</div>
 	{/if}
 	<InstanceView

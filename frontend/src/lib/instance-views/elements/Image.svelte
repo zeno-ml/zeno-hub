@@ -22,7 +22,7 @@
 		alt="Image thumbnail for instance {data}"
 	/>
 	<button
-		class="absolute right-0 top-0 hidden rounded-md p-1 hover:bg-primary-ligther group-hover:inline"
+		class="absolute bottom-0 right-0 hidden rounded-md p-1 hover:bg-primary-ligther group-hover:inline"
 		on:click={(e) => {
 			showPopup = true;
 			e.preventDefault();

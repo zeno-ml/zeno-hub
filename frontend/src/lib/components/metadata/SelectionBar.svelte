@@ -25,7 +25,7 @@
 	</div>
 	{#if !$page.url.href.includes('compare')}
 		<div class="flex w-full flex-wrap items-center border-b border-grey-lighter py-2.5">
-			<div class="mr-auto flex">
+			<div class="flex">
 				{#await currentResult then res}
 					{#if res !== undefined && res.length > 0}
 						{#if res[0].metric !== undefined && res[0].metric !== null}
@@ -43,17 +43,26 @@
 				{/await}
 			</div>
 			{#if $selectionIds.length > 0}
-				<button
-					class="my mx-1 mr-4 flex w-fit rounded-lg border-2 border-greenish-light px-2.5 py-1"
-					on:click={() => (showNewTag = true)}
-				>
-					<span>{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected</span>
-					<TrailingIcon class="remove material-icons" on:click={() => selectionIds.set([])}
-						>cancel</TrailingIcon
+				<div class="ml-4 flex items-center">
+					<div class="my flex w-fit rounded-lg border-2 border-greenish-light px-2.5 py-1">
+						<span
+							>{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected</span
+						>
+						<TrailingIcon class="remove material-icons" on:click={() => selectionIds.set([])}
+							>cancel</TrailingIcon
+						>
+					</div>
+					<Button
+						variant="outlined"
+						class="ml-2"
+						on:keydown={() => ({})}
+						on:click={() => (showNewTag = true)}
 					>
-				</button>
+						Create Tag
+					</Button>
+				</div>
 			{/if}
-			<div class="flex items-center">
+			<div class="ml-auto flex items-center">
 				{#if $editTag === undefined}
 					<slot />
 					<Group>
