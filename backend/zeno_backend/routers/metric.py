@@ -3,7 +3,6 @@
 from fastapi import (
     APIRouter,
     Request,
-    Response,
 )
 
 import zeno_backend.database.select as select
@@ -34,8 +33,7 @@ def get_metrics(project_uuid: str, request: Request):
     Returns:
         list[Metric]: all metrics associated with a specific project.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return select.metrics(project_uuid)
 
 
@@ -55,8 +53,7 @@ def get_metrics_filtered(req: MetricRequest, project_uuid: str, request: Request
     Returns:
         list[Metric]: metrics that match the metric request.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     return_metrics: list[GroupMetric] = []
     metrics = select.metrics_by_id([m.metric for m in req.metric_keys], project_uuid)
     for metric_key in req.metric_keys:
@@ -93,8 +90,7 @@ def get_metric_for_tag(metric_key: TagMetricKey, project_uuid: str, request: Req
     Returns:
         GroupMetric: the metric calculation result.
     """
-    if not util.project_access_valid(project_uuid, request):
-        return Response(status_code=401)
+    util.project_access_valid(project_uuid, request)
     filter_sql = table_filter(
         project_uuid, metric_key.model, None, metric_key.tag.data_ids
     )
