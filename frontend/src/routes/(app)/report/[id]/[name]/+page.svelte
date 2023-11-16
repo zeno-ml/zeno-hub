@@ -83,6 +83,14 @@
 	}
 </script>
 
+<svelte:window
+	on:keydown={($event) => {
+		if ($event.key === 'Escape') {
+			editId = -1;
+		}
+	}}
+/>
+
 {#if reportEdit && data.user !== null}
 	<ReportPopup on:close={() => (reportEdit = false)} user={data.user} />
 {/if}

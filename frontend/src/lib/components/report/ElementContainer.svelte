@@ -44,7 +44,12 @@
 	}
 </script>
 
-<div>
+<div
+	on:dblclick={() => (editId = element.id || -1)}
+	aria-label="double-click to edit"
+	role="button"
+	tabindex="0"
+>
 	<div
 		class="relative border-2
 			{editId === element.id ? 'border-primary-mid' : 'border-white'}
