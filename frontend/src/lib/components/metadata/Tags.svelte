@@ -68,7 +68,7 @@
 				<IconButton on:click={() => (showNewTag = true)}>
 					<Icon tag="svg" viewBox="0 0 24 24">
 						{#if $selectionIds !== undefined}
-							<path class="fill-greenish" d={mdiPlusCircle} />
+							<path class="fill-secondary" d={mdiPlusCircle} />
 						{:else}
 							<path class="fill-grey" d={mdiPlus} />
 						{/if}

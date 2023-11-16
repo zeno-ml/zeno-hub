@@ -24,7 +24,7 @@
 	}
 </script>
 
-<div class="my mx-1 w-fit rounded-lg bg-greenish-light px-2.5 py-1">
+<div class="my mx-1 w-fit rounded-lg bg-secondary-light px-2.5 py-1">
 	{$tags.find((tag) => tag.id === tagId)?.tagName}
 	<TrailingIcon class="remove material-icons" on:click={cancelClicked}>cancel</TrailingIcon>
 </div>

@@ -18,9 +18,9 @@ export default {
 				DEFAULT: 'rgb(245 245 245)',
 				light: '#fbfbfa'
 			},
-			greenish: {
-				DEFAULT: '#61988e',
-				light: '#d0ebe6'
+			secondary: {
+				DEFAULT: '#2A1B9A',
+				light: '#F2F1FB'
 			},
 			grey: {
 				DEFAULT: '#333333',

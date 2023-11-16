@@ -52,7 +52,7 @@
 				{:else}
 					<div class="flex items-center" style="margin-right: 10px">
 						<p style="margin: auto; margin-right: 10px">Editing</p>
-						<div class="my width-fit margin-auto mx-1 rounded bg-greenish-light px-2.5 py-1">
+						<div class="my width-fit margin-auto mx-1 rounded bg-secondary-light px-2.5 py-1">
 							{$editTag.tagName}
 						</div>
 					</div>

@@ -59,7 +59,7 @@
 				{api_key}
 			</button>
 			{#if copied}
-				<p out:fade={{ delay: 250, duration: 300 }} class="ml-3 text-greenish">
+				<p out:fade={{ delay: 250, duration: 300 }} class="ml-3 text-secondary">
 					Copied API key to clipboard!
 				</p>
 			{/if}
