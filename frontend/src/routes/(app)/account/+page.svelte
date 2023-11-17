@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { AuthUser } from '$lib/auth/types';
 	import Header from '$lib/components/general/Header.svelte';
+	import Help from '$lib/components/general/Help.svelte';
 	import Account from '$lib/components/settings/Account.svelte';
 	import OrganizationsTable from '$lib/components/settings/OrganizationsTable.svelte';
 	import type { Organization, User } from '$lib/zenoapi';
@@ -22,6 +23,10 @@
 	<title>Account | Zeno</title>
 	<meta name="description" content="Account and organization settings." />
 </svelte:head>
+
+<div class="absolute bottom-6 right-6">
+	<Help />
+</div>
 
 <div class="flex w-full flex-col">
 	<Header user={data.user} />
