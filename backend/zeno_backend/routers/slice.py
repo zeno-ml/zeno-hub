@@ -104,11 +104,6 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
         int: id of the newly added slice.
     """
     id = insert.slice(project, slice)
-    if id is None:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to insert slice",
-        )
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Slice Created",

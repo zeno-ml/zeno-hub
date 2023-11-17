@@ -73,7 +73,7 @@ def project_access_valid(project: str | None, request: Request):
             )
 
 
-def report_access_valid(report: int, request: Request) -> bool:
+def report_access_valid(report: int, request: Request):
     """Check whether accessing a resource is valid.
 
     Args:
@@ -87,12 +87,16 @@ def report_access_valid(report: int, request: Request) -> bool:
         token = request.headers.get("authorization")
         user = util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
-            return False
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
         available_report_ids = map(lambda x: x.id, select.reports(user, HomeRequest()))
         if report not in available_report_ids:
-            return False
-
-    return True
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
 
 
 def get_user_from_token(request: Request) -> User | None:

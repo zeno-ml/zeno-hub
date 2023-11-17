@@ -3,6 +3,7 @@ import json
 import secrets
 import uuid
 
+from fastapi import HTTPException, status
 from pgpq import ArrowToPostgresBinaryEncoder
 from psycopg import sql
 from pyarrow import RecordBatch, Schema
@@ -525,7 +526,7 @@ def folder(project: str, name: str) -> int | None:
         return id[0][0]
 
 
-def slice(project: str, req: Slice) -> int | None:
+def slice(project: str, req: Slice) -> int:
     """Add a slice to an existing project.
 
     Args:
@@ -549,7 +550,10 @@ def slice(project: str, req: Slice) -> int | None:
     if ids is not None:
         return ids[0][0]
     else:
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="ERROR: Failed to insert slice.",
+        )
 
 
 async def all_slices_for_column(

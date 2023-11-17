@@ -117,6 +117,9 @@ export class ZenoService {
 	 * current_user (Any, optional): user making the request.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
+	 * Raises:
+	 * HTTPException: error if the user is not found.
+	 *
 	 * Returns:
 	 * list[Organization]: all organizations the user is a member of.
 	 * @returns Organization Successful Response
@@ -772,7 +775,7 @@ export class ZenoService {
 	 * Get the metric for a specific tag.
 	 *
 	 * Args:
-	 * metric_key (TagMetricKey): specification of which tag to calculate the metric for.
+	 * metric_key (TagMetricKey): specification for which tag to calculate the metric.
 	 * project_uuid (str): UUID of the project to calculate the metric for.
 	 * request (Request): http request to get user information from.
 	 *

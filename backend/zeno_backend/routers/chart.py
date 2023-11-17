@@ -58,17 +58,8 @@ def get_chart(project_uuid: str, chart_id: int, request: Request):
     Returns:
         ChartResponse: chart spec and data.
     """
-    project = select.project_from_uuid(project_uuid)
-    if project is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-        )
     util.project_access_valid(project_uuid, request)
     chart = select.chart(project_uuid, chart_id)
-    if chart is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
-        )
     return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
 
 
@@ -92,10 +83,6 @@ def get_chart_data(project_uuid: str, chart_id: int, request: Request):
         str: data for the chart in json representation.
     """
     chart = select.chart(project_uuid, chart_id)
-    if chart is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Chart not found"
-        )
     return chart_data(chart, project_uuid)
 
 

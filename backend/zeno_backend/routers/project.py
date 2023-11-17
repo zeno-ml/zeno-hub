@@ -53,11 +53,6 @@ def get_project_state(
         ProjectState | None: current state of the project.
     """
     project = select.project_from_uuid(project_uuid)
-    if project is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
-        )
-
     util.project_access_valid(project_uuid, request)
 
     user = util.get_user_from_token(request)
@@ -184,7 +179,7 @@ def add_project_user(project_uuid: str, user: User):
         user (User): user to be added to the project.
     """
     project_obj = select.project_from_uuid(project_uuid)
-    if project_obj is not None and project_obj.owner_name != user.name:
+    if project_obj.owner_name != user.name:
         insert.project_user(project_uuid, user)
 
 
@@ -272,7 +267,7 @@ def delete_project(project_uuid: str, current_user=Depends(util.auth.claim())):
             Defaults to Depends(util.auth.claim()).
     """
     project_obj = select.project_from_uuid(project_uuid)
-    if project_obj is None or project_obj.owner_name != current_user["username"]:
+    if project_obj.owner_name != current_user["username"]:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=("ERROR: Only project owners can delete projects."),
