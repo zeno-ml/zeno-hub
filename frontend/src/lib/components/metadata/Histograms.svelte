@@ -3,11 +3,13 @@
 	import MetadataCell from '$lib/components/metadata/cells/MetadataCell.svelte';
 	import {
 		columns,
+		filterSelection,
 		metric,
 		metricRange,
 		model,
 		project,
 		requestingHistogramCounts,
+		selectionIds,
 		selectionPredicates,
 		tagIds
 	} from '$lib/stores';
@@ -62,8 +64,11 @@
 		);
 
 		requestingHistogramCounts.set(true);
-		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const dataIds = [...new Set(secureTagIds)];
+		const secureIds = [
+			...($tagIds === undefined ? [] : $tagIds),
+			...($filterSelection ? $selectionIds : [])
+		];
+		const dataIds = [...new Set(secureIds)];
 		zenoClient
 			.calculateHistograms($project.uuid, {
 				columns: requestColumns,

@@ -6,10 +6,12 @@
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
+		filterSelection,
 		metric,
 		model,
 		project,
 		rowsPerPage,
+		selectionIds,
 		selectionPredicates,
 		selections,
 		tagIds
@@ -72,6 +74,8 @@
 		$comparisonColumn;
 		$rowsPerPage;
 		$compareSort;
+		$selectionIds;
+		$filterSelection;
 		$selectionPredicates;
 		$tagIds;
 		$selections.tags;
@@ -137,8 +141,11 @@
 			};
 		}
 
-		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const dataIds = [...new Set(secureTagIds)];
+		const secureIds = [
+			...($tagIds === undefined ? [] : $tagIds),
+			...($filterSelection ? $selectionIds : [])
+		];
+		const dataIds = [...new Set(secureIds)];
 		getFilteredTable(
 			$project.uuid,
 			$columns,

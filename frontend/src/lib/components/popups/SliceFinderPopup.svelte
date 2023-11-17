@@ -3,8 +3,10 @@
 	import {
 		columns,
 		comparisonModel,
+		filterSelection,
 		model,
 		project,
+		selectionIds,
 		selectionPredicates,
 		selections,
 		tagIds
@@ -103,8 +105,11 @@
 		}
 		sliceFinderMessage = 'Generating Slices...';
 		if (metricColumn !== undefined) {
-			const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-			const dataIds = [...new Set(secureTagIds)];
+			const secureIds = [
+				...($tagIds === undefined ? [] : $tagIds),
+				...($filterSelection ? $selectionIds : [])
+			];
+			const dataIds = [...new Set(secureIds)];
 			sliceFinderReturn = await zenoClient.runSliceFinder($project.uuid, {
 				metricColumn,
 				searchColumns,

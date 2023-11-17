@@ -3,9 +3,11 @@
 	import { getFilteredTable } from '$lib/api/table';
 	import {
 		columns,
+		filterSelection,
 		model,
 		project,
 		rowsPerPage,
+		selectionIds,
 		selectionPredicates,
 		selections,
 		sort,
@@ -55,6 +57,8 @@
 		$model;
 		$sort;
 		$tagIds;
+		$selectionIds;
+		$filterSelection;
 		updateTable();
 	}
 
@@ -78,8 +82,11 @@
 				predicates: [predicates]
 			};
 		}
-		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const dataIds = [...new Set(secureTagIds)];
+		const secureIds = [
+			...($tagIds === undefined ? [] : $tagIds),
+			...($filterSelection ? $selectionIds : [])
+		];
+		const dataIds = [...new Set(secureIds)];
 		getFilteredTable(
 			$project.uuid,
 			$columns,

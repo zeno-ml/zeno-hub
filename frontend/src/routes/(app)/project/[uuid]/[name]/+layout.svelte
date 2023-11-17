@@ -5,6 +5,8 @@
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
+		editTag,
+		filterSelection,
 		folders,
 		metric,
 		metricRange,
@@ -40,6 +42,8 @@
 		metricRange.set(data.metricRange);
 		selections.set(data.selections);
 		selectionIds.set([]);
+		filterSelection.set(false);
+		editTag.set(undefined);
 
 		model.subscribe((mod) => {
 			if ($comparisonModel && $comparisonModel === mod) {

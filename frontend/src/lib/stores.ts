@@ -44,6 +44,7 @@ export const editTag: Writable<Tag | undefined> = writable(undefined);
 
 // The ids directly selected by the user.
 export const selectionIds: Writable<string[]> = writable([]);
+export const filterSelection: Writable<boolean> = writable(false);
 export const selections: Writable<{
 	metadata: Record<string, FilterPredicateGroup>;
 	slices: number[];
