@@ -81,20 +81,15 @@
 
 <div class="mb-2">
 	{#each [...$tags.values()] as t}
-		{#if $editTag !== undefined && $editTag.id === t.id}
-			<div style="display: flex; align-items: center">
+		<div class="mb-2 flex items-center">
+			{#if $editTag !== undefined && $editTag.id === t.id}
 				<div class="mr-2 w-full">
 					<TagCell tag={t} />
 				</div>
-				<Button
-					style="background-color: var(--N1); margin-top: 5px; color: white; "
-					on:click={saveChanges}
-				>
-					Done
-				</Button>
-			</div>
-		{:else}
-			<TagCell tag={t} />
-		{/if}
+				<Button class="bg-secondary" style="color: white; " on:click={saveChanges}>Done</Button>
+			{:else}
+				<TagCell tag={t} />
+			{/if}
+		</div>
 	{/each}
 </div>

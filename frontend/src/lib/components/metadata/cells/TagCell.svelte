@@ -151,7 +151,7 @@
 	/>
 {/if}
 <button
-	class="parent relative mt-1 flex h-9 w-full items-center justify-between overflow-visible rounded-2xl border border-grey-lighter px-2.5 {selected
+	class="parent relative flex h-9 w-full items-center justify-between overflow-visible rounded-2xl border border-grey-lighter px-2.5 {selected
 		? 'bg-secondary-light'
 		: ''}"
 	on:click={setSelected}
