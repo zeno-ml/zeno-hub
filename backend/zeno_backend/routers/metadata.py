@@ -150,10 +150,6 @@ async def calculate_histograms(
     """
     util.project_access_valid(project_uuid, request)
 
-    project_obj = select.project_from_uuid(project_uuid)
-    if project_obj is None:
-        return []
-
     filter_sql = table_filter(
         project_uuid, req.model, req.filter_predicates, req.data_ids
     )

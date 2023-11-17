@@ -56,10 +56,6 @@ def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
         json: json representation of the requested data.
     """
     slice = select.slice_by_id(slice_table_request.slice_id)
-    if slice is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
-        )
     project_uuid = slice.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -97,10 +93,6 @@ def get_tag_table(tag_table_request: TagTableRequest, request: Request):
         json: json representation of the requested data.
     """
     tag = select.tag_by_id(tag_table_request.tag_id)
-    if tag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-        )
     project_uuid = tag.project_uuid
     if project_uuid is None:
         raise HTTPException(

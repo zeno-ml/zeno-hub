@@ -2,6 +2,7 @@
 import asyncio
 import json
 
+from fastapi import HTTPException, status
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
@@ -457,7 +458,7 @@ def report_count(user: User | None = None) -> int:
     return 0
 
 
-def project_uuid(owner_name: str, project_name: str) -> str | None:
+def project_uuid(owner_name: str, project_name: str) -> str:
     """Get the project uuid given an owner and project name.
 
     Args:
@@ -476,6 +477,11 @@ def project_uuid(owner_name: str, project_name: str) -> str | None:
             "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
             [project_name, owner_id[0][0]],
         )
+        if len(project_uuid) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="ERROR: Project not found.",
+            )
         return str(project_uuid[0][0])
 
 
@@ -531,7 +537,7 @@ def api_key_exists(api_key: str) -> bool:
         raise Exception("Error while checking whether API key exists.")
 
 
-def user_by_api_key(api_key: str) -> User | None:
+def user_by_api_key(api_key: str) -> User:
     """Get the user ID given an API key.
 
     Args:
@@ -547,11 +553,15 @@ def user_by_api_key(api_key: str) -> User | None:
         "SELECT id, name, cognito_id FROM users WHERE api_key_hash = %s;",
         [api_key_hash],
     )
-    if len(user_res) > 0:
+    if len(user_res) == 1:
         return User(
             id=int(user_res[0][0]), name=str(user_res[0][1]), cognito_id=user_res[0][2]
         )
-    return None
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="ERROR: Invalid API key. Double check your API key or generate"
+        + " a new one at https://hub.zenoml.com/account.",
+    )
 
 
 def user_name_by_api_key(api_key: str) -> str | None:
@@ -638,7 +648,7 @@ def report_id(owner: str, name: str) -> int | None:
             return id[0][0]
 
 
-def report_response(id: int, user: User | None) -> ReportResponse | None:
+def report_response(id: int, user: User | None) -> ReportResponse:
     """Get the report data given a report ID.
 
     Args:
@@ -655,7 +665,10 @@ def report_response(id: int, user: User | None) -> ReportResponse | None:
             [id],
         )
         if len(report_result) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Report could not be found.",
+            )
         else:
             report_result = report_result[0]
 
@@ -663,7 +676,10 @@ def report_response(id: int, user: User | None) -> ReportResponse | None:
             "SELECT name FROM users WHERE id = %s;", [report_result[2]]
         )
         if len(owner_name) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Could not fetch owner of project.",
+            )
         else:
             owner_name = owner_name[0][0]
 
@@ -852,7 +868,7 @@ def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
     )
 
 
-def project_from_uuid(project_uuid: str) -> Project | None:
+def project_from_uuid(project_uuid: str) -> Project:
     """Get the project data given a UUID.
 
     Args:
@@ -869,7 +885,10 @@ def project_from_uuid(project_uuid: str) -> Project | None:
             [project_uuid],
         )
         if len(project_result) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Project could not be found.",
+            )
         project_result = project_result[0]
         owner_result = db.execute_return(
             "SELECT name from users WHERE id = %s;", [project_result[2]]
@@ -889,9 +908,14 @@ def project_from_uuid(project_uuid: str) -> Project | None:
                 created_at=project_result[7].isoformat(),
                 updated_at=project_result[8].isoformat(),
             )
+        else:
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Could not load project owner.",
+            )
 
 
-def report_from_id(report_id: int) -> Report | None:
+def report_from_id(report_id: int) -> Report:
     """Get the report data given a ID.
 
     Args:
@@ -907,7 +931,10 @@ def report_from_id(report_id: int) -> Report | None:
             [report_id],
         )
         if len(report_result) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Report could not be found.",
+            )
         else:
             report_result = report_result[0]
         owner_result = db.execute_return(
@@ -932,6 +959,11 @@ def report_from_id(report_id: int) -> Report | None:
                 description=str(report_result[4]),
                 created_at=report_result[5].isoformat(),
                 updated_at=report_result[6].isoformat(),
+            )
+        else:
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Could not load report owner.",
             )
 
 
@@ -1294,7 +1326,7 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
     return ret
 
 
-def slice_by_id(slice_id: int) -> Slice | None:
+def slice_by_id(slice_id: int) -> Slice:
     """Get a single slice by its ID.
 
     Args:
@@ -1310,7 +1342,9 @@ def slice_by_id(slice_id: int) -> Slice | None:
     )
 
     if len(slice_result) == 0:
-        return None
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Slice could not be found."
+        )
 
     return Slice(
         id=slice_result[0][0],
@@ -1324,7 +1358,7 @@ def slice_by_id(slice_id: int) -> Slice | None:
     )
 
 
-def tag_by_id(tag_id: int) -> Tag | None:
+def tag_by_id(tag_id: int) -> Tag:
     """Get a single tag by its ID.
 
     Args:
@@ -1340,7 +1374,9 @@ def tag_by_id(tag_id: int) -> Tag | None:
         )
 
         if len(tag_result) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Tag could not be found."
+            )
         else:
             tag_result = tag_result[0]
 
@@ -1461,7 +1497,7 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     )
 
 
-def chart(project_uuid: str, chart_id: int):
+def chart(project_uuid: str, chart_id: int) -> Chart:
     """Get a project chart by its ID.
 
     Args:
@@ -1482,7 +1518,9 @@ def chart(project_uuid: str, chart_id: int):
         ],
     )
     if len(chart_result) == 0:
-        return None
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Chart could not be found."
+        )
     return Chart(
         id=chart_result[0][0],
         name=chart_result[0][1],
@@ -1768,7 +1806,7 @@ def slice_element_options(
 
 def tag_element_options(
     tag: Tag, project_uuid: str, model_name: str | None
-) -> TagElementOptions | None:
+) -> TagElementOptions:
     """Get options to render tag element in reports.
 
     Args:
@@ -1795,7 +1833,10 @@ def tag_element_options(
             [project_uuid],
         )
         if len(project) == 0:
-            return None
+            raise HTTPException(
+                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "ERROR: Could not find corresponding project.",
+            )
 
         owner_name = db.execute_return(
             "SELECT name FROM users WHERE id = %s", [project[0][6]]

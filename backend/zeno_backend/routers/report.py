@@ -66,15 +66,7 @@ def get_report(id: int, request: Request):
         Report: the requested report.
     """
     rep = select.report_response(id, user=util.get_user_from_token(request))
-    if not rep:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Report not found"
-        )
-    if not util.report_access_valid(rep.report.id, request):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Report is private",
-        )
+    util.report_access_valid(rep.report.id, request)
     return rep
 
 
@@ -168,10 +160,6 @@ def get_slice_element_options(slice_element_spec: SliceElementSpec, request: Req
         SliceElementOptions | None: options of a report's slice element.
     """
     slice = select.slice_by_id(slice_element_spec.slice_id)
-    if slice is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Slice not found"
-        )
     project_uuid = slice.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -204,10 +192,6 @@ def get_tag_element_options(tag_element_spec: TagElementSpec, request: Request):
         TagElementOptions | None: options of a report's tag element.
     """
     tag = select.tag_by_id(tag_element_spec.tag_id)
-    if tag is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found"
-        )
     project_uuid = tag.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -215,7 +199,6 @@ def get_tag_element_options(tag_element_spec: TagElementSpec, request: Request):
         )
 
     util.project_access_valid(project_uuid, request)
-
     return select.tag_element_options(tag, project_uuid, tag_element_spec.model_name)
 
 
@@ -307,7 +290,7 @@ def add_report_user(report_id: int, user: User):
         user (User): user to be added to the report.
     """
     report_obj = select.report_from_id(report_id)
-    if report_obj is not None and report_obj.owner_name != user.name:
+    if report_obj.owner_name != user.name:
         insert.report_user(report_id, user)
 
 
@@ -398,7 +381,7 @@ def delete_report(report_id: int, current_user=Depends(util.auth.claim())):
     """
     report_obj = select.report_from_id(report_id)
     # make sure only project owners can delete a project
-    if report_obj is None or report_obj.owner_name != current_user["username"]:
+    if report_obj.owner_name != current_user["username"]:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
         )

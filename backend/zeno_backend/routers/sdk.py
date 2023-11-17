@@ -98,26 +98,12 @@ def create_project(
         api_key (str, optional): API key.
     """
     user = select.user_by_api_key(api_key)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=(
-                "ERROR: Invalid API key. Double check your API key or generate"
-                + " a new one at https://hub.zenoml.com/account."
-            ),
-        )
 
-    if user is not None and select.project_exists(user.id, project.name):
+    if select.project_exists(user.id, project.name):
         project_uuid = select.project_uuid(user.name, project.name)
-        if project_uuid is not None:
-            project.uuid = project_uuid
-            update.project(project)
-            update.project_metrics(project)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=("ERROR: Project already exists but could not be updated."),
-            )
+        project.uuid = project_uuid
+        update.project(project)
+        update.project_metrics(project)
     else:
         project.uuid = str(uuid.uuid4())
         insert.project(project, user.id)
