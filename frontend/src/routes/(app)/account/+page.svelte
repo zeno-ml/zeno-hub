@@ -23,13 +23,15 @@
 	<meta name="description" content="Account and organization settings." />
 </svelte:head>
 
-<div class="mx-8 flex w-full flex-col py-5">
+<div class="flex w-full flex-col">
 	<Header user={data.user} />
-	<h1 class="mb-3 mt-5 text-xl">Account management</h1>
-	<Account name={cognitoUser.name} email={cognitoUser.email} />
-	<hr class="mt-5 text-grey-lighter" />
-	<OrganizationsTable {organizations} {user} />
-	<div class="mt-2">
-		<Button variant="raised" class="mb-2" on:click={logout}>Log Out</Button>
+	<div class="mx-6 mb-6">
+		<h1 class="mb-3 mt-2 text-xl">Account management</h1>
+		<Account name={cognitoUser.name} email={cognitoUser.email} />
+		<hr class="mt-5 text-grey-lighter" />
+		<OrganizationsTable {organizations} {user} />
+		<div class="mt-2">
+			<Button variant="raised" class="mb-2" on:click={logout}>Log Out</Button>
+		</div>
 	</div>
 </div>

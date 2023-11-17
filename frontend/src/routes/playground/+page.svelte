@@ -36,7 +36,7 @@
 	}
 </script>
 
-<div class="absolute bottom-4 right-0">
+<div class="absolute bottom-4 right-4">
 	<Help docsLink="https://zenoml.com/docs/views/" />
 </div>
 

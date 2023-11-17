@@ -14,14 +14,15 @@
 	<NewReportPopup on:close={() => (showNewReport = false)} bind:showNewReport />
 {/if}
 
-<div class="absolute bottom-4 right-0">
+<div class="absolute bottom-6 right-6">
 	<Help />
 </div>
-<div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
+
+<div class="flex h-full flex-grow flex-col">
 	<Header user={data.user} bind:showNewReport />
 	{#if isExplore}
 		<div
-			class="mt-4 flex w-full flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
+			class="mx-6 mt-4 flex w-full flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
 		>
 			<div class="p-6">
 				{#if !data.user}
@@ -86,7 +87,7 @@
 			</div>
 		</div>
 	{/if}
-	<div class="flex min-h-0 flex-col">
+	<div class="mx-6 flex min-h-0 flex-col">
 		<slot />
 	</div>
 </div>

@@ -19,7 +19,7 @@
 	const exploreTab = $page.route.id === '/(app)/home';
 </script>
 
-<div class="flex h-8 items-center justify-between">
+<div class="mx-6 my-5 flex h-8 items-center justify-between">
 	<div class="flex h-full items-center">
 		<a href="/" class="shrink-0">
 			<img src="/zeno-logo.png" class="h-8" alt="diamond tesselation logo" />

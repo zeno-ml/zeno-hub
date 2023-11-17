@@ -13,7 +13,7 @@
 </script>
 
 <div
-	class="relative z-20 flex flex-col items-end rounded-l border-y border-l border-primary-dark bg-white"
+	class="relative z-20 flex flex-col items-end rounded-full border border-l border-primary-dark bg-white"
 	transition:fade={{ delay: 1000, duration: 1000 }}
 >
 	<IconButton on:click={() => (showOptions = !showOptions)}>
