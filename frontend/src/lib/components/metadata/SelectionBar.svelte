@@ -113,7 +113,7 @@
 							}
 						}}
 					>
-						{$editTag === undefined ? 'Create Tag' : 'Done'}
+						{$editTag === undefined ? 'Create tag' : 'Update tag'}
 					</Button>
 				</div>
 			{/if}
