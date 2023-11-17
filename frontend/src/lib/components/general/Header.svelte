@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { tooltip } from '$lib/util/tooltip';
 	import type { Report, User, ZenoService } from '$lib/zenoapi';
 	import { mdiFileChartOutline, mdiPlus } from '@mdi/js';
 	import Button from '@smui/button';
 	import { getContext } from 'svelte';
 	import LikeButton from './LikeButton.svelte';
+	import UserButton from './UserButton.svelte';
 
 	export let user: User | null = null;
 	export let report: Report | null = null;
@@ -16,7 +15,6 @@
 	export let reportEdit = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-	const exploreTab = $page.route.id === '/(app)/home';
 </script>
 
 <div class="flex h-8 items-center justify-between">
@@ -49,34 +47,14 @@
 			</div>
 		{/if}
 	</div>
-	<!-- round div with the first letter of the username in the middle -->
 	<div class="flex h-full shrink-0 items-center">
-		{#if user}
-			{#if $page.route.id?.startsWith('/(app)/home')}
-				<Button
-					class="mr-3 h-full"
-					variant="outlined"
-					on:click={() => (exploreTab ? goto('/') : goto('/home'))}
-					>{exploreTab ? 'My Hub' : 'Explore'}</Button
-				>
-			{/if}
-			{#if report && report.editor}
-				<Button
-					class="mr-4 mt-2 shrink-0 sm:mt-0"
-					variant="raised"
-					on:click={() => (reportEdit = true)}>Settings</Button
-				>
-			{/if}
-			<button
-				class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-dark font-extrabold capitalize text-white transition hover:bg-primary"
-				use:tooltip={{ text: 'Account Settings' }}
-				on:click={() => goto('/account')}
+		{#if report && report.editor}
+			<Button
+				class="mr-4 mt-2 shrink-0 sm:mt-0"
+				variant="outlined"
+				on:click={() => (reportEdit = true)}>Settings</Button
 			>
-				{user.name[0]}
-			</button>
-		{:else}
-			<Button class="mr-3 h-full" variant="raised" on:click={() => goto('/signup')}>Sign Up</Button>
-			<Button class="h-full" variant="outlined" on:click={() => goto('/login')}>Log In</Button>
 		{/if}
+		<UserButton {user} />
 	</div>
 </div>
