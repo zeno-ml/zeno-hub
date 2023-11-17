@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/components/general/Header.svelte';
+	import Help from '$lib/components/general/Help.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
@@ -94,6 +95,10 @@
 	<title>{data.report.name} | Zeno</title>
 	<meta name="description" content={data.report.description || 'Zeno Evaluation Report'} />
 </svelte:head>
+
+<div class="absolute bottom-4 right-4">
+	<Help />
+</div>
 
 {#if reportEdit && data.user !== null}
 	<ReportPopup on:close={() => (reportEdit = false)} user={data.user} />

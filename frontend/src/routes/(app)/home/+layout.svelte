@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Header from '$lib/components/general/Header.svelte';
+	import Help from '$lib/components/general/Help.svelte';
 	import NewReportPopup from '$lib/components/popups/NewReportPopup.svelte';
 
 	export let data;
@@ -13,6 +14,9 @@
 	<NewReportPopup on:close={() => (showNewReport = false)} bind:showNewReport />
 {/if}
 
+<div class="absolute bottom-4 right-4">
+	<Help />
+</div>
 <div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
 	<Header user={data.user} bind:showNewReport />
 	{#if isExplore}
