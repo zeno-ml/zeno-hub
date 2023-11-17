@@ -10,6 +10,7 @@
 	export let dataColumn: string | undefined | null;
 	export let labelColumn: string | undefined | null;
 	export let modelColumn: string | undefined | null;
+	export let highlighted: boolean = false;
 
 	const ajv = new Ajv();
 	ajv.addSchema(schema);
@@ -72,7 +73,11 @@
 		{/if}
 	</table>
 {:else}
-	<div class="overflow-x-auto break-words rounded border border-grey-lighter p-4">
+	<div
+		class="overflow-x-auto break-words rounded border border-grey-lighter p-4 {highlighted
+			? 'border-primary'
+			: ''}"
+	>
 		{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
 			<div class="flex {isComplexElement(viewSpec.data.type) ? 'flex-col' : 'flex-row'}">
 				<svelte:component

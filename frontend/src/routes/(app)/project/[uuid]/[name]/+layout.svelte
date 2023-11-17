@@ -5,6 +5,8 @@
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
+		editTag,
+		filterSelection,
 		folders,
 		metric,
 		metricRange,
@@ -13,6 +15,7 @@
 		models,
 		project,
 		rowsPerPage,
+		selectionIds,
 		selections,
 		slices,
 		tags
@@ -38,6 +41,9 @@
 		compareSort.set(data.compareSort);
 		metricRange.set(data.metricRange);
 		selections.set(data.selections);
+		selectionIds.set([]);
+		filterSelection.set(false);
+		editTag.set(undefined);
 
 		model.subscribe((mod) => {
 			if ($comparisonModel && $comparisonModel === mod) {

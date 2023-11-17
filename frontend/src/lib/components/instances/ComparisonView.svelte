@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
-	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		compareSort,
 		comparisonColumn,
 		comparisonModel,
+		filterSelection,
 		metric,
 		model,
 		project,
@@ -21,6 +21,7 @@
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
+	import OptionsInstanceView from '../../instance-views/OptionsInstanceView.svelte';
 
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
 	export let modelBResult: Promise<GroupMetric[] | undefined>;
@@ -74,6 +75,7 @@
 		$rowsPerPage;
 		$compareSort;
 		$selectionIds;
+		$filterSelection;
 		$selectionPredicates;
 		$tagIds;
 		$selections.tags;
@@ -139,9 +141,11 @@
 			};
 		}
 
-		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		const secureIds = [
+			...($tagIds === undefined ? [] : $tagIds),
+			...($filterSelection ? $selectionIds : [])
+		];
+		const dataIds = [...new Set(secureIds)];
 		getFilteredTable(
 			$project.uuid,
 			$columns,
@@ -269,7 +273,7 @@
 							{modelValueAndDiff($model, tableContent)}
 						</p>
 						<div class="instance">
-							<InstanceView
+							<OptionsInstanceView
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}
@@ -284,7 +288,7 @@
 							{modelValueAndDiff($comparisonModel, tableContent)}
 						</p>
 						<div class="instance">
-							<InstanceView
+							<OptionsInstanceView
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}

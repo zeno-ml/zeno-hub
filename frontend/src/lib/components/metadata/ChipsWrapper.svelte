@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { project, selectionIds, selectionPredicates, selections, tagIds } from '$lib/stores';
+	import { project, selectionPredicates, selections, tagIds } from '$lib/stores';
 	import { Join, type FilterPredicate } from '$lib/zenoapi';
 	import Button from '@smui/button';
 	import SlicePopup from '../popups/SlicePopup.svelte';
-	import IdsChip from './chips/IdsChip.svelte';
 	import MetadataChip from './chips/MetadataChip.svelte';
 	import SliceChip from './chips/SliceChip.svelte';
 	import TagChip from './chips/TagChip.svelte';
@@ -19,7 +18,7 @@
 	<SlicePopup on:close={() => (showNewSlice = false)} />
 {/if}
 <div class="height-fit flex flex-wrap items-center py-1">
-	{#if $selections.slices.length + $selections.tags.length + filters.length === 0 && $selectionIds === undefined}
+	{#if $selections.slices.length + $selections.tags.length + filters.length === 0}
 		<p style="margin: 0px">
 			Filter by selecting slices or interacting with the feature distribution charts.
 		</p>
@@ -33,10 +32,7 @@
 		{#each $selections.tags as tagId}
 			<TagChip {tagId} />
 		{/each}
-		{#if $selectionIds !== undefined}
-			<IdsChip />
-		{/if}
-		{#if $selectionPredicates !== undefined || $tagIds !== undefined || $selectionIds !== undefined}
+		{#if $selectionPredicates !== undefined || $tagIds !== undefined}
 			{#if $project.editor}
 				<Button
 					variant="outlined"
@@ -63,7 +59,6 @@
 						});
 						return { slices: [], metadata: { ...m.metadata }, tags: [] };
 					});
-					selectionIds.set(undefined);
 					tagIds.set(undefined);
 				}}
 			>

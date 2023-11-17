@@ -1,6 +1,15 @@
 <script lang="ts">
 	import Confirm from '$lib/components/popups/Confirm.svelte';
-	import { editTag, metric, model, project, selections, tagIds, tags } from '$lib/stores';
+	import {
+		editTag,
+		metric,
+		model,
+		project,
+		selectionIds,
+		selections,
+		tagIds,
+		tags
+	} from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { Join, ZenoService, type Tag, type TagMetricKey } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
@@ -184,6 +193,7 @@
 										e.stopPropagation();
 										showOptions = false;
 										editTag.set(tag);
+										selectionIds.set(tag.dataIds);
 									}}
 								>
 									<Icon style="font-size: 18px;" class="material-icons">edit</Icon>&nbsp;

@@ -2,7 +2,7 @@
 	import SelectionBar from '$lib/components/metadata/SelectionBar.svelte';
 	import {
 		comparisonModel,
-		editTag,
+		filterSelection,
 		metric,
 		model,
 		project,
@@ -34,16 +34,14 @@
 	let modelBResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let numberOfInstances = 0;
 
-	$: secureTagIds = $tagIds === undefined ? [] : $tagIds;
-	$: secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-
-	// change selected to table if a tag is edited
-	$: selected = $editTag !== undefined ? 'table' : selected;
+	$: secureIds = [
+		...($tagIds === undefined ? [] : $tagIds),
+		...($filterSelection ? $selectionIds : [])
+	];
 	$: currentResult = zenoClient.getMetricsFiltered($project.uuid, {
 		metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
-		dataIds: [...new Set([...secureTagIds, ...secureSelectionIds])]
+		dataIds: [...new Set(secureIds)]
 	});
-
 	$: modelAResult = compare
 		? getCompareResults($model, $metric, $selectionPredicates)
 		: new Promise(() => undefined);
@@ -87,9 +85,11 @@
 		if (model === undefined || metric === undefined) {
 			return Promise.resolve(undefined);
 		}
-		const secureTagIds = $tagIds === undefined ? [] : $tagIds;
-		const secureSelectionIds = $selectionIds === undefined ? [] : $selectionIds;
-		const dataIds = [...new Set([...secureTagIds, ...secureSelectionIds])];
+		const secureIds = [
+			...($tagIds === undefined ? [] : $tagIds),
+			...($filterSelection ? $selectionIds : [])
+		];
+		const dataIds = [...new Set(secureIds)];
 		return zenoClient.getMetricsFiltered($project.uuid, {
 			metricKeys: getMetricKeys(model, metric, predicates),
 			dataIds
@@ -108,8 +108,6 @@
 	{#if $comparisonModel !== undefined}
 		<ComparisonView {modelAResult} {modelBResult} />
 	{/if}
-{:else if $editTag !== undefined}
-	<TableView {numberOfInstances} />
 {:else}
 	{#if selected === 'list'}
 		<ListView {numberOfInstances} />
