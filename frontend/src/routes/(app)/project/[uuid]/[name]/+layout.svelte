@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Help from '$lib/components/general/Help.svelte';
 	import ProjectSidebar from '$lib/components/project/ProjectSidebar.svelte';
 	import {
 		columns,
@@ -65,6 +66,10 @@
 	<title>{data.project.name} | Zeno</title>
 	<meta name="description" content={data.project.description || 'Zeno Evaluation Project'} />
 </svelte:head>
+
+<div class="absolute bottom-14 right-3">
+	<Help />
+</div>
 
 <ProjectSidebar user={data.user} />
 <slot />

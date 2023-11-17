@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/components/general/Header.svelte';
+	import Help from '$lib/components/general/Help.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
@@ -95,9 +96,14 @@
 	<meta name="description" content={data.report.description || 'Zeno Evaluation Report'} />
 </svelte:head>
 
+<div class="absolute bottom-6 right-6">
+	<Help />
+</div>
+
 {#if reportEdit && data.user !== null}
 	<ReportPopup on:close={() => (reportEdit = false)} user={data.user} />
 {/if}
+
 {#if showConfirmDelete !== -1}
 	<Confirm
 		message="Are you sure you want to delete this element?"
@@ -110,81 +116,82 @@
 		}}
 	/>
 {/if}
-<div class="relative h-screen w-full overflow-y-auto overflow-x-visible">
-	<div class="sticky top-0 z-10 bg-white px-6 pt-6">
-		<Header
-			user={data.user}
-			report={data.report}
-			numLikes={data.numLikes}
-			userLiked={data.userLiked}
-			bind:reportEdit
-		/>
-	</div>
-	<div
-		class="m-auto flex max-w-4xl flex-col rounded bg-background px-6 pb-20 pt-4 sm:mb-0 sm:mt-0 md:mb-6"
-	>
-		<h1 class="text-grey-darkest mr-6 pt-4 text-5xl">
-			{data.report.name}
-		</h1>
-		<div class="mt-4 flex items-center">
-			<h5 class="text-lg">Author: {data.report.ownerName}</h5>
-			<span class="ml-4 text-grey-darker"
-				>Updated {new Date(data.report.updatedAt ?? '').toLocaleString('en-US', {
-					weekday: 'long',
-					year: 'numeric',
-					month: 'long',
-					day: 'numeric',
-					hour: 'numeric',
-					minute: 'numeric'
-				})}</span
-			>
-		</div>
-		<hr class="mt-4 text-grey-light" />
 
-		{#if data.report.editor}
-			<p class="mb-2 mt-4">Associated Projects</p>
-			{#await zenoClient.getProjects() then projects}
-				<Svelecte
-					bind:value={selectedProjects}
-					on:change={updateReportProjects}
-					valueField="uuid"
-					labelField="name"
-					searchable={false}
-					multiple={true}
-					options={projects}
-					renderer={svelecteRendererName}
-				/>
-			{/await}
-			<hr class="mb-4 mt-4 text-grey-light" />
-			<AddElementButton
-				position={0}
-				{addElement}
-				alwaysShow={elements.length === 0 ? true : false}
-			/>
-		{/if}
+<div class="flex h-full min-h-0 w-full min-w-0 flex-grow flex-col">
+	<Header
+		user={data.user}
+		report={data.report}
+		numLikes={data.numLikes}
+		userLiked={data.userLiked}
+		bind:reportEdit
+	/>
+	<div class="overflow-auto">
 		<div
-			class="mt-2 flex flex-col"
-			use:dndzone={{
-				items: elements,
-				dragDisabled: !dragEnabled,
-				dropTargetStyle: {},
-				flipDurationMs: 100
-			}}
-			on:consider={handleMoved}
-			on:finalize={handleDropped}
+			class="m-auto flex w-full max-w-4xl flex-col rounded bg-background px-6 pb-20 pt-4 sm:mb-0 sm:mt-0 md:mb-6"
 		>
-			{#each elements as element (element.id)}
-				<ElementContainer
-					{element}
-					bind:editId
-					bind:dragEnabled
-					bind:showConfirmDelete
-					{swapElementPositions}
+			<h1 class="text-grey-darkest mr-6 pt-4 text-5xl">
+				{data.report.name}
+			</h1>
+			<div class="mt-4 flex items-center">
+				<h5 class="text-lg">Author: {data.report.ownerName}</h5>
+				<span class="ml-4 text-grey-darker"
+					>Updated {new Date(data.report.updatedAt ?? '').toLocaleString('en-US', {
+						weekday: 'long',
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+						hour: 'numeric',
+						minute: 'numeric'
+					})}</span
+				>
+			</div>
+			<hr class="mt-4 text-grey-light" />
+
+			{#if data.report.editor}
+				<p class="mb-2 mt-4">Associated Projects</p>
+				{#await zenoClient.getProjects() then projects}
+					<Svelecte
+						bind:value={selectedProjects}
+						on:change={updateReportProjects}
+						valueField="uuid"
+						labelField="name"
+						searchable={false}
+						multiple={true}
+						options={projects}
+						renderer={svelecteRendererName}
+					/>
+				{/await}
+				<hr class="mb-4 mt-4 text-grey-light" />
+				<AddElementButton
+					position={0}
 					{addElement}
-					{selectedProjects}
-					report={data.report}
+					alwaysShow={elements.length === 0 ? true : false}
 				/>
-			{/each}
+			{/if}
+			<div
+				class="mt-2 flex flex-col"
+				use:dndzone={{
+					items: elements,
+					dragDisabled: !dragEnabled,
+					dropTargetStyle: {},
+					flipDurationMs: 100
+				}}
+				on:consider={handleMoved}
+				on:finalize={handleDropped}
+			>
+				{#each elements as element (element.id)}
+					<ElementContainer
+						{element}
+						bind:editId
+						bind:dragEnabled
+						bind:showConfirmDelete
+						{swapElementPositions}
+						{addElement}
+						{selectedProjects}
+						report={data.report}
+					/>
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>
