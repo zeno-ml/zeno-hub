@@ -61,7 +61,7 @@
 	<meta name="description" content={data.project.description || 'Zeno Evaluation Project'} />
 </svelte:head>
 
-<div class="absolute bottom-14 right-4">
+<div class="absolute bottom-14 right-0">
 	<Help />
 </div>
 

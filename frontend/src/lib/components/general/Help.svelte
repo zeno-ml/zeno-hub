@@ -13,13 +13,10 @@
 </script>
 
 <div
-	class="relative z-20 flex flex-col items-end rounded-full border border-primary-dark"
+	class="relative z-20 flex flex-col items-end rounded-l border-y border-l border-primary-dark bg-white"
 	transition:fade={{ delay: 1000, duration: 1000 }}
 >
-	<IconButton
-		class="rounded-full  bg-white transition"
-		on:click={() => (showOptions = !showOptions)}
-	>
+	<IconButton on:click={() => (showOptions = !showOptions)}>
 		<Icon tag="svg" viewBox="0 0 24 24">
 			<path class="fill-primary-dark" d={mdiHelp} />
 		</Icon>

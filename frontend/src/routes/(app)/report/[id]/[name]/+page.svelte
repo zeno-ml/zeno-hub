@@ -96,7 +96,7 @@
 	<meta name="description" content={data.report.description || 'Zeno Evaluation Report'} />
 </svelte:head>
 
-<div class="absolute bottom-4 right-4">
+<div class="absolute bottom-4 right-0">
 	<Help />
 </div>
 

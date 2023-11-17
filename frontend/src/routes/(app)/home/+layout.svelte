@@ -14,7 +14,7 @@
 	<NewReportPopup on:close={() => (showNewReport = false)} bind:showNewReport />
 {/if}
 
-<div class="absolute bottom-4 right-4">
+<div class="absolute bottom-4 right-0">
 	<Help />
 </div>
 <div class="mx-8 flex h-full flex-grow flex-col bg-white py-5">
