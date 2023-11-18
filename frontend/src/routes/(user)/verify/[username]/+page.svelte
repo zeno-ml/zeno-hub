@@ -29,6 +29,6 @@
 		<Button type="submit" variant="raised" class="mt-3">Verify Account</Button>
 	</div>
 	{#if form?.error}
-		<p class="text-error font-semibold">{form.error}</p>
+		<p class="font-semibold text-error">{form.error}</p>
 	{/if}
 </form>

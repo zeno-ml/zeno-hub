@@ -41,7 +41,7 @@
 		/>
 		<Button type="submit" variant="raised" class="mt-5">Reset</Button>
 		{#if form?.error}
-			<p class="text-error mt-5 text-center font-semibold">
+			<p class="mt-5 text-center font-semibold text-error">
 				{form.error}
 			</p>
 		{/if}
