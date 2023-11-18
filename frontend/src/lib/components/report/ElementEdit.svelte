@@ -31,10 +31,10 @@
 
 	// only add ReportElementTypes if they have at least one option.
 	$: reportElementOptions = [
+		ReportElementType.TEXT,
 		...(chartOptions.length > 0 ? [ReportElementType.CHART] : []),
 		...(sliceOptions.length > 0 ? [ReportElementType.SLICE] : []),
-		...(tagOptions.length > 0 ? [ReportElementType.TAG] : []),
-		ReportElementType.TEXT
+		...(tagOptions.length > 0 ? [ReportElementType.TAG] : [])
 	];
 
 	async function updateType(e: CustomEvent) {
