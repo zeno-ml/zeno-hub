@@ -51,6 +51,9 @@
 			label="Repeat password"
 			class="mb-3 w-56"
 		/>
+		{#if form?.error}
+			<p class="text-error mt-4 font-semibold">{form.error}</p>
+		{/if}
 		<p class="mt-2 w-64 text-center">
 			Password must be at least 8 characters long and have at least one number, one special
 			character, and one uppercase letter.
@@ -71,8 +74,5 @@
 				>Log in now!</a
 			>
 		</p>
-		{#if form?.error}
-			<p class="mt-4 text-primary">{form.error}</p>
-		{/if}
 	</div>
 </form>
