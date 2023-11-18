@@ -21,7 +21,6 @@
 	});
 
 	function updateDragOrder(val: { value: number; label: string }[]) {
-		console.log(value);
 		dispatch(
 			'selected',
 			val.map((v) => v.value)
