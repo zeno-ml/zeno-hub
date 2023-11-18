@@ -31,7 +31,7 @@
 </script>
 
 <div class="flex flex-col">
-	{#if value[0].value != -2}
+	{#if value.length === 0 || value[0].value != -2}
 		<MultiSelect
 			bind:selected={value}
 			{options}
@@ -43,9 +43,11 @@
 	<div class="ml-auto flex items-center">
 		<span>All Metrics</span>
 		<Checkbox
-			checked={value[0].value == -2}
+			checked={value.length > 0 && value[0].value == -2}
 			on:click={() =>
-				value[0].value === -2 ? (value = []) : (value = [{ value: -1, label: 'slice size' }])}
+				value.length > 0 && value[0].value === -2
+					? (value = [])
+					: (value = [{ value: -2, label: '' }])}
 		/>
 	</div>
 </div>

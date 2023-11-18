@@ -14,7 +14,7 @@
 </script>
 
 <div class="flex w-full flex-col">
-	{#if stringValues[0] != ''}
+	{#if value.length === 0 || value[0] != ''}
 		<MultiSelect
 			bind:selected={value}
 			options={$models}
@@ -26,8 +26,8 @@
 	<div class="ml-auto flex items-center">
 		<span>All Systems</span>
 		<Checkbox
-			checked={value[0] == ''}
-			on:click={() => (value[0] === '' ? (value = []) : (value = ['']))}
+			checked={value.length > 0 && value[0] == ''}
+			on:click={() => (value.length > 0 && value[0] === '' ? (value = []) : (value = ['']))}
 		/>
 	</div>
 </div>

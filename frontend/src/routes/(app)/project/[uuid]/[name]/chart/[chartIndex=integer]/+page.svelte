@@ -19,6 +19,8 @@
 	let chart = data.chart;
 	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
 
+	let updatingData = false;
+
 	$: updateEditUrl(isChartEdit);
 	$: updateChart(chart);
 
@@ -35,12 +37,14 @@
 	}
 
 	function updateChart(chart: Chart) {
+		updatingData = true;
 		if ($project && $project.editor && browser) {
-			zenoClient
-				.updateChart($project.uuid, chart)
-				.then(() =>
-					zenoClient.getChartData($project.uuid, chart.id).then((d) => (chartData = JSON.parse(d)))
-				);
+			zenoClient.updateChart($project.uuid, chart).then(() =>
+				zenoClient.getChartData($project.uuid, chart.id).then((d) => {
+					chartData = JSON.parse(d);
+					updatingData = false;
+				})
+			);
 		}
 	}
 </script>
@@ -59,7 +63,7 @@
 	{/if}
 	{#if chartData}
 		<div class={`flex h-full flex-col overflow-auto pl-2`}>
-			<ChartContainer chartName={chart.name}>
+			<ChartContainer chartName={chart.name} loading={updatingData}>
 				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
 			</ChartContainer>
 		</div>
