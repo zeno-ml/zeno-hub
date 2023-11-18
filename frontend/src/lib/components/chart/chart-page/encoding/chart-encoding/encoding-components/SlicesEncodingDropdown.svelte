@@ -3,7 +3,6 @@
 	import { svelecteRenderer } from '$lib/util/util';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
-	import EncodingContainer from './EncodingContainer.svelte';
 
 	export let numberValue: number;
 
@@ -27,12 +26,4 @@
 	}
 </script>
 
-<EncodingContainer>
-	<Svelecte
-		style="width: 280px; flex:none;"
-		bind:value
-		{options}
-		on:change={valueSelected}
-		renderer={svelecteRenderer}
-	/>
-</EncodingContainer>
+<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />

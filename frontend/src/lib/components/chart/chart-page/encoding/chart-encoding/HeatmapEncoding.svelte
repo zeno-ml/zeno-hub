@@ -75,11 +75,9 @@
 	}
 </script>
 
-<EncodingSection>
+<EncodingSection title="X">
 	<svelte:fragment slot="parameters">
-		<h4>x</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.xChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
@@ -97,11 +95,9 @@
 		stringValues={parameters.xChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="Y">
 	<svelte:fragment slot="parameters">
-		<h4>y</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.yChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
@@ -119,15 +115,13 @@
 		stringValues={parameters.yChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="System">
 	<svelte:fragment slot="parameters">
-		<h4>system</h4>
 		<ModelsEncodingDropdown stringValue={parameters.model} on:selected={selectModel} />
 	</svelte:fragment>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="Color">
 	<svelte:fragment slot="parameters">
-		<h4>color</h4>
 		<MetricsEncodingDropdown
 			on:selected={fixedSelected}
 			numberValue={parameters.metric}

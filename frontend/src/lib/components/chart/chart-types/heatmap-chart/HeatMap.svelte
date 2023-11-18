@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chart, HeatmapParameters, ZenoService } from '$lib/zenoapi';
+	import type { Chart, HeatmapParameters, Metric, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
 	import generateSpec from './vegaSpec-heatmap';
@@ -17,17 +17,24 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let spec: VegaLiteSpec;
+	let metrics: Metric[] = [];
+	zenoClient.getMetrics(chart.projectUuid).then((m) => (metrics = m));
 
 	$: parameters = chart.parameters as HeatmapParameters;
 	$: sliceVsSlice = parameters.xChannel === parameters.yChannel;
-	$: zenoClient.getMetrics(chart.projectUuid).then((metrics) => {
+	$: {
+		data;
+		updateSpec();
+	}
+
+	function updateSpec() {
 		const metric = metrics.find((m) => m.id === parameters.metric);
 		if (metric) {
 			spec = generateSpec(parameters, metric.name);
 		} else {
 			spec = generateSpec(parameters, 'slice size');
 		}
-	});
+	}
 </script>
 
 {#if sliceVsSlice}

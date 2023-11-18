@@ -1,7 +1,6 @@
 <script lang="ts">
-	import { metrics, slices } from '$lib/stores';
-	import { SlicesMetricsOrModels, type Chart, type RadarParameters } from '$lib/zenoapi';
-	import { Vega } from 'svelte-vega';
+	import type { Chart, RadarParameters } from '$lib/zenoapi';
+	import { Vega, type VegaSpec } from 'svelte-vega';
 	import generateSpec from './vegaSpec-radar';
 
 	export let chart: Chart;
@@ -16,23 +15,24 @@
 	export let height = 575;
 	export let width: number;
 
-	$: parameters = chart.parameters as RadarParameters;
+	let spec: VegaSpec;
 
-	function getFixedName(): string {
-		switch (parameters.fixedChannel) {
-			case SlicesMetricsOrModels.SLICES:
-				return $slices.find((sli) => sli.id === parameters.slices[0])?.sliceName ?? '';
-			case SlicesMetricsOrModels.METRICS:
-				return $metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '';
-			case SlicesMetricsOrModels.MODELS:
-				return parameters.models[0];
-		}
+	$: {
+		data;
+		updateSpec();
+	}
+
+	function updateSpec() {
+		spec = generateSpec(
+			chart.parameters as RadarParameters,
+			Math.min(height, width),
+			Math.min(height, width)
+		) as VegaSpec;
 	}
 </script>
 
-<h4 class="m-0">{getFixedName()}</h4>
 <Vega
-	spec={generateSpec(parameters, Math.min(height, width), Math.min(height, width))}
+	{spec}
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },

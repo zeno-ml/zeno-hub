@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ChartContainer from '$lib/components/chart/ChartContainer.svelte';
 	import EditHeader from '$lib/components/chart/chart-page/chart-header/EditHeader.svelte';
@@ -11,21 +10,17 @@
 	import { chartMap } from '$lib/util/charts';
 	import type { Chart, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
-	import { overrideItemIdKeyNameBeforeInitialisingDndZones } from 'svelte-dnd-action';
 
 	export let data;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
-	let chartData: { table: Record<string, unknown> } | undefined;
-	let unique = {};
+	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
 
-	$: chartData = data.chartData;
 	$: updateEditUrl(isChartEdit);
 	$: updateChart(chart);
-
-	overrideItemIdKeyNameBeforeInitialisingDndZones('value');
 
 	function updateEditUrl(edit: boolean | undefined) {
 		if (edit === undefined) {
@@ -41,9 +36,11 @@
 
 	function updateChart(chart: Chart) {
 		if ($project && $project.editor && browser) {
-			zenoClient.updateChart($project.uuid, chart).then(() => {
-				invalidate('app:chart');
-			});
+			zenoClient
+				.updateChart($project.uuid, chart)
+				.then(() =>
+					zenoClient.getChartData($project.uuid, chart.id).then((d) => (chartData = JSON.parse(d)))
+				);
 		}
 	}
 </script>
@@ -54,16 +51,8 @@
 			class="h-full w-[380px] shrink-0 overflow-y-auto border-r border-r-grey-lighter bg-yellowish-light px-5 pb-20"
 		>
 			<EditHeader bind:isChartEdit bind:chart />
-			<ViewSelection bind:chart bind:unique />
-			<!--
-				This is a hack to force the component to rerender on chart type change as the selections otherwise don't update.
-				If svelecte ever resolves this issue, this hack can be removed and we can listen to events on svelecte.
-				https://github.com/mskocik/svelecte/issues/200.
-				A detailed description of this problem is in: https://github.com/zeno-ml/zeno-hub/pull/235.
-			-->
-			{#key unique}
-				<Encoding bind:chart />
-			{/key}
+			<ViewSelection bind:chart />
+			<Encoding bind:chart />
 		</div>
 	{:else}
 		<ViewHeader bind:isChartEdit />

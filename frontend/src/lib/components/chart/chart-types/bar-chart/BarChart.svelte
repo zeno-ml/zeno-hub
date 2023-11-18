@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Chart, XCParameters, ZenoService } from '$lib/zenoapi';
+	import type { Chart, Metric, XCParameters, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
 	import generateSpec from './vegaSpec-bar';
@@ -12,16 +12,23 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let spec: VegaLiteSpec;
+	let metrics: Metric[] = [];
+	zenoClient.getMetrics(chart.projectUuid).then((m) => (metrics = m));
 
-	$: parameters = chart.parameters as XCParameters;
-	$: zenoClient.getMetrics(chart.projectUuid).then((metrics) => {
-		const metric = metrics.find((m) => m.id === parameters.metric);
+	$: {
+		data;
+		updateChart(metrics);
+	}
+
+	function updateChart(mets: Metric[]) {
+		const params = chart.parameters as XCParameters;
+		const metric = mets.find((m) => m.id === params.metric);
 		if (metric) {
-			spec = generateSpec(parameters, metric.name, height, width);
+			spec = generateSpec(params, metric.name, height, width);
 		} else {
-			spec = generateSpec(parameters, 'slice size', height, width);
+			spec = generateSpec(params, 'slice size', height, width);
 		}
-	});
+	}
 </script>
 
 <VegaLite

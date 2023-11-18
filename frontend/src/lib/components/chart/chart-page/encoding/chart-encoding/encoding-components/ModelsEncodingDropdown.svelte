@@ -25,10 +25,4 @@
 	}
 </script>
 
-<Svelecte
-	style="width: 280px; flex:none;"
-	bind:value
-	{options}
-	on:change={valueSelected}
-	renderer={svelecteRenderer}
-/>
+<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />
