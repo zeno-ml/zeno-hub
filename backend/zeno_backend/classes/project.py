@@ -32,7 +32,7 @@ class Project(CamelModel):
     owner_name: str
     view: str
     editor: bool
-    samples_per_page: int = 10
+    samples_per_page: int = 30
     public: bool = False
     created_at: str = ""
     updated_at: str = ""

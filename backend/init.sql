@@ -10,7 +10,7 @@ CREATE TABLE projects (
     name text NOT NULL,
     owner_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     view text NOT NULL,
-    samples_per_page integer NOT NULL DEFAULT 10,
+    samples_per_page integer NOT NULL DEFAULT 30,
     public boolean NOT NULL DEFAULT false,
     description text NOT NULL DEFAULT '',
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
