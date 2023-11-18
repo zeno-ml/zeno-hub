@@ -160,24 +160,26 @@
 		<div style:margin-right="10px">
 			{sls.length} slice{sls.length === 1 ? '' : 's'}
 		</div>
-		<div class="flex items-center" style:cursor="pointer">
-			<div style:width="36px">
-				{#if hovering}
-					<IconButton
-						size="button"
-						style="padding: 0px"
-						on:click={(e) => {
-							e.stopPropagation();
-							showOptions = !showOptions;
-						}}
-					>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path fill="black" d={mdiDotsHorizontal} />
-						</Icon>
-					</IconButton>
-				{/if}
+		{#if $project.editor}
+			<div class="flex items-center" style:cursor="pointer">
+				<div style:width="36px">
+					{#if hovering}
+						<IconButton
+							size="button"
+							style="padding: 0px"
+							on:click={(e) => {
+								e.stopPropagation();
+								showOptions = !showOptions;
+							}}
+						>
+							<Icon tag="svg" viewBox="0 0 24 24">
+								<path fill="black" d={mdiDotsHorizontal} />
+							</Icon>
+						</IconButton>
+					{/if}
+				</div>
 			</div>
-		</div>
+		{/if}
 	</div>
 </button>
 {#if expandFolder}

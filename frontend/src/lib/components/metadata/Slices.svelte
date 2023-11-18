@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { comparisonModel, model } from '$lib/stores';
+	import { comparisonModel, model, project } from '$lib/stores';
 	import { Join } from '$lib/zenoapi';
 
 	import { folders, selectionPredicates, selections, slices, tagIds } from '$lib/stores';
@@ -52,7 +52,9 @@
 						sliceModel={$comparisonModel}
 					/>
 				{/if}
-				<div style:width="36px" />
+				{#if $project.editor}
+					<div style:width="36px" />
+				{/if}
 			</div>
 		{/if}
 	</button>

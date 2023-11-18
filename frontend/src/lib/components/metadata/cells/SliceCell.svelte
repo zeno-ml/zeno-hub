@@ -201,27 +201,29 @@
 			{#if compare}
 				<SliceCellResult {compare} {slice} sliceModel={$comparisonModel ?? ''} />
 			{/if}
-			<div
-				style:width="36px"
-				use:clickOutside={() => {
-					hovering = false;
-				}}
-			>
-				{#if hovering && $project.editor}
-					<IconButton
-						size="button"
-						style="padding: 0px"
-						on:click={(e) => {
-							e.stopPropagation();
-							showOptions = !showOptions;
-						}}
-					>
-						<Icon tag="svg" viewBox="0 0 24 24">
-							<path fill="black" d={mdiDotsHorizontal} />
-						</Icon>
-					</IconButton>
-				{/if}
-			</div>
+			{#if $project.editor}
+				<div
+					class="min-w-[36px]"
+					use:clickOutside={() => {
+						hovering = false;
+					}}
+				>
+					{#if hovering}
+						<IconButton
+							class="p-0"
+							size="button"
+							on:click={(e) => {
+								e.stopPropagation();
+								showOptions = !showOptions;
+							}}
+						>
+							<Icon tag="svg" viewBox="0 0 24 24">
+								<path fill="black" d={mdiDotsHorizontal} />
+							</Icon>
+						</IconButton>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
 </button>

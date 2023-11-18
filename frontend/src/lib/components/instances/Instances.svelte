@@ -29,7 +29,7 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let selected = 'list';
-	let currentResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
+	let currentResult: GroupMetric[] | undefined;
 	let modelAResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let modelBResult: Promise<GroupMetric[] | undefined> = new Promise(() => undefined);
 	let numberOfInstances = 0;
@@ -38,10 +38,17 @@
 		...($tagIds === undefined ? [] : $tagIds),
 		...($filterSelection ? $selectionIds : [])
 	];
-	$: currentResult = zenoClient.getMetricsFiltered($project.uuid, {
-		metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
-		dataIds: [...new Set(secureIds)]
-	});
+	$: zenoClient
+		.getMetricsFiltered($project.uuid, {
+			metricKeys: getMetricKeys($model, $metric, $selectionPredicates),
+			dataIds: [...new Set(secureIds)]
+		})
+		.then((r) => {
+			currentResult = r;
+			if (r !== undefined && r.length > 0) {
+				numberOfInstances = r[0].size;
+			}
+		});
 	$: modelAResult = compare
 		? getCompareResults($model, $metric, $selectionPredicates)
 		: new Promise(() => undefined);
@@ -95,12 +102,6 @@
 			dataIds
 		});
 	}
-
-	$: currentResult.then((d) => {
-		if (d !== undefined && d.length > 0) {
-			numberOfInstances = d[0].size;
-		}
-	});
 </script>
 
 <SelectionBar {currentResult} bind:selected />
