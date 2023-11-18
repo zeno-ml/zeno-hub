@@ -14,7 +14,7 @@
 
 <div class="mb-5">
 	<h4 class="mb-2 border-b-2 border-grey-light pb-1">Chart Type</h4>
-	<div class="grid-cols-3 grid gap-1">
+	<div class="grid grid-cols-3 gap-1">
 		<ChartElement {chart} {updateChartType} type={ChartType.BAR} />
 		<ChartElement {chart} {updateChartType} type={ChartType.LINE} />
 		<ChartElement {chart} {updateChartType} type={ChartType.TABLE} />
