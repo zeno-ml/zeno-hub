@@ -115,17 +115,15 @@
 		stringValues={parameters.yChannel === SlicesOrModels.MODELS ? stringValues : []}
 	/>
 </EncodingSection>
-<EncodingSection title="System">
-	<svelte:fragment slot="parameters">
-		<ModelsEncodingDropdown stringValue={parameters.model} on:selected={selectModel} />
-	</svelte:fragment>
-</EncodingSection>
+{#if parameters.xChannel === SlicesOrModels.SLICES && parameters.yChannel === SlicesOrModels.SLICES}
+	<EncodingSection title="System">
+		<svelte:fragment slot="parameters">
+			<ModelsEncodingDropdown stringValue={parameters.model} on:selected={selectModel} />
+		</svelte:fragment>
+	</EncodingSection>
+{/if}
 <EncodingSection title="Color">
 	<svelte:fragment slot="parameters">
-		<MetricsEncodingDropdown
-			on:selected={fixedSelected}
-			numberValue={parameters.metric}
-			container={false}
-		/>
+		<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metric} />
 	</svelte:fragment>
 </EncodingSection>

@@ -80,16 +80,14 @@
 </script>
 
 <EncodingSection title="Metric">
-	<svelte:fragment slot="parameters">
-		<div class="flex items-center">
-			<span>fixed</span>
-			<Checkbox
-				checked={fixedDimension === 'metric'}
-				on:click={() =>
-					(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
-			/>
-		</div>
-	</svelte:fragment>
+	<div class="flex items-center" slot="parameters">
+		<span>fixed</span>
+		<Checkbox
+			checked={fixedDimension === 'metric'}
+			on:click={() =>
+				(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
+		/>
+	</div>
 	<svelte:fragment slot="component">
 		{#if fixedDimension === 'metric'}
 			<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metrics[0]} />
@@ -102,15 +100,13 @@
 	</svelte:fragment>
 </EncodingSection>
 <EncodingSection title="Y">
-	<svelte:fragment slot="parameters">
-		<div class="flex items-center">
-			<span>fixed</span>
-			<Checkbox
-				checked={fixedDimension === 'y'}
-				on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
-			/>
-		</div>
-	</svelte:fragment>
+	<div class="flex items-center" slot="parameters">
+		<span>fixed</span>
+		<Checkbox
+			checked={fixedDimension === 'y'}
+			on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+		/>
+	</div>
 	<svelte:fragment slot="component">
 		<Svelecte
 			value={parameters.yChannel}

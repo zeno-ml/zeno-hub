@@ -5,7 +5,6 @@
 	import { createEventDispatcher } from 'svelte';
 
 	export let numberValue: number;
-	export let container = true;
 
 	const dispatch = createEventDispatcher<{
 		selected: number;
@@ -27,8 +26,4 @@
 	}
 </script>
 
-{#if container}
-	<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />
-{:else}
-	<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />
-{/if}
+<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />

@@ -8,46 +8,46 @@
 
 	const dispatch = createEventDispatcher<{ selected: number[] }>();
 
-	let options: { value: number; label: string }[] = [];
-	let value: { value: number; label: string }[] = [];
+	let options: { id: number; label: string }[] = [];
+	let selected: { id: number; label: string }[] = [];
 
 	// initial options & values
-	options.push({ value: -1, label: 'slice size' });
+	options.push({ id: -1, label: 'slice size' });
 	$metrics.forEach((m) => {
-		options.push({ value: m.id, label: m.name });
+		options.push({ id: m.id, label: m.name });
 	});
-	value = numberValues.map((v) => {
-		return { value: v, label: options.find((o) => o.value === v)?.label || '' };
+	selected = numberValues.map((v) => {
+		return { id: v, label: options.find((o) => o.id === v)?.label || '' };
 	});
 
-	function updateDragOrder(val: { value: number; label: string }[]) {
-		dispatch(
-			'selected',
-			val.map((v) => v.value)
-		);
-	}
-
-	$: updateDragOrder(value);
+	$: dispatch(
+		'selected',
+		selected.map((v) => v.id)
+	);
 </script>
 
 <div class="flex flex-col">
-	{#if value.length === 0 || value[0].value != -2}
+	{#if selected.length === 0 || selected[0].id != -2}
 		<MultiSelect
-			bind:selected={value}
+			bind:selected
 			{options}
+			key={JSON.stringify}
 			liSelectedClass="!bg-primary-light ![&>svg]:fill-primary"
 			outerDivClass="!w-full !border-grey-light !py-1 !bg-white"
 			liActiveOptionClass="!bg-primary-light"
-		/>
+		>
+			<p style="text-wrap: pretty;" slot="selected" let:option>{option.label}</p>
+		</MultiSelect>
 	{/if}
 	<div class="ml-auto flex items-center">
 		<span>All Metrics</span>
+		<!-- An ID of -2 indicates "all metrics". -->
 		<Checkbox
-			checked={value.length > 0 && value[0].value == -2}
+			checked={selected.length > 0 && selected[0].id == -2}
 			on:click={() =>
-				value.length > 0 && value[0].value === -2
-					? (value = [])
-					: (value = [{ value: -2, label: '' }])}
+				selected.length > 0 && selected[0].id === -2
+					? (selected = [])
+					: (selected = [{ id: -2, label: '' }])}
 		/>
 	</div>
 </div>
