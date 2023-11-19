@@ -30,7 +30,7 @@
 		zenoClient
 			.addReportElement(data.report.id, {
 				type: ReportElementType.TEXT,
-				data: 'new element I',
+				data: 'new element',
 				position: elementIndex
 			})
 			.then((res) => {
@@ -38,7 +38,7 @@
 				elements.push({
 					id: res,
 					type: ReportElementType.TEXT,
-					data: 'new element I',
+					data: 'new element',
 					position: elementIndex
 				});
 				elements = elements.sort((a, b) => a.position - b.position);
