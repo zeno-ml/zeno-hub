@@ -12,7 +12,6 @@
 		mdiCheckBold,
 		mdiChevronDown,
 		mdiChevronUp,
-		mdiDrag,
 		mdiPencilOutline,
 		mdiTrashCanOutline
 	} from '@mdi/js';
@@ -27,7 +26,6 @@
 	export let selectedProjects: string[];
 	export let editId: number;
 	export let showConfirmDelete: number;
-	export let dragEnabled: boolean;
 	export let addElement: (elementIndex: number) => void;
 	export let swapElementPositions: (elementId: number | null | undefined, position: number) => void;
 
@@ -54,18 +52,13 @@
 		class="relative border-2
 			{editId === element.id ? 'border-primary-mid' : 'border-white'}
 			{report.editor ? 'group/edit rounded p-4 hover:border-primary-mid' : 'py-2'}
-			{dragEnabled ? 'border-2 border-primary-mid' : ''} transition"
+			transition"
 	>
 		<button
 			class="absolute -top-4 right-14 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
 			on:click={() => (showConfirmDelete = element.id ?? -1)}
 		>
-			<Icon
-				style="outline:none; width: 20px; height: 20px"
-				tag="svg"
-				viewBox="0 0 24 24"
-				on:mousedown={() => (dragEnabled = true)}
-			>
+			<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
 				<path class="fill-primary" d={mdiTrashCanOutline} />
 			</Icon>
 		</button>
@@ -76,29 +69,12 @@
 					? (editId = -1)
 					: (editId = element.id)}
 		>
-			<Icon
-				style="outline:none; width: 20px; height: 20px"
-				tag="svg"
-				viewBox="0 0 24 24"
-				on:mousedown={() => (dragEnabled = true)}
-			>
+			<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
 				<path class="fill-primary" d={editId === element.id ? mdiCheckBold : mdiPencilOutline} />
 			</Icon>
 		</button>
-		<div
-			class="absolute -left-3 -top-1 mr-2 hidden cursor-move rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
-		>
-			<Icon
-				style="outline:none; width: 24px; height: 24px"
-				tag="svg"
-				viewBox="0 0 24 24"
-				on:mousedown={() => (dragEnabled = true)}
-			>
-				<path class="fill-primary" d={mdiDrag} />
-			</Icon>
-		</div>
 		<button
-			class="absolute -left-3 top-7 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+			class="absolute -left-3 top-1 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 			on:click={() => swapElementPositions(element.id, element.position - 1)}
 		>
 			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
@@ -106,7 +82,7 @@
 			</Icon>
 		</button>
 		<button
-			class="absolute -left-3 top-14 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+			class="absolute -left-3 top-8 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 			on:click={() => swapElementPositions(element.id, element.position + 1)}
 		>
 			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">

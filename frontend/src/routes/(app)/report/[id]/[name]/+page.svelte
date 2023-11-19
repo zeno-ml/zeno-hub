@@ -6,10 +6,9 @@
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import { svelecteRendererName } from '$lib/util/util.js';
-	import { ReportElementType, ZenoService, type Project, type ReportElement } from '$lib/zenoapi';
+	import { ReportElementType, ZenoService, type Project } from '$lib/zenoapi';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
-	import { dndzone } from 'svelte-dnd-action';
 
 	export let data;
 
@@ -18,7 +17,6 @@
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
 	let showConfirmDelete = -1;
-	let dragEnabled = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -51,19 +49,6 @@
 	function updateReportProjects(e: CustomEvent) {
 		const projectUuids = e.detail.map((p: Project) => p.uuid);
 		zenoClient.updateReportProjects(data.report.id, projectUuids);
-	}
-
-	function handleDropped(e: CustomEvent) {
-		e.detail.items.forEach((item: ReportElement, index: number) => {
-			item.position = index;
-			zenoClient.updateReportElement(data.report.id, { ...item, position: index });
-		});
-		elements = e.detail.items;
-		dragEnabled = false;
-	}
-
-	function handleMoved(e: CustomEvent) {
-		elements = e.detail.items;
 	}
 
 	function swapElementPositions(elementId: number | null | undefined, position: number) {
@@ -168,22 +153,11 @@
 					alwaysShow={elements.length === 0 ? true : false}
 				/>
 			{/if}
-			<div
-				class="mt-2 flex flex-col"
-				use:dndzone={{
-					items: elements,
-					dragDisabled: !dragEnabled,
-					dropTargetStyle: {},
-					flipDurationMs: 100
-				}}
-				on:consider={handleMoved}
-				on:finalize={handleDropped}
-			>
+			<div class="mt-2 flex flex-col">
 				{#each elements as element (element.id)}
 					<ElementContainer
-						{element}
+						bind:element
 						bind:editId
-						bind:dragEnabled
 						bind:showConfirmDelete
 						{swapElementPositions}
 						{addElement}
