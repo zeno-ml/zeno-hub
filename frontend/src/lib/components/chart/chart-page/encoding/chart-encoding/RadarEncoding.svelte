@@ -109,11 +109,9 @@
 	}
 </script>
 
-<EncodingSection>
+<EncodingSection title="Axis">
 	<svelte:fragment slot="parameters">
-		<h4>axis</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.axisChannel}
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },
@@ -136,11 +134,9 @@
 		stringValues={parameters.axisChannel === SlicesMetricsOrModels.MODELS ? parameters.models : []}
 	/>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="Color">
 	<svelte:fragment slot="parameters">
-		<h4>color</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.layerChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },
@@ -158,11 +154,9 @@
 		stringValues={parameters.layerChannel === SlicesOrModels.MODELS ? parameters.models : []}
 	/>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="Value">
 	<svelte:fragment slot="parameters">
-		<h4>value</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.fixedChannel}
 			options={[
 				{ label: 'slices', value: SlicesMetricsOrModels.SLICES },

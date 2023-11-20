@@ -4,19 +4,17 @@
 	import ChartElement from './ChartElement.svelte';
 
 	export let chart: Chart;
-	export let unique: unknown;
 
 	async function updateChartType(chartType: ChartType) {
 		if (chart.type !== chartType) {
 			chart = chartDefaults(chart.name, chart.id, chart.projectUuid, chartType);
-			unique = {};
 		}
 	}
 </script>
 
 <div class="mb-5">
 	<h4 class="mb-2 border-b-2 border-grey-light pb-1">Chart Type</h4>
-	<div class="flex flex-wrap justify-between">
+	<div class="grid grid-cols-3 gap-2">
 		<ChartElement {chart} {updateChartType} type={ChartType.BAR} />
 		<ChartElement {chart} {updateChartType} type={ChartType.LINE} />
 		<ChartElement {chart} {updateChartType} type={ChartType.TABLE} />

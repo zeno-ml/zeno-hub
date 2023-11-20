@@ -1,55 +1,54 @@
 <script lang="ts">
 	import { slices } from '$lib/stores';
-	import { svelecteRenderer } from '$lib/util/util';
 	import Checkbox from '@smui/checkbox';
-	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
-	import { dndzone } from 'svelte-dnd-action';
-	import EncodingContainer from './EncodingContainer.svelte';
+	import { MultiSelect } from 'svelte-multiselect';
 
 	export let numberValues: number[];
 
 	const dispatch = createEventDispatcher<{ selected: number[] }>();
 
-	let options: { value: number; label: string }[] = [];
-	let value: number[] = [];
+	let options: { id: number; label: string }[] = [];
+	let selected: { id: number; label: string }[] = [];
 
-	options.push({ value: -1, label: 'All instances' });
+	options.push({ id: -1, label: 'All instances' });
 	// initial options & values
 	$slices.forEach((s) => {
-		options.push({ value: s.id, label: s.sliceName });
+		options.push({ id: s.id, label: s.sliceName });
 	});
-	value = numberValues;
+	selected = numberValues.map((v) => {
+		return { id: v, label: options.find((o) => o.id === v)?.label || '' };
+	});
 
-	function updateDragOrder(val: number[]) {
-		// check if all elements are numbers (dndzone's place holder)
-		if (!val.some((i) => !Number.isInteger(i))) {
-			dispatch('selected', val);
-		}
-	}
-
-	$: updateDragOrder(value);
+	$: dispatch(
+		'selected',
+		selected.map((v) => v.id)
+	);
 </script>
 
-<EncodingContainer>
-	<div class="flex flex-col">
-		{#if value[0] != -2}
-			<Svelecte
-				style="width: 280px; flex:none;"
-				bind:value
-				{options}
-				{dndzone}
-				multiple
-				renderer={svelecteRenderer}
-				placeholder="Select Slices..."
-			/>
-		{/if}
-		<div class="ml-auto flex items-center">
-			<span>All Slices</span>
-			<Checkbox
-				checked={value[0] == -2}
-				on:click={() => (value[0] === -2 ? (value = []) : (value = [-2]))}
-			/>
-		</div>
+<div class="flex flex-col">
+	{#if selected.length === 0 || selected[0].id != -2}
+		<MultiSelect
+			bind:selected
+			{options}
+			key={JSON.stringify}
+			liSelectedClass="!bg-primary-light ![&>svg]:fill-primary"
+			ulSelectedClass="!overflow-x-auto !w-full"
+			outerDivClass="!w-full !border-grey-light !py-1 !bg-white"
+			liActiveOptionClass="!bg-primary-light"
+		>
+			<p style="text-wrap: pretty;" slot="selected" let:option>{option.label}</p>
+		</MultiSelect>
+	{/if}
+	<div class="ml-auto flex items-center">
+		<span>All Slices</span>
+		<!-- An ID of -2 indicates "all slices" -->
+		<Checkbox
+			checked={selected.length > 0 && selected[0].id == -2}
+			on:click={() =>
+				selected.length > 0 && selected[0].id === -2
+					? (selected = [])
+					: (selected = [{ id: -2, label: '' }])}
+		/>
 	</div>
-</EncodingContainer>
+</div>

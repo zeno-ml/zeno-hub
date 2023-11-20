@@ -79,18 +79,15 @@
 	}
 </script>
 
-<EncodingSection>
-	<svelte:fragment slot="parameters">
-		<h4>metric</h4>
-		<div class="flex items-center">
-			<span>fixed</span>
-			<Checkbox
-				checked={fixedDimension === 'metric'}
-				on:click={() =>
-					(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
-			/>
-		</div>
-	</svelte:fragment>
+<EncodingSection title="Metric">
+	<div class="flex items-center" slot="parameters">
+		<span>fixed</span>
+		<Checkbox
+			checked={fixedDimension === 'metric'}
+			on:click={() =>
+				(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
+		/>
+	</div>
 	<svelte:fragment slot="component">
 		{#if fixedDimension === 'metric'}
 			<MetricsEncodingDropdown on:selected={fixedSelected} numberValue={parameters.metrics[0]} />
@@ -102,34 +99,24 @@
 		{/if}
 	</svelte:fragment>
 </EncodingSection>
-<EncodingSection>
-	<svelte:fragment slot="parameters">
-		<h4>y</h4>
-		<div class="flex flex-col">
-			<div class="flex items-center">
-				<span>fixed</span>
-				<Checkbox
-					checked={fixedDimension === 'y'}
-					on:click={() =>
-						(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
-				/>
-			</div>
-		</div>
-	</svelte:fragment>
+<EncodingSection title="Y">
+	<div class="flex items-center" slot="parameters">
+		<span>fixed</span>
+		<Checkbox
+			checked={fixedDimension === 'y'}
+			on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+		/>
+	</div>
 	<svelte:fragment slot="component">
-		<div class="flex justify-between px-3">
-			<h4 class="m-2">&nbsp;</h4>
-			<Svelecte
-				style="width: 280px; height: 30px; flex:none;"
-				value={parameters.yChannel}
-				options={[
-					{ label: 'slices', value: SlicesOrModels.SLICES },
-					{ label: 'systems', value: SlicesOrModels.MODELS }
-				]}
-				searchable={false}
-				on:change={refreshY}
-			/>
-		</div>
+		<Svelecte
+			value={parameters.yChannel}
+			options={[
+				{ label: 'slices', value: SlicesOrModels.SLICES },
+				{ label: 'systems', value: SlicesOrModels.MODELS }
+			]}
+			searchable={false}
+			on:change={refreshY}
+		/>
 		{#if fixedDimension === 'y'}
 			<svelte:component
 				this={EncodingMap[parameters.yChannel].fixed}
@@ -147,11 +134,9 @@
 		{/if}
 	</svelte:fragment>
 </EncodingSection>
-<EncodingSection>
+<EncodingSection title="Color">
 	<svelte:fragment slot="parameters">
-		<h4>color</h4>
 		<Svelecte
-			style="width: 280px; height: 30px; flex:none"
 			value={parameters.colorChannel}
 			options={[
 				{ label: 'slices', value: SlicesOrModels.SLICES },

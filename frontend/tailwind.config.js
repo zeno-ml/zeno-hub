@@ -38,8 +38,10 @@ export default {
 				DEFAULT: '#ffffff'
 			}
 		},
-		gridTemplateColumns: {
-			home: 'repeat(auto-fill, minmax(275px, 1fr))'
+		extend: {
+			gridTemplateColumns: {
+				home: 'repeat(auto-fill, minmax(275px, 1fr))'
+			}
 		}
 	},
 	plugins: [require('@tailwindcss/typography')]

@@ -3,10 +3,8 @@
 	import { svelecteRenderer } from '$lib/util/util';
 	import Svelecte from 'svelecte';
 	import { createEventDispatcher } from 'svelte';
-	import EncodingContainer from './EncodingContainer.svelte';
 
 	export let numberValue: number;
-	export let container = true;
 
 	const dispatch = createEventDispatcher<{
 		selected: number;
@@ -28,22 +26,4 @@
 	}
 </script>
 
-{#if container}
-	<EncodingContainer>
-		<Svelecte
-			style="width: 280px; flex:none;"
-			bind:value
-			{options}
-			on:change={valueSelected}
-			renderer={svelecteRenderer}
-		/>
-	</EncodingContainer>
-{:else}
-	<Svelecte
-		style="width: 280px; flex:none;"
-		bind:value
-		{options}
-		on:change={valueSelected}
-		renderer={svelecteRenderer}
-	/>
-{/if}
+<Svelecte bind:value {options} on:change={valueSelected} renderer={svelecteRenderer} />
