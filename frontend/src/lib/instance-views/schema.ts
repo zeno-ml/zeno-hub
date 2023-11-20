@@ -68,7 +68,7 @@ export interface SeparatedValues extends View {
 
 export interface ViewSchema {
 	data: ViewUnion;
-	label: ViewUnion;
-	output: ViewUnion;
+	label?: ViewUnion;
+	output?: ViewUnion;
 	displayType?: DisplayType;
 }
