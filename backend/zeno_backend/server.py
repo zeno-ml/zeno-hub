@@ -41,9 +41,6 @@ class EndpointFilter(logging.Filter):
 def get_server() -> FastAPI:
     """Provide the FastAPI server and specifies its inputs.
 
-    Raises:
-        HTTPException: Something goes wrong server-side.
-
     Returns:
         FastAPI: FastAPI endpoint
     """
