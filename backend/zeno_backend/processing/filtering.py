@@ -1,5 +1,5 @@
 """Functions for parsing filter predicates and filtering data."""
-
+from fastapi import HTTPException, status
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn
@@ -51,6 +51,9 @@ def filter_to_sql(
         model (Optional[str], optional): model for which to get a SQL filter.
             Defaults to None.
 
+    Raises:
+        HTTPException: Could not get a filter sql.
+
     Returns:
         sql.Composed: filter to be used in a SQL query.
     """
@@ -81,6 +84,12 @@ def filter_to_sql(
             else:
                 column_id = column_id_from_name_and_model(project, f.column.name, model)
 
+            if column_id == "":
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Could not find column: {f.column.name} "
+                    "for model {f.column.model}.",
+                )
             filt = (
                 filt
                 + sql.SQL(f.join.value)
