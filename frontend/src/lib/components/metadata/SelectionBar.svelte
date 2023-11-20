@@ -29,6 +29,7 @@
 
 	function saveChanges() {
 		if ($editTag === undefined) return;
+		filterSelection.set(false);
 		zenoClient
 			.updateTag($project.uuid, {
 				...$editTag,
@@ -64,7 +65,7 @@
 	{#if !$page.url.href.includes('compare') || $selectionIds.length > 0 || $editTag !== undefined}
 		<div class="flex w-full flex-wrap items-center border-b border-grey-lighter py-2.5">
 			<div class="mr-4 flex items-center">
-				{#if currentResult !== undefined && currentResult.length > 0}
+				{#if !$page.url.href.includes('compare') && currentResult !== undefined && currentResult.length > 0}
 					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
 						<span class="mr-3 text-grey-dark">
 							{$metric ? $metric.name + ':' : ''}
@@ -116,18 +117,19 @@
 					</div>
 				{/if}
 			</div>
-			<div class="ml-auto flex items-center">
-				<slot />
-				<Group>
-					{#each choices as choice}
-						<Button
-							style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
-							variant="outlined"
-							on:click={() => (selected = choice)}>{choice}</Button
-						>
-					{/each}
-				</Group>
-			</div>
+			{#if !$page.url.href.includes('compare')}
+				<div class="ml-auto flex items-center">
+					<Group>
+						{#each choices as choice}
+							<Button
+								style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
+								variant="outlined"
+								on:click={() => (selected = choice)}>{choice}</Button
+							>
+						{/each}
+					</Group>
+				</div>
+			{/if}
 		</div>
 	{/if}
 </div>
