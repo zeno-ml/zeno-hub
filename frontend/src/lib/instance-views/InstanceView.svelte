@@ -3,6 +3,8 @@
 	import { elementMap, isComplexElement } from '$lib/instance-views/resolve.js';
 	import type { ViewSchema } from '$lib/instance-views/schema';
 	import schema from '$lib/instance-views/schema.json';
+	import { columns } from '$lib/stores';
+	import { ZenoColumnType } from '$lib/zenoapi';
 	import Ajv from 'ajv';
 
 	export let view: string;
@@ -36,83 +38,91 @@
 	} catch (error) {
 		JSONParseError = error as string;
 	}
+
+	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
+	$: entryId = idColumn ? (entry[idColumn.id] as string) : '';
 </script>
 
 {#if JSONParseError}
 	<Error type="Invalid JSON for View Specification" message={JSONParseError} />
 {:else if schemaValidationError}
 	<Error type="Invalid View Specification" message={schemaValidationError} />
-{:else if viewSpec.displayType === 'table'}
-	<table class="overflow-x-auto break-words rounded border border-grey-lighter p-4">
-		{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
-			<svelte:component
-				this={elementMap[viewSpec.data.type]}
-				spec={viewSpec.data}
-				data={typeof entry[dataColumn] === 'object'
-					? JSON.stringify(entry[dataColumn])
-					: entry[dataColumn]}
-			/>
-		{/if}
-		{#if labelColumn && entry[labelColumn] !== undefined && viewSpec.label}
-			<svelte:component
-				this={elementMap[viewSpec.label.type]}
-				spec={viewSpec.label}
-				data={typeof entry[labelColumn] === 'object'
-					? JSON.stringify(entry[labelColumn])
-					: entry[labelColumn]}
-			/>
-		{/if}
-		{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
-			<svelte:component
-				this={elementMap[viewSpec.output.type]}
-				spec={viewSpec.output}
-				data={typeof entry[modelColumn] === 'object'
-					? JSON.stringify(entry[modelColumn])
-					: entry[modelColumn]}
-			/>
-		{/if}
-	</table>
 {:else}
 	<div
 		class="overflow-x-auto break-words rounded border border-grey-lighter p-4 {highlighted
 			? 'border-primary'
 			: ''}"
 	>
-		{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
-			<div class="flex {isComplexElement(viewSpec.data.type) ? 'flex-col' : 'flex-row'}">
-				<svelte:component
-					this={elementMap[viewSpec.data.type]}
-					spec={viewSpec.data}
-					data={typeof entry[dataColumn] === 'object'
-						? JSON.stringify(entry[dataColumn])
-						: entry[dataColumn]}
-				/>
-			</div>
-		{/if}
-		{#if labelColumn && entry[labelColumn] !== undefined && viewSpec.label}
-			<div class="flex {isComplexElement(viewSpec.label.type) ? 'flex-col' : 'flex-row'} mt-2">
-				<span class="pr-2 font-semibold">label: </span>
-				<svelte:component
-					this={elementMap[viewSpec.label.type]}
-					spec={viewSpec.label}
-					data={typeof entry[labelColumn] === 'object'
-						? JSON.stringify(entry[labelColumn])
-						: entry[labelColumn]}
-				/>
-			</div>
-		{/if}
-		{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
-			<hr class="-mx-4 my-4 text-grey-lighter" />
-			<div class="flex {isComplexElement(viewSpec.output.type) ? 'flex-col' : 'flex-row'}">
-				<span class="pr-2 font-semibold">output: </span>
-				<svelte:component
-					this={elementMap[viewSpec.output.type]}
-					spec={viewSpec.output}
-					data={typeof entry[modelColumn] === 'object'
-						? JSON.stringify(entry[modelColumn])
-						: entry[modelColumn]}
-				/>
-			</div>
+		<div class="mb-4 text-xs text-grey-light">
+			{entryId}
+		</div>
+		{#if viewSpec.displayType === 'table'}
+			<table class="overflow-x-auto break-words rounded border border-grey-lighter p-4">
+				{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
+					<svelte:component
+						this={elementMap[viewSpec.data.type]}
+						spec={viewSpec.data}
+						data={typeof entry[dataColumn] === 'object'
+							? JSON.stringify(entry[dataColumn])
+							: entry[dataColumn]}
+					/>
+				{/if}
+				{#if labelColumn && entry[labelColumn] !== undefined && viewSpec.label}
+					<svelte:component
+						this={elementMap[viewSpec.label.type]}
+						spec={viewSpec.label}
+						data={typeof entry[labelColumn] === 'object'
+							? JSON.stringify(entry[labelColumn])
+							: entry[labelColumn]}
+					/>
+				{/if}
+				{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
+					<svelte:component
+						this={elementMap[viewSpec.output.type]}
+						spec={viewSpec.output}
+						data={typeof entry[modelColumn] === 'object'
+							? JSON.stringify(entry[modelColumn])
+							: entry[modelColumn]}
+					/>
+				{/if}
+			</table>
+		{:else}
+			{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
+				<div class="flex {isComplexElement(viewSpec.data.type) ? 'flex-col' : 'flex-row'}">
+					<svelte:component
+						this={elementMap[viewSpec.data.type]}
+						spec={viewSpec.data}
+						data={typeof entry[dataColumn] === 'object'
+							? JSON.stringify(entry[dataColumn])
+							: entry[dataColumn]}
+					/>
+				</div>
+			{/if}
+			{#if labelColumn && entry[labelColumn] !== undefined && viewSpec.label}
+				<div class="flex {isComplexElement(viewSpec.label.type) ? 'flex-col' : 'flex-row'} mt-2">
+					<span class="pr-2 font-semibold">label: </span>
+					<svelte:component
+						this={elementMap[viewSpec.label.type]}
+						spec={viewSpec.label}
+						data={typeof entry[labelColumn] === 'object'
+							? JSON.stringify(entry[labelColumn])
+							: entry[labelColumn]}
+					/>
+				</div>
+			{/if}
+			{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
+				<hr class="-mx-4 my-4 text-grey-lighter" />
+				<div class="flex {isComplexElement(viewSpec.output.type) ? 'flex-col' : 'flex-row'}">
+					<span class="pr-2 font-semibold">output: </span>
+					<svelte:component
+						this={elementMap[viewSpec.output.type]}
+						spec={viewSpec.output}
+						data={typeof entry[modelColumn] === 'object'
+							? JSON.stringify(entry[modelColumn])
+							: entry[modelColumn]}
+					/>
+				</div>
+			{/if}
 		{/if}
 	</div>
 {/if}
