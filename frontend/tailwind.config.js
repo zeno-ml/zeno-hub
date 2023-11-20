@@ -14,6 +14,7 @@ export default {
 				ligther: '#f9f7fb'
 			},
 			background: '#ffffff',
+			error: '#cc1b1b',
 			yellowish: {
 				DEFAULT: 'rgb(245 245 245)',
 				light: '#fbfbfa'
