@@ -1,24 +1,69 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { metric, project } from '$lib/stores';
-	import type { GroupMetric } from '$lib/zenoapi';
+	import {
+		editTag,
+		filterSelection,
+		metric,
+		project,
+		selectionIds,
+		selections,
+		tagIds,
+		tags
+	} from '$lib/stores';
+	import type { GroupMetric, Tag, ZenoService } from '$lib/zenoapi';
 	import Button, { Group } from '@smui/button';
+	import { TrailingIcon } from '@smui/chips';
+	import { getContext } from 'svelte';
+	import TagPopup from '../popups/TagPopup.svelte';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
 	export let currentResult: GroupMetric[] | undefined;
 	export let selected: string;
 
+	let showNewTag = false;
+
+	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	$: choices = $project.view === '' ? ['table'] : ['list', 'table'];
 	$: selected = choices[0];
+
+	function saveChanges() {
+		if ($editTag === undefined) return;
+		zenoClient
+			.updateTag($project.uuid, {
+				...$editTag,
+				dataIds: $selectionIds
+			})
+			.then(() => {
+				tags.update((t) => {
+					const index = t.findIndex((tag) => tag.id === $editTag?.id);
+					if (index !== -1 && $editTag !== undefined) {
+						t[index] = { ...$editTag, dataIds: $selectionIds };
+					}
+					return t;
+				});
+				let s = new Set<string>();
+				$selections.tags.forEach((tagId) => {
+					const tag: Tag | undefined = $tags.find((cur) => cur.id === tagId);
+					if (tag !== undefined) tag.dataIds.forEach((item) => s.add(item));
+					tagIds.set([...s]);
+				});
+				editTag.set(undefined);
+				selectionIds.set([]);
+			});
+	}
 </script>
 
+{#if showNewTag}
+	<TagPopup on:close={() => (showNewTag = false)} />
+{/if}
 <div class="w-full">
 	<div class="flex min-h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
 		<ChipsWrapper />
 	</div>
-	{#if !$page.url.href.includes('compare')}
+	{#if !$page.url.href.includes('compare') || $selectionIds.length > 0 || $editTag !== undefined}
 		<div class="flex w-full flex-wrap items-center border-b border-grey-lighter py-2.5">
-			<div class="mr-4 flex">
+			<div class="mr-4 flex items-center">
 				{#if currentResult !== undefined && currentResult.length > 0}
 					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
 						<span class="mr-3 text-grey-dark">
@@ -33,6 +78,42 @@
 							? 's'
 							: ''})</span
 					>
+				{/if}
+				{#if $selectionIds.length > 0 || $editTag !== undefined}
+					<div class="flex items-center">
+						<button
+							class="mx-1 flex w-fit rounded-2xl border-2 bg-greenish-light {$filterSelection
+								? 'border-greenish'
+								: 'border-greenish-light'} px-2.5 py-1"
+							on:click={() => filterSelection.set(!$filterSelection)}
+						>
+							<span
+								>{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected</span
+							>
+							<TrailingIcon
+								class="remove material-icons"
+								on:click={() => {
+									selectionIds.set([]);
+									filterSelection.set(false);
+								}}
+							>
+								cancel
+							</TrailingIcon>
+						</button>
+						<Button
+							variant="outlined"
+							class="!text-greenish"
+							on:keydown={() => ({})}
+							on:click={() => {
+								if ($editTag === undefined) showNewTag = true;
+								else {
+									saveChanges();
+								}
+							}}
+						>
+							{$editTag === undefined ? 'Create tag' : 'Update tag'}
+						</Button>
+					</div>
 				{/if}
 			</div>
 			<div class="ml-auto flex items-center">
