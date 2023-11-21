@@ -71,7 +71,7 @@ jobs:
           cd backend
           poetry install --no-interaction --no-root
 
-  test-frontend:
+  test-integration:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -80,4 +80,4 @@ jobs:
       - name: Set up docker containers
         run: docker-compose up -d
       - name: Run tests
-        run: cd frontend && npm run test
+        run: cd frontend && npm run i && npm run test
