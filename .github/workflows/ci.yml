@@ -75,14 +75,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
       - name: Set up secrets
         run: echo "${{ secrets.ZENO_HUB_ENV }}" > frontend/.env
-      - name: Set up docker containers
-        run: docker-compose up -d
-      - name: Run tests
+      - name: Install node
         run: |
           cd frontend
           npm ci
+      - name: Set up docker containers
+        run: docker-compose up -d
       - name: Install Playwright Browsers
         run: |
           cd frontend
