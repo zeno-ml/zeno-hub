@@ -16,7 +16,7 @@ class HistogramBucket(CamelModel):
         metric (float | None): the metric value of the bucket.
     """
 
-    bucket: float | bool | int | str
+    bucket: float | bool | int | str | None
     bucket_end: float | bool | int | str | None = None
     size: int | None = None
     filtered_size: int | None = None
