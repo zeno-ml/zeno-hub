@@ -78,8 +78,14 @@
 		)}
 	on:mouseover={() => (hovering = true)}
 	on:focus={() => (hovering = true)}
-	on:mouseleave={() => (hovering = false)}
-	on:blur={() => (hovering = false)}
+	on:mouseleave={() => {
+		hovering = false;
+		showOptions = false;
+	}}
+	on:blur={() => {
+		hovering = false;
+		showOptions = false;
+	}}
 	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
 	<div
