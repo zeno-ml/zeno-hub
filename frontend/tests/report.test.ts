@@ -17,6 +17,7 @@ test('can create report', async ({ page }) => {
 	await page.getByRole('button', { name: 'Create', exact: true }).click();
 
 	await page.waitForURL('/report/**');
+	await page.waitForSelector('body.started', { timeout: 5000 });
 
 	await expect(page.getByRole('heading', { name: 'Test Report' })).toBeVisible();
 });

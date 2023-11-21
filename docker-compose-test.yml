@@ -1,0 +1,48 @@
+version: "3"
+services:
+  frontend:
+    container_name: zeno-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules/
+    ports:
+      - "5173:5173"
+    command: ["npm", "run", "preview", "--", "--host"]
+  backend:
+    container_name: zeno-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/.venv/
+    depends_on:
+      - postgres
+    environment:
+      BACKEND_HOST: 0.0.0.0
+      BACKEND_PORT: 8000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: zeno
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+    command: poetry run uvicorn zeno_backend.server:get_server --reload --host 0.0.0.0 --timeout-keep-alive 75 --workers 4
+  postgres:
+    container_name: zeno-postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: zeno
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - ./backend/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+    ports:
+      # Use a different port to avoid clashes with local postgres
+      - "5431:5432"
