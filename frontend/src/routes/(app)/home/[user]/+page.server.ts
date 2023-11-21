@@ -1,8 +1,6 @@
-import { getClient } from '$lib/api/client';
-import { EntrySort, type HomeEntry } from '$lib/zenoapi';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url, depends, parent }) {
+export async function load({ url, depends, parent }) {
 	depends('app:reports');
 	depends('app:projects');
 
@@ -11,20 +9,7 @@ export async function load({ cookies, url, depends, parent }) {
 		throw redirect(303, `/login?redirectto=${url.pathname}`);
 	}
 
-	const zenoClient = await getClient(cookies, url);
-
-	let homeResponse: HomeEntry[];
-	try {
-		homeResponse = await zenoClient.getHomeDetails({
-			userName: cognitoUser.name,
-			sort: EntrySort.RECENT
-		});
-	} catch (e) {
-		throw redirect(303, `/login?redirectto=${url.pathname}`);
-	}
-
 	return {
-		cognitoUser: cognitoUser,
-		entries: homeResponse
+		cognitoUser: cognitoUser
 	};
 }

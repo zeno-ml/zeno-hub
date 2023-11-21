@@ -1,8 +1,14 @@
 <script lang="ts">
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
+	import { inViewport } from '$lib/util/viewport';
 
-	import { EntrySort, EntryTypeFilter, type ZenoService } from '$lib/zenoapi/index.js';
+	import {
+		EntrySort,
+		EntryTypeFilter,
+		type HomeEntry,
+		type ZenoService
+	} from '$lib/zenoapi/index.js';
 	import { getContext } from 'svelte';
 
 	export let data;
@@ -12,6 +18,7 @@
 	let searchText = '';
 	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
 	let sort: EntrySort = EntrySort.POPULAR;
+	let entries: HomeEntry[] = [];
 
 	$: updateEntries(searchText, typeFilter, sort);
 
@@ -20,10 +27,26 @@
 			.getHomeDetails({
 				searchString,
 				typeFilter,
-				sort
+				sort,
+				offset: 0,
+				limit: 20
 			})
 			.then((res) => {
-				data.entries = res;
+				entries = res;
+			});
+	}
+
+	function loadMore() {
+		zenoClient
+			.getHomeDetails({
+				searchString: searchText,
+				typeFilter,
+				sort,
+				offset: entries.length,
+				limit: 20
+			})
+			.then((res) => {
+				entries = [...entries, ...res];
 			});
 	}
 </script>
@@ -35,7 +58,13 @@
 
 <HomeSearchBar bind:searchText bind:typeFilter bind:sort />
 <div class="grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
-	{#each data.entries as entry ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
-		<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
+	{#each entries as entry, i ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
+		{#if i === entries.length - 1}
+			<div use:inViewport={loadMore}>
+				<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
+			</div>
+		{:else}
+			<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
+		{/if}
 	{/each}
 </div>
