@@ -80,11 +80,17 @@ jobs:
       - name: Set up docker containers
         run: docker-compose up -d
       - name: Run tests
-        run: cd frontend && npm ci
+        run: |
+          cd frontend
+          npm ci
       - name: Install Playwright Browsers
-        run: cd frontend && npx playwright install --with-deps
+        run: |
+          cd frontend
+          npx playwright install --with-deps
       - name: Run Playwright tests
-        run: cd frontend && npx playwright test
+        run: |
+          cd frontend
+          npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
