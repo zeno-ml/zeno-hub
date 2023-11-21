@@ -160,7 +160,7 @@
 	/>
 {/if}
 <button
-	class="parent relative mt-1 flex h-9 w-full items-center justify-between overflow-visible rounded-2xl border border-grey-lighter px-2.5 {selected
+	class="relative mt-1 flex h-9 w-full items-center justify-between overflow-visible rounded border border-grey-lighter px-2.5 {selected
 		? 'bg-greenish-light'
 		: ''}"
 	on:click={setSelected}
@@ -176,7 +176,7 @@
 			{tag.tagName}
 		</span>
 		<div
-			class="flex items-center justify-between"
+			class="flex items-center"
 			use:clickOutside={() => {
 				showOptions = false;
 			}}
@@ -228,29 +228,27 @@
 					<span class="mr-1 italic text-grey-darker"> (0) </span>
 				{/if}
 			{/await}
-			{#if $editTag === undefined || $editTag.id !== tag.id}
-				<div class="flex">
-					<div
-						style:width="36px"
-						use:clickOutside={() => {
-							hovering = false;
-						}}
-					>
-						{#if hovering && $project.editor}
-							<IconButton
-								size="button"
-								style="padding: 0px"
-								on:click={(e) => {
-									e.stopPropagation();
-									showOptions = !showOptions;
-								}}
-							>
-								<Icon tag="svg" viewBox="0 0 24 24">
-									<path fill="black" d={mdiDotsHorizontal} />
-								</Icon>
-							</IconButton>
-						{/if}
-					</div>
+			{#if $project.editor}
+				<div
+					class="w-[36px] min-w-[36px]"
+					use:clickOutside={() => {
+						hovering = false;
+					}}
+				>
+					{#if hovering && ($editTag === undefined || $editTag.id !== tag.id)}
+						<IconButton
+							class="p-0"
+							size="button"
+							on:click={(e) => {
+								e.stopPropagation();
+								showOptions = !showOptions;
+							}}
+						>
+							<Icon tag="svg" viewBox="0 0 24 24">
+								<path fill="black" d={mdiDotsHorizontal} />
+							</Icon>
+						</IconButton>
+					{/if}
 				</div>
 			{/if}
 		</div>

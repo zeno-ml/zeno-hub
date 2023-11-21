@@ -1,6 +1,6 @@
 <script lang="ts">
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
-	import { columns, selectionIds } from '$lib/stores';
+	import { columns, project, selectionIds } from '$lib/stores';
 	import { ZenoColumnType } from '$lib/zenoapi';
 	import Checkbox from '@smui/checkbox';
 
@@ -27,10 +27,10 @@
 	}}
 	tabindex="0"
 	role="button"
-	class="relative"
+	class="relative cursor-default"
 >
-	{#if hovering || $selectionIds.includes(entryId)}
-		<div class="absolute right-0 top-0 z-10">
+	{#if $project.editor && (hovering || $selectionIds.includes(entryId))}
+		<div class="absolute right-0 top-0 z-10 cursor-pointer">
 			<Checkbox
 				checked={$selectionIds.includes(entryId)}
 				on:click={() =>

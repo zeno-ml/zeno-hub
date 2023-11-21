@@ -17,7 +17,7 @@
 	import TagPopup from '../popups/TagPopup.svelte';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
-	export let currentResult: Promise<GroupMetric[] | undefined> | undefined;
+	export let currentResult: GroupMetric[] | undefined;
 	export let selected: string;
 
 	let showNewTag = false;
@@ -29,6 +29,7 @@
 
 	function saveChanges() {
 		if ($editTag === undefined) return;
+		filterSelection.set(false);
 		zenoClient
 			.updateTag($project.uuid, {
 				...$editTag,
@@ -58,68 +59,66 @@
 	<TagPopup on:close={() => (showNewTag = false)} />
 {/if}
 <div class="w-full">
-	<div class="flex h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
+	<div class="flex min-h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
 		<ChipsWrapper />
 	</div>
-	{#if !$page.url.href.includes('compare') || $selectionIds.length > 0 || $editTag}
+	{#if !$page.url.href.includes('compare') || $selectionIds.length > 0 || $editTag !== undefined}
 		<div class="flex w-full flex-wrap items-center border-b border-grey-lighter py-2.5">
-			{#if !$page.url.href.includes('compare')}
-				<div class="mr-4 flex">
-					{#await currentResult then res}
-						{#if res !== undefined && res.length > 0}
-							{#if res[0].metric !== undefined && res[0].metric !== null}
-								<span class="mr-3 text-grey-dark">
-									{$metric ? $metric.name + ':' : ''}
-								</span>
-								<span class="mr-3 text-primary">
-									{res[0].metric.toFixed(2)}
-								</span>
-							{/if}
-							<span class="mr-2.5 italic text-grey-darker"
-								>({res[0].size.toLocaleString()} instance{res[0].size > 1 ? 's' : ''})</span
+			<div class="mr-4 flex items-center">
+				{#if !$page.url.href.includes('compare') && currentResult !== undefined && currentResult.length > 0}
+					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
+						<span class="mr-3 text-grey-dark">
+							{$metric ? $metric.name + ':' : ''}
+						</span>
+						<span class="mr-3 text-primary">
+							{currentResult[0].metric.toFixed(2)}
+						</span>
+					{/if}
+					<span class="mr-2.5 italic text-grey-darker"
+						>({currentResult[0].size.toLocaleString()} instance{currentResult[0].size > 1
+							? 's'
+							: ''})</span
+					>
+				{/if}
+				{#if $selectionIds.length > 0 || $editTag !== undefined}
+					<div class="flex items-center">
+						<button
+							class="mx-1 flex w-fit rounded-2xl border-2 bg-greenish-light {$filterSelection
+								? 'border-greenish'
+								: 'border-greenish-light'} px-2.5 py-1"
+							on:click={() => filterSelection.set(!$filterSelection)}
+						>
+							<span
+								>{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected</span
 							>
-						{/if}
-					{/await}
-				</div>
-			{/if}
-			{#if $selectionIds.length > 0}
-				<div class="flex items-center">
-					<button
-						class="my flex w-fit rounded-lg border-2 {$filterSelection
-							? 'bg-greenish-light'
-							: ''} border-greenish-light px-2.5 py-1"
-						on:click={() => filterSelection.set(!$filterSelection)}
-					>
-						<span
-							>{$selectionIds.length} instance{$selectionIds.length > 1 ? 's' : ''} selected</span
-						>
-						<TrailingIcon
-							class="remove material-icons"
+							<TrailingIcon
+								class="remove material-icons"
+								on:click={() => {
+									selectionIds.set([]);
+									filterSelection.set(false);
+								}}
+							>
+								cancel
+							</TrailingIcon>
+						</button>
+						<Button
+							variant="outlined"
+							class="!text-greenish"
+							on:keydown={() => ({})}
 							on:click={() => {
-								selectionIds.set([]);
-								filterSelection.set(false);
-							}}>cancel</TrailingIcon
+								if ($editTag === undefined) showNewTag = true;
+								else {
+									saveChanges();
+								}
+							}}
 						>
-					</button>
-					<Button
-						variant="outlined"
-						class="ml-2"
-						style="background-color: var(--N1); color: white; "
-						on:keydown={() => ({})}
-						on:click={() => {
-							if ($editTag === undefined) showNewTag = true;
-							else {
-								saveChanges();
-							}
-						}}
-					>
-						{$editTag === undefined ? 'Create tag' : 'Update tag'}
-					</Button>
-				</div>
-			{/if}
+							{$editTag === undefined ? 'Create tag' : 'Update tag'}
+						</Button>
+					</div>
+				{/if}
+			</div>
 			{#if !$page.url.href.includes('compare')}
 				<div class="ml-auto flex items-center">
-					<slot />
 					<Group>
 						{#each choices as choice}
 							<Button
