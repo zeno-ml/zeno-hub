@@ -42,12 +42,11 @@ jobs:
     steps:
       - uses: jakebailey/pyright-action@v1
 
-  test:
+  test-backend:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
@@ -72,22 +71,11 @@ jobs:
           cd backend
           poetry install --no-interaction --no-root
 
-      - name: Cache NPM packages
-        uses: actions/cache@v3.3.2
-        id: cache-npm
-        with:
-          path: ~/frontend/node_modules
-          key: npm-${{ hashFiles('~/frontend/**/package.lock') }}
-          restore-keys: |
-            npm-${{ hashFiles('~/frontend/**/package.lock') }}
-
-      - name: Install NPM packages
-        if: steps.cache-npm.outputs.cache-hit != 'true'
-        run: |
-          cd frontend/
-          npm i
-
-      - name: Build frontend
-        run: |
-          cd frontend/
-          npm run build
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up docker containers
+        run: docker-compose up -d
+      - name: Run tests
+        run: cd frontend && npm run test
