@@ -133,9 +133,9 @@
 		</select>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
-		{start + 1} -
-		{Math.min(end, numberOfInstances)} of
-		{numberOfInstances}
+		{(start + 1).toLocaleString()} -
+		{Math.min(end, numberOfInstances).toLocaleString()} of
+		{numberOfInstances.toLocaleString()}
 	</svelte:fragment>
 
 	<IconButton
