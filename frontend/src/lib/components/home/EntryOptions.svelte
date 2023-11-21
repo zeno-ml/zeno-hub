@@ -14,7 +14,7 @@
 	const exploreTab = $page.route.id === '/(app)/home';
 </script>
 
-<div class="absolute right-0 top-0 z-30 mt-9 hover:bg-grey-lighter">
+<div class="absolute left-0 top-0 z-30 mt-9 hover:bg-grey-lighter">
 	<Paper style="padding: 3px 0px;" elevation={7}>
 		<Content>
 			{#if project}
