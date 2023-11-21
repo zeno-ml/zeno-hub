@@ -42,6 +42,7 @@
 			png: 3
 		},
 		renderer: 'svg',
-		theme: 'vox'
+		theme: 'vox',
+		downloadFileName: chart.name
 	}}
 />

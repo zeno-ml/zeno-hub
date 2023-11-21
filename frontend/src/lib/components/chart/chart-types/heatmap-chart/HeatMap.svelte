@@ -51,6 +51,7 @@
 		width: 700,
 		height: 700,
 		renderer: 'svg',
-		theme: 'vox'
+		theme: 'vox',
+		downloadFileName: chart.name
 	}}
 />
