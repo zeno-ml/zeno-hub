@@ -6,9 +6,10 @@ test('can go to home', async ({ page }) => {
 
 test('can login', async ({ page }) => {
 	await page.goto('/login');
-	await page.fill('input[name="username"]', process.env.HUB_USERNAME || '');
-	await page.fill('input[name="password"]', process.env.HUB_PASSWORD || '');
-	await page.click('button[type="submit"]');
+
+	await page.getByLabel('username').fill(process.env.HUB_USERNAME || '');
+	await page.getByLabel('password').fill(process.env.HUB_PASSWORD || '');
+	await page.getByRole('button', { name: 'Login' }).click();
 
 	// Should have profile button with first two letters, in this case 'te' for 'test'
 	await expect(page.getByRole('button', { name: 'te', exact: true })).toBeVisible();
