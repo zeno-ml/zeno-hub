@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		filterSelection,
@@ -18,7 +19,6 @@
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
-	import OptionsInstanceView from '../../instance-views/OptionsInstanceView.svelte';
 
 	export let numberOfInstances = 0;
 
@@ -112,12 +112,13 @@
 >
 	{#each table as inst (inst[idColumn])}
 		<div class="mr-2 mt-2">
-			<OptionsInstanceView
+			<InstanceView
 				view={$project.view}
 				{dataColumn}
 				{labelColumn}
 				modelColumn={modelColumn?.id}
 				entry={inst}
+				selectable
 			/>
 		</div>
 	{/each}

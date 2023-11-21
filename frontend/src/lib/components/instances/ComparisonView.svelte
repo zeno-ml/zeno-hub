@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
+	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import {
 		columns,
 		compareSort,
@@ -21,7 +22,6 @@
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
-	import OptionsInstanceView from '../../instance-views/OptionsInstanceView.svelte';
 
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
 	export let modelBResult: Promise<GroupMetric[] | undefined>;
@@ -273,12 +273,13 @@
 							{modelValueAndDiff($model, tableContent)}
 						</p>
 						<div class="instance">
-							<OptionsInstanceView
+							<InstanceView
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}
 								modelColumn={modelAColumn?.id}
 								entry={tableContent}
+								selectable
 							/>
 						</div>
 					</td>
@@ -288,12 +289,13 @@
 							{modelValueAndDiff($comparisonModel, tableContent)}
 						</p>
 						<div class="instance">
-							<OptionsInstanceView
+							<InstanceView
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}
 								modelColumn={modelBColumn?.id}
 								entry={tableContent}
+								selectable
 							/>
 						</div>
 					</td>
