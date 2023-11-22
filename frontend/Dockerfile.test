@@ -14,5 +14,7 @@ COPY . .
 
 RUN npm run build
 
+RUN ls -l
+
 # Expose the port
 EXPOSE 5173
