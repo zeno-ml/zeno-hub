@@ -5,11 +5,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.test
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules/
+    environment:
+      PORT: 5173
     ports:
       - "5173:5173"
+    command: node build
   backend:
     container_name: zeno-backend
     build:
@@ -19,9 +19,6 @@ services:
       - ./frontend/.env
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
-      - /app/.venv/
     depends_on:
       - postgres
     environment:
