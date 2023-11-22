@@ -5,11 +5,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.test
-    environment:
-      PORT: 5173
     ports:
       - "5173:5173"
-    command: node build
+    command: npm run preview -- --port 5173 --host 0.0.0.0
   backend:
     container_name: zeno-backend
     build:
