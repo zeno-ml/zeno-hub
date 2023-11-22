@@ -7,11 +7,9 @@ test.beforeEach(async ({ page }) => {
 	await page.getByLabel('password').fill(process.env.HUB_PASSWORD || '');
 	await page.getByRole('button', { name: 'Login' }).click();
 	await page.waitForURL('/home/test');
-	await page.waitForSelector('body.started', { timeout: 5000 });
 
 	await page.getByRole('button', { name: 'Translation Report' }).click();
 	await page.waitForURL('/report/**');
-	await page.waitForSelector('body.started', { timeout: 5000 });
 });
 
 test('can see report elements', async ({ page }) => {

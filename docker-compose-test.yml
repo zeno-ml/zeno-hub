@@ -4,7 +4,7 @@ services:
     container_name: zeno-frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile.test
+      dockerfile: Dockerfile.prod
     ports:
       - "5173:5173"
     command: npm run preview -- --port 5173 --host 0.0.0.0

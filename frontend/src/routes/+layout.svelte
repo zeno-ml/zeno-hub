@@ -6,7 +6,6 @@
 	import { featureFlags, tooltipState } from '$lib/stores';
 	import { zenoFeatureFlags } from '$lib/util/features';
 	import * as amplitude from '@amplitude/analytics-browser';
-	import { onMount } from 'svelte';
 	import '../app.postcss';
 
 	export let data;
@@ -17,12 +16,6 @@
 		amplitude.init(env.PUBLIC_AMPLITUDE_API_KEY, {
 			defaultTracking: true
 		});
-
-	// Indicate that the SvelteKit app has mounted for hydration issues
-	// with playwright testing.
-	onMount(() => {
-		document.body.classList.add('started');
-	});
 
 	onNavigate((navigation) => {
 		tooltipState.set({
