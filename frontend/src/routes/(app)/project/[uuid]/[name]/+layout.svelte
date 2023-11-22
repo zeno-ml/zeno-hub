@@ -19,6 +19,7 @@
 		selectionIds,
 		selections,
 		slices,
+		tagIds,
 		tags
 	} from '$lib/stores.js';
 	import { setURLParameters } from '$lib/util/util.js';
@@ -45,6 +46,14 @@
 		selectionIds.set([]);
 		filterSelection.set(false);
 		editTag.set(undefined);
+		// Set tagIds according to the selection we get from URL params
+		tagIds.set(
+			data.selections.tags.flatMap((selectionTag) => {
+				const tag = data.tags.find((tag) => tag.id === selectionTag);
+				if (tag === undefined) return [];
+				return tag.dataIds;
+			})
+		);
 
 		model.subscribe((mod) => {
 			if ($comparisonModel && $comparisonModel === mod) {
