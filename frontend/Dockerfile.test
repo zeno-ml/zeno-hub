@@ -1,5 +1,5 @@
 # Load the node image
-FROM frontend/Dockerfile.prodnode:20-bookworm-slim
+FROM node:20-bookworm-slim
 
 # Set the working directory
 WORKDIR /app
