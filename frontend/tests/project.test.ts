@@ -21,14 +21,15 @@ test('can see project elements', async ({ page }) => {
 
 test('slice and tag metrics are correct', async ({ page }) => {
 	await expect(page.getByRole('button', { name: 'All instances 42.15 (20,240)' })).toBeVisible();
-	await expect(page.getByRole('button', { name: 'short arabic 38.20 (1,525)' })).toBeVisible();
+	await expect(page.getByRole('button', { name: 'short latin 31.77 (7)' })).toBeVisible();
+	await expect(page.getByRole('button', { name: 'random tag 26.15 (3)' })).toBeVisible();
 });
 
 test('can filter by slice', async ({ page }) => {
-	await page.getByText('short arabic').click();
+	await page.getByText('short latin').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toHaveText(
-		' People may not anticipate that patience and understanding are also necessary for travellers returning home. label: ممكن ما يتوقع الناس أن الصبر والتفاهم ضروريات أيضاً للمسافرين الراجعين لبلدانهم.  output: الناس ممكن ما يتوقعوا إن الصبر والتفهم لازمين كمان للمسافرين اللي راجعين البيت.'
+		'He built a WiFi door bell, he said. label: Utsi wakhe ibheli ye-WiFi yasemnyango. output: Wagcina umgodi we-WiFi, wathi.'
 	);
 });
 
@@ -36,6 +37,6 @@ test('can filter by tag', async ({ page }) => {
 	await page.getByText('random tag').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toHaveText(
-		'"We now have 4-month-old mice that are non-diabetic that used to be diabetic," he added. label: Mums tagad ir 4 mēnešus vecas peles, kas nav diabēta slimnieces, bet kuras agrāk bija diabēta slimnieces, viņš piebilda.  output: "Mums tagad ir četru mēnešu veci peliņi, kas nav diabētiski, bet agrāk bija diabētiski," viņš piebilda.'
+		'He built a WiFi door bell, he said. label: Utsi wakhe ibheli ye-WiFi yasemnyango. output: Wagcina umgodi we-WiFi, wathi.'
 	);
 });
