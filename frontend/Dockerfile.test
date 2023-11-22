@@ -14,7 +14,7 @@ COPY . .
 
 RUN npm run build
 
-RUN npm run preview
-
 # Expose the port
 EXPOSE 5173
+
+CMD ["npm", "run", "preview", "--", "--port", "5173", "--host", "0.0.0.0"]
