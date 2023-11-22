@@ -4,7 +4,7 @@ services:
     container_name: zeno-frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.test
     volumes:
       - ./frontend:/app
       - /app/node_modules/
