@@ -24,7 +24,6 @@
 				searchString,
 				typeFilter,
 				sort,
-				offset: 0,
 				limit: 20
 			})
 			.then((res) => {
@@ -33,13 +32,16 @@
 	}
 
 	function loadMore() {
+		const numProjects = entries.filter((entry) => 'uuid' in entry.entry).length;
+		const numReports = entries.filter((entry) => 'id' in entry.entry).length;
 		zenoClient
 			.getHomeDetails({
 				userName: data.cognitoUser.name,
 				searchString: searchText,
 				typeFilter,
 				sort,
-				offset: entries.length,
+				projectOffset: numProjects,
+				reportOffset: numReports,
 				limit: 20
 			})
 			.then((res) => {

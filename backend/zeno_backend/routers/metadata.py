@@ -90,10 +90,11 @@ def get_home_details(home_request: HomeRequest, req: Request):
         and home_request.type_filter != EntryTypeFilter.ALL
     ):
         projects = []
-    elif user and home_request.user_name is not None:
-        projects = select.projects(user, home_request)
     else:
-        projects = select.public_projects(home_request)
+        if user and home_request.user_name is not None:
+            projects = select.projects(user, home_request)
+        else:
+            projects = select.public_projects(home_request)
     project_ret: list[HomeEntry] = []
     for proj in projects:
         stats = select.project_stats(proj.uuid, user.id if user else None)
@@ -104,10 +105,11 @@ def get_home_details(home_request: HomeRequest, req: Request):
         and home_request.type_filter != EntryTypeFilter.ALL
     ):
         reports = []
-    elif user and home_request.user_name is not None:
-        reports = select.reports(user, home_request)
     else:
-        reports = select.public_reports(home_request)
+        if user and home_request.user_name is not None:
+            reports = select.reports(user, home_request)
+        else:
+            reports = select.public_reports(home_request)
     report_ret: list[HomeEntry] = []
     for rep in reports:
         stats = select.report_stats(rep.id, user.id if user else None)

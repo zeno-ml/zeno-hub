@@ -27,7 +27,8 @@ class HomeRequest(CamelModel):
 
     Attributes:
         user_name: Username of user to get entries for. If None, get public entries.
-        offset: Offset of entries to return
+        project_offset: Offset of project entries already fetched
+        report_offset: Offset of report entries already fetched
         limit: Limit of entries to return
         search_string: String to search for in entries
         type_filter: Type of entry to filter by
@@ -35,7 +36,8 @@ class HomeRequest(CamelModel):
     """
 
     user_name: str | None = None
-    offset: int = 0
+    project_offset: int = 0
+    report_offset: int = 0
     limit: int | None = None
     search_string: str = ""
     type_filter: EntryTypeFilter = EntryTypeFilter.ALL
