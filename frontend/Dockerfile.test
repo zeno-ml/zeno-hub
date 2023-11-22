@@ -16,11 +16,5 @@ RUN npm run build
 
 RUN mv ./build ./.svelte-kit/output
 
-RUN ls -la
-
-RUN ls -la ./build
-
-RUN ls -la ./.svelte-kit
-
 # Expose the port
 EXPOSE 5173
