@@ -56,14 +56,14 @@ jobs:
       - name: Set up docker containers
         run: |
           docker-compose -f ./docker-compose-test.yml up -d
-      - name: Get docker status
-        run: docker ps -a
-      - name: Get docker logs
-        run: docker-compose -f ./docker-compose-test.yml logs
       - name: Install Playwright Browsers
         run: |
           cd frontend
           npx playwright install --with-deps
+      - name: Get docker status
+        run: docker ps -a
+      - name: Get docker logs
+        run: docker-compose -f ./docker-compose-test.yml logs
       - name: Run Playwright tests
         run: |
           cd frontend
