@@ -1,0 +1,18 @@
+# Load the node image
+FROM frontend/Dockerfile.prodnode:20-bookworm-slim
+
+# Set the working directory
+WORKDIR /app
+
+COPY package.json .
+
+# Install the dependencies
+RUN npm install
+
+# Copy the rest of the files
+COPY . .
+
+RUN npm run build
+
+# Expose the port
+EXPOSE 5173
