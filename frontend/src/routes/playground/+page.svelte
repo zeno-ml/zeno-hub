@@ -24,6 +24,7 @@
 		sample === undefined ? samples[Object.keys(samples)[0]].data : samples[sample].data;
 	let jsonData: Record<string, unknown> | undefined = undefined;
 	let errorMessage: string | undefined = undefined;
+	let codeHeight: number = 0;
 
 	$: setURLParameters(sample);
 
@@ -60,32 +61,54 @@
 			{/each}
 		</div>
 	</div>
-	<div class="flex h-full w-full">
+	<div class="flex h-full min-h-0 w-full">
 		<div class="h-full w-1/3 border-r border-grey-light p-2">
-			<div class="flex flex-col">
+			<div class="flex h-full flex-col">
 				<h2 class="mb-4 text-xl font-bold">View Specification</h2>
-				<CodeMirror bind:value={spec} lang={json()} />
+				<div class="min-h-0 grow" bind:clientHeight={codeHeight}>
+					<CodeMirror
+						bind:value={spec}
+						lang={json()}
+						styles={{
+							'&': {
+								height: `${codeHeight}px`
+							}
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 		<div class="h-full w-1/3 border-r border-grey-light p-2">
-			<div class="flex flex-col">
+			<div class="flex h-full flex-col">
 				<h2 class="mb-4 text-xl font-bold">Data Sample</h2>
-				<CodeMirror bind:value={currentData} lang={json()} />
+				<div class="min-h-0 grow">
+					<CodeMirror
+						bind:value={currentData}
+						lang={json()}
+						styles={{
+							'&': {
+								height: `${codeHeight}px`
+							}
+						}}
+					/>
+				</div>
 			</div>
 		</div>
 		<div class="h-full w-1/3 p-2">
-			<div class="flex flex-col">
+			<div class="flex h-full flex-col">
 				<h2 class="mb-4 text-xl font-bold">Instance View</h2>
 				{#if jsonData === undefined}
 					<Error type="Incorrect Data" message={errorMessage} />
 				{:else}
-					<InstanceView
-						view={spec}
-						entry={jsonData}
-						dataColumn="data"
-						labelColumn="label"
-						modelColumn="output"
-					/>
+					<div class="min-h-0 overflow-y-auto">
+						<InstanceView
+							view={spec}
+							entry={jsonData}
+							dataColumn="data"
+							labelColumn="label"
+							modelColumn="output"
+						/>
+					</div>
 				{/if}
 			</div>
 		</div>
