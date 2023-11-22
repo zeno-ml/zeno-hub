@@ -18,5 +18,7 @@ RUN ls -la
 
 RUN ls -la ./build
 
+RUN ls -la ./.svelte-kit
+
 # Expose the port
 EXPOSE 5173
