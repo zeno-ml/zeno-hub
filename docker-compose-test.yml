@@ -10,7 +10,7 @@ services:
       - /app/node_modules/
     ports:
       - "5173:5173"
-   backend:
+  backend:
     container_name: zeno-backend
     build:
       context: ./backend
