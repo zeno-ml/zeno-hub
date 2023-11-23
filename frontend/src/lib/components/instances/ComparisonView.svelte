@@ -69,18 +69,21 @@
 	// when state changes update current table view
 	$: {
 		currentPage;
-		$model;
 		$comparisonModel;
 		$comparisonColumn;
 		$rowsPerPage;
 		$compareSort;
-		$selectionIds;
-		$filterSelection;
 		$selectionPredicates;
 		$tagIds;
 		$selections.tags;
 		start;
 		end;
+		updateTable(true);
+	}
+	$: {
+		$model;
+		$selectionIds;
+		$filterSelection;
 		updateTable();
 	}
 
@@ -123,7 +126,7 @@
 		}
 	}
 
-	function updateTable() {
+	function updateTable(resetScroll: boolean = false) {
 		if (
 			isNaN(start) ||
 			isNaN(end) ||
@@ -159,7 +162,7 @@
 			predicates
 		).then((t) => {
 			table = t;
-			instanceContainer.scrollTop = 0;
+			if (resetScroll) instanceContainer.scrollTop = 0;
 		});
 	}
 

@@ -63,12 +63,15 @@
 		$columns;
 		$selections.tags;
 		$selectionPredicates;
-		$model;
 		$sort;
 		$editTag;
+		$rowsPerPage;
+		updateTable(true);
+	}
+	$: {
+		$model;
 		$selectionIds;
 		$filterSelection;
-		$rowsPerPage;
 		updateTable();
 	}
 	$: modelColumn = $columns.find(
@@ -82,7 +85,7 @@
 		}
 	});
 
-	function updateTable() {
+	function updateTable(resetScroll: boolean = false) {
 		if (isNaN(start) || isNaN(end) || end <= start || !idColumn) return;
 		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
@@ -109,7 +112,7 @@
 			predicates
 		).then((t) => {
 			table = t;
-			tableContainer.scrollTop = 0;
+			if (resetScroll) tableContainer.scrollTop = 0;
 		});
 	}
 
