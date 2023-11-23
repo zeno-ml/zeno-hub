@@ -130,6 +130,7 @@
 		on:click={setSelection}
 		on:mouseleave={blur}
 		on:focusout={blur}
+		disabled={Operation.REGEX && !regexValid}
 	>
 		<Label>Set</Label>
 	</Button>

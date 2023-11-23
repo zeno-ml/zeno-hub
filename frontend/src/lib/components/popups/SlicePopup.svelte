@@ -46,26 +46,32 @@
 
 	// check if predicates are valid (not empty)
 	function checkValidPredicates(preds: (FilterPredicateGroup | FilterPredicate)[]): boolean {
-		let valid = preds.length > 0;
-		preds.forEach((p, i) => {
-			if (i !== 0 && p.join === Join._) {
-				valid = false;
+		for (const [index, predicate] of preds.entries()) {
+			if (index !== 0 && predicate.join === Join._) {
+				return false;
 			} else {
-				if (isPredicateGroup(p)) {
-					valid = checkValidPredicates(p.predicates);
+				if (isPredicateGroup(predicate)) {
+					if (!checkValidPredicates(predicate.predicates)) return false;
 				} else {
 					if (
-						p.column === null ||
-						p.operation === undefined ||
-						p.value === '' ||
-						p.value === null
+						predicate.column === null ||
+						predicate.operation === undefined ||
+						predicate.value === '' ||
+						predicate.value === null
 					) {
-						valid = false;
+						return false;
+					}
+					if (predicate.operation === Operation.REGEX) {
+						try {
+							new RegExp(String(predicate.value));
+						} catch (e) {
+							return false;
+						}
 					}
 				}
 			}
-		});
-		return valid;
+		}
+		return preds.length > 0;
 	}
 
 	function updatePredicates() {
