@@ -40,8 +40,8 @@ import type { TagTableRequest } from '../models/TagTableRequest';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
-import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
+import type { CancelablePromise } from '../core/CancelablePromise';
 
 export class ZenoService {
 	constructor(public readonly httpRequest: BaseHttpRequest) {}

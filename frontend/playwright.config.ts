@@ -1,12 +1,16 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const config: PlaywrightTestConfig = {
-	webServer: {
-		command: 'npm run build && npm run preview',
-		port: 4173
-	},
+	reporter: 'html',
 	testDir: 'tests',
-	testMatch: /(.+\.)?(test|spec)\.[jt]s/
+	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
+	retries: 2,
+	use: {
+		baseURL: 'http://localhost:5173'
+	}
 };
 
 export default config;
