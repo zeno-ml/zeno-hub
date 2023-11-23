@@ -54,9 +54,12 @@
 		$rowsPerPage;
 		$columns;
 		$selections.tags;
-		$model;
 		$sort;
 		$tagIds;
+		updateTable(true);
+	}
+	$: {
+		$model;
 		$selectionIds;
 		$filterSelection;
 		updateTable();
@@ -73,7 +76,7 @@
 		}
 	});
 
-	function updateTable() {
+	function updateTable(resetScroll: boolean = false) {
 		if (isNaN(start) || isNaN(end) || end <= start || !idColumn) return;
 		let predicates = $selectionPredicates;
 		if (predicates !== undefined && instanceOfFilterPredicate(predicates)) {
@@ -100,7 +103,7 @@
 			predicates
 		).then((t) => {
 			table = t;
-			listContainer.scrollTop = 0;
+			if (resetScroll) listContainer.scrollTop = 0;
 		});
 	}
 </script>
