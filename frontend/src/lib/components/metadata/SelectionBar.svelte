@@ -15,12 +15,14 @@
 	import { TrailingIcon } from '@smui/chips';
 	import { getContext } from 'svelte';
 	import TagPopup from '../popups/TagPopup.svelte';
+	import UpdateTagPopup from '../popups/UpdateTagPopup.svelte';
 	import ChipsWrapper from './ChipsWrapper.svelte';
 
 	export let currentResult: GroupMetric[] | undefined;
 	export let selected: string;
 
 	let showNewTag = false;
+	let showUpdateTag = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -57,6 +59,9 @@
 
 {#if showNewTag}
 	<TagPopup on:close={() => (showNewTag = false)} />
+{/if}
+{#if showUpdateTag}
+	<UpdateTagPopup on:close={() => (showUpdateTag = false)} />
 {/if}
 <div class="w-full">
 	<div class="flex min-h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
@@ -114,6 +119,18 @@
 						>
 							{$editTag === undefined ? 'Create tag' : 'Update tag'}
 						</Button>
+						{#if $editTag === undefined && $tags.length > 0}
+							<Button
+								variant="outlined"
+								class="ml-2 !text-greenish"
+								on:keydown={() => ({})}
+								on:click={() => {
+									showUpdateTag = true;
+								}}
+							>
+								Add to Tag
+							</Button>
+						{/if}
 					</div>
 				{/if}
 			</div>
