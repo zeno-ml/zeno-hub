@@ -40,8 +40,8 @@ import type { TagTableRequest } from '../models/TagTableRequest';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
 
-import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 import type { CancelablePromise } from '../core/CancelablePromise';
+import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 
 export class ZenoService {
 	constructor(public readonly httpRequest: BaseHttpRequest) {}
@@ -2155,6 +2155,47 @@ export class ZenoService {
 			url: '/slice/{project}',
 			path: {
 				project: project
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Slice Instance Ids
+	 * Get all instance ids of a slice.
+	 *
+	 * Args:
+	 * slice_id (int): id of the slice to get instance ids for.
+	 * model (str | None): model of the slice.
+	 * id_column (ZenoColumn): column to get ids from.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the project cannot be found.
+	 *
+	 * Returns:
+	 * list[str]: all ids of the slice.
+	 * @param sliceId
+	 * @param model
+	 * @param requestBody
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getSliceInstanceIds(
+		sliceId: number,
+		model: string | null,
+		requestBody: ZenoColumn
+	): CancelablePromise<Array<string>> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/slice_instance_ids/{slice_id}/{model}',
+			path: {
+				slice_id: sliceId,
+				model: model
 			},
 			body: requestBody,
 			mediaType: 'application/json',
