@@ -18,7 +18,7 @@
 	let searchText = '';
 	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
 	let sort: EntrySort = EntrySort.POPULAR;
-	let entries: HomeEntry[] = [];
+	let entries: HomeEntry[] = data.entries;
 
 	$: updateEntries(searchText, typeFilter, sort);
 
@@ -59,7 +59,7 @@
 </svelte:head>
 
 <HomeSearchBar bind:searchText bind:typeFilter bind:sort />
-<div class="grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
+<div class="mb-4 grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
 	{#each entries as entry, i ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
 		{#if i === entries.length - 1}
 			<div use:inViewport={loadMore}>
