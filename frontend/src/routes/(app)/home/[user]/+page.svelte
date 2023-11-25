@@ -15,8 +15,6 @@
 	let sort: EntrySort = EntrySort.RECENT;
 	let entries: HomeEntry[] = data.entries;
 
-	$: updateEntries(searchText, typeFilter, sort);
-
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		zenoClient
 			.getHomeDetails({
@@ -55,7 +53,12 @@
 	<meta name="description" content="Your projects and reports." />
 </svelte:head>
 
-<HomeSearchBar bind:typeFilter bind:searchText bind:sort />
+<HomeSearchBar
+	bind:typeFilter
+	bind:searchText
+	bind:sort
+	on:change={() => updateEntries(searchText, typeFilter, sort)}
+/>
 <div class="mb-4 grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
 	{#each entries as entry, i ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
 		{#if i === entries.length - 1}
