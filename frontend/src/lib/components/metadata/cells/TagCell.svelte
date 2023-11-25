@@ -205,10 +205,10 @@
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
-									navigator.clipboard.writeText(tag.dataIds.toString());
+									navigator.clipboard.writeText(`[${tag.dataIds.toString()}]`);
 								}}
 							>
-								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+								<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
 								<span class="text-xs">Copy Ids</span>
 							</button>
 							<button

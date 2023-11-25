@@ -1959,23 +1959,19 @@ def slice_instance_ids(
         list[str]: list of instance ids that belong to the slice.
     """
     with Database() as db:
-        if db.cur is None:
-            return []
-
         filter = sql.SQL("")
         if filter_sql is not None:
             filter = sql.SQL("WHERE ") + filter_sql
 
         final_statement = sql.SQL(" ").join(
             [
-                sql.SQL("SELECT {}").format(sql.Identifier(id_column.id)),
-                sql.SQL("FROM {}").format(sql.Identifier(project_uuid)),
+                sql.SQL("SELECT {} FROM {}").format(
+                    sql.Identifier(id_column.id), sql.Identifier(project_uuid)
+                ),
                 filter,
             ]
         )
-        db.cur.execute(final_statement)
-
-        results = db.cur.fetchall()
+        results = db.execute_return(final_statement)
         return list(map(lambda res: str(res[0]), results))
 
 

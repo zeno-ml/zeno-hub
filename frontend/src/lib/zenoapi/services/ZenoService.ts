@@ -2192,7 +2192,7 @@ export class ZenoService {
 	): CancelablePromise<Array<string>> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/slice_instance_ids/{slice_id}/{model}',
+			url: '/slice-instance-ids/{slice_id}/{model}',
 			path: {
 				slice_id: sliceId,
 				model: model

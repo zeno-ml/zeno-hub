@@ -192,12 +192,12 @@
 										zenoClient
 											.getSliceInstanceIds(slice.id, $model === undefined ? null : $model, idColumn)
 											.then((sliceInstanceIds) => {
-												navigator.clipboard.writeText(sliceInstanceIds.toString());
+												navigator.clipboard.writeText(`[${sliceInstanceIds.toString()}]`);
 											});
 									}
 								}}
 							>
-								<Icon style="font-size: 18px;" class="material-icons">delete_outline</Icon>&nbsp;
+								<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
 								<span class="text-xs">Copy Ids</span>
 							</button>
 							<button

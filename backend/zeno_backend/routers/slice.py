@@ -116,7 +116,7 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
 
 
 @router.post(
-    "/slice_instance_ids/{slice_id}/{model}", response_model=list[str], tags=["zeno"]
+    "/slice-instance-ids/{slice_id}/{model}", response_model=list[str], tags=["zeno"]
 )
 def get_slice_instance_ids(
     slice_id: int, model: str | None, id_column: ZenoColumn, request: Request
