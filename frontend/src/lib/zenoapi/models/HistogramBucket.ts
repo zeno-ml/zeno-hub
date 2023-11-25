@@ -14,7 +14,7 @@
  * metric (float | None): the metric value of the bucket.
  */
 export type HistogramBucket = {
-	bucket: number | boolean | string;
+	bucket: number | boolean | string | null;
 	bucketEnd?: number | boolean | string | null;
 	size?: number | null;
 	filteredSize?: number | null;

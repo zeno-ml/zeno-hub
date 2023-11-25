@@ -13,6 +13,7 @@ from zeno_backend.classes.base import (
 )
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SliceFinderRequest, SliceFinderReturn
+from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.slice_finder import slice_finder
 
 router = APIRouter(tags=["zeno"])
@@ -112,6 +113,41 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
         )
     )
     return id
+
+
+@router.post(
+    "/slice-instance-ids/{slice_id}/{model}", response_model=list[str], tags=["zeno"]
+)
+def get_slice_instance_ids(
+    slice_id: int, model: str | None, id_column: ZenoColumn, request: Request
+):
+    """Get all instance ids of a slice.
+
+    Args:
+        slice_id (int): id of the slice to get instance ids for.
+        model (str | None): model of the slice.
+        id_column (ZenoColumn): column to get ids from.
+        request (Request): http request to get user information from.
+
+    Raises:
+        HTTPException: error if the project cannot be found.
+
+    Returns:
+        list[str]: all ids of the slice.
+    """
+    slice = select.slice_by_id(slice_id)
+    project_uuid = slice.project_uuid
+
+    if project_uuid is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
+
+    util.project_access_valid(project_uuid, request)
+
+    filter_sql = table_filter(project_uuid, model, slice.filter_predicates)
+
+    return select.slice_instance_ids(project_uuid, filter_sql, id_column)
 
 
 @router.post(

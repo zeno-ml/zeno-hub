@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
-	import { comparisonModel, model, project, selections, slices } from '$lib/stores';
+	import { columns, comparisonModel, model, project, selections, slices } from '$lib/stores';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { Join, ZenoService, type Slice } from '$lib/zenoapi';
+	import { Join, ZenoColumnType, ZenoService, type Slice } from '$lib/zenoapi';
 	import { mdiDotsHorizontal } from '@mdi/js';
 	import { Content } from '@smui/dialog';
 	import IconButton, { Icon } from '@smui/icon-button';
@@ -172,7 +172,7 @@
 					<Paper style="padding: 3px 0px;" elevation={7}>
 						<Content>
 							<button
-								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
+								class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;
@@ -183,7 +183,25 @@
 								<span class="text-xs">Edit</span>
 							</button>
 							<button
-								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
+								class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = false;
+									const idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
+									if (idColumn) {
+										zenoClient
+											.getSliceInstanceIds(slice.id, $model === undefined ? null : $model, idColumn)
+											.then((sliceInstanceIds) => {
+												navigator.clipboard.writeText(`[${sliceInstanceIds.toString()}]`);
+											});
+									}
+								}}
+							>
+								<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
+								<span class="text-xs">Copy Ids</span>
+							</button>
+							<button
+								class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
 								on:click={(e) => {
 									e.stopPropagation();
 									showOptions = false;

@@ -187,7 +187,7 @@
 						<Content>
 							{#if $editTag === undefined}
 								<button
-									class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
+									class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
 									on:keydown={() => ({})}
 									on:click={(e) => {
 										e.stopPropagation();
@@ -201,7 +201,18 @@
 								</button>
 							{/if}
 							<button
-								class="py flex w-20 items-center px-2 hover:bg-grey-lighter"
+								class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
+								on:click={(e) => {
+									e.stopPropagation();
+									showOptions = false;
+									navigator.clipboard.writeText(`[${tag.dataIds.toString()}]`);
+								}}
+							>
+								<Icon style="font-size: 18px;" class="material-icons">content_copy</Icon>&nbsp;
+								<span class="text-xs">Copy Ids</span>
+							</button>
+							<button
+								class="py flex w-24 items-center px-2 hover:bg-grey-lighter"
 								on:keydown={() => ({})}
 								on:click={(e) => {
 									e.stopPropagation();

@@ -1944,6 +1944,36 @@ def slice_or_tag_table(
         return SQLTable(table=filter_results, columns=columns)
 
 
+def slice_instance_ids(
+    project_uuid: str, filter_sql: sql.Composed | None, id_column: ZenoColumn
+) -> list[str]:
+    """Get all data ids for a slice.
+
+    Args:
+        project_uuid (str): project the slice belongs to.
+        filter_sql (sql.Composed | None): filter specified by the slice.
+        id_column (ZenoColumn): identifier of the instance id column in the project.
+
+    Returns:
+        list[str]: list of instance ids that belong to the slice.
+    """
+    with Database() as db:
+        filter = sql.SQL("")
+        if filter_sql is not None:
+            filter = sql.SQL("WHERE ") + filter_sql
+
+        final_statement = sql.SQL(" ").join(
+            [
+                sql.SQL("SELECT {} FROM {}").format(
+                    sql.Identifier(id_column.id), sql.Identifier(project_uuid)
+                ),
+                filter,
+            ]
+        )
+        results = db.execute_return(final_statement)
+        return list(map(lambda res: str(res[0]), results))
+
+
 def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
     """Get the filtered data table for the current project.
 
