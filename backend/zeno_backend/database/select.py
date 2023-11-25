@@ -164,10 +164,10 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
 
         if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit, home_request.offset]
-        else:
-            params += [home_request.offset]
+            params += [home_request.limit]
         projects_query += sql.SQL(" OFFSET %s; ")
+        params += [home_request.project_offset]
+
         projects_result = db.execute_return(projects_query, params)
 
         projects = []
@@ -227,9 +227,9 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
 
         if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
-            params = [home_request.limit] + params
-        params += [home_request.offset]
+            params += [home_request.limit]
         projects_query += sql.SQL(" OFFSET %s")
+        params += [home_request.project_offset]
 
         projects_query = (
             sql.SQL("(SELECT main.*, u.name AS owner_name FROM (")
@@ -305,11 +305,10 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
 
         if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit, home_request.offset]
-        else:
-            params += [home_request.offset]
-
+            params += [home_request.limit]
         reports_query += sql.SQL(" OFFSET %s; ")
+        params += [home_request.report_offset]
+
         reports_result = db.execute_return(reports_query, params)
 
         reports = []
@@ -373,9 +372,9 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
 
         if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
-            params = [home_request.limit] + params
-        params += [home_request.offset]
+            params += [home_request.limit]
         reports_query += sql.SQL(" OFFSET %s")
+        params += [home_request.report_offset]
 
         reports_query = (
             sql.SQL("SELECT main.*, u.name AS owner_name FROM (")

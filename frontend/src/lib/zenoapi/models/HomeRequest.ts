@@ -11,7 +11,8 @@ import type { EntryTypeFilter } from './EntryTypeFilter';
  *
  * Attributes:
  * user_name: Username of user to get entries for. If None, get public entries.
- * offset: Offset of entries to return
+ * project_offset: Offset of project entries already fetched
+ * report_offset: Offset of report entries already fetched
  * limit: Limit of entries to return
  * search_string: String to search for in entries
  * type_filter: Type of entry to filter by
@@ -19,7 +20,8 @@ import type { EntryTypeFilter } from './EntryTypeFilter';
  */
 export type HomeRequest = {
 	userName?: string | null;
-	offset?: number;
+	projectOffset?: number;
+	reportOffset?: number;
 	limit?: number | null;
 	searchString?: string;
 	typeFilter?: EntryTypeFilter;

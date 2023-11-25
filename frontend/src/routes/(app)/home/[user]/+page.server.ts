@@ -17,7 +17,8 @@ export async function load({ cookies, url, depends, parent }) {
 	try {
 		homeResponse = await zenoClient.getHomeDetails({
 			userName: cognitoUser.name,
-			sort: EntrySort.RECENT
+			sort: EntrySort.RECENT,
+			limit: 20
 		});
 	} catch (e) {
 		throw redirect(303, `/login?redirectto=${url.pathname}`);
