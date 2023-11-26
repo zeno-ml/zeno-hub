@@ -160,7 +160,7 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
         if home_request.sort == EntrySort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
         elif home_request.sort == EntrySort.RECENT:
-            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+            projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
 
         if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
@@ -223,7 +223,7 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
         if home_request.sort == EntrySort.POPULAR:
             projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
         elif home_request.sort == EntrySort.RECENT:
-            projects_query += sql.SQL(" ORDER BY updated_at DESC ")
+            projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
 
         if home_request.limit:
             projects_query += sql.SQL(" LIMIT %s ")
@@ -301,7 +301,7 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
         if home_request.sort == EntrySort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
         elif home_request.sort == EntrySort.RECENT:
-            reports_query += sql.SQL(" ORDER BY updated_at DESC ")
+            reports_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
 
         if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
@@ -368,7 +368,7 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
         if home_request.sort == EntrySort.POPULAR:
             reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
         elif home_request.sort == EntrySort.RECENT:
-            reports_query += sql.SQL(" ORDER BY r.updated_at DESC ")
+            reports_query += sql.SQL(" ORDER BY r.updated_at DESC, total_likes DESC ")
 
         if home_request.limit:
             reports_query += sql.SQL(" LIMIT %s ")
