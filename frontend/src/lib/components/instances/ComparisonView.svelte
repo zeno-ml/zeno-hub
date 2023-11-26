@@ -61,10 +61,10 @@
 
 	$: modelAColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
-	);
+	)?.id;
 	$: modelBColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $comparisonModel
-	);
+	)?.id;
 
 	// when state changes update current table view
 	$: {
@@ -81,7 +81,6 @@
 		updateTable(true);
 	}
 	$: {
-		$model;
 		$selectionIds;
 		$filterSelection;
 		updateTable();
@@ -268,7 +267,7 @@
 			</th>
 		</thead>
 		<tbody>
-			{#each table as tableContent (tableContent[idColumn])}
+			{#each table as tableContent (`${tableContent[idColumn]}_${modelAColumn}_${modelBColumn}`)}
 				<tr>
 					<td class="p-3 align-baseline">
 						<p class="mb-2">
@@ -280,7 +279,7 @@
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}
-								modelColumn={modelAColumn?.id}
+								modelColumn={modelAColumn}
 								entry={tableContent}
 								selectable
 							/>
@@ -296,7 +295,7 @@
 								view={$project.view}
 								{dataColumn}
 								{labelColumn}
-								modelColumn={modelBColumn?.id}
+								modelColumn={modelBColumn}
 								entry={tableContent}
 								selectable
 							/>

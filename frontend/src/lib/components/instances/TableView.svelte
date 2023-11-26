@@ -69,14 +69,13 @@
 		updateTable(true);
 	}
 	$: {
-		$model;
 		$selectionIds;
 		$filterSelection;
 		updateTable();
 	}
 	$: modelColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
-	);
+	)?.id;
 
 	// reset page on selection change
 	selectionPredicates.subscribe(() => {
@@ -166,7 +165,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each table as tableContent (tableContent[idColumn])}
+			{#each table as tableContent (`${tableContent[idColumn]}_${modelColumn}`)}
 				<tr class="border-b border-grey-lighter">
 					<td class="border border-grey-lighter p-3 align-top">
 						{tableContent[idColumn]}
@@ -181,7 +180,7 @@
 										view={$project.view}
 										{dataColumn}
 										{labelColumn}
-										modelColumn={modelColumn?.id}
+										{modelColumn}
 										entry={tableContent}
 										selectable
 									/>
