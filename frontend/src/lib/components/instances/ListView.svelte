@@ -59,7 +59,6 @@
 		updateTable(true);
 	}
 	$: {
-		$model;
 		$selectionIds;
 		$filterSelection;
 		updateTable();
@@ -67,7 +66,7 @@
 
 	$: modelColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
-	);
+	)?.id;
 
 	// reset page on selection change
 	selectionPredicates.subscribe(() => {
@@ -113,13 +112,13 @@
 	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); grid-auto-rows: min-content;"
 	bind:this={listContainer}
 >
-	{#each table as inst (inst[idColumn])}
+	{#each table as inst (`${inst[idColumn]}_${modelColumn}`)}
 		<div class="mr-2 mt-2">
 			<InstanceView
 				view={$project.view}
 				{dataColumn}
 				{labelColumn}
-				modelColumn={modelColumn?.id}
+				{modelColumn}
 				entry={inst}
 				selectable
 			/>
