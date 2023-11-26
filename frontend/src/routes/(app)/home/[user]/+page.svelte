@@ -63,10 +63,20 @@
 	{#each entries as entry, i ('id' in entry.entry ? entry.entry.id : 'uuid' in entry.entry ? entry.entry.uuid : '')}
 		{#if i === entries.length - 1}
 			<div use:inViewport={loadMore}>
-				<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
+				<HomeCard
+					entry={entry.entry}
+					stats={entry.stats}
+					user={data.user}
+					on:deleted={() => updateEntries(searchText, typeFilter, sort)}
+				/>
 			</div>
 		{:else}
-			<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
+			<HomeCard
+				entry={entry.entry}
+				stats={entry.stats}
+				user={data.user}
+				on:deleted={() => updateEntries(searchText, typeFilter, sort)}
+			/>
 		{/if}
 	{/each}
 </div>

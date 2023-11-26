@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import CopyProjectPopup from '$lib/components/popups/CopyProjectPopup.svelte';
@@ -17,7 +17,7 @@
 		mdiViewGridOutline
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import { getContext } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import LikeButton from '../general/LikeButton.svelte';
 	import EntryOptions from './EntryOptions.svelte';
 	import EntryStat from './EntryStat.svelte';
@@ -27,6 +27,7 @@
 	export let user: User | null;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+	const dispatch = createEventDispatcher();
 
 	const project = 'uuid' in entry ? (entry as Project) : null;
 	const report = 'id' in entry ? (entry as Report) : null;
@@ -41,9 +42,9 @@
 
 	function deleteEntry() {
 		if (project !== null) {
-			zenoClient.deleteProject(project.uuid).then(() => invalidate('app:projects'));
+			zenoClient.deleteProject(project.uuid).then(() => dispatch('deleted'));
 		} else if (report !== null) {
-			zenoClient.deleteReport(report.id).then(() => invalidate('app:reports'));
+			zenoClient.deleteReport(report.id).then(() => dispatch('deleted'));
 		}
 		showConfirmDelete = false;
 	}
