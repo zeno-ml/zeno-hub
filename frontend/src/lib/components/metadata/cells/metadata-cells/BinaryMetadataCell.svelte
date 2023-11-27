@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { metricRangeColorScale } from '$lib/stores';
+	import { tooltip } from '$lib/util/tooltip';
 	import {
 		Join,
 		Operation,
@@ -53,6 +54,7 @@
 				style="background-color: {$metricRangeColorScale(histogram[0].metric ?? 0)}"
 				on:click={() => setSelection(true)}
 				on:keydown={() => setSelection(true)}
+				use:tooltip={{ text: `Metric: ${histogram[0].metric?.toFixed(2)}` }}
 			>
 				<Label>True</Label>
 			</button>
@@ -67,6 +69,7 @@
 				style="background-color: {$metricRangeColorScale(histogram[1].metric ?? 0)}"
 				on:click={() => setSelection(false)}
 				on:keydown={() => setSelection(false)}
+				use:tooltip={{ text: `Metric: ${histogram[1].metric?.toFixed(2)}` }}
 			>
 				<Label>False</Label>
 			</button>
