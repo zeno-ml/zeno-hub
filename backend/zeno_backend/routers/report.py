@@ -169,7 +169,7 @@ def get_slice_element_options(slice_element_spec: SliceElementSpec, request: Req
     util.project_access_valid(project_uuid, request)
 
     return select.slice_element_options(
-        slice, project_uuid, slice_element_spec.model_name
+        slice, project_uuid, slice_element_spec.system_name
     )
 
 
@@ -199,7 +199,7 @@ def get_tag_element_options(tag_element_spec: TagElementSpec, request: Request):
         )
 
     util.project_access_valid(project_uuid, request)
-    return select.tag_element_options(tag, project_uuid, tag_element_spec.model_name)
+    return select.tag_element_options(tag, project_uuid, tag_element_spec.system_name)
 
 
 @router.post("/report/{name}", tags=["zeno"], dependencies=[Depends(util.auth)])

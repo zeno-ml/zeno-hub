@@ -3,7 +3,6 @@ import logging
 import os
 from pathlib import Path
 
-import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -87,13 +86,3 @@ def get_server() -> FastAPI:
         return Response(status_code=status.HTTP_200_OK)
 
     return app
-
-
-def serve():
-    """Serve the FastAPI application for the backend."""
-    app = get_server()
-    uvicorn.run(
-        app,
-        host=os.environ["BACKEND_HOST"] if "BACKEND_HOST" in os.environ else "0.0.0.0",
-        port=int(os.environ["BACKEND_PORT"]) if "BACKEND_PORT" in os.environ else 80,
-    )

@@ -15,7 +15,7 @@ import type { Project } from './Project';
  * id_column (str): name of the column containing the instance id.
  * data_column (str | None): name of the column containing the instance data.
  * label_column (str | None): name of the column containing the instance label.
- * model_column (str | None): name of the column containing the instance model.
+ * system_column (str | None): name of the column containing the instance model.
  */
 export type SliceElementOptions = {
 	project: Project;
@@ -24,5 +24,5 @@ export type SliceElementOptions = {
 	idColumn: string;
 	dataColumn?: string | null;
 	labelColumn?: string | null;
-	modelColumn?: string | null;
+	systemColumn?: string | null;
 };

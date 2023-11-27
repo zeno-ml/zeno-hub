@@ -40,7 +40,7 @@ password=[password for DB login]
 For the backend to be able to verify user status, the `ZENO_USER_POOL_AUTH_REGION`, `ZENO_USER_POOL_ID`, and `ZENO_USER_POOL_CLIENT_ID` environment variables are needed.
 To simplify the dev setup, the zeno backend will try to read these from `../frontend/.env`.
 
-For a debug setup, you can run `uvicorn zeno_backend.server:get_server --reload` from within the poetry shell.
+For a debug setup, you can run `uvicorn --factory zeno_backend.server:get_server --reload` from within the poetry shell.
 
 ### Static Analysis Tools
 
@@ -62,6 +62,5 @@ To deploy the backend, you can either use the same setup as outlined for local d
 You will have to set the following variables: `DB_HOST`, `DB_NAME`, `DB_USER`, and `DB_PASSWORD`.
 
 Additionally, you can configure the host and port for the backend using `BACKEND_HOST` and `BACKEND_PORT`, if not set, these default to `0.0.0.0` and `80`, respectively.
-The backend can be started with poetry, from within the backend folder, run: `poetry run backend`.
 
 To make sure that your frontend can access content from this backend even if running on another origin, use the `CORS_ORIGIN` environment variable to set CORS headers when requests come from the specified origin.
