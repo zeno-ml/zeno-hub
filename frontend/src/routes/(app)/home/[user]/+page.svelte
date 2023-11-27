@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Banner from '$lib/components/general/Banner.svelte';
+	import Spinner from '$lib/components/general/Spinner.svelte';
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import { inViewport } from '$lib/util/viewport.js';
@@ -14,6 +15,7 @@
 	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
 	let sort: EntrySort = EntrySort.RECENT;
 	let entries: HomeEntry[] = data.entries;
+	let loading = false;
 
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		zenoClient
@@ -30,6 +32,7 @@
 	}
 
 	function loadMore() {
+		loading = true;
 		const numProjects = entries.filter((entry) => 'uuid' in entry.entry).length;
 		const numReports = entries.filter((entry) => 'id' in entry.entry).length;
 		zenoClient
@@ -44,6 +47,7 @@
 			})
 			.then((res) => {
 				entries = [...entries, ...res];
+				loading = false;
 			});
 	}
 </script>
@@ -79,6 +83,12 @@
 			/>
 		{/if}
 	{/each}
+	{#if loading}
+		<div class="flex h-full w-full flex-col items-center justify-center">
+			<Spinner />
+			<span class="text-grey-dark">loading more...</span>
+		</div>
+	{/if}
 </div>
 {#if entries.length === 0}
 	<Banner>
