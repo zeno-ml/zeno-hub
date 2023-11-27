@@ -1,3 +1,5 @@
+CREATE COLLATION numeric (provider = icu, locale = 'en-u-kn-true');
+
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL UNIQUE,
