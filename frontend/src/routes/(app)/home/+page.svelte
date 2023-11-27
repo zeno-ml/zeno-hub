@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Spinner from '$lib/components/general/Spinner.svelte';
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import { inViewport } from '$lib/util/viewport';
@@ -19,6 +20,7 @@
 	let typeFilter: EntryTypeFilter = EntryTypeFilter.ALL;
 	let sort: EntrySort = EntrySort.POPULAR;
 	let entries: HomeEntry[] = data.entries;
+	let loading = false;
 
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		zenoClient
@@ -34,6 +36,7 @@
 	}
 
 	function loadMore() {
+		loading = true;
 		const numProjects = entries.filter((entry) => 'uuid' in entry.entry).length;
 		const numReports = entries.filter((entry) => 'id' in entry.entry).length;
 		zenoClient
@@ -47,6 +50,7 @@
 			})
 			.then((res) => {
 				entries = [...entries, ...res];
+				loading = false;
 			});
 	}
 </script>
@@ -72,4 +76,7 @@
 			<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 		{/if}
 	{/each}
+	{#if loading}
+		<Spinner width={24} height={24} />
+	{/if}
 </div>
