@@ -1,8 +1,10 @@
 import { getClientAndUser } from '$lib/api/client';
 import { redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, url }) {
+export async function load({ cookies, url, depends }) {
 	const { zenoClient, cognitoUser } = await getClientAndUser(cookies, url);
+
+	depends('app:organizations');
 
 	if (!cognitoUser) {
 		throw redirect(303, '/');
@@ -11,7 +13,7 @@ export async function load({ cookies, url }) {
 	let user, organizations;
 	try {
 		user = await zenoClient.login(cognitoUser.name);
-		organizations = await zenoClient.getOrganizations();
+		organizations = await zenoClient.getUserOrganizations();
 	} catch (e) {
 		throw redirect(303, '/');
 	}
