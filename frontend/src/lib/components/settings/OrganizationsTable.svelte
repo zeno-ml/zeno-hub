@@ -3,14 +3,12 @@
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Organization, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose, mdiCog, mdiLogout, mdiPlus } from '@mdi/js';
-	import Button, { Icon } from '@smui/button';
+	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
-	import { Content } from '@smui/paper';
-	import Textfield from '@smui/textfield';
 	import { getContext } from 'svelte';
 	import Confirm from '../popups/Confirm.svelte';
+	import NewOrganizationPopup from '../popups/NewOrganizationPopup.svelte';
 	import OrganizationPopup from '../popups/OrganizationPopup.svelte';
-	import Popup from '../popups/Popup.svelte';
 
 	export let organizations: Organization[];
 	export let user: User;
@@ -21,45 +19,10 @@
 	let showConfirmDelete = false;
 	let showNewOrganizationPopup = false;
 	let organizationToDelete: Organization | undefined;
-	let reportName = '';
-	let input: Textfield;
-
-	$: if (input) {
-		input.getElement().focus();
-	}
 </script>
 
 {#if showNewOrganizationPopup}
-	<Popup on:close={() => (showNewOrganizationPopup = false)}>
-		<Content style="display: flex; align-items: center;">
-			<Textfield bind:value={reportName} label="Organization Name" bind:this={input} />
-			<Button
-				style="margin-left: 10px;"
-				variant="outlined"
-				on:click={() => (showNewOrganizationPopup = false)}
-			>
-				Cancel
-			</Button>
-			<Button
-				style="margin-left: 5px;"
-				variant="outlined"
-				on:click={() =>
-					zenoClient
-						.addOrganization({
-							user: user,
-							organization: { name: reportName, id: -1, members: [], admin: true }
-						})
-						.then(() => {
-							invalidate('app:organizations');
-							showNewOrganizationPopup = false;
-							reportName = '';
-						})}
-				disabled={reportName.length === 0}
-			>
-				Create
-			</Button>
-		</Content>
-	</Popup>
+	<NewOrganizationPopup {user} on:close={() => (showNewOrganizationPopup = false)} />
 {/if}
 {#if organizationToEdit}
 	<OrganizationPopup

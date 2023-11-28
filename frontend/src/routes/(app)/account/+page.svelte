@@ -30,7 +30,7 @@
 
 <div class="flex w-full flex-col">
 	<Header user={data.user} />
-	<div class="mx-6 mb-6 overflow-y-scroll">
+	<div class="mx-6 mb-6 overflow-y-auto">
 		<h1 class="mb-3 mt-2 text-xl">Account management</h1>
 		<Account name={cognitoUser.name} email={cognitoUser.email} />
 		<hr class="mt-5 text-grey-lighter" />
