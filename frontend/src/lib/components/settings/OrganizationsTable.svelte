@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Organization, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose, mdiCog, mdiLogout, mdiPlus } from '@mdi/js';
@@ -6,6 +7,7 @@
 	import IconButton from '@smui/icon-button/src/IconButton.svelte';
 	import { getContext } from 'svelte';
 	import Confirm from '../popups/Confirm.svelte';
+	import NewOrganizationPopup from '../popups/NewOrganizationPopup.svelte';
 	import OrganizationPopup from '../popups/OrganizationPopup.svelte';
 
 	export let organizations: Organization[];
@@ -15,18 +17,20 @@
 
 	let organizationToEdit: Organization | undefined;
 	let showConfirmDelete = false;
+	let showNewOrganizationPopup = false;
 	let organizationToDelete: Organization | undefined;
 </script>
 
+{#if showNewOrganizationPopup}
+	<NewOrganizationPopup {user} on:close={() => (showNewOrganizationPopup = false)} />
+{/if}
 {#if organizationToEdit}
 	<OrganizationPopup
 		{organizationToEdit}
 		{user}
 		on:close={() => {
 			organizationToEdit = undefined;
-			zenoClient
-				.getOrganizations()
-				.then((fetchedOrganizations) => (organizations = fetchedOrganizations));
+			invalidate('app:organizations');
 		}}
 	/>
 {/if}
@@ -40,7 +44,7 @@
 			if (organizationToDelete !== undefined) {
 				zenoClient
 					.deleteOrganization(organizationToDelete)
-					.then(() => zenoClient.getOrganizations().then((orgs) => (organizations = orgs)));
+					.then(() => invalidate('app:organizations'));
 			}
 			showConfirmDelete = false;
 		}}
@@ -49,20 +53,7 @@
 <div class="mt-7 flex flex-col">
 	<div class="flex items-center">
 		<h2 class="mr-2.5 text-lg">Organizations ({organizations.length})</h2>
-		<IconButton
-			on:click={() => {
-				zenoClient
-					.addOrganization({
-						user: user,
-						organization: { name: 'New Organization', id: -1, members: [], admin: true }
-					})
-					.then(() =>
-						zenoClient
-							.getOrganizations()
-							.then((fetchedOrganizations) => (organizations = fetchedOrganizations))
-					);
-			}}
-		>
+		<IconButton on:click={() => (showNewOrganizationPopup = true)}>
 			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={mdiPlus} />
 			</Icon>
@@ -126,9 +117,7 @@
 														...organization.members.slice(memberIndex + 1)
 													]
 												})
-												.then(() =>
-													zenoClient.getOrganizations().then((orgs) => (organizations = orgs))
-												);
+												.then(() => invalidate('app:organizations'));
 										}}
 										disabled={organization.admin &&
 											organization.members.filter((member) => member.admin).length < 2}
