@@ -60,6 +60,8 @@ jobs:
         run: |
           cd frontend
           npx playwright install --with-deps
+      - name: Get Docker status
+        run: docker ps -a
       - name: Run Playwright tests
         run: |
           cd frontend
