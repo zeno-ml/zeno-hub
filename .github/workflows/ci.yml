@@ -61,7 +61,9 @@ jobs:
           cd frontend
           npx playwright install --with-deps
       - name: Get Docker status
-        run: docker ps -a
+        run: |
+          docker ps -a
+          docker-compose -f ./docker-compose-test.yml logs
       - name: Run Playwright tests
         run: |
           cd frontend
