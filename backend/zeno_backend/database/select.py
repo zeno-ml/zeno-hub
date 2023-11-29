@@ -1698,7 +1698,12 @@ def table_data_paginated(
             )
             if len(id_column) > 0:
                 id_column = id_column[0][0]
-                order_sql = sql.SQL("ORDER BY {} ASC").format(sql.Identifier(id_column))
+                # Collate does natural sort,
+                # (https://www.postgresql.org/docs/11/collation.html#id-1.6.10.4.5.7.5)
+                # See: https://dbfiddle.uk/cptUkufH
+                order_sql = sql.SQL("ORDER BY {} COLLATE numeric ASC").format(
+                    sql.Identifier(id_column)
+                )
 
         final_statement = sql.SQL(" ").join(
             [
