@@ -106,7 +106,7 @@
 							entry={jsonData}
 							dataColumn="data"
 							labelColumn="label"
-							modelColumn="output"
+							systemColumn="output"
 						/>
 					</div>
 				{/if}

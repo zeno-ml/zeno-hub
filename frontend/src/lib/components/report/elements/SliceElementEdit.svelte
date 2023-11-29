@@ -41,7 +41,7 @@
 	function updateSliceModel(e: CustomEvent) {
 		sliceElementSpec = {
 			sliceId: sliceElementSpec.sliceId,
-			modelName: e.detail.label
+			systemName: e.detail.label
 		};
 		element = { ...element, data: JSON.stringify(sliceElementSpec) };
 		zenoClient.updateReportElement(reportId, {
@@ -70,7 +70,7 @@
 {#if models.length > 0}
 	<div class="mt-3" />
 	<Svelecte
-		bind:value={sliceElementSpec.modelName}
+		bind:value={sliceElementSpec.systemName}
 		labelAsValue={true}
 		options={models}
 		on:change={updateSliceModel}
