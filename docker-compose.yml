@@ -33,7 +33,7 @@ services:
       DB_NAME: zeno
       DB_USER: myuser
       DB_PASSWORD: mypassword
-    command: poetry run uvicorn --factory zeno_backend.server:get_server --reload --host 0.0.0.0 --timeout-keep-alive 75 --workers 4
+    command: poetry run uvicorn --factory zeno_backend.server:get_server --reload --host 0.0.0.0 --timeout-keep-alive 75
   postgres:
     container_name: zeno-postgres
     image: postgres:latest
