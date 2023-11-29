@@ -52,8 +52,8 @@
 			channel === Dimensions.y
 				? parameters.yChannel
 				: channel === Dimensions.metric
-				? SlicesMetricsOrModels.METRICS
-				: parameters.colorChannel;
+				  ? SlicesMetricsOrModels.METRICS
+				  : parameters.colorChannel;
 		if (channelType === SlicesOrModels.SLICES) {
 			const slices = e.detail as number[];
 			chart = { ...chart, parameters: { ...parameters, slices: slices } };
