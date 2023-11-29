@@ -50,8 +50,8 @@
 		parameters.xChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices
 			: parameters.xChannel === SlicesMetricsOrModels.METRICS
-			? parameters.metrics
-			: parameters.models;
+			  ? parameters.metrics
+			  : parameters.models;
 	$: rows = parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : parameters.models;
 	$: {
 		data, (tableRecord = {});
@@ -94,8 +94,8 @@
 					SlicesMetricsOrModels.SLICES
 						? 'slices'
 						: parameters.xChannel === SlicesMetricsOrModels.MODELS
-						? 'systems'
-						: 'metrics'}</Cell
+						  ? 'systems'
+						  : 'metrics'}</Cell
 				>
 				{#each columns as column}
 					<Cell

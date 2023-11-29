@@ -129,8 +129,8 @@
 		numberValues={parameters.axisChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices
 			: parameters.axisChannel === SlicesMetricsOrModels.METRICS
-			? parameters.metrics
-			: []}
+			  ? parameters.metrics
+			  : []}
 		stringValues={parameters.axisChannel === SlicesMetricsOrModels.MODELS ? parameters.models : []}
 	/>
 </EncodingSection>
@@ -174,8 +174,8 @@
 		numberValue={parameters.fixedChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices[0]
 			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
-			? parameters.metrics[0]
-			: 0}
+			  ? parameters.metrics[0]
+			  : 0}
 		stringValue={parameters.fixedChannel === SlicesMetricsOrModels.MODELS
 			? parameters.models[0]
 			: ''}

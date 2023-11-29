@@ -28,10 +28,10 @@
 		jsonData === undefined
 			? []
 			: showAll || spec.collapsible === undefined
-			? jsonData
-			: spec.collapsible === 'bottom'
-			? jsonData.slice(0, 4)
-			: jsonData.slice(-4);
+			  ? jsonData
+			  : spec.collapsible === 'bottom'
+			    ? jsonData.slice(0, 4)
+			    : jsonData.slice(-4);
 </script>
 
 {#if jsonData === undefined}

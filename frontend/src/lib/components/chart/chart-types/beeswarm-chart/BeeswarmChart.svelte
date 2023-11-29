@@ -48,8 +48,8 @@
 		parameters.fixedDimension === 'y'
 			? parameters.metrics.map((id) => metrics.find((metric) => metric.id === id)?.name ?? 'count')
 			: parameters.yChannel === SlicesOrModels.MODELS
-			? parameters.models
-			: parameters.slices.map((id) => slices.find((sli) => sli.id === id)?.sliceName ?? '');
+			  ? parameters.models
+			  : parameters.slices.map((id) => slices.find((sli) => sli.id === id)?.sliceName ?? '');
 
 	function dataFilter(
 		data: {
