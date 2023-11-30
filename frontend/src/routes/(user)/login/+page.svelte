@@ -37,17 +37,14 @@
 			label="Password"
 			class="w-56"
 		/>
-		<Button type="submit" variant="raised" class="mt-5">Login</Button>
+		<Button type="submit" variant="raised" class="mb-4 mt-5">Login</Button>
 		{#if form?.error}
-			<p class="mt-5 text-center font-semibold text-error">
+			<p class="mt-4 text-center font-semibold text-error">
 				{form.error}
-				{#if form.showReset}
-					<br />
-					<a href="/forgot" class="text-primary">Reset your password?</a>
-				{/if}
 			</p>
 		{/if}
-		<p class="mt-7">
+		<a href="/forgot" class="mt-4 text-primary">Reset your password.</a>
+		<p class="mt-2">
 			Don't have an account? <a href="/signup/" class="text-primary">Sign up now!</a>
 		</p>
 	</div>
