@@ -10,7 +10,7 @@ export async function load({ cookies, url, depends }) {
 
 	let homeResponse: HomeEntry[];
 	try {
-		homeResponse = await zenoClient.getHomeDetails({});
+		homeResponse = await zenoClient.getHomeDetails({ limit: 20 });
 	} catch (e) {
 		throw redirect(303, `/login?redirectto=${url.pathname}`);
 	}
