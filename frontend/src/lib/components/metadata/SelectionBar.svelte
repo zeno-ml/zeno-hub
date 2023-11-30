@@ -85,7 +85,7 @@
 							: ''})</span
 					>
 				{/if}
-				{#if $selectionIds.length > 0 || $editTag !== undefined}
+				{#if $project.editor && ($selectionIds.length > 0 || $editTag !== undefined)}
 					<div class="flex items-center">
 						<button
 							class="mx-1 flex w-fit rounded-2xl border-2 bg-greenish-light {$filterSelection

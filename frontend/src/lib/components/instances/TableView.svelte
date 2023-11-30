@@ -182,7 +182,7 @@
 										{labelColumn}
 										{modelColumn}
 										entry={tableContent}
-										selectable
+										selectable={$project.editor}
 									/>
 								</div>
 							{/if}
