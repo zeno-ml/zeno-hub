@@ -17,7 +17,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Folder],
     tags=["zeno"],
 )
-def get_folders(project: str, request: Request):
+async def get_folders(project: str, request: Request):
     """Get all folders for a specific project.
 
     Args:
@@ -27,8 +27,8 @@ def get_folders(project: str, request: Request):
     Returns:
         list[Folder]: all folders for a specific project.
     """
-    util.project_access_valid(project, request)
-    return select.folders(project)
+    await util.project_access_valid(project, request)
+    return await select.folders(project)
 
 
 @router.post(
@@ -37,7 +37,7 @@ def get_folders(project: str, request: Request):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def add_folder(project: str, name: str):
+async def add_folder(project: str, name: str):
     """Add a folder to a project.
 
     Args:
@@ -50,7 +50,7 @@ def add_folder(project: str, name: str):
     Returns:
         int: id of the newly created folder.
     """
-    id = insert.folder(project, name)
+    id = await insert.folder(project, name)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -60,14 +60,14 @@ def add_folder(project: str, name: str):
 
 
 @router.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_folder(folder: Folder, project: str):
+async def update_folder(folder: Folder, project: str):
     """Updatae a folder in the database.
 
     Args:
         folder (Folder): new folder specification.
         project (str): project that the folder belongs to.
     """
-    update.folder(folder, project)
+    await update.folder(folder, project)
 
 
 @router.delete("/folder", tags=["zeno"], dependencies=[Depends(util.auth)])

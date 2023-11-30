@@ -24,7 +24,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Slice],
     tags=["zeno"],
 )
-def get_slices(project: str, request: Request):
+async def get_slices(project: str, request: Request):
     """Fetch all slices of a project.
 
     Args:
@@ -34,8 +34,8 @@ def get_slices(project: str, request: Request):
     Returns:
         list[Slice]: requested slices.
     """
-    util.project_access_valid(project, request)
-    return select.slices(project)
+    await util.project_access_valid(project, request)
+    return await select.slices(project)
 
 
 @router.post(
@@ -43,7 +43,7 @@ def get_slices(project: str, request: Request):
     tags=["zeno"],
     response_model=SliceFinderReturn,
 )
-def run_slice_finder(
+async def run_slice_finder(
     req: SliceFinderRequest, project: str, current_user=Depends(util.auth.claim())
 ):
     """Run slice finder to recommend slices to the user.
@@ -64,7 +64,7 @@ def run_slice_finder(
             event_properties={"project_uuid": project},
         )
     )
-    return slice_finder(project, req)
+    return await slice_finder(project, req)
 
 
 @router.post(
@@ -72,7 +72,7 @@ def run_slice_finder(
     response_model=list[Slice],
     tags=["zeno"],
 )
-def get_slices_for_projects(req: list[str]):
+async def get_slices_for_projects(req: list[str]):
     """Get all slices for a list of projects.
 
     Args:
@@ -81,7 +81,7 @@ def get_slices_for_projects(req: list[str]):
     Returns:
         list[Slice]: all slices in all specifiec projects.
     """
-    return select.slices_for_projects(req)
+    return await select.slices_for_projects(req)
 
 
 @router.post(
@@ -89,7 +89,9 @@ def get_slices_for_projects(req: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim())):
+async def add_slice(
+    project: str, slice: Slice, current_user=Depends(util.auth.claim())
+):
     """Add a slice to a project.
 
     Args:
@@ -104,7 +106,7 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
     Returns:
         int: id of the newly added slice.
     """
-    id = insert.slice(project, slice)
+    id = await insert.slice(project, slice)
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Slice Created",
@@ -118,7 +120,7 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
 @router.post(
     "/slice-instance-ids/{slice_id}/{model}", response_model=list[str], tags=["zeno"]
 )
-def get_slice_instance_ids(
+async def get_slice_instance_ids(
     slice_id: int, model: str | None, id_column: ZenoColumn, request: Request
 ):
     """Get all instance ids of a slice.
@@ -135,7 +137,7 @@ def get_slice_instance_ids(
     Returns:
         list[str]: all ids of the slice.
     """
-    slice = select.slice_by_id(slice_id)
+    slice = await select.slice_by_id(slice_id)
     project_uuid = slice.project_uuid
 
     if project_uuid is None:
@@ -143,11 +145,11 @@ def get_slice_instance_ids(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    util.project_access_valid(project_uuid, request)
+    await util.project_access_valid(project_uuid, request)
 
-    filter_sql = table_filter(project_uuid, model, slice.filter_predicates)
+    filter_sql = await table_filter(project_uuid, model, slice.filter_predicates)
 
-    return select.slice_instance_ids(project_uuid, filter_sql, id_column)
+    return await select.slice_instance_ids(project_uuid, filter_sql, id_column)
 
 
 @router.post(
@@ -187,21 +189,21 @@ async def add_all_slices(project: str, column: ZenoColumn, name: str | None = No
 
 
 @router.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_slice(slice: Slice, project: str):
+async def update_slice(slice: Slice, project: str):
     """Update a slice in the database.
 
     Args:
         slice (Slice): new values of the slice to be updated.
         project (str): project to which the slice belongs.
     """
-    update.slice(slice, project)
+    await update.slice(slice, project)
 
 
 @router.delete("/slice", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_slice(slice: Slice):
+async def delete_slice(slice: Slice):
     """Delete a slice from the database.
 
     Args:
         slice (Slice): the slice to be deleted.
     """
-    delete.slice(slice)
+    await delete.slice(slice)

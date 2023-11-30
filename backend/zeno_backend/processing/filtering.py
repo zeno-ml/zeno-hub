@@ -5,10 +5,10 @@ from psycopg import sql
 from zeno_backend.classes.base import MetadataType, ZenoColumn
 from zeno_backend.classes.filter import FilterPredicateGroup, Operation
 from zeno_backend.classes.metadata import HistogramBucket
-from zeno_backend.database.database import Database
+from zeno_backend.database.database import db_pool
 
 
-def column_id_from_name_and_model(
+async def column_id_from_name_and_model(
     project: str, column_name: str, model: str | None
 ) -> str:
     """Get a column's id given its name and model.
@@ -21,26 +21,27 @@ def column_id_from_name_and_model(
     Returns:
         str: column id retreived by name and model.
     """
-    db = Database()
-    if model is None:
-        column_result = db.connect_execute_return(
-            sql.SQL(
-                "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
-            ).format(sql.Identifier(f"{project}_column_map")),
-            [column_name],
-        )
-    else:
-        column_result = db.connect_execute_return(
-            sql.SQL("SELECT column_id FROM {} WHERE name = %s AND model = %s;").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-            [column_name, model],
-        )
+    async with db_pool.connection() as db:
+        async with db.cursor() as cur:
+            if model is None:
+                await cur.execute(
+                    sql.SQL(
+                        "SELECT column_id FROM {} WHERE name = %s AND model IS NULL;"
+                    ).format(sql.Identifier(f"{project}_column_map")),
+                    [column_name],
+                )
+            else:
+                await cur.execute(
+                    sql.SQL(
+                        "SELECT column_id FROM {} WHERE name = %s AND model = %s;"
+                    ).format(sql.Identifier(f"{project}_column_map")),
+                    [column_name, model],
+                )
+            column_result = await cur.fetchall()
+            return str(column_result[0][0]) if len(column_result) > 0 else ""
 
-    return str(column_result[0][0]) if len(column_result) > 0 else ""
 
-
-def filter_to_sql(
+async def filter_to_sql(
     filter: FilterPredicateGroup, project: str, model: str | None = None
 ) -> sql.Composed:
     """Converting a filter representation to a SQL string for the database.
@@ -65,7 +66,7 @@ def filter_to_sql(
                     filt
                     + sql.SQL(f.join.value)
                     + sql.SQL("(")
-                    + filter_to_sql(f, project, model)
+                    + await filter_to_sql(f, project, model)
                     + sql.SQL(")")
                 )
         else:
@@ -80,9 +81,13 @@ def filter_to_sql(
                     val = "%" + str(val) + "%"
 
             if f.column.model is None:
-                column_id = column_id_from_name_and_model(project, f.column.name, None)
+                column_id = await column_id_from_name_and_model(
+                    project, f.column.name, None
+                )
             else:
-                column_id = column_id_from_name_and_model(project, f.column.name, model)
+                column_id = await column_id_from_name_and_model(
+                    project, f.column.name, model
+                )
 
             if column_id == "":
                 raise HTTPException(
@@ -102,7 +107,7 @@ def filter_to_sql(
     return filt
 
 
-def table_filter(
+async def table_filter(
     project: str,
     model: str | None,
     filter_predicates: FilterPredicateGroup | None = None,
@@ -123,15 +128,17 @@ def table_filter(
     """
     filter_result: sql.Composed | None = None
     if filter_predicates is not None and len(filter_predicates.predicates) > 0:
-        filter_result = filter_to_sql(filter_predicates, project, model)
+        filter_result = await filter_to_sql(filter_predicates, project, model)
 
     if data_ids is not None and len(data_ids) > 0:
-        db = Database()
-        id_column = db.connect_execute_return(
-            sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
-                sql.Identifier(f"{project}_column_map")
-            ),
-        )
+        async with db_pool.connection() as db:
+            async with db.cursor() as cur:
+                await cur.execute(
+                    sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                        sql.Identifier(f"{project}_column_map")
+                    ),
+                )
+                id_column = await cur.fetchall()
         if len(id_column) == 0:
             return None
         datapoint_filter = sql.SQL("{} IN ({})").format(

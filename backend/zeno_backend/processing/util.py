@@ -8,7 +8,7 @@ from zeno_backend.processing.filtering import column_id_from_name_and_model
 CHUNK_SIZE = 1024 * 1024  # adjust the chunk size as desired
 
 
-def generate_diff_cols(
+async def generate_diff_cols(
     df: pd.DataFrame,
     diff_col_1: ZenoColumn,
     diff_col_2: ZenoColumn,
@@ -36,10 +36,10 @@ def generate_diff_cols(
     if diff_col_1.model is None or diff_col_2.model is None:
         return df
 
-    col1_id = column_id_from_name_and_model(
+    col1_id = await column_id_from_name_and_model(
         project=project, column_name=diff_col_1.name, model=diff_col_1.model
     )
-    col2_id = column_id_from_name_and_model(
+    col2_id = await column_id_from_name_and_model(
         project=project, column_name=diff_col_2.name, model=diff_col_2.model
     )
 

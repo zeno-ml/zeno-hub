@@ -39,7 +39,7 @@ def verify_token(token: str) -> bool:
         return False
 
 
-def project_access_valid(project: str | None, request: Request):
+async def project_access_valid(project: str | None, request: Request):
     """Check whether accessing a resource is valid.
 
     Args:
@@ -55,16 +55,16 @@ def project_access_valid(project: str | None, request: Request):
             detail="Project not found",
         )
 
-    if not select.project_public(project):
+    if not await select.project_public(project):
         token = request.headers.get("authorization")
-        user = util.get_user_from_token(request)
+        user = await util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unauthorized",
             )
         available_project_ids = map(
-            lambda x: x.uuid, select.projects(user, HomeRequest())
+            lambda x: x.uuid, await select.projects(user, HomeRequest())
         )
         if project not in available_project_ids:
             raise HTTPException(
@@ -73,7 +73,7 @@ def project_access_valid(project: str | None, request: Request):
             )
 
 
-def report_access_valid(report: int, request: Request):
+async def report_access_valid(report: int, request: Request):
     """Check whether accessing a resource is valid.
 
     Args:
@@ -83,15 +83,17 @@ def report_access_valid(report: int, request: Request):
     Returns:
         bool: whether or not othe project data can be accessed.
     """
-    if not select.report_public(report):
+    if not await select.report_public(report):
         token = request.headers.get("authorization")
-        user = util.get_user_from_token(request)
+        user = await util.get_user_from_token(request)
         if token is None or not verify_token(token) or user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unauthorized",
             )
-        available_report_ids = map(lambda x: x.id, select.reports(user, HomeRequest()))
+        available_report_ids = map(
+            lambda x: x.id, await select.reports(user, HomeRequest())
+        )
         if report not in available_report_ids:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -99,7 +101,7 @@ def report_access_valid(report: int, request: Request):
             )
 
 
-def get_user_from_token(request: Request) -> User | None:
+async def get_user_from_token(request: Request) -> User | None:
     """Get a user from a cognito access token.
 
     Args:
@@ -118,6 +120,6 @@ def get_user_from_token(request: Request) -> User | None:
             os.environ["ZENO_USER_POOL_ID"],
             os.environ["ZENO_USER_POOL_CLIENT_ID"],
         )
-        return select.user((user_dict["username"]))
+        return await select.user((user_dict["username"]))
     except cognitojwt.CognitoJWTException:
         return None

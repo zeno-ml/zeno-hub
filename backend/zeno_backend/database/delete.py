@@ -6,10 +6,10 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import Database, db_pool
+from zeno_backend.database.database import db_pool
 
 
-def project(project: str):
+async def project(project: str):
     """Deletes a project with a specific id.
 
     Args:
@@ -18,47 +18,52 @@ def project(project: str):
     Raises:
         Exception: something went wrong while deleting the project from the database.
     """
-    with Database() as db:
-        # Drop the primary table with project data.
-        db.execute(
-            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(sql.Identifier(project))
-        )
-        # Drop the table with column properties.
-        db.execute(
-            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
-                sql.Identifier(f"{project}_column_map")
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            # Drop the primary table with project data.
+            await cur.execute(
+                sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                    sql.Identifier(project)
+                )
             )
-        )
-        # Drop the table with tag data.
-        db.execute(
-            sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
-                sql.Identifier(f"{project}_tags_datapoints")
+            # Drop the table with column properties.
+            await cur.execute(
+                sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                    sql.Identifier(f"{project}_column_map")
+                )
             )
-        )
-        # Finally, delete the project from the projects table.
-        db.execute(
-            "DELETE FROM projects WHERE uuid = %s;",
-            [
-                project,
-            ],
-        )
+            # Drop the table with tag data.
+            await cur.execute(
+                sql.SQL("DROP TABLE IF EXISTS {} CASCADE;").format(
+                    sql.Identifier(f"{project}_tags_datapoints")
+                )
+            )
+            # Finally, delete the project from the projects table.
+            await cur.execute(
+                "DELETE FROM projects WHERE uuid = %s;",
+                [
+                    project,
+                ],
+            )
 
-        db.commit()
+            await conn.commit()
 
 
-def report(report_id: int):
+async def report(report_id: int):
     """Deletes a report from Zeno.
 
     Args:
         report_id (int): the id of the report to be deleted.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM reports WHERE id = %s;",
-        [
-            report_id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM reports WHERE id = %s;",
+                [
+                    report_id,
+                ],
+            )
+            await conn.commit()
 
 
 async def folder(folder: Folder, delete_slices: bool):
@@ -86,127 +91,153 @@ async def folder(folder: Folder, delete_slices: bool):
             await conn.commit()
 
 
-def slice(req: Slice):
+async def slice(req: Slice):
     """Deletes a slice from an existing project.
 
     Args:
         req (Slice): the slice to be deleted.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM slices WHERE id = %s;",
-        [
-            req.id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM slices WHERE id = %s;",
+                [
+                    req.id,
+                ],
+            )
+            await conn.commit()
 
 
-def chart(chart: Chart):
+async def chart(chart: Chart):
     """Deletes a chart from an existing project.
 
     Args:
         chart (Chart): the chart to be deleted.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM charts WHERE id = %s;",
-        [
-            chart.id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM charts WHERE id = %s;",
+                [
+                    chart.id,
+                ],
+            )
+            await conn.commit()
 
 
-def tag(tag: Tag):
+async def tag(tag: Tag):
     """Deletes a tag from an existing project.
 
     Args:
         tag (Tag): the tag to be deleted.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM tags WHERE id = %s;",
-        [
-            tag.id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM tags WHERE id = %s;",
+                [
+                    tag.id,
+                ],
+            )
+            await conn.commit()
 
 
-def organization(organization: Organization):
+async def organization(organization: Organization):
     """Deletes an organization from the database.
 
     Args:
         organization (Organization): the organization to delete.
     """
-    db = Database()
-    db.connect_execute("DELETE FROM organizations WHERE id = %s;", [organization.id])
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM organizations WHERE id = %s;",
+                [
+                    organization.id,
+                ],
+            )
+            await conn.commit()
 
 
-def project_user(project: str, user: User):
+async def project_user(project: str, user: User):
     """Remove a user from a project.
 
     Args:
         project (str): the project id from which to remove the user.
         user (User): the user to remove.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM user_project WHERE user_id = %s AND project_uuid = %s;",
-        [user.id, project],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM user_project WHERE user_id = %s AND project_uuid = %s;",
+                [user.id, project],
+            )
+            await conn.commit()
 
 
-def project_org(project: str, organization: Organization):
+async def project_org(project: str, organization: Organization):
     """Remove an organization from a project.
 
     Args:
         project (str): the project id from which to remove the organization.
         organization (Organization): the organization to remove.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM organization_project WHERE organization_id = %s "
-        "AND project_uuid = %s;",
-        [organization.id, project],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM organization_project WHERE organization_id = %s "
+                "AND project_uuid = %s;",
+                [organization.id, project],
+            )
+            await conn.commit()
 
 
-def report_element(id: int):
+async def report_element(id: int):
     """Delete an element of a report.
 
     Args:
         id (int): ID of the element to be deleted.
     """
-    db = Database()
-    db.connect_execute("DELETE FROM report_elements WHERE id = %s;", [id])
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM report_elements WHERE id = %s;",
+                [id],
+            )
+            await conn.commit()
 
 
-def report_user(report_id: int, user: User):
+async def report_user(report_id: int, user: User):
     """Remove a user from a report.
 
     Args:
         report_id (int): the report id from which to remove the user.
         user (User): the user to remove.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM user_report WHERE user_id = %s AND report_id = %s;",
-        [user.id, report_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM user_report WHERE user_id = %s AND report_id = %s;",
+                [user.id, report_id],
+            )
+            await conn.commit()
 
 
-def report_org(report_id: int, organization: Organization):
+async def report_org(report_id: int, organization: Organization):
     """Remove an organization from a report.
 
     Args:
         report_id (int): the report id from which to remove the organization.
         organization (Organization): the organization to remove.
     """
-    db = Database()
-    db.connect_execute(
-        "DELETE FROM organization_report WHERE organization_id = %s "
-        "AND report_id = %s;",
-        [organization.id, report_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM organization_report WHERE organization_id = %s "
+                "AND report_id = %s;",
+                [organization.id, report_id],
+            )
+            await conn.commit()
 
 
 async def dataset(project_uuid: str):

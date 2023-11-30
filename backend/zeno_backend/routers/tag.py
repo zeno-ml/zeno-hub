@@ -24,7 +24,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Tag],
     tags=["zeno"],
 )
-def get_tags(project_uuid: str, request: Request):
+async def get_tags(project_uuid: str, request: Request):
     """Get all tags for a project.
 
     Args:
@@ -34,8 +34,8 @@ def get_tags(project_uuid: str, request: Request):
     Returns:
         list[Tag]: list of all of a project's tags.
     """
-    util.project_access_valid(project_uuid, request)
-    return select.tags(project_uuid)
+    await util.project_access_valid(project_uuid, request)
+    return await select.tags(project_uuid)
 
 
 @router.post(
@@ -43,7 +43,7 @@ def get_tags(project_uuid: str, request: Request):
     response_model=list[Tag],
     tags=["zeno"],
 )
-def get_tags_for_projects(project_uuids: list[str]):
+async def get_tags_for_projects(project_uuids: list[str]):
     """Get all tags for a list of projects.
 
     Args:
@@ -52,7 +52,7 @@ def get_tags_for_projects(project_uuids: list[str]):
     Returns:
         list[Tag]: all tags for the specified projects.
     """
-    return select.tags_for_projects(project_uuids)
+    return await select.tags_for_projects(project_uuids)
 
 
 @router.post(
@@ -60,7 +60,7 @@ def get_tags_for_projects(project_uuids: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())):
+async def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())):
     """Add a tag to a project.
 
     Args:
@@ -75,7 +75,7 @@ def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())
     Returns:
         int: id of the newly created tag.
     """
-    id = insert.tag(project_uuid, tag)
+    id = await insert.tag(project_uuid, tag)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -92,21 +92,21 @@ def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_tag(tag: Tag, project_uuid: str):
+async def update_tag(tag: Tag, project_uuid: str):
     """Update a tag in the database.
 
     Args:
         tag (Tag): updated tag.
         project_uuid (str): project to which the tag belongs.
     """
-    update.tag(tag, project_uuid)
+    await update.tag(tag, project_uuid)
 
 
 @router.delete("/tag", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_tag(tag: Tag):
+async def delete_tag(tag: Tag):
     """Delete a tag from the database.
 
     Args:
         tag (Tag): tag to be deleted from the database.
     """
-    delete.tag(tag)
+    await delete.tag(tag)

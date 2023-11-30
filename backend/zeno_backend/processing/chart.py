@@ -21,7 +21,7 @@ from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.metrics.map import metric_map
 
 
-def get_selected_slices(chart_slices: list[int], project: str) -> list[Slice]:
+async def get_selected_slices(chart_slices: list[int], project: str) -> list[Slice]:
     """Get the slices of the chart from a list of slice ids.
 
     Args:
@@ -32,8 +32,8 @@ def get_selected_slices(chart_slices: list[int], project: str) -> list[Slice]:
         list[Slice]: list of slices of the chart.
     """
     if -2 in chart_slices:  # -2 signals that all slices should be selected
-        return slices(project)
-    selected_slices = slices(project, chart_slices)
+        return await slices(project)
+    selected_slices = await slices(project, chart_slices)
     if -1 in chart_slices:  # -1 signals that the "all instances" slice should be added
         index = chart_slices.index(-1)
         selected_slices.insert(
@@ -49,7 +49,7 @@ def get_selected_slices(chart_slices: list[int], project: str) -> list[Slice]:
     return selected_slices
 
 
-def get_selected_metrics(chart_metrics: list[int], project: str) -> list[Metric]:
+async def get_selected_metrics(chart_metrics: list[int], project: str) -> list[Metric]:
     """Get the metrics of the chart from a list of chart ids.
 
     Args:
@@ -60,16 +60,17 @@ def get_selected_metrics(chart_metrics: list[int], project: str) -> list[Metric]
         list[Metric]: list of metrics of the chart.
     """
     if -2 in chart_metrics:  # -2 signals that all metrics should be selected
-        return metrics(project)
+        return await metrics(project)
     return list(
         filter(
             lambda metric: metric.id in chart_metrics,
-            metrics(project) + [Metric(id=-1, name="count", type="count", columns=[])],
+            await metrics(project)
+            + [Metric(id=-1, name="count", type="count", columns=[])],
         )
     )
 
 
-def get_selected_models(chart_models: list[str], project: str) -> list[str]:
+async def get_selected_models(chart_models: list[str], project: str) -> list[str]:
     """Get the models of the chart from a list of models.
 
     Args:
@@ -80,11 +81,11 @@ def get_selected_models(chart_models: list[str], project: str) -> list[str]:
         list[str]: list of models of the chart.
     """
     if "" in chart_models:  # all models should be selected
-        return models(project)
+        return await models(project)
     return chart_models
 
 
-def xyc_data(chart: Chart, project: str) -> str:
+async def xyc_data(chart: Chart, project: str) -> str:
     """Generate data for a chart that is based on x, y, and color values.
 
     Args:
@@ -98,17 +99,19 @@ def xyc_data(chart: Chart, project: str) -> str:
     if not (isinstance(chart.parameters, XCParameters)):
         return json.dumps({"table": elements})
 
-    all_metrics = metrics(project)
+    all_metrics = await metrics(project)
     selected_metric = next(
         (x for x in all_metrics if x.id == chart.parameters.metric),
         Metric(id=-1, name="count", type="count", columns=[]),
     )
-    selected_slices = get_selected_slices(chart.parameters.slices, project)
-    selected_models = get_selected_models(chart.parameters.models, project)
+    selected_slices = await get_selected_slices(chart.parameters.slices, project)
+    selected_models = await get_selected_models(chart.parameters.models, project)
     for current_slice in selected_slices:
         for model in selected_models:
-            filter_sql = table_filter(project, model, current_slice.filter_predicates)
-            metric = metric_map(selected_metric, project, model, filter_sql)
+            filter_sql = await table_filter(
+                project, model, current_slice.filter_predicates
+            )
+            metric = await metric_map(selected_metric, project, model, filter_sql)
             elements.append(
                 {
                     "x_value": current_slice.slice_name
@@ -125,7 +128,7 @@ def xyc_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-def table_data(chart: Chart, project: str) -> str:
+async def table_data(chart: Chart, project: str) -> str:
     """Generate data for a tabular visualization.
 
     Args:
@@ -139,17 +142,17 @@ def table_data(chart: Chart, project: str) -> str:
     params = chart.parameters
     if not isinstance(params, TableParameters):
         return json.dumps({"table": elements})
-    selected_metrics = get_selected_metrics(params.metrics, project)
-    selected_slices = get_selected_slices(params.slices, project)
-    selected_models = get_selected_models(params.models, project)
+    selected_metrics = await get_selected_metrics(params.metrics, project)
+    selected_slices = await get_selected_slices(params.slices, project)
+    selected_models = await get_selected_models(params.models, project)
 
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
+                filter_sql = await table_filter(
                     project, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
+                metric = await metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "x_value": current_slice.id
@@ -167,7 +170,7 @@ def table_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-def beeswarm_data(chart: Chart, project: str) -> str:
+async def beeswarm_data(chart: Chart, project: str) -> str:
     """Generate data for a beeswarm visualization.
 
     Args:
@@ -181,17 +184,17 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     params = chart.parameters
     if not (isinstance(params, BeeswarmParameters)):
         return json.dumps({"table": elements})
-    selected_metrics = get_selected_metrics(params.metrics, project)
-    selected_slices = get_selected_slices(params.slices, project)
-    selected_models = get_selected_models(params.models, project)
+    selected_metrics = await get_selected_metrics(params.metrics, project)
+    selected_slices = await get_selected_slices(params.slices, project)
+    selected_models = await get_selected_models(params.models, project)
 
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
+                filter_sql = await table_filter(
                     project, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
+                metric = await metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "color_value": current_slice.slice_name
@@ -208,7 +211,7 @@ def beeswarm_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-def radar_data(chart: Chart, project: str) -> str:
+async def radar_data(chart: Chart, project: str) -> str:
     """Generate data for a radar chart.
 
     Args:
@@ -222,17 +225,17 @@ def radar_data(chart: Chart, project: str) -> str:
     params = chart.parameters
     if not (isinstance(params, RadarParameters)):
         return json.dumps({"table": elements})
-    selected_metrics = get_selected_metrics(params.metrics, project)
-    selected_slices = get_selected_slices(params.slices, project)
-    selected_models = get_selected_models(params.models, project)
+    selected_metrics = await get_selected_metrics(params.metrics, project)
+    selected_slices = await get_selected_slices(params.slices, project)
+    selected_models = await get_selected_models(params.models, project)
 
     for current_metric in selected_metrics:
         for current_slice in selected_slices:
             for model in selected_models:
-                filter_sql = table_filter(
+                filter_sql = await table_filter(
                     project, model, current_slice.filter_predicates
                 )
-                metric = metric_map(current_metric, project, model, filter_sql)
+                metric = await metric_map(current_metric, project, model, filter_sql)
                 elements.append(
                     {
                         "axis_value": current_slice.slice_name
@@ -250,7 +253,7 @@ def radar_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-def heatmap_data(chart: Chart, project: str) -> str:
+async def heatmap_data(chart: Chart, project: str) -> str:
     """Generate data for a heatmap visualization.
 
     Args:
@@ -265,15 +268,15 @@ def heatmap_data(chart: Chart, project: str) -> str:
     if not (isinstance(params, HeatmapParameters)):
         return json.dumps({"table": elements})
     selected_metric = next(
-        (x for x in metrics(project) if x.id == params.metric),
+        (x for x in await metrics(project) if x.id == params.metric),
         Metric(id=-1, name="count", type="count", columns=[]),
     )
     x_slice = params.x_channel == SlicesOrModels.SLICES
     y_slice = params.y_channel == SlicesOrModels.SLICES
     selected_x = (
-        get_selected_slices(params.x_values, project)  # type: ignore
+        await get_selected_slices(params.x_values, project)  # type: ignore
         if x_slice
-        else get_selected_models(params.x_values, project)  # type: ignore
+        else await get_selected_models(params.x_values, project)  # type: ignore
     )
     if x_slice and -1 in params.x_values:
         selected_x = selected_x + [
@@ -287,9 +290,9 @@ def heatmap_data(chart: Chart, project: str) -> str:
         ]
 
     selected_y = (
-        get_selected_slices(params.y_values, project)  # type: ignore
+        await get_selected_slices(params.y_values, project)  # type: ignore
         if y_slice
-        else get_selected_models(params.y_values, project)  # type: ignore
+        else await get_selected_models(params.y_values, project)  # type: ignore
     )
 
     for current_x in selected_x:
@@ -311,10 +314,12 @@ def heatmap_data(chart: Chart, project: str) -> str:
                         ],
                         join=Join.OMITTED,
                     )
-                filter_sql = table_filter(project, params.model, pred_group)
-                metric = metric_map(selected_metric, project, params.model, filter_sql)
+                filter_sql = await table_filter(project, params.model, pred_group)
+                metric = await metric_map(
+                    selected_metric, project, params.model, filter_sql
+                )
             else:
-                filter_sql = table_filter(
+                filter_sql = await table_filter(
                     project,
                     params.model,
                     (
@@ -323,7 +328,9 @@ def heatmap_data(chart: Chart, project: str) -> str:
                         else current_y.filter_predicates  # type: ignore
                     ),
                 )
-                metric = metric_map(selected_metric, project, params.model, filter_sql)
+                metric = await metric_map(
+                    selected_metric, project, params.model, filter_sql
+                )
             elements.append(
                 {
                     "x_value": current_x.slice_name  # type: ignore
@@ -339,7 +346,7 @@ def heatmap_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-def chart_data(chart: Chart, project: str) -> str:
+async def chart_data(chart: Chart, project: str) -> str:
     """Extract the chart data for a specific chart that the user created.
 
     Args:
@@ -350,14 +357,14 @@ def chart_data(chart: Chart, project: str) -> str:
         str: JSON representation of the chart data the user requested.
     """
     if chart.type == ChartType.BAR or chart.type == ChartType.LINE:
-        return xyc_data(chart, project)
+        return await xyc_data(chart, project)
     elif chart.type == ChartType.TABLE:
-        return table_data(chart, project)
+        return await table_data(chart, project)
     elif chart.type == ChartType.BEESWARM:
-        return beeswarm_data(chart, project)
+        return await beeswarm_data(chart, project)
     elif chart.type == ChartType.RADAR:
-        return radar_data(chart, project)
+        return await radar_data(chart, project)
     elif chart.type == ChartType.HEATMAP:
-        return heatmap_data(chart, project)
+        return await heatmap_data(chart, project)
     else:
         return json.dumps({"table": []})

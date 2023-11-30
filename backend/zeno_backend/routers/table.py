@@ -15,7 +15,7 @@ router = APIRouter(tags=["zeno"])
     response_model=str,
     tags=["zeno"],
 )
-def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
+async def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
     """Get the data in a project's table.
 
     Args:
@@ -26,12 +26,12 @@ def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
     Returns:
         json: json representation of the requested data.
     """
-    util.project_access_valid(project_uuid, request)
-    filter_sql = table_filter(
+    await util.project_access_valid(project_uuid, request)
+    filter_sql = await table_filter(
         project_uuid, req.model, req.filter_predicates, req.data_ids
     )
 
-    sql_table = select.table_data_paginated(project_uuid, filter_sql, req)
+    sql_table = await select.table_data_paginated(project_uuid, filter_sql, req)
     table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
 
     return table.to_json(orient="records")
@@ -42,7 +42,7 @@ def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
     response_model=str,
     tags=["zeno"],
 )
-def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
+async def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
     """Get the data in a project's table for a specific slice.
 
     Args:
@@ -55,20 +55,22 @@ def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
     Returns:
         json: json representation of the requested data.
     """
-    slice = select.slice_by_id(slice_table_request.slice_id)
+    slice = await select.slice_by_id(slice_table_request.slice_id)
     project_uuid = slice.project_uuid
     if project_uuid is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    util.project_access_valid(project_uuid, request)
+    await util.project_access_valid(project_uuid, request)
 
-    filter_sql = table_filter(
+    filter_sql = await table_filter(
         project_uuid, slice_table_request.model, slice.filter_predicates
     )
 
-    sql_table = select.slice_or_tag_table(project_uuid, filter_sql, slice_table_request)
+    sql_table = await select.slice_or_tag_table(
+        project_uuid, filter_sql, slice_table_request
+    )
 
     table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
     return table.to_json(orient="records")
@@ -79,7 +81,7 @@ def get_slice_table(slice_table_request: SliceTableRequest, request: Request):
     response_model=str,
     tags=["zeno"],
 )
-def get_tag_table(tag_table_request: TagTableRequest, request: Request):
+async def get_tag_table(tag_table_request: TagTableRequest, request: Request):
     """Get the data in a project's table for a specific tag.
 
     Args:
@@ -92,20 +94,22 @@ def get_tag_table(tag_table_request: TagTableRequest, request: Request):
     Returns:
         json: json representation of the requested data.
     """
-    tag = select.tag_by_id(tag_table_request.tag_id)
+    tag = await select.tag_by_id(tag_table_request.tag_id)
     project_uuid = tag.project_uuid
     if project_uuid is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
-    util.project_access_valid(project_uuid, request)
+    await util.project_access_valid(project_uuid, request)
 
-    filter_sql = table_filter(
+    filter_sql = await table_filter(
         project_uuid, tag_table_request.model, data_ids=tag.data_ids
     )
 
-    sql_table = select.slice_or_tag_table(project_uuid, filter_sql, tag_table_request)
+    sql_table = await select.slice_or_tag_table(
+        project_uuid, filter_sql, tag_table_request
+    )
 
     table = pd.DataFrame(sql_table.table, columns=sql_table.columns)
     return table.to_json(orient="records")
