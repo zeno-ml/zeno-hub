@@ -43,7 +43,7 @@
 				{form.error}
 			</p>
 		{/if}
-		<a href="/forgot" class="mt-4 text-primary">Reset your password?</a>
+		<a href="/forgot" class="mt-4 text-primary">Reset your password.</a>
 		<p class="mt-2">
 			Don't have an account? <a href="/signup/" class="text-primary">Sign up now!</a>
 		</p>
