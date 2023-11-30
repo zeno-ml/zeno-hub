@@ -44,19 +44,24 @@ def get_slices(project: str, request: Request):
     response_model=SliceFinderReturn,
 )
 def run_slice_finder(
-    req: SliceFinderRequest, project: str, current_user=Depends(util.auth.claim())
+    req: SliceFinderRequest,
+    project: str,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
 ):
     """Run slice finder to recommend slices to the user.
 
     Args:
         req (SliceFinderRequest): request to slice finder algorithm specifying params.
         project (str): project to run slice finder for.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user who initiated the slice finder request.
             Defaults to Depends(util.auth.claim()).
 
     Returns:
         SliceFinderReturn: the result of the slice finder algorithm.
     """
+    util.project_editor(project, request)
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Ran Slice Finder",
@@ -72,15 +77,18 @@ def run_slice_finder(
     response_model=list[Slice],
     tags=["zeno"],
 )
-def get_slices_for_projects(req: list[str]):
+def get_slices_for_projects(req: list[str], request: Request):
     """Get all slices for a list of projects.
 
     Args:
         req (list[str]): the projects to fetch slices for.
+        request (Request): http request to get user information from.
 
     Returns:
         list[Slice]: all slices in all specifiec projects.
     """
+    for project in req:
+        util.project_access_valid(project, request)
     return select.slices_for_projects(req)
 
 
@@ -89,12 +97,18 @@ def get_slices_for_projects(req: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim())):
+def add_slice(
+    project: str,
+    slice: Slice,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
+):
     """Add a slice to a project.
 
     Args:
         project (str): project to add the slice to.
         slice (Slice): slice to be added to the project.
+        request (Request): http request to get user information from.
         current_user (Any, optional): User who wants to add a slice to a project.
             Defaults to Depends(util.auth.claim()).
 
@@ -104,6 +118,7 @@ def add_slice(project: str, slice: Slice, current_user=Depends(util.auth.claim()
     Returns:
         int: id of the newly added slice.
     """
+    util.project_editor(project, request)
     id = insert.slice(project, slice)
     AmplitudeHandler().track(
         BaseEvent(
@@ -156,12 +171,15 @@ def get_slice_instance_ids(
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def add_all_slices(project: str, column: ZenoColumn, name: str | None = None):
+async def add_all_slices(
+    project: str, column: ZenoColumn, request: Request, name: str | None = None
+):
     """Add all slices for a column's values.
 
     Args:
         project (str): project to add the slices to.
         column (ZenoColumn): column to add all slices for.
+        request (Request): http request to get user information from.
         name (str | None, optional): name of the folder the slices should be added to.
             Defaults to None.
 
@@ -171,6 +189,7 @@ async def add_all_slices(project: str, column: ZenoColumn, name: str | None = No
     Returns:
         list[int]: ids of all added slices.
     """
+    util.project_editor(project, request)
     try:
         ids = await insert.all_slices_for_column(project, column, name)
     except Exception as exc:
@@ -187,21 +206,26 @@ async def add_all_slices(project: str, column: ZenoColumn, name: str | None = No
 
 
 @router.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_slice(slice: Slice, project: str):
+def update_slice(slice: Slice, project: str, request: Request):
     """Update a slice in the database.
 
     Args:
         slice (Slice): new values of the slice to be updated.
         project (str): project to which the slice belongs.
+        request (Request): http request to get user information from.
     """
+    util.project_editor(project, request)
     update.slice(slice, project)
 
 
 @router.delete("/slice", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_slice(slice: Slice):
+def delete_slice(project_uuid: str, slice: Slice, request: Request):
     """Delete a slice from the database.
 
     Args:
-        slice (Slice): the slice to be deleted.
+        project_uuid (str): project to which the slice belongs (to check permissions).
+        slice (Slice): slice to be deleted.
+        request (Request): http request to get user information from.
     """
+    util.project_editor(project_uuid, request)
     delete.slice(slice)

@@ -65,8 +65,8 @@ def get_report(id: int, request: Request):
     Returns:
         Report: the requested report.
     """
+    util.report_access_valid(id, request)
     rep = select.report_response(id, user=util.get_user_from_token(request))
-    util.report_access_valid(rep.report.id, request)
     return rep
 
 
@@ -75,15 +75,17 @@ def get_report(id: int, request: Request):
     response_model=list[ReportElement],
     tags=["zeno"],
 )
-def get_report_elements(report_id: int):
+def get_report_elements(report_id: int, request: Request):
     """Get all elements that a report contains.
 
     Args:
         report_id (int): id of the report for which to fetch elements.
+        request (Request): http request to get user information from.
 
     Returns:
         list[ReportElement] | None: all elements that a report contains.
     """
+    util.report_access_valid(report_id, request)
     return select.report_elements(report_id)
 
 
@@ -111,15 +113,17 @@ def like_report(report_id: int, current_user=Depends(util.auth.claim())):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def get_report_users(report_id: int):
+def get_report_users(report_id: int, request: Request):
     """Get all users  that have access to a report.
 
     Args:
         report_id (int): the report for which to get user access.
+        request (Request): http request to get user information from.
 
     Returns:
         list[User]: the list of users who can access the report.
     """
+    util.report_editor(report_id, request)
     return select.report_users(report_id)
 
 
@@ -129,15 +133,17 @@ def get_report_users(report_id: int):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def get_report_orgs(report_id: int):
+def get_report_orgs(report_id: int, request: Request):
     """Get all the organizations that have access to a report.
 
     Args:
         report_id (int): the report for which to get organization access.
+        request (Request): http request to get user information from.
 
     Returns:
         list[Organization]: the list of organizations who can access the report.
     """
+    util.report_editor(report_id, request)
     return select.report_orgs(report_id)
 
 
@@ -241,13 +247,17 @@ def add_report(name: str, current_user=Depends(util.auth.claim())):
 
 @router.post("/report-element/{id}", tags=["zeno"], dependencies=[Depends(util.auth)])
 def add_report_element(
-    report_id: int, element: ReportElement, current_user=Depends(util.auth.claim())
+    report_id: int,
+    element: ReportElement,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
 ):
     """Add an element to an existing report.
 
     Args:
         report_id (int): id of the report to add an element to.
         element (ReportElement): element to be added to the report.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user who wants to add an element to a report.
             Defaults to Depends(util.auth.claim()).
 
@@ -257,6 +267,7 @@ def add_report_element(
     Returns:
         id: id of the newly created report element.
     """
+    util.report_editor(report_id, request)
     user = select.user(current_user["username"])
     if user is None:
         raise HTTPException(
@@ -282,13 +293,15 @@ def add_report_element(
 @router.post(
     "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-def add_report_user(report_id: int, user: User):
+def add_report_user(report_id: int, user: User, request: Request):
     """Add a user to a report.
 
     Args:
         report_id (int): report to add the user to.
         user (User): user to be added to the report.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     report_obj = select.report_from_id(report_id)
     if report_obj.owner_name != user.name:
         insert.report_user(report_id, user)
@@ -297,37 +310,43 @@ def add_report_user(report_id: int, user: User):
 @router.post(
     "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-def add_report_org(report_id: int, organization: Organization):
+def add_report_org(report_id: int, organization: Organization, request: Request):
     """Add an organization to a report.
 
     Args:
         report_id (int): report to add the user to.
         organization (Organization): organization to be added to the report.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     insert.report_org(report_id, organization)
 
 
 @router.patch(
     "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-def update_report_user(report_id: int, user: User):
+def update_report_user(report_id: int, user: User, request: Request):
     """Update a user's privileges for a report.
 
     Args:
         report_id (int): the report to update user privileges for.
         user (User): updated user privileges.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     update.report_user(report_id, user)
 
 
 @router.patch("/report-org/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_report_org(report_id: int, organization: Organization):
+def update_report_org(report_id: int, organization: Organization, request: Request):
     """Update a organization's privileges for a report.
 
     Args:
         report_id (int): the report to update user privileges for.
         organization (Organization): updated organization privileges.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     update.report_org(report_id, organization)
 
 
@@ -336,34 +355,40 @@ def update_report_org(report_id: int, organization: Organization):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def update_report_element(report_id: int, element: ReportElement):
+def update_report_element(report_id: int, element: ReportElement, request: Request):
     """Update an element of a report.
 
     Args:
         report_id (int): the report to update the element for.
         element (ReportElement): updated report element.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     update.report_element(element)
 
 
 @router.patch("/report/", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_report(report: Report):
+def update_report(report: Report, request: Request):
     """Update a report's settings.
 
     Args:
         report (Report): updated report settings.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report.id, request)
     update.report(report)
 
 
 @router.patch("/report-projects/", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_report_projects(report_id: int, project_uuids: list[str]):
+def update_report_projects(report_id: int, project_uuids: list[str], request: Request):
     """Update the projects associated with a report.
 
     Args:
         report_id (int): the report to update the projects for.
         project_uuids (list[str]): list of project UUIDs associated with the report.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     update.report_projects(report_id, project_uuids)
 
 
@@ -389,36 +414,43 @@ def delete_report(report_id: int, current_user=Depends(util.auth.claim())):
 
 
 @router.delete("/report-element/{id}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_report_element(id: int):
+def delete_report_element(report_id: int, id: int, request: Request):
     """Delete an element from a report.
 
     Args:
+        report_id (int): the id of the report the element is associated with.
         id (int): the id of the report element to be deleted.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     delete.report_element(id)
 
 
 @router.delete(
     "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-def delete_report_user(report_id: int, user: User):
+def delete_report_user(report_id: int, user: User, request: Request):
     """Remove a user from a report.
 
     Args:
         report_id (int): id dof the report to remove a user from.
         user (User): user to be removed from the report.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     delete.report_user(report_id, user)
 
 
 @router.delete(
     "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-def delete_report_org(report_id: int, organization: Organization):
+def delete_report_org(report_id: int, organization: Organization, request: Request):
     """Remove an organizations from a report.
 
     Args:
         report_id (int): id dof the report to remove an organization from.
         organization (Organization): organization to be removed from the report.
+        request (Request): http request to get user information from.
     """
+    util.report_editor(report_id, request)
     delete.report_org(report_id, organization)
