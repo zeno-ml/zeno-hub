@@ -2,6 +2,7 @@
 import json
 import uuid
 
+from fastapi import HTTPException
 from psycopg import AsyncConnection, AsyncCursor, sql
 
 import zeno_backend.database.select as select
@@ -19,11 +20,14 @@ async def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         user (User): user who is copying the project.
 
     Raises:
-        Exception: something went wrong in the process of copying a project in
+        HTTPException: something went wrong in the process of copying a project in
             the database.
     """
     if select.project_exists(user.id, copy_spec.name) and user.name is not None:
-        raise Exception("Project with this name already exists.")
+        raise HTTPException(
+            status_code=400,
+            detail="Project with this name already exists.",
+        )
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -35,7 +39,7 @@ async def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
             )
             project_result = await cur.fetchall()
             if len(project_result) == 0:
-                raise Exception("Project does not exist.")
+                raise HTTPException(status_code=400, detail="Project does not exist.")
 
             # Create new project in DB.
             new_uuid = str(uuid.uuid4())
@@ -183,7 +187,7 @@ async def copy_data(
     )
     col_id = await cur.fetchall()
     if len(col_id) == 0:
-        raise Exception("ERROR: No ID column found.")
+        raise HTTPException(status_code=400, detail="No ID column found.")
     col_id = col_id[0][0]
 
     # Make ID column primary key.

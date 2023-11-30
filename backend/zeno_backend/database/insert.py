@@ -276,8 +276,9 @@ async def system_schema(
                     )
                     id_col = await cur.fetchall()
                     if id_col is None or len(id_col) == 0:
-                        raise Exception(
-                            "ERROR: No ID column found. Have you uploaded a dataset?"
+                        raise HTTPException(
+                            status_code=400,
+                            detail="No ID column found. Have you uploaded a dataset?",
                         )
 
                     columns.append(
@@ -346,6 +347,9 @@ async def system(
         project_uuid (str): project the user is currently working with.
         system_name (str): name of the system that produced the output.
         batch (RecordBatch): system output to be added.
+
+    Raises:
+        HTTPException: no ID column found.
     """
     encoder = ArrowToPostgresBinaryEncoder(batch.schema)
     pg_schema = encoder.schema()
@@ -376,7 +380,10 @@ async def system(
             )
             col_id = await cursor.fetchone()
             if col_id is None:
-                raise Exception("ERROR: No ID column found.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="No ID column found.",
+                )
             col_id = col_id[0]
 
             await cursor.execute(
@@ -410,7 +417,7 @@ async def report(name: str, user: User) -> int:
         int: the id of the newly created report.
 
     Raises:
-        Exception: a report with the same name already exists.
+        HTTPException: a report with the same name already exists.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -420,7 +427,10 @@ async def report(name: str, user: User) -> int:
             )
             res = await cur.fetchall()
             if len(res) > 0:
-                raise Exception("Report with this name already exists.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Report with this name already exists.",
+                )
 
             await cur.execute(
                 "INSERT INTO reports (name, owner_id, public) VALUES (%s,%s,%s)"
@@ -431,7 +441,7 @@ async def report(name: str, user: User) -> int:
             await conn.commit()
 
             if len(id) == 0:
-                raise Exception("Could not create report.")
+                raise HTTPException(status_code=500, detail="Could not create report.")
             return id[0][0]
 
 
@@ -599,7 +609,10 @@ async def all_slices_for_column(
             )
             values = await cur.fetchall()
             if len(values) > 100:
-                raise Exception("Too many distinct values to create slices for.")
+                raise HTTPException(
+                    status_code=400,
+                    detail="Too many distinct values to create slices. Must be < 100",
+                )
             folder_id = None
             if len(values) > 0:
                 await cur.execute(

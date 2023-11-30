@@ -561,7 +561,10 @@ async def api_key_exists(api_key: str) -> bool:
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether API key exists.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not check whether API key exists.",
+        )
 
 
 async def user_by_api_key(api_key: str) -> User:
@@ -659,7 +662,9 @@ async def project_exists(owner_id: int, project_name: str) -> bool:
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether project exists.")
+        raise HTTPException(
+            status_code=500, detail="Could not check if project exists."
+        )
 
 
 async def report_id(owner: str, name: str) -> int | None:
@@ -2525,7 +2530,7 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
         bool: whether the system exists.
 
     Raises:
-        Exception: something went wrong while checking whether the system exists.
+        HTTPException: something went wrong while checking whether the system exists.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -2539,4 +2544,4 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether system exists.")
+        raise HTTPException(status_code=500, detail="Could not check if system exists")
