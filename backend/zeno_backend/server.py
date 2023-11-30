@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
-from zeno_backend.database.database import db_pool
 from zeno_backend.routers import (
     account,
     chart,
@@ -44,8 +43,6 @@ def get_server() -> FastAPI:
     Returns:
         FastAPI: FastAPI endpoint
     """
-    _ = db_pool.open()
-
     app = FastAPI(title="Frontend API", separate_input_output_schemas=False)
     # Filter out /endpoint
     logging.getLogger("uvicorn.access").addFilter(EndpointFilter())

@@ -1,4 +1,5 @@
 """Functionality to interact with the database."""
+import asyncio
 import os
 from configparser import ConfigParser
 from pathlib import Path
@@ -7,10 +8,10 @@ from typing import Any
 from psycopg_pool import AsyncConnectionPool
 
 
-def config(
+def get_db_pool(
     filename: str = "zeno_backend/database/database.ini",
     section: str = "postgresql",
-) -> dict[str, Any]:
+) -> AsyncConnectionPool:
     """Get the configuration of the database.
 
     Args:
@@ -35,7 +36,6 @@ def config(
                 db[param[0]] = param[1]
         else:
             raise Exception(f"Section {section} not found in the {filename} file")
-        return db
     else:
         db: dict[str, Any] = {}
         db["host"] = os.environ["DB_HOST"]
@@ -43,7 +43,12 @@ def config(
         db["dbname"] = os.environ["DB_NAME"]
         db["user"] = os.environ["DB_USER"]
         db["password"] = os.environ["DB_PASSWORD"]
-        return db
+
+    pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in db.items()]))
+    loop = asyncio.get_running_loop()
+    asyncio.run_coroutine_threadsafe(pool.open(), loop)
+
+    return pool
 
 
-db_pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in config().items()]))
+db_pool = get_db_pool()
