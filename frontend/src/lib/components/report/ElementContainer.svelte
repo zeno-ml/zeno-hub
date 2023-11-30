@@ -43,74 +43,67 @@
 </script>
 
 <div
-	on:dblclick={() => (editId = element.id || -1)}
-	aria-label="double-click to edit"
-	role="button"
-	tabindex="0"
->
-	<div
-		class="relative border-2
+	class="relative border-2
 			{editId === element.id ? 'border-primary-mid' : 'border-white'}
 			{report.editor ? 'group/edit rounded p-4 hover:border-primary-mid' : 'py-2'}
 			transition"
+>
+	<button
+		class="absolute -top-4 right-14 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
+		on:click={() => (showConfirmDelete = element.id ?? -1)}
 	>
-		<button
-			class="absolute -top-4 right-14 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
-			on:click={() => (showConfirmDelete = element.id ?? -1)}
-		>
-			<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
-				<path class="fill-primary" d={mdiTrashCanOutline} />
-			</Icon>
-		</button>
-		<button
-			class="absolute -top-4 right-4 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
-			on:click={() =>
-				editId === element.id || element.id === null || element.id === undefined
-					? (editId = -1)
-					: (editId = element.id)}
-		>
-			<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
-				<path class="fill-primary" d={editId === element.id ? mdiCheckBold : mdiPencilOutline} />
-			</Icon>
-		</button>
-		<button
-			class="absolute -left-3 top-1 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
-			on:click={() => swapElementPositions(element.id, element.position - 1)}
-		>
-			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
-				<path class="fill-primary" d={mdiChevronUp} />
-			</Icon>
-		</button>
-		<button
-			class="absolute -left-3 top-8 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
-			on:click={() => swapElementPositions(element.id, element.position + 1)}
-		>
-			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
-				<path class="fill-primary" d={mdiChevronDown} />
-			</Icon>
-		</button>
-		{#if editId === element.id}
-			<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
-				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-					{#await sliceOptions then sliceOptions}
-						<ElementEdit
-							bind:element
-							{chartOptions}
-							{sliceOptions}
-							{tagOptions}
-							reportId={report.id}
-						/>
-					{/await}
-				</div>
-				<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-					<Element {element} {chartOptions} />
-				</div>
+		<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
+			<path class="fill-primary" d={mdiTrashCanOutline} />
+		</Icon>
+	</button>
+	<button
+		class="absolute -top-4 right-4 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
+		on:click={() =>
+			editId === element.id || element.id === null || element.id === undefined
+				? (editId = -1)
+				: (editId = element.id)}
+	>
+		<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
+			<path class="fill-primary" d={editId === element.id ? mdiCheckBold : mdiPencilOutline} />
+		</Icon>
+	</button>
+	<button
+		class="absolute -left-3 top-1 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+		on:click={() => swapElementPositions(element.id, element.position - 1)}
+	>
+		<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+			<path class="fill-primary" d={mdiChevronUp} />
+		</Icon>
+	</button>
+	<button
+		class="absolute -left-3 top-8 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
+		on:click={() => swapElementPositions(element.id, element.position + 1)}
+	>
+		<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+			<path class="fill-primary" d={mdiChevronDown} />
+		</Icon>
+	</button>
+	{#if editId === element.id}
+		<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
+			<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+				{#await sliceOptions then sliceOptions}
+					<ElementEdit
+						bind:element
+						{chartOptions}
+						{sliceOptions}
+						{tagOptions}
+						reportId={report.id}
+					/>
+				{/await}
 			</div>
-		{:else}
-			<Element {element} {chartOptions} />
-		{/if}
-	</div>
-	{#if report.editor}
-		<AddElementButton position={element.position + 1} {addElement} />
+			<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
+				<Element {element} {chartOptions} />
+			</div>
+		</div>
+	{:else}
+		<Element {element} {chartOptions} />
 	{/if}
 </div>
+{#if report.editor}
+	<AddElementButton position={element.position + 1} {addElement} />
+{/if}
