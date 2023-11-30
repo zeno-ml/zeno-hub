@@ -79,7 +79,7 @@
 					goto(
 						`/project/${sliceElementOptions?.project.uuid}/${encodeURIComponent(
 							sliceElementOptions?.project.name || ''
-						)}` + encodeParams()
+						)}/explore` + encodeParams()
 					)}>Explore</Button
 			>
 			<p class="ml-auto">
