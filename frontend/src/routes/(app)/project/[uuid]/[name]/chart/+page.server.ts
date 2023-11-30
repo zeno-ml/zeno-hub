@@ -1,5 +1,5 @@
 import { getClient } from '$lib/api/client';
-import type { Chart } from '$lib/zenoapi/index';
+import type { ApiError, Chart } from '$lib/zenoapi/index';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, depends, cookies, url }) {
@@ -11,7 +11,8 @@ export async function load({ params, depends, cookies, url }) {
 	try {
 		charts = await zenoClient.getCharts(params.uuid);
 	} catch (e) {
-		throw error(404, 'Could not load charts');
+		const err = e as ApiError;
+		throw error(err.status, err.body.detail);
 	}
 
 	return {

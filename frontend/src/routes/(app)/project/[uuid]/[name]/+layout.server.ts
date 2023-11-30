@@ -18,13 +18,14 @@ export async function load({ cookies, params, url }) {
 	try {
 		project_result = await zenoClient.getProjectState(params.uuid);
 	} catch (e: unknown) {
-		if ((e as ApiError).status === 401) {
+		const err = e as ApiError;
+		if (err.status === 401) {
 			if (cognitoUser !== null) {
 				throw redirect(303, `/auth`);
 			} else {
 				throw redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
-		} else if ((e as ApiError).status === 404) {
+		} else if (err.status === 404) {
 			// try to route using owner/project_name for legacy projects.
 			const project_uuid = await zenoClient.getProjectUuid(
 				params.uuid,
@@ -36,7 +37,7 @@ export async function load({ cookies, params, url }) {
 				`/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`
 			);
 		}
-		throw error(404, 'Could not load project configuration');
+		throw error(err.status, err.body.detail);
 	}
 
 	if (project_result.project.name !== decodeURI(params.name)) {
