@@ -69,15 +69,9 @@ def filter_to_sql(
                     + sql.SQL(")")
                 )
         else:
-            if str(f.value).lower() in [
-                "true",
-                "false",
-            ]:
-                val = "True" if str(f.value).lower() == "true" else "False"
-            else:
-                val = f.value
-                if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
-                    val = "%" + str(val) + "%"
+            val = f.value
+            if f.operation == Operation.LIKE or f.operation == Operation.ILIKE:
+                val = "%" + str(val) + "%"
 
             if f.column.model is None:
                 column_id = column_id_from_name_and_model(project, f.column.name, None)
