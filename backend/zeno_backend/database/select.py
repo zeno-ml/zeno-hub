@@ -885,7 +885,7 @@ def project_from_uuid(project_uuid: str) -> Project:
         )
         if len(project_result) == 0:
             raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
+                status.HTTP_404_NOT_FOUND,
                 "ERROR: Project could not be found.",
             )
         project_result = project_result[0]
