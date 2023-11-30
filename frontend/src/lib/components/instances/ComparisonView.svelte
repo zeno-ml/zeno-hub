@@ -281,7 +281,7 @@
 								{labelColumn}
 								modelColumn={modelAColumn}
 								entry={tableContent}
-								selectable
+								selectable={$project.editor}
 							/>
 						</div>
 					</td>
@@ -297,7 +297,7 @@
 								{labelColumn}
 								modelColumn={modelBColumn}
 								entry={tableContent}
-								selectable
+								selectable={$project.editor}
 							/>
 						</div>
 					</td>
