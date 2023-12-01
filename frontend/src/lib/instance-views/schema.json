@@ -156,6 +156,10 @@
 				},
 				"output": {
 					"$ref": "#/definitions/ViewUnion"
+				},
+				"size": {
+					"enum": ["medium", "large"],
+					"type": "string"
 				}
 			},
 			"required": ["data"],

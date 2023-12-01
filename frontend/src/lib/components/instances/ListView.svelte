@@ -2,6 +2,7 @@
 	import { instanceOfFilterPredicate } from '$lib/api/slice';
 	import { getFilteredTable } from '$lib/api/table';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
+	import type { ViewSchema } from '$lib/instance-views/schema';
 	import {
 		columns,
 		filterSelection,
@@ -23,6 +24,7 @@
 	export let numberOfInstances = 0;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+	const viewSpec = JSON.parse($project.view) as ViewSchema;
 
 	let listContainer: HTMLDivElement;
 	let table: Record<string, string | number | boolean>[] = [];
@@ -109,7 +111,10 @@
 
 <div
 	class="grid h-full w-full overflow-y-auto"
-	style="grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); grid-auto-rows: min-content;"
+	style="grid-template-columns: repeat(auto-fill, minmax({viewSpec.size && viewSpec.size === 'large'
+		? '800px'
+		: '400px'}, 1fr));
+	grid-auto-rows: min-content;"
 	bind:this={listContainer}
 >
 	{#each table as inst (`${inst[idColumn]}_${modelColumn}`)}

@@ -175,7 +175,7 @@
 							{#if instanceHidden}
 								<p class="text-center">...</p>
 							{:else}
-								<div class="instance">
+								<div class="min-w-small-instance">
 									<InstanceView
 										view={$project.view}
 										{dataColumn}

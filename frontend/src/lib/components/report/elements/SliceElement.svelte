@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
+	import type { ViewSchema } from '$lib/instance-views/schema';
 	import type { URLParams } from '$lib/util/util';
 	import type {
 		ReportElement,
@@ -17,20 +18,23 @@
 	export let element: ReportElement;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let sliceElementSpec: SliceElementSpec | undefined;
 	let sliceElementOptions: SliceElementOptions | undefined;
 	let table: Record<string, string | number | boolean>[] | undefined = [];
 	let page = 0;
 
 	$: updateSliceElementSpec(element.data as string);
+	$: viewSchema = JSON.parse(sliceElementOptions?.project.view || '{}') as ViewSchema;
+	$: instancesPerPage = viewSchema.size && viewSchema.size === 'large' ? 1 : 2;
 
 	$: if (sliceElementSpec && sliceElementOptions) {
 		zenoClient
 			.getSliceTable({
 				sliceId: sliceElementSpec.sliceId,
 				model: sliceElementSpec.modelName,
-				offset: page * 2,
-				limit: 2
+				offset: page * instancesPerPage,
+				limit: instancesPerPage
 			} as SliceTableRequest)
 			.then((r) => (table = JSON.parse(r)));
 	}
@@ -83,7 +87,10 @@
 					)}>Explore</Button
 			>
 			<p class="ml-auto">
-				{page * 2 + 1} - {Math.min(page * 2 + 2, sliceElementOptions.sliceSize)} of {sliceElementOptions.sliceSize}
+				{page * instancesPerPage + 1} - {Math.min(
+					page * instancesPerPage + instancesPerPage,
+					sliceElementOptions.sliceSize
+				)} of {sliceElementOptions.sliceSize}
 			</p>
 		</div>
 		<div class="flex w-full items-stretch justify-between">
@@ -103,7 +110,7 @@
 			<div class="flex h-full w-full flex-wrap content-start overflow-x-auto">
 				{#if sliceElementOptions.idColumn !== undefined && table.length > 0 && table[0][sliceElementOptions.idColumn] !== undefined}
 					{#each table as inst (inst[sliceElementOptions.idColumn])}
-						<div class="m-auto mt-0 w-1/2 px-1">
+						<div class="m-auto mt-0 {instancesPerPage === 1 ? 'w-full' : 'w-1/2'} px-1">
 							<InstanceView
 								view={sliceElementOptions.project.view}
 								dataColumn={sliceElementOptions.dataColumn}
@@ -117,8 +124,10 @@
 			</div>
 			<button
 				class="flex items-center hover:bg-yellowish-light
-				{page * 2 + 2 >= sliceElementOptions.sliceSize ? 'bg-yellowish-light' : ''}"
-				disabled={page * 2 + 2 >= sliceElementOptions.sliceSize}
+				{page * instancesPerPage + instancesPerPage >= sliceElementOptions.sliceSize
+					? 'bg-yellowish-light'
+					: ''}"
+				disabled={page * instancesPerPage + instancesPerPage >= sliceElementOptions.sliceSize}
 				on:click={() => page++}
 			>
 				<div class="h-6 w-6">
