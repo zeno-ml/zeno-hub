@@ -40,7 +40,7 @@
 		message={'Are you sure you want to delete this chart?'}
 		on:confirm={() => {
 			showOptions = false;
-			zenoClient.deleteChart(chart).then(() => invalidate('app:charts'));
+			zenoClient.deleteChart($project.uuid, chart).then(() => invalidate('app:charts'));
 		}}
 		on:cancel={() => (showDelete = false)}
 	/>

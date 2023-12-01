@@ -39,7 +39,7 @@
 
 	/** Remove a generated slice from the slice drawer **/
 	function removeSlice() {
-		zenoClient.deleteSlice(slice).then(() => {
+		zenoClient.deleteSlice($project.uuid, slice).then(() => {
 			slices.update((s) => s.filter((sli) => sli.id !== slice.id));
 			created = false;
 		});
