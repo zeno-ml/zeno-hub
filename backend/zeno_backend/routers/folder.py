@@ -74,21 +74,22 @@ async def update_folder(folder: Folder, project: str, request: Request):
     await update.folder(folder, project)
 
 
-@router.delete("/folder", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_folder(folder: Folder, request: Request, delete_slices: bool = False):
+@router.delete(
+    "/folder/{project_uuid}/{folder_id}",
+    tags=["zeno"],
+    dependencies=[Depends(util.auth)],
+)
+async def delete_folder(
+    project_uuid: str, folder_id: int, request: Request, delete_slices: bool = False
+):
     """Delete an existing folder from the database.
 
     Args:
-        folder (Folder): folder to be deleted.
+        project_uuid (str): project that the folder belongs to.
+        folder_id (int): id of the folder to be deleted.
         request (Request): http request to get user information from.
         delete_slices (bool, optional): Whether to also delete all slices in the folder.
             Defaults to False.
     """
-    folder_with_uuid = await select.folder(folder.id)
-    if folder_with_uuid is None or folder_with_uuid.project_uuid is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Folder not found",
-        )
-    await util.project_editor(folder_with_uuid.project_uuid, request)
-    await delete.folder(folder, delete_slices)
+    await util.project_editor(project_uuid, request)
+    await delete.folder(folder_id, delete_slices)

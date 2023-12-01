@@ -423,7 +423,9 @@ async def delete_report(report_id: int, current_user=Depends(util.auth.claim()))
     await delete.report(report_id)
 
 
-@router.delete("/report-element/{id}", tags=["zeno"], dependencies=[Depends(util.auth)])
+@router.delete(
+    "/report-element/{report_id}/{id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
 async def delete_report_element(report_id: int, id: int, request: Request):
     """Delete an element from a report.
 

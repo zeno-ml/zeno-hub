@@ -1,10 +1,6 @@
 """Functions to delete data from the database."""
 from psycopg import sql
 
-from zeno_backend.classes.chart import Chart
-from zeno_backend.classes.folder import Folder
-from zeno_backend.classes.slice import Slice
-from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import db_pool
 
@@ -66,11 +62,11 @@ async def report(report_id: int):
             await conn.commit()
 
 
-async def folder(folder: Folder, delete_slices: bool):
+async def folder(folder_id: int, delete_slices: bool):
     """Deletes a folder from an existing project.
 
     Args:
-        folder (Folder): the folder to be deleted.
+        folder_id (int): the id of the folder to be deleted.
         delete_slices (bool): whether to delete the slices in the folder as well.
     """
     async with db_pool.connection() as conn:
@@ -79,64 +75,62 @@ async def folder(folder: Folder, delete_slices: bool):
                 await cur.execute(
                     "DELETE FROM slices WHERE folder_id = %s;",
                     [
-                        folder.id,
+                        folder_id,
                     ],
                 )
             await cur.execute(
                 "DELETE FROM folders WHERE id = %s;",
                 [
-                    folder.id,
+                    folder_id,
                 ],
             )
             await conn.commit()
 
 
-async def slice(req: Slice):
+async def slice(slice_id: int):
     """Deletes a slice from an existing project.
 
     Args:
-        req (Slice): the slice to be deleted.
+        slice_id (int): the id of the slice to be deleted.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "DELETE FROM slices WHERE id = %s;",
-                [
-                    req.id,
-                ],
+                [slice_id],
             )
             await conn.commit()
 
 
-async def chart(chart: Chart):
+async def chart(chart_id: int):
     """Deletes a chart from an existing project.
 
     Args:
-        chart (Chart): the chart to be deleted.
+        chart_id (int): the id of the chart to be deleted.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "DELETE FROM charts WHERE id = %s;",
                 [
-                    chart.id,
+                    chart_id,
                 ],
             )
             await conn.commit()
 
 
-async def tag(tag: Tag):
+async def tag(tag_id: int):
     """Deletes a tag from an existing project.
 
     Args:
-        tag (Tag): the tag to be deleted.
+        tag_id (int): the id of the tag to be deleted.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "DELETE FROM tags WHERE id = %s;",
                 [
-                    tag.id,
+                    tag_id,
                 ],
             )
             await conn.commit()

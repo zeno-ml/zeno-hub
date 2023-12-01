@@ -218,14 +218,16 @@ async def update_slice(slice: Slice, project: str, request: Request):
     await update.slice(slice, project)
 
 
-@router.delete("/slice", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_slice(project_uuid: str, slice: Slice, request: Request):
+@router.delete(
+    "/slice/{project_uuid}/{slice_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_slice(project_uuid: str, slice_id: int, request: Request):
     """Delete a slice from the database.
 
     Args:
         project_uuid (str): project to which the slice belongs (to check permissions).
-        slice (Slice): slice to be deleted.
+        slice_id (int): id of the slice to be deleted.
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.slice(slice)
+    await delete.slice(slice_id)

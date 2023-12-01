@@ -65,7 +65,7 @@
 			deleteSlices = true;
 		}}
 		on:confirm={() => {
-			zenoClient.deleteFolder(folder, deleteSlices).then(() => {
+			zenoClient.deleteFolder($project.uuid, folder.id, deleteSlices).then(() => {
 				slices.update((s) => {
 					if (deleteSlices) {
 						s = s.filter((slice) => slice.folderId !== folder.id);

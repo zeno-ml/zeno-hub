@@ -432,22 +432,21 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): project to which the chart belongs.
-	 * chart (Chart): chart to be deleted.
+	 * chart_id (int): id of the chart to be deleted.
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
-	 * @param requestBody
+	 * @param chartId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteChart(projectUuid: string, requestBody: Chart): CancelablePromise<any> {
+	public deleteChart(projectUuid: string, chartId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/chart',
-			query: {
-				project_uuid: projectUuid
+			url: '/chart/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}
@@ -549,24 +548,32 @@ export class ZenoService {
 	 * Delete an existing folder from the database.
 	 *
 	 * Args:
-	 * folder (Folder): folder to be deleted.
+	 * project_uuid (str): project that the folder belongs to.
+	 * folder_id (int): id of the folder to be deleted.
 	 * request (Request): http request to get user information from.
 	 * delete_slices (bool, optional): Whether to also delete all slices in the folder.
 	 * Defaults to False.
-	 * @param requestBody
+	 * @param projectUuid
+	 * @param folderId
 	 * @param deleteSlices
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteFolder(requestBody: Folder, deleteSlices: boolean = false): CancelablePromise<any> {
+	public deleteFolder(
+		projectUuid: string,
+		folderId: number,
+		deleteSlices: boolean = false
+	): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/folder',
+			url: '/folder/{project_uuid}/{folder_id}',
+			path: {
+				project_uuid: projectUuid,
+				folder_id: folderId
+			},
 			query: {
 				delete_slices: deleteSlices
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}
@@ -1548,35 +1555,6 @@ export class ZenoService {
 	}
 
 	/**
-	 * Delete Report Element
-	 * Delete an element from a report.
-	 *
-	 * Args:
-	 * report_id (int): the id of the report the element is associated with.
-	 * id (int): the id of the report element to be deleted.
-	 * request (Request): http request to get user information from.
-	 * @param id
-	 * @param reportId
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public deleteReportElement(id: number, reportId: number): CancelablePromise<any> {
-		return this.httpRequest.request({
-			method: 'DELETE',
-			url: '/report-element/{id}',
-			path: {
-				id: id
-			},
-			query: {
-				report_id: reportId
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Add Report User
 	 * Add a user to a report.
 	 *
@@ -1847,6 +1825,33 @@ export class ZenoService {
 			url: '/report/{report_id}',
 			path: {
 				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report Element
+	 * Delete an element from a report.
+	 *
+	 * Args:
+	 * report_id (int): the id of the report the element is associated with.
+	 * id (int): the id of the report element to be deleted.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param id
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteReportElement(reportId: number, id: number): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/report-element/{report_id}/{id}',
+			path: {
+				report_id: reportId,
+				id: id
 			},
 			errors: {
 				422: `Validation Error`
@@ -2301,22 +2306,21 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): project to which the slice belongs (to check permissions).
-	 * slice (Slice): slice to be deleted.
+	 * slice_id (int): id of the slice to be deleted.
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
-	 * @param requestBody
+	 * @param sliceId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteSlice(projectUuid: string, requestBody: Slice): CancelablePromise<any> {
+	public deleteSlice(projectUuid: string, sliceId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/slice',
-			query: {
-				project_uuid: projectUuid
+			url: '/slice/{project_uuid}/{slice_id}',
+			path: {
+				project_uuid: projectUuid,
+				slice_id: sliceId
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}
@@ -2537,22 +2541,21 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): project to which the tag belongs.
-	 * tag (Tag): tag to be deleted from the database.
+	 * tag_id (int): id of the tag to be deleted.
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
-	 * @param requestBody
+	 * @param tagId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteTag(projectUuid: string, requestBody: Tag): CancelablePromise<any> {
+	public deleteTag(projectUuid: string, tagId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/tag',
-			query: {
-				project_uuid: projectUuid
+			url: '/tag/{project_uuid}/{tag_id}',
+			path: {
+				project_uuid: projectUuid,
+				tag_id: tagId
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}

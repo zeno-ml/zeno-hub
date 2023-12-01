@@ -111,14 +111,16 @@ async def update_tag(tag: Tag, project_uuid: str, request: Request):
     await update.tag(tag, project_uuid)
 
 
-@router.delete("/tag", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_tag(project_uuid: str, tag: Tag, request: Request):
+@router.delete(
+    "/tag/{project_uuid}/{tag_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_tag(project_uuid: str, tag_id: int, request: Request):
     """Delete a tag from the database.
 
     Args:
         project_uuid (str): project to which the tag belongs.
-        tag (Tag): tag to be deleted from the database.
+        tag_id (int): id of the tag to be deleted.
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.tag(tag)
+    await delete.tag(tag_id)

@@ -38,7 +38,7 @@
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
 		zenoClient
-			.deleteSlice(slice)
+			.deleteSlice($project.uuid, slice.id)
 			.then(() => slices.update((s) => s.filter((s) => s.id !== slice.id)));
 	}
 

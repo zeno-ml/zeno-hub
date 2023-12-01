@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { goto, invalidate } from '$app/navigation';
+	import { project } from '$lib/stores';
+	import { clickOutside } from '$lib/util/clickOutside';
+	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import {
 		mdiBee,
 		mdiChartBar,
@@ -8,11 +12,6 @@
 		mdiTable,
 		mdiViewGrid
 	} from '@mdi/js';
-
-	import { goto, invalidate } from '$app/navigation';
-	import { project } from '$lib/stores';
-	import { clickOutside } from '$lib/util/clickOutside';
-	import { ChartType, ZenoService, type Chart } from '$lib/zenoapi';
 	import { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
@@ -40,7 +39,7 @@
 		message={'Are you sure you want to delete this chart?'}
 		on:confirm={() => {
 			showOptions = false;
-			zenoClient.deleteChart(chart).then(() => invalidate('app:charts'));
+			zenoClient.deleteChart($project.uuid, chart.id).then(() => invalidate('app:charts'));
 		}}
 		on:cancel={() => (showDelete = false)}
 	/>

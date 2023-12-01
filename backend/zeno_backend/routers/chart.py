@@ -163,14 +163,16 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
     await update.chart(chart, project_uuid)
 
 
-@router.delete("/chart", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_chart(project_uuid: str, chart: Chart, request: Request):
+@router.delete(
+    "/chart/{project_uuid}/{chart_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_chart(project_uuid: str, chart_id: int, request: Request):
     """Delete a chart from the database.
 
     Args:
         project_uuid (str): project to which the chart belongs.
-        chart (Chart): chart to be deleted.
+        chart_id (int): id of the chart to be deleted.
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.chart(chart)
+    await delete.chart(chart_id)
