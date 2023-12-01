@@ -75,7 +75,7 @@
 				class="ml-4"
 				on:click={() =>
 					goto(
-						`/project/${tagElementOptions?.project.ownerName}/${tagElementOptions?.project.name}` +
+						`/project/${tagElementOptions?.project.ownerName}/${tagElementOptions?.project.name}/explore` +
 							encodeParams()
 					)}>Explore</Button
 			>

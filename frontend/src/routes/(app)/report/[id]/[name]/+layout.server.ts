@@ -23,7 +23,8 @@ export async function load({ cookies, params, url }) {
 					encodeURIComponent(params.name)
 				);
 			} catch (e: unknown) {
-				throw error(404, 'Could not load report');
+				const err = e as ApiError;
+				throw error(err.status, err.body.detail);
 			}
 			throw redirect(
 				301,

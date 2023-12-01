@@ -82,6 +82,7 @@ async def get_chart_data(project_uuid: str, chart_id: int, request: Request):
     Returns:
         str: data for the chart in json representation.
     """
+    await util.project_access_valid(project_uuid, request)
     chart = await select.chart(project_uuid, chart_id)
     return await chart_data(chart, project_uuid)
 
@@ -91,15 +92,18 @@ async def get_chart_data(project_uuid: str, chart_id: int, request: Request):
     response_model=list[Chart],
     tags=["zeno"],
 )
-async def get_charts_for_projects(project_uuids: list[str]):
+async def get_charts_for_projects(project_uuids: list[str], request: Request):
     """Get all charts for a list of projects.
 
     Args:
         project_uuids (list[str]): list of UUIDs of projects to fetch all charts for.
+        request (Request): http request to get user information from.
 
     Returns:
         list[Chart]: all charts for the list of projects
     """
+    for project_uuid in project_uuids:
+        await util.project_access_valid(project_uuid, request)
     return await select.charts_for_projects(project_uuids)
 
 
@@ -109,13 +113,17 @@ async def get_charts_for_projects(project_uuids: list[str]):
     tags=["zeno"],
 )
 async def add_chart(
-    project_uuid: str, chart: Chart, current_user=Depends(util.auth.claim())
+    project_uuid: str,
+    chart: Chart,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
 ):
     """Add a new chart to a project.
 
     Args:
         project_uuid (str): UUID of the project to add a chart to.
         chart (Chart): chart to be added to the project.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user making the addition of the chart.
             Defaults to Depends(util.auth.claim()).
 
@@ -125,6 +133,7 @@ async def add_chart(
     Returns:
         int: id of the newly added chart.
     """
+    await util.project_editor(project_uuid, request)
     id = await insert.chart(project_uuid, chart)
     if id is None:
         raise HTTPException(
@@ -142,21 +151,26 @@ async def add_chart(
 
 
 @router.patch("/chart/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_chart(chart: Chart, project_uuid: str):
+async def update_chart(chart: Chart, project_uuid: str, request: Request):
     """Update a chart.
 
     Args:
         chart (Chart): new chart data.
         project_uuid (str): UUID of the project that holds the chart.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await update.chart(chart, project_uuid)
 
 
 @router.delete("/chart", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_chart(chart: Chart):
+async def delete_chart(project_uuid: str, chart: Chart, request: Request):
     """Delete a chart from the database.
 
     Args:
+        project_uuid (str): project to which the chart belongs.
         chart (Chart): chart to be deleted.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await delete.chart(chart)

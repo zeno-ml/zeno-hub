@@ -60,12 +60,18 @@ async def get_tags_for_projects(project_uuids: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-async def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())):
+async def add_tag(
+    tag: Tag,
+    project_uuid: str,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
+):
     """Add a tag to a project.
 
     Args:
         tag (Tag): the tag to be added.
         project_uuid (str): UUID of the project to add the tag to.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user adding the new tag.
             Defaults to Depends(util.auth.claim()).
 
@@ -75,6 +81,7 @@ async def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.cl
     Returns:
         int: id of the newly created tag.
     """
+    await util.project_editor(project_uuid, request)
     id = await insert.tag(project_uuid, tag)
     if id is None:
         raise HTTPException(
@@ -92,21 +99,26 @@ async def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.cl
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_tag(tag: Tag, project_uuid: str):
+async def update_tag(tag: Tag, project_uuid: str, request: Request):
     """Update a tag in the database.
 
     Args:
         tag (Tag): updated tag.
         project_uuid (str): project to which the tag belongs.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await update.tag(tag, project_uuid)
 
 
 @router.delete("/tag", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_tag(tag: Tag):
+async def delete_tag(project_uuid: str, tag: Tag, request: Request):
     """Delete a tag from the database.
 
     Args:
+        project_uuid (str): project to which the tag belongs.
         tag (Tag): tag to be deleted from the database.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await delete.tag(tag)

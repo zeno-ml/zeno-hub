@@ -120,7 +120,7 @@
 				{labelColumn}
 				{modelColumn}
 				entry={inst}
-				selectable
+				selectable={$project.editor}
 			/>
 		</div>
 	{/each}

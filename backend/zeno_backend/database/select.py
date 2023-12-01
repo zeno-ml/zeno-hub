@@ -1568,6 +1568,7 @@ async def folder(id: int) -> Folder | None:
         Folder(
             id=folder_result[0][0] if isinstance(folder_result[0][0], int) else 0,
             name=str(folder_result[0][1]),
+            project_uuid=str(folder_result[0][2]),
         )
         if len(folder_result) > 0
         else None

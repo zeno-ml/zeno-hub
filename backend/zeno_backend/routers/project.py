@@ -23,16 +23,18 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get("/project-public/{project_uuid}", response_model=bool, tags=["zeno"])
-async def is_project_public(project_uuid: str):
+async def is_project_public(project_uuid: str, request: Request):
     """Check if a given project is public.
 
     Args:
         project_uuid (str): uuid of the project to be checked.
+        request (Request): http request to get user information from.
 
     Returns:
         bool: whether the specified project is public.
     """
-    return await select.project_public(project_uuid)
+    await util.project_access_valid(project_uuid, request)
+    return select.project_public(project_uuid)
 
 
 @router.get("/project-state/{uuid}", response_model=ProjectState, tags=["zeno"])
@@ -52,9 +54,8 @@ async def get_project_state(
     Returns:
         ProjectState | None: current state of the project.
     """
-    project = await select.project_from_uuid(project_uuid)
     await util.project_access_valid(project_uuid, request)
-
+    project = await select.project_from_uuid(project_uuid)
     user = await util.get_user_from_token(request)
     return await select.project_state(project_uuid, user, project)
 
@@ -65,7 +66,7 @@ async def get_project_state(
     tags=["zeno"],
 )
 async def get_project_uuid(owner_name: str, project_name: str, request: Request):
-    """Get the UUIS of a project by owner and project name.
+    """Get the UUID of a project by owner and project name.
 
     Args:
         owner_name (str): name of the project's owner.
@@ -138,15 +139,17 @@ async def like_project(project_uuid: str, current_user=Depends(util.auth.claim()
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def get_project_users(project_uuid: str):
+async def get_project_users(project_uuid: str, request: Request):
     """Get all users of a specific project.
 
     Args:
         project_uuid (str): UUID of the project to get all users for.
+        request (Request): http request to get user information from.
 
     Returns:
         list[User]: all users who have access to the project.
     """
+    await util.project_editor(project_uuid, request)
     return await select.project_users(project_uuid)
 
 
@@ -156,28 +159,32 @@ async def get_project_users(project_uuid: str):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def get_project_orgs(project_uuid: str):
+async def get_project_orgs(project_uuid: str, request: Request):
     """Get all organizations that have access to a project.
 
     Args:
         project_uuid (str): UUID of the project to get all organizations for.
+        request (Request): http request to get user information from.
 
     Returns:
         list[Organization]: all organizations with access to the project.
     """
+    await util.project_editor(project_uuid, request)
     return await select.project_orgs(project_uuid)
 
 
 @router.post(
     "/project-user/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def add_project_user(project_uuid: str, user: User):
+async def add_project_user(project_uuid: str, user: User, request: Request):
     """Add a user to a project.
 
     Args:
         project_uuid (str): UUID of the project to add a new user to.
         user (User): user to be added to the project.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     project_obj = await select.project_from_uuid(project_uuid)
     if project_obj.owner_name != user.name:
         await insert.project_user(project_uuid, user)
@@ -186,13 +193,17 @@ async def add_project_user(project_uuid: str, user: User):
 @router.post(
     "/project-org/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def add_project_org(project_uuid: str, organization: Organization):
+async def add_project_org(
+    project_uuid: str, organization: Organization, request: Request
+):
     """Add an organization to a project.
 
     Args:
         project_uuid (str): UUID of the project to add the organizion to.
         organization (Organization): organization to be added to the project.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await insert.project_org(project_uuid, organization)
 
 
@@ -202,6 +213,7 @@ async def add_project_org(project_uuid: str, organization: Organization):
 async def copy_project(
     project_uuid: str,
     copy_spec: ProjectCopy,
+    request: Request,
     current_user=Depends(util.auth.claim()),
 ):
     """Create a copy of an existing project.
@@ -209,9 +221,11 @@ async def copy_project(
     Args:
         project_uuid (str): UUID of the project to be copied.
         copy_spec (ProjectCopy): specification of what content to copy over.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user initiating the copy request.
             Defaults to Depends(util.auth.claim()).
     """
+    await util.project_access_valid(project_uuid, request)
     user = await select.user(current_user["username"])
     if user is None:
         raise HTTPException(
@@ -222,38 +236,46 @@ async def copy_project(
 
 
 @router.patch("/project/", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_project(project: Project):
+async def update_project(project: Project, request: Request):
     """Update a project's specification.
 
     Args:
         project (Project): updated project specification.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project.uuid, request)
     await update.project(project)
 
 
 @router.patch(
     "/project-user/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def update_project_user(project_uuid: str, user: User):
+async def update_project_user(project_uuid: str, user: User, request: Request):
     """Update the rights of a project user.
 
     Args:
         project_uuid (str): UUID of the project to update user rights for.
         user (User): updated user rights of a specified user.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await update.project_user(project_uuid, user)
 
 
 @router.patch(
     "/project-org/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def update_project_org(project_uuid: str, organization: Organization):
+async def update_project_org(
+    project_uuid: str, organization: Organization, request: Request
+):
     """Update the rights of a project's organization.
 
     Args:
         project_uuid (str): UUID of the project to update organization rights for.
         organization (Organization): updated rights of a specified organization.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await update.project_org(project_uuid, organization)
 
 
@@ -281,24 +303,30 @@ async def delete_project(project_uuid: str, current_user=Depends(util.auth.claim
 @router.delete(
     "/project-user/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def delete_project_user(project_uuid: str, user: User):
+async def delete_project_user(project_uuid: str, user: User, request: Request):
     """Remove a user from a project.
 
     Args:
         project_uuid (str): UUID of the project to remove the user from.
         user (User): user to be removed from the project.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await delete.project_user(project_uuid, user)
 
 
 @router.delete(
     "/project-org/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def delete_project_org(project_uuid: str, organization: Organization):
+async def delete_project_org(
+    project_uuid: str, organization: Organization, request: Request
+):
     """Remove an organization from a project.
 
     Args:
         project_uuid (str): UUID of the project to remove the organization from.
         organization (Organization): organization to be removed from the project.
+        request (Request): http request to get user information from.
     """
+    await util.project_editor(project_uuid, request)
     await delete.project_org(project_uuid, organization)

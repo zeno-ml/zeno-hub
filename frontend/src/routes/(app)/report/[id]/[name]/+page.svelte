@@ -155,15 +155,34 @@
 			{/if}
 			<div class="mt-2 flex flex-col">
 				{#each elements as element (element.id)}
-					<ElementContainer
-						bind:element
-						bind:editId
-						bind:showConfirmDelete
-						{swapElementPositions}
-						{addElement}
-						{selectedProjects}
-						report={data.report}
-					/>
+					{#if data.report.editor}
+						<div
+							on:dblclick={() => (editId = element.id || -1)}
+							aria-label="double-click to edit"
+							role="button"
+							tabindex="0"
+						>
+							<ElementContainer
+								bind:element
+								bind:editId
+								bind:showConfirmDelete
+								{swapElementPositions}
+								{addElement}
+								{selectedProjects}
+								report={data.report}
+							/>
+						</div>
+					{:else}
+						<ElementContainer
+							bind:element
+							bind:editId
+							bind:showConfirmDelete
+							{swapElementPositions}
+							{addElement}
+							{selectedProjects}
+							report={data.report}
+						/>
+					{/if}
 				{/each}
 			</div>
 		</div>
