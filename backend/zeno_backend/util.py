@@ -73,6 +73,34 @@ def project_access_valid(project: str | None, request: Request):
             )
 
 
+def project_editor(project_uuid: str, request: Request):
+    """Check whether a user is an editor of a project.
+
+    Args:
+        project_uuid (str): the project to check.
+        request (Request): the request to get the access token if needed.
+
+    Throws:
+        HTTPException: if the project is not found or the user is not an editor.
+    """
+    token = request.headers.get("authorization")
+    user = util.get_user_from_token(request)
+    if token is None or not verify_token(token) or user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
+    available_project_ids = map(
+        lambda x: x.uuid,
+        filter(lambda y: y.editor, select.projects(user, HomeRequest())),
+    )
+    if project_uuid not in available_project_ids:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
+
+
 def report_access_valid(report: int, request: Request):
     """Check whether accessing a resource is valid.
 
@@ -97,6 +125,34 @@ def report_access_valid(report: int, request: Request):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unauthorized",
             )
+
+
+def report_editor(report_id: int, request: Request):
+    """Check whether a user is an editor of a report.
+
+    Args:
+        report_id (int): the report to check.
+        request (Request): the request to get the access token if needed.
+
+    Throws:
+        HTTPException: if the report is not found or the user is not an editor.
+    """
+    token = request.headers.get("authorization")
+    user = util.get_user_from_token(request)
+    if token is None or not verify_token(token) or user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
+    available_report_ids = map(
+        lambda x: x.id,
+        filter(lambda y: y.editor, select.reports(user, HomeRequest())),
+    )
+    if report_id not in available_report_ids:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
 
 
 def get_user_from_token(request: Request) -> User | None:

@@ -60,12 +60,18 @@ def get_tags_for_projects(project_uuids: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())):
+def add_tag(
+    tag: Tag,
+    project_uuid: str,
+    request: Request,
+    current_user=Depends(util.auth.claim()),
+):
     """Add a tag to a project.
 
     Args:
         tag (Tag): the tag to be added.
         project_uuid (str): UUID of the project to add the tag to.
+        request (Request): http request to get user information from.
         current_user (Any, optional): user adding the new tag.
             Defaults to Depends(util.auth.claim()).
 
@@ -75,6 +81,7 @@ def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())
     Returns:
         int: id of the newly created tag.
     """
+    util.project_editor(project_uuid, request)
     id = insert.tag(project_uuid, tag)
     if id is None:
         raise HTTPException(
@@ -92,21 +99,26 @@ def add_tag(tag: Tag, project_uuid: str, current_user=Depends(util.auth.claim())
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_tag(tag: Tag, project_uuid: str):
+def update_tag(tag: Tag, project_uuid: str, request: Request):
     """Update a tag in the database.
 
     Args:
         tag (Tag): updated tag.
         project_uuid (str): project to which the tag belongs.
+        request (Request): http request to get user information from.
     """
+    util.project_editor(project_uuid, request)
     update.tag(tag, project_uuid)
 
 
 @router.delete("/tag", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_tag(tag: Tag):
+def delete_tag(project_uuid: str, tag: Tag, request: Request):
     """Delete a tag from the database.
 
     Args:
+        project_uuid (str): project to which the tag belongs.
         tag (Tag): tag to be deleted from the database.
+        request (Request): http request to get user information from.
     """
+    util.project_editor(project_uuid, request)
     delete.tag(tag)
