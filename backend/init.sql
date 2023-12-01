@@ -25,6 +25,7 @@ CREATE TABLE charts (
     name text NOT NULL,
     type text NOT NULL,
     parameters text NOT NULL,
+    data jsonb NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
