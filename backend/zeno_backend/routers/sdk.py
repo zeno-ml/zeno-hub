@@ -79,8 +79,7 @@ class APIKeyBearer(HTTPBearer):
         Returns:
             bool: True if the API key is valid, False otherwise.
         """
-        api_key_is_valid = await select.api_key_exists(api_key)
-        return api_key_is_valid
+        return await select.api_key_exists(api_key)
 
 
 router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
@@ -99,7 +98,7 @@ async def create_project(
     """
     user = await select.user_by_api_key(api_key)
 
-    if select.project_exists(user.id, project.name):
+    if await select.project_exists(user.id, project.name):
         project_uuid = await select.project_uuid(user.name, project.name)
         project.uuid = project_uuid
         await update.project(project)
@@ -147,7 +146,7 @@ async def upload_dataset_schema(
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(project_uuid):
+    if not await select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
@@ -193,7 +192,7 @@ async def upload_dataset(
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(project_uuid):
+    if not await select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
@@ -242,7 +241,7 @@ async def upload_system_schema(
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(project_uuid):
+    if not await select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
@@ -290,7 +289,7 @@ async def upload_system(
                 + " a new one at https://hub.zenoml.com/account."
             ),
         )
-    if not select.project_uuid_exists(project_uuid):
+    if not await select.project_uuid_exists(project_uuid):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=("ERROR: Project does not exist."),
