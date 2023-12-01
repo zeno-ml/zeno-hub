@@ -27,7 +27,7 @@ test('can filter by slice', async ({ page }) => {
 	await page.getByText('short latin').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toContainText(
-		'395  Most of the life of the Hebrew family happened in the open air.'
+		'Water is spilling over the levee in a section 100 feet wide.'
 	);
 });
 
