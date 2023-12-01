@@ -17,7 +17,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Folder],
     tags=["zeno"],
 )
-def get_folders(project: str, request: Request):
+async def get_folders(project: str, request: Request):
     """Get all folders for a specific project.
 
     Args:
@@ -27,8 +27,8 @@ def get_folders(project: str, request: Request):
     Returns:
         list[Folder]: all folders for a specific project.
     """
-    util.project_access_valid(project, request)
-    return select.folders(project)
+    await util.project_access_valid(project, request)
+    return await select.folders(project)
 
 
 @router.post(
@@ -37,7 +37,7 @@ def get_folders(project: str, request: Request):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def add_folder(project: str, name: str, request: Request):
+async def add_folder(project: str, name: str, request: Request):
     """Add a folder to a project.
 
     Args:
@@ -51,8 +51,8 @@ def add_folder(project: str, name: str, request: Request):
     Returns:
         int: id of the newly created folder.
     """
-    util.project_editor(project, request)
-    id = insert.folder(project, name)
+    await util.project_editor(project, request)
+    id = await insert.folder(project, name)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -62,7 +62,7 @@ def add_folder(project: str, name: str, request: Request):
 
 
 @router.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_folder(folder: Folder, project: str, request: Request):
+async def update_folder(folder: Folder, project: str, request: Request):
     """Updatae a folder in the database.
 
     Args:
@@ -70,19 +70,26 @@ def update_folder(folder: Folder, project: str, request: Request):
         project (str): project that the folder belongs to.
         request (Request): http request to get user information from.
     """
-    util.project_editor(project, request)
-    update.folder(folder, project)
+    await util.project_editor(project, request)
+    await update.folder(folder, project)
 
 
-@router.delete("/folder", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def delete_folder(folder: Folder, request: Request, delete_slices: bool = False):
+@router.delete(
+    "/folder/{project_uuid}/{folder_id}",
+    tags=["zeno"],
+    dependencies=[Depends(util.auth)],
+)
+async def delete_folder(
+    project_uuid: str, folder_id: int, request: Request, delete_slices: bool = False
+):
     """Delete an existing folder from the database.
 
     Args:
-        folder (Folder): folder to be deleted.
+        project_uuid (str): project that the folder belongs to.
+        folder_id (int): id of the folder to be deleted.
         request (Request): http request to get user information from.
         delete_slices (bool, optional): Whether to also delete all slices in the folder.
             Defaults to False.
     """
-    util.project_editor(folder.project, request)
-    await delete.folder(folder, delete_slices)
+    await util.project_editor(project_uuid, request)
+    await delete.folder(folder_id, delete_slices)

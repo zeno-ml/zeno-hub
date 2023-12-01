@@ -8,7 +8,9 @@ class Folder(CamelModel):
     Attributes:
         id (int): the id of the folder.
         name (str): the name of the folder.
+        project_uuid (str | None): the uuid of the project the folder belongs to.
     """
 
     id: int
     name: str
+    project_uuid: str | None = None

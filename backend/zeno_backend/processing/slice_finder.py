@@ -33,7 +33,7 @@ def cont_cols_df(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return new_df
 
 
-def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
+async def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
     """Return slices of data with high or low metric values.
 
     Args:
@@ -56,13 +56,13 @@ def slice_finder(project: str, req: SliceFinderRequest) -> SliceFinderReturn:
     not_cont_search_col_ids: list[str] = [col.id for col in not_cont_search_cols]
     metric_col: str = "diff" if req.compare_column else req.metric_column.id
 
-    filter_sql = table_filter(project, None, req.filter_predicates, req.data_ids)
-    sql_table = table_data(project, filter_sql)
+    filter_sql = await table_filter(project, None, req.filter_predicates, req.data_ids)
+    sql_table = await table_data(project, filter_sql)
     filt_df = pd.DataFrame(sql_table.table, columns=sql_table.columns)
     cont_df = cont_cols_df(filt_df[cont_search_col_ids].dropna(), cont_search_col_ids)
 
     if req.compare_column:
-        filt_df = generate_diff_cols(
+        filt_df = await generate_diff_cols(
             filt_df, req.metric_column, req.compare_column, project, req.order_by
         )
 

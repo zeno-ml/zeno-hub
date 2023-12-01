@@ -51,7 +51,7 @@ class APIKeyBearer(HTTPBearer):
                 raise HTTPException(
                     status_code=403, detail="Invalid authentication scheme."
                 )
-            if not self.verify_api_key(credentials.credentials):
+            if not await self.verify_api_key(credentials.credentials):
                 raise HTTPException(
                     status_code=403,
                     detail=(
@@ -69,7 +69,7 @@ class APIKeyBearer(HTTPBearer):
                 ),
             )
 
-    def verify_api_key(self, api_key: str) -> bool:
+    async def verify_api_key(self, api_key: str) -> bool:
         """Verify that the API key is valid.
 
         Args:
@@ -79,7 +79,7 @@ class APIKeyBearer(HTTPBearer):
         Returns:
             bool: True if the API key is valid, False otherwise.
         """
-        api_key_is_valid = select.api_key_exists(api_key)
+        api_key_is_valid = await select.api_key_exists(api_key)
         return api_key_is_valid
 
 
@@ -87,7 +87,7 @@ router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
 
 
 @router.post("/project", status_code=200, response_model=Project)
-def create_project(
+async def create_project(
     project: Project, response: Response, api_key=Depends(APIKeyBearer())
 ):
     """Create a new project.
@@ -97,16 +97,16 @@ def create_project(
         response (Response): response object.
         api_key (str, optional): API key.
     """
-    user = select.user_by_api_key(api_key)
+    user = await select.user_by_api_key(api_key)
 
     if select.project_exists(user.id, project.name):
-        project_uuid = select.project_uuid(user.name, project.name)
+        project_uuid = await select.project_uuid(user.name, project.name)
         project.uuid = project_uuid
-        update.project(project)
-        update.project_metrics(project)
+        await update.project(project)
+        await update.project_metrics(project)
     else:
         project.uuid = str(uuid.uuid4())
-        insert.project(project, user.id)
+        await insert.project(project, user.id)
         AmplitudeHandler().track(
             BaseEvent(
                 event_type="Project Created",
@@ -138,7 +138,7 @@ async def upload_dataset_schema(
         file (DatasetSchema): the dataset schema to upload.
         api_key (str, optional): API key.
     """
-    user = select.user_by_api_key(api_key)
+    user = await select.user_by_api_key(api_key)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -184,7 +184,7 @@ async def upload_dataset(
         file (UploadFile): the dataset to upload. Serialized Arrow RecordBatch.
         api_key (str, optional): API key.
     """
-    user = select.user_by_api_key(api_key)
+    user = await select.user_by_api_key(api_key)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -233,7 +233,7 @@ async def upload_system_schema(
         file (Schema): the system PyArrow schema to upload.
         api_key (str, optional): API key.
     """
-    user = select.user_by_api_key(api_key)
+    user = await select.user_by_api_key(api_key)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -281,7 +281,7 @@ async def upload_system(
         file (UploadFile): the system to upload. Serialized Arrow RecordBatch.
         api_key (str, optional): API key.
     """
-    user = select.user_by_api_key(api_key)
+    user = await select.user_by_api_key(api_key)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -333,6 +333,6 @@ async def delete_all_systems(project_uuid: str):
 
 
 @router.get("/min-client-version")
-def min_client_version():
+async def min_client_version():
     """Get the minimum client version required to use the server."""
     return MIN_CLIENT_VERSION

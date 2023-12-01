@@ -23,7 +23,7 @@
 	function deleteElement(elementId: number) {
 		if (elementId < 0) return;
 		elements = elements.filter((e) => e.id !== elementId);
-		zenoClient.deleteReportElement(elementId);
+		zenoClient.deleteReportElement(data.report.id, elementId);
 	}
 
 	function addElement(elementIndex: number) {

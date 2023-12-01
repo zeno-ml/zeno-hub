@@ -25,7 +25,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Chart],
     tags=["zeno"],
 )
-def get_charts(project_uuid: str, request: Request):
+async def get_charts(project_uuid: str, request: Request):
     """Get all charts of a project.
 
     Args:
@@ -35,8 +35,8 @@ def get_charts(project_uuid: str, request: Request):
     Returns:
         list[Chart]: list of all of a project's charts.
     """
-    util.project_access_valid(project_uuid, request)
-    return select.charts(project_uuid)
+    await util.project_access_valid(project_uuid, request)
+    return await select.charts(project_uuid)
 
 
 @router.get(
@@ -44,7 +44,7 @@ def get_charts(project_uuid: str, request: Request):
     response_model=ChartResponse,
     tags=["zeno"],
 )
-def get_chart(project_uuid: str, chart_id: int, request: Request):
+async def get_chart(project_uuid: str, chart_id: int, request: Request):
     """Get a chart by its id.
 
     Args:
@@ -58,9 +58,9 @@ def get_chart(project_uuid: str, chart_id: int, request: Request):
     Returns:
         ChartResponse: chart spec and data.
     """
-    util.project_access_valid(project_uuid, request)
-    chart = select.chart(project_uuid, chart_id)
-    return ChartResponse(chart=chart, chart_data=chart_data(chart, project_uuid))
+    await util.project_access_valid(project_uuid, request)
+    chart = await select.chart(project_uuid, chart_id)
+    return ChartResponse(chart=chart, chart_data=await chart_data(chart, project_uuid))
 
 
 @router.get(
@@ -68,7 +68,7 @@ def get_chart(project_uuid: str, chart_id: int, request: Request):
     response_model=str,
     tags=["zeno"],
 )
-def get_chart_data(project_uuid: str, chart_id: int, request: Request):
+async def get_chart_data(project_uuid: str, chart_id: int, request: Request):
     """Get the data for a chart.
 
     Args:
@@ -82,9 +82,9 @@ def get_chart_data(project_uuid: str, chart_id: int, request: Request):
     Returns:
         str: data for the chart in json representation.
     """
-    util.project_access_valid(project_uuid, request)
-    chart = select.chart(project_uuid, chart_id)
-    return chart_data(chart, project_uuid)
+    await util.project_access_valid(project_uuid, request)
+    chart = await select.chart(project_uuid, chart_id)
+    return await chart_data(chart, project_uuid)
 
 
 @router.post(
@@ -92,7 +92,7 @@ def get_chart_data(project_uuid: str, chart_id: int, request: Request):
     response_model=list[Chart],
     tags=["zeno"],
 )
-def get_charts_for_projects(project_uuids: list[str], request: Request):
+async def get_charts_for_projects(project_uuids: list[str], request: Request):
     """Get all charts for a list of projects.
 
     Args:
@@ -103,8 +103,8 @@ def get_charts_for_projects(project_uuids: list[str], request: Request):
         list[Chart]: all charts for the list of projects
     """
     for project_uuid in project_uuids:
-        util.project_access_valid(project_uuid, request)
-    return select.charts_for_projects(project_uuids)
+        await util.project_access_valid(project_uuid, request)
+    return await select.charts_for_projects(project_uuids)
 
 
 @router.post(
@@ -112,7 +112,7 @@ def get_charts_for_projects(project_uuids: list[str], request: Request):
     response_model=int,
     tags=["zeno"],
 )
-def add_chart(
+async def add_chart(
     project_uuid: str,
     chart: Chart,
     request: Request,
@@ -133,8 +133,8 @@ def add_chart(
     Returns:
         int: id of the newly added chart.
     """
-    util.project_editor(project_uuid, request)
-    id = insert.chart(project_uuid, chart)
+    await util.project_editor(project_uuid, request)
+    id = await insert.chart(project_uuid, chart)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -151,7 +151,7 @@ def add_chart(
 
 
 @router.patch("/chart/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_chart(chart: Chart, project_uuid: str, request: Request):
+async def update_chart(chart: Chart, project_uuid: str, request: Request):
     """Update a chart.
 
     Args:
@@ -159,18 +159,20 @@ def update_chart(chart: Chart, project_uuid: str, request: Request):
         project_uuid (str): UUID of the project that holds the chart.
         request (Request): http request to get user information from.
     """
-    util.project_editor(project_uuid, request)
-    update.chart(chart, project_uuid)
+    await util.project_editor(project_uuid, request)
+    await update.chart(chart, project_uuid)
 
 
-@router.delete("/chart", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_chart(project_uuid: str, chart: Chart, request: Request):
+@router.delete(
+    "/chart/{project_uuid}/{chart_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_chart(project_uuid: str, chart_id: int, request: Request):
     """Delete a chart from the database.
 
     Args:
         project_uuid (str): project to which the chart belongs.
-        chart (Chart): chart to be deleted.
+        chart_id (int): id of the chart to be deleted.
         request (Request): http request to get user information from.
     """
-    util.project_editor(project_uuid, request)
-    delete.chart(chart)
+    await util.project_editor(project_uuid, request)
+    await delete.chart(chart_id)

@@ -342,6 +342,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuids (list[str]): list of UUIDs of projects to fetch all charts for.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Chart]: all charts for the list of projects
@@ -368,6 +369,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to add a chart to.
 	 * chart (Chart): chart to be added to the project.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user making the addition of the chart.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
@@ -403,6 +405,7 @@ export class ZenoService {
 	 * Args:
 	 * chart (Chart): new chart data.
 	 * project_uuid (str): UUID of the project that holds the chart.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -428,17 +431,22 @@ export class ZenoService {
 	 * Delete a chart from the database.
 	 *
 	 * Args:
-	 * chart (Chart): chart to be deleted.
-	 * @param requestBody
+	 * project_uuid (str): project to which the chart belongs.
+	 * chart_id (int): id of the chart to be deleted.
+	 * request (Request): http request to get user information from.
+	 * @param projectUuid
+	 * @param chartId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteChart(requestBody: Chart): CancelablePromise<any> {
+	public deleteChart(projectUuid: string, chartId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/chart',
-			body: requestBody,
-			mediaType: 'application/json',
+			url: '/chart/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
 			errors: {
 				422: `Validation Error`
 			}
@@ -479,6 +487,7 @@ export class ZenoService {
 	 * Args:
 	 * project (str): project to add the folder to.
 	 * name (str): name of the folder to be added.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Raises:
 	 * HTTPException: error if folder cannot be added.
@@ -513,6 +522,7 @@ export class ZenoService {
 	 * Args:
 	 * folder (Folder): new folder specification.
 	 * project (str): project that the folder belongs to.
+	 * request (Request): http request to get user information from.
 	 * @param project
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -538,23 +548,32 @@ export class ZenoService {
 	 * Delete an existing folder from the database.
 	 *
 	 * Args:
-	 * folder (Folder): folder to be deleted.
+	 * project_uuid (str): project that the folder belongs to.
+	 * folder_id (int): id of the folder to be deleted.
+	 * request (Request): http request to get user information from.
 	 * delete_slices (bool, optional): Whether to also delete all slices in the folder.
 	 * Defaults to False.
-	 * @param requestBody
+	 * @param projectUuid
+	 * @param folderId
 	 * @param deleteSlices
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteFolder(requestBody: Folder, deleteSlices: boolean = false): CancelablePromise<any> {
+	public deleteFolder(
+		projectUuid: string,
+		folderId: number,
+		deleteSlices: boolean = false
+	): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/folder',
+			url: '/folder/{project_uuid}/{folder_id}',
+			path: {
+				project_uuid: projectUuid,
+				folder_id: folderId
+			},
 			query: {
 				delete_slices: deleteSlices
 			},
-			body: requestBody,
-			mediaType: 'application/json',
 			errors: {
 				422: `Validation Error`
 			}
@@ -810,6 +829,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): uuid of the project to be checked.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * bool: whether the specified project is public.
@@ -862,7 +882,7 @@ export class ZenoService {
 
 	/**
 	 * Get Project Uuid
-	 * Get the UUIS of a project by owner and project name.
+	 * Get the UUID of a project by owner and project name.
 	 *
 	 * Args:
 	 * owner_name (str): name of the project's owner.
@@ -944,6 +964,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): UUID of the project to get all users for.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[User]: all users who have access to the project.
@@ -970,6 +991,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): UUID of the project to get all organizations for.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Organization]: all organizations with access to the project.
@@ -997,6 +1019,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to add a new user to.
 	 * user (User): user to be added to the project.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1024,6 +1047,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to update user rights for.
 	 * user (User): updated user rights of a specified user.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1051,6 +1075,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to remove the user from.
 	 * user (User): user to be removed from the project.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1078,6 +1103,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to add the organizion to.
 	 * organization (Organization): organization to be added to the project.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1105,6 +1131,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to update organization rights for.
 	 * organization (Organization): updated rights of a specified organization.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1132,6 +1159,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to remove the organization from.
 	 * organization (Organization): organization to be removed from the project.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1159,6 +1187,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): UUID of the project to be copied.
 	 * copy_spec (ProjectCopy): specification of what content to copy over.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user initiating the copy request.
 	 * Defaults to Depends(util.auth.claim()).
 	 * @param projectUuid
@@ -1187,6 +1216,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project (Project): updated project specification.
+	 * request (Request): http request to get user information from.
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
@@ -1297,6 +1327,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * report_id (int): id of the report for which to fetch elements.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[ReportElement] | None: all elements that a report contains.
@@ -1348,6 +1379,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * report_id (int): the report for which to get user access.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[User]: the list of users who can access the report.
@@ -1374,6 +1406,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * report_id (int): the report for which to get organization access.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Organization]: the list of organizations who can access the report.
@@ -1492,6 +1525,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): id of the report to add an element to.
 	 * element (ReportElement): element to be added to the report.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user who wants to add an element to a report.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
@@ -1521,35 +1555,13 @@ export class ZenoService {
 	}
 
 	/**
-	 * Delete Report Element
-	 * Delete an element from a report.
-	 *
-	 * Args:
-	 * id (int): the id of the report element to be deleted.
-	 * @param id
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public deleteReportElement(id: number): CancelablePromise<any> {
-		return this.httpRequest.request({
-			method: 'DELETE',
-			url: '/report-element/{id}',
-			path: {
-				id: id
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
 	 * Add Report User
 	 * Add a user to a report.
 	 *
 	 * Args:
 	 * report_id (int): report to add the user to.
 	 * user (User): user to be added to the report.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1577,6 +1589,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): the report to update user privileges for.
 	 * user (User): updated user privileges.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1604,6 +1617,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): id dof the report to remove a user from.
 	 * user (User): user to be removed from the report.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1631,6 +1645,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): report to add the user to.
 	 * organization (Organization): organization to be added to the report.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1658,6 +1673,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): id dof the report to remove an organization from.
 	 * organization (Organization): organization to be removed from the report.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1685,6 +1701,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): the report to update user privileges for.
 	 * organization (Organization): updated organization privileges.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1712,6 +1729,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): the report to update the element for.
 	 * element (ReportElement): updated report element.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1738,6 +1756,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * report (Report): updated report settings.
+	 * request (Request): http request to get user information from.
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
@@ -1761,6 +1780,7 @@ export class ZenoService {
 	 * Args:
 	 * report_id (int): the report to update the projects for.
 	 * project_uuids (list[str]): list of project UUIDs associated with the report.
+	 * request (Request): http request to get user information from.
 	 * @param reportId
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -1805,6 +1825,33 @@ export class ZenoService {
 			url: '/report/{report_id}',
 			path: {
 				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report Element
+	 * Delete an element from a report.
+	 *
+	 * Args:
+	 * report_id (int): the id of the report the element is associated with.
+	 * id (int): the id of the report element to be deleted.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param id
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteReportElement(reportId: number, id: number): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/report-element/{report_id}/{id}',
+			path: {
+				report_id: reportId,
+				id: id
 			},
 			errors: {
 				422: `Validation Error`
@@ -2049,6 +2096,7 @@ export class ZenoService {
 	 * Args:
 	 * req (SliceFinderRequest): request to slice finder algorithm specifying params.
 	 * project (str): project to run slice finder for.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user who initiated the slice finder request.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
@@ -2083,6 +2131,7 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * req (list[str]): the projects to fetch slices for.
+	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Slice]: all slices in all specifiec projects.
@@ -2109,6 +2158,7 @@ export class ZenoService {
 	 * Args:
 	 * project (str): project to add the slice to.
 	 * slice (Slice): slice to be added to the project.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): User who wants to add a slice to a project.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
@@ -2144,6 +2194,7 @@ export class ZenoService {
 	 * Args:
 	 * slice (Slice): new values of the slice to be updated.
 	 * project (str): project to which the slice belongs.
+	 * request (Request): http request to get user information from.
 	 * @param project
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -2212,6 +2263,7 @@ export class ZenoService {
 	 * Args:
 	 * project (str): project to add the slices to.
 	 * column (ZenoColumn): column to add all slices for.
+	 * request (Request): http request to get user information from.
 	 * name (str | None, optional): name of the folder the slices should be added to.
 	 * Defaults to None.
 	 *
@@ -2253,17 +2305,22 @@ export class ZenoService {
 	 * Delete a slice from the database.
 	 *
 	 * Args:
-	 * slice (Slice): the slice to be deleted.
-	 * @param requestBody
+	 * project_uuid (str): project to which the slice belongs (to check permissions).
+	 * slice_id (int): id of the slice to be deleted.
+	 * request (Request): http request to get user information from.
+	 * @param projectUuid
+	 * @param sliceId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteSlice(requestBody: Slice): CancelablePromise<any> {
+	public deleteSlice(projectUuid: string, sliceId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/slice',
-			body: requestBody,
-			mediaType: 'application/json',
+			url: '/slice/{project_uuid}/{slice_id}',
+			path: {
+				project_uuid: projectUuid,
+				slice_id: sliceId
+			},
 			errors: {
 				422: `Validation Error`
 			}
@@ -2421,6 +2478,7 @@ export class ZenoService {
 	 * Args:
 	 * tag (Tag): the tag to be added.
 	 * project_uuid (str): UUID of the project to add the tag to.
+	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user adding the new tag.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
@@ -2456,6 +2514,7 @@ export class ZenoService {
 	 * Args:
 	 * tag (Tag): updated tag.
 	 * project_uuid (str): project to which the tag belongs.
+	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
@@ -2481,17 +2540,22 @@ export class ZenoService {
 	 * Delete a tag from the database.
 	 *
 	 * Args:
-	 * tag (Tag): tag to be deleted from the database.
-	 * @param requestBody
+	 * project_uuid (str): project to which the tag belongs.
+	 * tag_id (int): id of the tag to be deleted.
+	 * request (Request): http request to get user information from.
+	 * @param projectUuid
+	 * @param tagId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteTag(requestBody: Tag): CancelablePromise<any> {
+	public deleteTag(projectUuid: string, tagId: number): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
-			url: '/tag',
-			body: requestBody,
-			mediaType: 'application/json',
+			url: '/tag/{project_uuid}/{tag_id}',
+			path: {
+				project_uuid: projectUuid,
+				tag_id: tagId
+			},
 			errors: {
 				422: `Validation Error`
 			}

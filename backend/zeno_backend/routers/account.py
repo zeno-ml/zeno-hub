@@ -23,7 +23,7 @@ router = APIRouter(tags=["zeno"])
     response_model=User,
     tags=["zeno"],
 )
-def login(name: str, current_user=Depends(util.auth.claim())):
+async def login(name: str, current_user=Depends(util.auth.claim())):
     """Log a user in to Zeno.
 
     Args:
@@ -38,7 +38,7 @@ def login(name: str, current_user=Depends(util.auth.claim())):
         User: user that has been logged in.
     """
     try:
-        fetched_user = select.user(name)
+        fetched_user = await select.user(name)
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -47,15 +47,15 @@ def login(name: str, current_user=Depends(util.auth.claim())):
     if fetched_user is None:
         try:
             user = User(id=-1, name=name, admin=None, cognito_id=current_user["sub"])
-            insert.user(user)
-            insert.api_key(user)
+            await insert.user(user)
+            await insert.api_key(user)
             AmplitudeHandler().track(
                 BaseEvent(
                     event_type="Signup",
                     user_id=user.cognito_id,
                 )
             )
-            return select.user(name)
+            return await select.user(name)
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -64,7 +64,7 @@ def login(name: str, current_user=Depends(util.auth.claim())):
 
     if fetched_user.cognito_id is None:
         try:
-            update.user(
+            await update.user(
                 User(id=fetched_user.id, name=name, cognito_id=current_user["sub"])
             )
         except Exception as exc:
@@ -82,13 +82,13 @@ def login(name: str, current_user=Depends(util.auth.claim())):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def get_users():
+async def get_users():
     """Get all users in the database.
 
     Returns:
         list[User]: list of all users.
     """
-    return select.users()
+    return await select.users()
 
 
 @router.get(
@@ -97,17 +97,17 @@ def get_users():
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def get_organizations():
+async def get_organizations():
     """Get all organizations in the database.
 
     Returns:
         list[Organization]: list of all organizations.
     """
-    return select.organizations()
+    return await select.organizations()
 
 
 @router.post("/user_organizations", tags=["zeno"], response_model=list[Organization])
-def get_user_organizations(current_user=Depends(util.auth.claim())):
+async def get_user_organizations(current_user=Depends(util.auth.claim())):
     """Get all organizations a specified user is a member of.
 
     Args:
@@ -120,13 +120,13 @@ def get_user_organizations(current_user=Depends(util.auth.claim())):
     Returns:
         list[Organization]: all organizations the user is a member of.
     """
-    user = select.user(current_user["username"])
+    user = await select.user(current_user["username"])
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="User not found",
         )
-    return select.user_organizations(user)
+    return await select.user_organizations(user)
 
 
 @router.post(
@@ -135,7 +135,7 @@ def get_user_organizations(current_user=Depends(util.auth.claim())):
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-def create_api_key(current_user=Depends(util.auth.claim())):
+async def create_api_key(current_user=Depends(util.auth.claim())):
     """Create a new API key for a specific user.
 
     Args:
@@ -145,51 +145,51 @@ def create_api_key(current_user=Depends(util.auth.claim())):
     Returns:
         str | None: new API key of the user.
     """
-    user = select.user(current_user["username"])
+    user = await select.user(current_user["username"])
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="User not found",
         )
-    return insert.api_key(user)
+    return await insert.api_key(user)
 
 
 @router.post("/organization", tags=["zeno"], dependencies=[Depends(util.auth)])
-def add_organization(user: User, organization: Organization):
+async def add_organization(user: User, organization: Organization):
     """Add an organization to the database.
 
     Args:
         user (User): user creating the new organization.
         organization (Organization): specification of the organization to be created.
     """
-    insert.organization(user, organization)
+    await insert.organization(user, organization)
 
 
 @router.patch("/user/", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_user(user: User):
+async def update_user(user: User):
     """Update a user's profile.
 
     Args:
         user (User): updated user profile.
     """
-    update.user(user)
+    await update.user(user)
 
 
 @router.patch("/organization/", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_organization(organization: Organization):
+async def update_organization(organization: Organization):
     """Update an organization in the database.
 
     Args:
         organization (Organization): updated organization.
     """
-    update.organization(organization)
+    await update.organization(organization)
 
 
 @router.delete("/organization", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_organization(organization: Organization):
+async def delete_organization(organization: Organization):
     """Delete an organization from the database.
 
     Args:
         organization (Organization): organization to be deleted.
     """
-    delete.organization(organization)
+    await delete.organization(organization)

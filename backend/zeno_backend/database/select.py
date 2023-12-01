@@ -34,7 +34,7 @@ from zeno_backend.classes.table import (
 )
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
-from zeno_backend.database.database import Database, db_pool
+from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, match_instance_view
 from zeno_backend.processing.filtering import table_filter
 from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
@@ -99,7 +99,7 @@ REPORTS_BASE_QUERY = sql.SQL(
 )
 
 
-def models(project: str) -> list[str]:
+async def models(project: str) -> list[str]:
     """Get all models for a specified project.
 
     Args:
@@ -108,16 +108,19 @@ def models(project: str) -> list[str]:
     Returns:
         list[str]: a list of model names included in the project.
     """
-    db = Database()
-    model_results = db.connect_execute_return(
-        sql.SQL("SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;").format(
-            sql.Identifier(f"{project}_column_map")
-        ),
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;"
+                ).format(sql.Identifier(f"{project}_column_map"))
+            )
+            model_results = await cur.fetchall()
+
     return [m[0] for m in model_results]
 
 
-def projects(user: User, home_request: HomeRequest) -> list[Project]:
+async def projects(user: User, home_request: HomeRequest) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
@@ -127,69 +130,71 @@ def projects(user: User, home_request: HomeRequest) -> list[Project]:
     Returns:
         list[Project]: the projects that the user can interact with.
     """
-    with Database() as db:
-        params = [user.id, user.id, user.id, user.id, user.id]
-        likes_query = sql.SQL(
-            "SELECT project_uuid, COUNT(*) as total_likes"
-            " FROM project_like GROUP BY project_uuid "
+    params = [user.id, user.id, user.id, user.id, user.id]
+    likes_query = sql.SQL(
+        "SELECT project_uuid, COUNT(*) as total_likes"
+        " FROM project_like GROUP BY project_uuid "
+    )
+    projects_query = (
+        sql.SQL("WITH LikesSummary AS (")
+        + likes_query
+        + sql.SQL("),")
+        + sql.SQL(" CombinedProjects AS (")
+        + PROJECTS_BASE_QUERY
+        + sql.SQL(") ")
+        + sql.SQL(
+            "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
+            " CombinedProjects cp LEFT JOIN LikesSummary ls "
+            " ON cp.uuid = ls.project_uuid "
         )
-        projects_query = (
-            sql.SQL("WITH LikesSummary AS (")
-            + likes_query
-            + sql.SQL("),")
-            + sql.SQL(" CombinedProjects AS (")
-            + PROJECTS_BASE_QUERY
-            + sql.SQL(") ")
-            + sql.SQL(
-                "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
-                " CombinedProjects cp LEFT JOIN LikesSummary ls "
-                " ON cp.uuid = ls.project_uuid "
+    )
+
+    if home_request.search_string:
+        projects_query += sql.SQL(
+            "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+            "LOWER(cp.description) LIKE LOWER(%s)) "
+        )
+        params += [
+            "%" + home_request.search_string + "%",
+            "%" + home_request.search_string + "%",
+        ]
+
+    if home_request.sort == EntrySort.POPULAR:
+        projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
+    elif home_request.sort == EntrySort.RECENT:
+        projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
+
+    if home_request.limit:
+        projects_query += sql.SQL(" LIMIT %s ")
+        params += [home_request.limit]
+    projects_query += sql.SQL(" OFFSET %s; ")
+    params += [home_request.project_offset]
+
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(projects_query, params)
+            projects_result = await cur.fetchall()
+
+    projects = []
+    for res in projects_result:
+        projects.append(
+            Project(
+                uuid=res[0],
+                name=res[1],
+                view=match_instance_view(res[3]),
+                samples_per_page=res[4],
+                public=res[5],
+                description=res[6],
+                editor=res[7],
+                created_at=res[8].isoformat(),
+                updated_at=res[9].isoformat(),
+                owner_name=res[10],
             )
         )
-
-        if home_request.search_string:
-            projects_query += sql.SQL(
-                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
-                "LOWER(cp.description) LIKE LOWER(%s)) "
-            )
-            params += [
-                "%" + home_request.search_string + "%",
-                "%" + home_request.search_string + "%",
-            ]
-
-        if home_request.sort == EntrySort.POPULAR:
-            projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
-        elif home_request.sort == EntrySort.RECENT:
-            projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
-
-        if home_request.limit:
-            projects_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit]
-        projects_query += sql.SQL(" OFFSET %s; ")
-        params += [home_request.project_offset]
-
-        projects_result = db.execute_return(projects_query, params)
-
-        projects = []
-        for res in projects_result:
-            projects.append(
-                Project(
-                    uuid=res[0],
-                    name=res[1],
-                    view=match_instance_view(res[3]),
-                    samples_per_page=res[4],
-                    public=res[5],
-                    description=res[6],
-                    editor=res[7],
-                    created_at=res[8].isoformat(),
-                    updated_at=res[9].isoformat(),
-                    owner_name=res[10],
-                )
-            )
-        return projects
+    return projects
 
 
-def public_projects(home_request: HomeRequest) -> list[Project]:
+async def public_projects(home_request: HomeRequest) -> list[Project]:
     """Fetch all publicly accessible projects.
 
     Args:
@@ -198,67 +203,69 @@ def public_projects(home_request: HomeRequest) -> list[Project]:
     Returns:
         list[Project]: all publicly accessible projects.
     """
-    with Database() as db:
-        params = []
-        projects_query = sql.SQL(
-            "SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page, "
-            "p.description, p.public, p.created_at, p.updated_at, "
-            "COALESCE(ls.total_likes, 0) AS total_likes "
-            "FROM projects AS p "
-            "LEFT JOIN (SELECT project_uuid, COUNT(*) as total_likes "
-            "FROM project_like GROUP BY project_uuid) AS ls "
-            "ON p.uuid = ls.project_uuid "
-            "WHERE p.public IS TRUE "
+    params = []
+    projects_query = sql.SQL(
+        "SELECT p.uuid, p.name, p.owner_id, p.view, p.samples_per_page, "
+        "p.description, p.public, p.created_at, p.updated_at, "
+        "COALESCE(ls.total_likes, 0) AS total_likes "
+        "FROM projects AS p "
+        "LEFT JOIN (SELECT project_uuid, COUNT(*) as total_likes "
+        "FROM project_like GROUP BY project_uuid) AS ls "
+        "ON p.uuid = ls.project_uuid "
+        "WHERE p.public IS TRUE "
+    )
+    if home_request.search_string:
+        projects_query += sql.SQL(
+            "AND (LOWER(p.name) LIKE LOWER(%s) OR "
+            "LOWER(p.description) LIKE LOWER(%s)) "
         )
-        if home_request.search_string:
-            projects_query += sql.SQL(
-                "AND (LOWER(p.name) LIKE LOWER(%s) OR "
-                "LOWER(p.description) LIKE LOWER(%s)) "
+        params += [
+            "%" + home_request.search_string + "%",
+            "%" + home_request.search_string + "%",
+        ]
+
+    if home_request.sort == EntrySort.POPULAR:
+        projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
+    elif home_request.sort == EntrySort.RECENT:
+        projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
+
+    if home_request.limit:
+        projects_query += sql.SQL(" LIMIT %s ")
+        params += [home_request.limit]
+    projects_query += sql.SQL(" OFFSET %s")
+    params += [home_request.project_offset]
+
+    projects_query = (
+        sql.SQL("(SELECT main.*, u.name AS owner_name FROM (")
+        + projects_query
+        + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id)")
+    )
+
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(projects_query, params)
+            projects_result = await cur.fetchall()
+
+    projects = []
+    for res in projects_result:
+        projects.append(
+            Project(
+                uuid=res[0],
+                name=res[1],
+                view=match_instance_view(res[3]),
+                samples_per_page=res[4],
+                editor=False,
+                public=True,
+                description=res[5],
+                created_at=res[7].isoformat(),
+                updated_at=res[8].isoformat(),
+                owner_name=res[10],
             )
-            params += [
-                "%" + home_request.search_string + "%",
-                "%" + home_request.search_string + "%",
-            ]
-
-        if home_request.sort == EntrySort.POPULAR:
-            projects_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
-        elif home_request.sort == EntrySort.RECENT:
-            projects_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
-
-        if home_request.limit:
-            projects_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit]
-        projects_query += sql.SQL(" OFFSET %s")
-        params += [home_request.project_offset]
-
-        projects_query = (
-            sql.SQL("(SELECT main.*, u.name AS owner_name FROM (")
-            + projects_query
-            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id)")
         )
-
-        projects_result = db.execute_return(projects_query, params)
-
-        projects = []
-        for res in projects_result:
-            projects.append(
-                Project(
-                    uuid=res[0],
-                    name=res[1],
-                    view=match_instance_view(res[3]),
-                    samples_per_page=res[4],
-                    editor=False,
-                    public=True,
-                    description=res[5],
-                    created_at=res[7].isoformat(),
-                    updated_at=res[8].isoformat(),
-                    owner_name=res[10],
-                )
-            )
-        return projects
+    return projects
 
 
-def reports(user: User, home_request: HomeRequest) -> list[Report]:
+async def reports(user: User, home_request: HomeRequest) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
@@ -268,74 +275,77 @@ def reports(user: User, home_request: HomeRequest) -> list[Report]:
     Returns:
         list[Report]: the reports that the user can interact with.
     """
-    with Database() as db:
-        params = [user.id, user.id, user.id, user.id, user.id]
-        likes_query = sql.SQL(
-            "SELECT report_id, COUNT(*) as total_likes"
-            " FROM report_like GROUP BY report_id "
+    params = [user.id, user.id, user.id, user.id, user.id]
+    likes_query = sql.SQL(
+        "SELECT report_id, COUNT(*) as total_likes"
+        " FROM report_like GROUP BY report_id "
+    )
+    reports_query = (
+        sql.SQL("WITH LikesSummary AS (")
+        + likes_query
+        + sql.SQL("),")
+        + sql.SQL(" CombinedReports AS (")
+        + REPORTS_BASE_QUERY
+        + sql.SQL(") ")
+        + sql.SQL(
+            "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
+            " CombinedReports cp LEFT JOIN LikesSummary ls "
+            " ON cp.id = ls.report_id "
         )
-        reports_query = (
-            sql.SQL("WITH LikesSummary AS (")
-            + likes_query
-            + sql.SQL("),")
-            + sql.SQL(" CombinedReports AS (")
-            + REPORTS_BASE_QUERY
-            + sql.SQL(") ")
-            + sql.SQL(
-                "SELECT cp.*, COALESCE(ls.total_likes, 0) AS total_likes FROM"
-                " CombinedReports cp LEFT JOIN LikesSummary ls "
-                " ON cp.id = ls.report_id "
-            )
+    )
+
+    if home_request.search_string:
+        reports_query += sql.SQL(
+            "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
+            "LOWER(cp.description) LIKE LOWER(%s)) "
         )
+        params += [
+            "%" + home_request.search_string + "%",
+            "%" + home_request.search_string + "%",
+        ]
 
-        if home_request.search_string:
-            reports_query += sql.SQL(
-                "WHERE (LOWER(cp.name) LIKE LOWER(%s) OR "
-                "LOWER(cp.description) LIKE LOWER(%s)) "
-            )
-            params += [
-                "%" + home_request.search_string + "%",
-                "%" + home_request.search_string + "%",
-            ]
+    if home_request.sort == EntrySort.POPULAR:
+        reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
+    elif home_request.sort == EntrySort.RECENT:
+        reports_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
 
-        if home_request.sort == EntrySort.POPULAR:
-            reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
-        elif home_request.sort == EntrySort.RECENT:
-            reports_query += sql.SQL(" ORDER BY updated_at DESC, total_likes DESC ")
+    if home_request.limit:
+        reports_query += sql.SQL(" LIMIT %s ")
+        params += [home_request.limit]
+    reports_query += sql.SQL(" OFFSET %s; ")
+    params += [home_request.report_offset]
 
-        if home_request.limit:
-            reports_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit]
-        reports_query += sql.SQL(" OFFSET %s; ")
-        params += [home_request.report_offset]
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(reports_query, params)
+            reports_result = await cur.fetchall()
 
-        reports_result = db.execute_return(reports_query, params)
-
-        reports = []
-        for report in reports_result:
-            linked_projects = db.execute_return(
-                "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-                [report[0]],
-            )
-            reports.append(
-                Report(
-                    id=report[0],
-                    name=report[1],
-                    linked_projects=[]
-                    if len(linked_projects) == 0
-                    else list(map(lambda linked: str(linked[0]), linked_projects)),
-                    public=report[3],
-                    description=report[4],
-                    editor=report[5],
-                    created_at=report[6].isoformat(),
-                    updated_at=report[7].isoformat(),
-                    owner_name=report[8],
+            reports = []
+            for report in reports_result:
+                await cur.execute(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [report[0]],
                 )
-            )
-        return reports
+                linked_projects = await cur.fetchall()
+                reports.append(
+                    Report(
+                        id=report[0],
+                        name=report[1],
+                        linked_projects=[]
+                        if len(linked_projects) == 0
+                        else list(map(lambda linked: str(linked[0]), linked_projects)),
+                        public=report[3],
+                        description=report[4],
+                        editor=report[5],
+                        created_at=report[6].isoformat(),
+                        updated_at=report[7].isoformat(),
+                        owner_name=report[8],
+                    )
+                )
+            return reports
 
 
-def public_reports(home_request: HomeRequest) -> list[Report]:
+async def public_reports(home_request: HomeRequest) -> list[Report]:
     """Fetch all publicly accessible reports.
 
     Args:
@@ -344,71 +354,78 @@ def public_reports(home_request: HomeRequest) -> list[Report]:
     Returns:
         list[Report]: all publicly accessible reports.
     """
-    with Database() as db:
-        params = []
-        reports_query = sql.SQL(
-            "SELECT r.id, r.name, r.owner_id, r.description, r.public,"
-            " r.created_at, r.updated_at, COALESCE(ls.total_likes, 0) AS total_likes "
-            "FROM reports AS r "
-            "LEFT JOIN (SELECT report_id, COUNT(*) as total_likes "
-            "FROM report_like GROUP BY report_id) AS ls "
-            "ON r.id = ls.report_id "
-            "WHERE r.public IS TRUE "
+    params = []
+    reports_query = sql.SQL(
+        "SELECT r.id, r.name, r.owner_id, r.description, r.public,"
+        " r.created_at, r.updated_at, COALESCE(ls.total_likes, 0) AS total_likes "
+        "FROM reports AS r "
+        "LEFT JOIN (SELECT report_id, COUNT(*) as total_likes "
+        "FROM report_like GROUP BY report_id) AS ls "
+        "ON r.id = ls.report_id "
+        "WHERE r.public IS TRUE "
+    )
+    if home_request.search_string:
+        reports_query += sql.SQL(
+            "AND (LOWER(r.name) LIKE LOWER(%s) OR "
+            "LOWER(r.description) LIKE LOWER(%s)) "
         )
-        if home_request.search_string:
-            reports_query += sql.SQL(
-                "AND (LOWER(r.name) LIKE LOWER(%s) OR "
-                "LOWER(r.description) LIKE LOWER(%s)) "
-            )
-            params += [
-                "%" + home_request.search_string + "%",
-                "%" + home_request.search_string + "%",
-            ]
+        params += [
+            "%" + home_request.search_string + "%",
+            "%" + home_request.search_string + "%",
+        ]
 
-        if home_request.sort == EntrySort.POPULAR:
-            reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
-        elif home_request.sort == EntrySort.RECENT:
-            reports_query += sql.SQL(" ORDER BY r.updated_at DESC, total_likes DESC ")
+    if home_request.sort == EntrySort.POPULAR:
+        reports_query += sql.SQL(" ORDER BY total_likes DESC, updated_at DESC ")
+    elif home_request.sort == EntrySort.RECENT:
+        reports_query += sql.SQL(" ORDER BY r.updated_at DESC, total_likes DESC ")
 
-        if home_request.limit:
-            reports_query += sql.SQL(" LIMIT %s ")
-            params += [home_request.limit]
-        reports_query += sql.SQL(" OFFSET %s")
-        params += [home_request.report_offset]
+    if home_request.limit:
+        reports_query += sql.SQL(" LIMIT %s ")
+        params += [home_request.limit]
+    reports_query += sql.SQL(" OFFSET %s")
+    params += [home_request.report_offset]
 
-        reports_query = (
-            sql.SQL("SELECT main.*, u.name AS owner_name FROM (")
-            + reports_query
-            + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id")
-        )
-        report_result = db.execute_return(reports_query, params)
+    reports_query = (
+        sql.SQL("SELECT main.*, u.name AS owner_name FROM (")
+        + reports_query
+        + sql.SQL(") AS main LEFT JOIN users AS u ON main.owner_id = u.id")
+    )
 
-        reports = []
-        if report_result is not None:
-            for res in report_result:
-                linked_projects = db.execute_return(
-                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-                    [res[0]],
-                )
-                reports.append(
-                    Report(
-                        id=res[0],
-                        name=res[1],
-                        linked_projects=[]
-                        if len(linked_projects) == 0
-                        else list(map(lambda linked: str(linked[0]), linked_projects)),
-                        editor=False,
-                        public=True,
-                        description=res[3],
-                        created_at=res[5].isoformat(),
-                        updated_at=res[6].isoformat(),
-                        owner_name=res[8],
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(reports_query, params)
+            reports_result = await cur.fetchall()
+
+            reports = []
+            if reports_result is not None:
+                for res in reports_result:
+                    await cur.execute(
+                        "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                        [res[0]],
                     )
-                )
-        return reports
+                    linked_projects = await cur.fetchall()
+
+                    reports.append(
+                        Report(
+                            id=res[0],
+                            name=res[1],
+                            linked_projects=[]
+                            if len(linked_projects) == 0
+                            else list(
+                                map(lambda linked: str(linked[0]), linked_projects)
+                            ),
+                            editor=False,
+                            public=True,
+                            description=res[3],
+                            created_at=res[5].isoformat(),
+                            updated_at=res[6].isoformat(),
+                            owner_name=res[8],
+                        )
+                    )
+            return reports
 
 
-def project_count(user: User | None = None) -> int:
+async def project_count(user: User | None = None) -> int:
     """Get the number of projects.
 
     Args:
@@ -417,23 +434,25 @@ def project_count(user: User | None = None) -> int:
     Returns:
         int: the number of projects.
     """
-    db = Database()
-    if user is None:
-        res = db.connect_execute_return(
-            "SELECT COUNT(*) FROM projects WHERE public = TRUE;"
-        )
-    else:
-        res = db.connect_execute_return(
-            sql.SQL("SELECT COUNT(*) FROM") + PROJECTS_BASE_QUERY + sql.SQL(";"),
-            [user.id, user.id, user.id, user.id, user.id],
-        )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if user is None:
+                await cur.execute("SELECT COUNT(*) FROM projects WHERE public = TRUE;")
+            else:
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(*) FROM")
+                    + PROJECTS_BASE_QUERY
+                    + sql.SQL(";"),
+                    [user.id, user.id, user.id, user.id, user.id],
+                )
+            res = await cur.fetchall()
 
     if len(res) > 0:
         return res[0][0]
     return 0
 
 
-def report_count(user: User | None = None) -> int:
+async def report_count(user: User | None = None) -> int:
     """Get the number of reports.
 
     Args:
@@ -442,22 +461,22 @@ def report_count(user: User | None = None) -> int:
     Returns:
         int: the number of reports.
     """
-    db = Database()
-    if user is None:
-        res = db.connect_execute_return(
-            "SELECT COUNT(*) FROM reports WHERE public = TRUE;"
-        )
-    else:
-        res = db.connect_execute_return(
-            sql.SQL("SELECT COUNT(*) FROM") + REPORTS_BASE_QUERY + sql.SQL(";"),
-            [user.id, user.id, user.id, user.id, user.id],
-        )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if user is None:
+                await cur.execute("SELECT COUNT(*) FROM reports WHERE public = TRUE;")
+            else:
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(*) FROM") + REPORTS_BASE_QUERY + sql.SQL(";"),
+                    [user.id, user.id, user.id, user.id, user.id],
+                )
+            res = await cur.fetchall()
     if len(res) > 0:
         return res[0][0]
     return 0
 
 
-def project_uuid(owner_name: str, project_name: str) -> str:
+async def project_uuid(owner_name: str, project_name: str) -> str:
     """Get the project uuid given an owner and project name.
 
     Args:
@@ -467,24 +486,26 @@ def project_uuid(owner_name: str, project_name: str) -> str:
     Returns:
         str | None: uuid of the requested project.
     """
-    with Database() as db:
-        owner_id = db.execute_return(
-            "SELECT id FROM users WHERE name = %s;", [owner_name]
-        )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT id FROM users WHERE name = %s;", [owner_name])
+            owner_id = await cur.fetchall()
 
-        project_uuid = db.execute_return(
-            "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
-            [project_name, owner_id[0][0]],
-        )
-        if len(project_uuid) == 0:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="ERROR: Project not found.",
+            await cur.execute(
+                "SELECT uuid FROM projects WHERE name = %s AND owner_id = %s;",
+                [project_name, owner_id[0][0]],
             )
-        return str(project_uuid[0][0])
+            project_uuid = await cur.fetchall()
+
+    if len(project_uuid) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="ERROR: Project not found.",
+        )
+    return str(project_uuid[0][0])
 
 
-def project_public(project_uuid: str) -> bool:
+async def project_public(project_uuid: str) -> bool:
     """Check whether a project is public.
 
     Args:
@@ -493,14 +514,17 @@ def project_public(project_uuid: str) -> bool:
     Returns:
         bool: whether the project is public.
     """
-    db = Database()
-    public = db.connect_execute_return(
-        "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT public FROM projects WHERE uuid = %s;", [project_uuid]
+            )
+            public = await cur.fetchall()
+
     return bool(public[0][0]) if len(public) > 0 else False
 
 
-def report_public(report: int) -> bool:
+async def report_public(report: int) -> bool:
     """Check whether a report is public.
 
     Args:
@@ -509,14 +533,14 @@ def report_public(report: int) -> bool:
     Returns:
         bool: whether the report is public.
     """
-    db = Database()
-    public = db.connect_execute_return(
-        "SELECT public FROM reports WHERE id = %s;", [report]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT public FROM reports WHERE id = %s;", [report])
+            public = await cur.fetchall()
     return bool(public[0][0]) if len(public) > 0 else False
 
 
-def api_key_exists(api_key: str) -> bool:
+async def api_key_exists(api_key: str) -> bool:
     """Check whether an API key exists.
 
     Args:
@@ -525,18 +549,25 @@ def api_key_exists(api_key: str) -> bool:
     Returns:
         bool: whether the API key exists.
     """
-    db = Database()
     api_key_hash = hash_api_key(api_key)
-    exists = db.connect_execute_return(
-        "SELECT EXISTS(SELECT 1 FROM users WHERE api_key_hash = %s);", [api_key_hash]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT EXISTS(SELECT 1 FROM users WHERE api_key_hash = %s);",
+                [api_key_hash],
+            )
+            exists = await cur.fetchall()
+
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether API key exists.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not check whether API key exists.",
+        )
 
 
-def user_by_api_key(api_key: str) -> User:
+async def user_by_api_key(api_key: str) -> User:
     """Get the user ID given an API key.
 
     Args:
@@ -546,12 +577,14 @@ def user_by_api_key(api_key: str) -> User:
     Returns:
         int | None: the user ID of the user with the given API key.
     """
-    db = Database()
     api_key_hash = hash_api_key(api_key)
-    user_res = db.connect_execute_return(
-        "SELECT id, name, cognito_id FROM users WHERE api_key_hash = %s;",
-        [api_key_hash],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, cognito_id FROM users WHERE api_key_hash = %s;",
+                [api_key_hash],
+            )
+            user_res = await cur.fetchall()
     if len(user_res) == 1:
         return User(
             id=int(user_res[0][0]), name=str(user_res[0][1]), cognito_id=user_res[0][2]
@@ -563,7 +596,7 @@ def user_by_api_key(api_key: str) -> User:
     )
 
 
-def user_name_by_api_key(api_key: str) -> str | None:
+async def user_name_by_api_key(api_key: str) -> str | None:
     """Get the user name given an API key.
 
     Args:
@@ -573,15 +606,17 @@ def user_name_by_api_key(api_key: str) -> str | None:
     Returns:
         str | None: the user name of the user with the given API key.
     """
-    db = Database()
     api_key_hash = hash_api_key(api_key)
-    user_id = db.connect_execute_return(
-        "SELECT name FROM users WHERE api_key_hash = %s;", [api_key_hash]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT name FROM users WHERE api_key_hash = %s;", [api_key_hash]
+            )
+            user_id = await cur.fetchall()
     return user_id[0][0] if len(user_id) > 0 else None
 
 
-def project_uuid_exists(project_uuid: str) -> bool:
+async def project_uuid_exists(project_uuid: str) -> bool:
     """Check whether a project exists.
 
     Args:
@@ -590,16 +625,18 @@ def project_uuid_exists(project_uuid: str) -> bool:
     Returns:
         bool: whether the project exists.
     """
-    db = Database()
-    exists = db.connect_execute_return(
-        "SELECT * FROM projects WHERE uuid = %s;", [project_uuid]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT EXISTS(SELECT 1 FROM projects WHERE uuid = %s);", [project_uuid]
+            )
+            exists = await cur.fetchall()
     if len(exists) > 0:
         return True
     return False
 
 
-def project_exists(owner_id: int, project_name: str) -> bool:
+async def project_exists(owner_id: int, project_name: str) -> bool:
     """Check whether a project exists.
 
     Args:
@@ -614,18 +651,23 @@ def project_exists(owner_id: int, project_name: str) -> bool:
     Raises:
         Exception: something went wrong while checking whether the project exists.
     """
-    db = Database()
-    exists = db.connect_execute_return(
-        "SELECT EXISTS(SELECT 1 FROM projects " "WHERE name = %s AND owner_id = %s);",
-        [project_name, owner_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT EXISTS(SELECT 1 FROM projects WHERE name = %s"
+                " AND owner_id = %s);",
+                [project_name, owner_id],
+            )
+            exists = await cur.fetchall()
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether project exists.")
+        raise HTTPException(
+            status_code=500, detail="Could not check if project exists."
+        )
 
 
-def report_id(owner: str, name: str) -> int | None:
+async def report_id(owner: str, name: str) -> int | None:
     """Get report ID given owner and name.
 
     Args:
@@ -635,19 +677,21 @@ def report_id(owner: str, name: str) -> int | None:
     Returns:
         int | None: the ID of the report.
     """
-    with Database() as db:
-        owner_id = db.execute_return("SELECT id FROM users WHERE name = %s;", [owner])
-        if len(owner_id) == 0:
-            return
-        id = db.execute_return(
-            "SELECT id FROM reports WHERE name = %s AND owner_id = %s;",
-            [name, owner_id[0][0]],
-        )
-        if len(id) > 0:
-            return id[0][0]
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT id FROM users WHERE name = %s;", [owner])
+            owner_id = await cur.fetchall()
+
+            await cur.execute(
+                "SELECT id FROM reports WHERE name = %s AND owner_id = %s;",
+                [name, owner_id[0][0]],
+            )
+            id = await cur.fetchall()
+    if len(id) > 0:
+        return id[0][0]
 
 
-def report_response(id: int, user: User | None) -> ReportResponse:
+async def report_response(id: int, user: User | None) -> ReportResponse:
     """Get the report data given a report ID.
 
     Args:
@@ -657,111 +701,120 @@ def report_response(id: int, user: User | None) -> ReportResponse:
     Returns:
         ReportResponse | None: the data for the requested report.
     """
-    with Database() as db:
-        report_result = db.execute_return(
-            "SELECT id, name, owner_id, public, description, created_at, updated_at "
-            "FROM reports WHERE id = %s;",
-            [id],
-        )
-        if len(report_result) == 0:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Report could not be found.",
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, owner_id, public, description, created_at, "
+                "updated_at FROM reports WHERE id = %s;",
+                [id],
             )
-        else:
-            report_result = report_result[0]
-
-        owner_name = db.execute_return(
-            "SELECT name FROM users WHERE id = %s;", [report_result[2]]
-        )
-        if len(owner_name) == 0:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Could not fetch owner of project.",
-            )
-        else:
-            owner_name = owner_name[0][0]
-
-        if user is None:
-            editor = False
-        elif int(report_result[2]) == user.id:
-            # Owners can always edit projects
-            editor = True
-        else:
-            # Check whether the user or an org of the user have project edit rights
-            user_editor = db.execute_return(
-                "SELECT editor FROM user_report WHERE user_id = %s "
-                "AND report_id = %s",
-                [user.id, id],
-            )
-            org_editor = db.execute_return(
-                "SELECT * FROM organization_report AS r JOIN user_organization "
-                "AS o ON r.organization_id = o.organization_id "
-                "WHERE r.report_id = %s AND o.user_id = %s AND r.editor = TRUE;",
-                [id, user.id],
-            )
-            editor = len(org_editor) > 0 or (
-                bool(user_editor[0][0]) if len(user_editor) > 0 else False
-            )
-
-        linked_projects = db.execute_return(
-            "SELECT project_uuid FROM report_project WHERE report_id = %s;",
-            [id],
-        )
-
-        element_result = db.execute_return(
-            "SELECT id, type, data, position FROM report_elements "
-            "WHERE report_id = %s ORDER BY position;",
-            [id],
-        )
-
-        num_likes = db.execute_return(
-            "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [id]
-        )
-
-        user_liked = False
-        if user is not None:
-            user_liked = db.execute_return(
-                "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
-                "user_id = %s);",
-                [id, user.id],
-            )
-            if len(user_liked) > 0:
-                user_liked = bool(user_liked[0][0])
-            else:
-                user_liked = False
-
-        return ReportResponse(
-            report=Report(
-                id=report_result[0],
-                name=report_result[1],
-                owner_name=owner_name,
-                linked_projects=[]
-                if len(linked_projects) == 0
-                else list(map(lambda linked: str(linked[0]), linked_projects)),
-                editor=editor,
-                public=report_result[3],
-                description=report_result[4],
-                created_at=report_result[5].isoformat(),
-                updated_at=report_result[6].isoformat(),
-            ),
-            report_elements=list(
-                map(
-                    lambda element: ReportElement(
-                        id=element[0],
-                        type=element[1],
-                        data=element[2],
-                        position=element[3],
-                    ),
-                    element_result,
+            report_result = await cur.fetchall()
+            if len(report_result) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Report could not be found.",
                 )
-            ),
-            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
-            user_liked=user_liked,
-        )
+            else:
+                report_result = report_result[0]
+
+            await cur.execute(
+                "SELECT name FROM users WHERE id = %s;", [report_result[2]]
+            )
+            owner_name = await cur.fetchall()
+            if len(owner_name) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Could not fetch owner of project.",
+                )
+            else:
+                owner_name = owner_name[0][0]
+
+            if user is None:
+                editor = False
+            elif int(report_result[2]) == user.id:
+                # Owners can always edit projects
+                editor = True
+            else:
+                # Check whether the user or an org of the user have project edit rights
+                await cur.execute(
+                    "SELECT editor FROM user_report WHERE user_id = %s "
+                    "AND report_id = %s",
+                    [user.id, id],
+                )
+                user_editor = await cur.fetchall()
+                await cur.execute(
+                    "SELECT * FROM organization_report AS r JOIN user_organization "
+                    "AS o ON r.organization_id = o.organization_id "
+                    "WHERE r.report_id = %s AND o.user_id = %s AND r.editor = TRUE;",
+                    [id, user.id],
+                )
+                org_editor = await cur.fetchall()
+                editor = len(org_editor) > 0 or (
+                    bool(user_editor[0][0]) if len(user_editor) > 0 else False
+                )
+
+            await cur.execute(
+                "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                [id],
+            )
+            linked_projects = await cur.fetchall()
+
+            await cur.execute(
+                "SELECT id, type, data, position FROM report_elements "
+                "WHERE report_id = %s ORDER BY position;",
+                [id],
+            )
+            element_result = await cur.fetchall()
+
+            await cur.execute(
+                "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [id]
+            )
+            num_likes = await cur.fetchall()
+
+            user_liked = False
+            if user is not None:
+                await cur.execute(
+                    "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
+                    "user_id = %s);",
+                    [id, user.id],
+                )
+                user_liked = await cur.fetchall()
+                if len(user_liked) > 0:
+                    user_liked = bool(user_liked[0][0])
+                else:
+                    user_liked = False
+
+            return ReportResponse(
+                report=Report(
+                    id=report_result[0],
+                    name=report_result[1],
+                    owner_name=owner_name,
+                    linked_projects=[]
+                    if len(linked_projects) == 0
+                    else list(map(lambda linked: str(linked[0]), linked_projects)),
+                    editor=editor,
+                    public=report_result[3],
+                    description=report_result[4],
+                    created_at=report_result[5].isoformat(),
+                    updated_at=report_result[6].isoformat(),
+                ),
+                report_elements=list(
+                    map(
+                        lambda element: ReportElement(
+                            id=element[0],
+                            type=element[1],
+                            data=element[2],
+                            position=element[3],
+                        ),
+                        element_result,
+                    )
+                ),
+                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+                user_liked=user_liked,
+            )
 
 
-def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
+async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     """Get all charts for a list of projects.
 
     Args:
@@ -770,13 +823,15 @@ def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     Returns:
         list[Chart]: the list of charts.
     """
-    db = Database()
-    chart_results = db.connect_execute_return(
-        sql.SQL(
-            "SELECT id, name, type, parameters, project_uuid"
-            " FROM charts WHERE project_uuid IN ({})"
-        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT id, name, type, parameters, project_uuid"
+                    " FROM charts WHERE project_uuid IN ({})"
+                ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+            )
+            chart_results = await cur.fetchall()
 
     if len(chart_results) == 0:
         return []
@@ -795,7 +850,7 @@ def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     )
 
 
-def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
+async def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
     """Get all tags for a list of projects.
 
     Args:
@@ -804,13 +859,15 @@ def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
     Returns:
         list[Tag]: the list of tags.
     """
-    db = Database()
-    tag_results = db.connect_execute_return(
-        sql.SQL(
-            "SELECT id, name, folder_id, project_uuid"
-            " FROM tags WHERE project_uuid IN ({})"
-        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT id, name, folder_id, project_uuid"
+                    " FROM tags WHERE project_uuid IN ({})"
+                ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+            )
+            tag_results = await cur.fetchall()
 
     if len(tag_results) == 0:
         return []
@@ -829,7 +886,7 @@ def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
     )
 
 
-def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
+async def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
     """Get all slices for a list of projects.
 
     Args:
@@ -839,13 +896,15 @@ def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
     Returns:
         list[Slice]: the list of slices.
     """
-    db = Database()
-    slice_results = db.connect_execute_return(
-        sql.SQL(
-            "SELECT id, name, folder_id, filter, project_uuid"
-            " FROM slices WHERE project_uuid IN ({})"
-        ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT id, name, folder_id, filter, project_uuid"
+                    " FROM slices WHERE project_uuid IN ({})"
+                ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
+            )
+            slice_results = await cur.fetchall()
 
     if len(slice_results) == 0:
         return []
@@ -867,7 +926,7 @@ def slices_for_projects(project_uuids: list[str]) -> list[Slice]:
     )
 
 
-def project_from_uuid(project_uuid: str) -> Project:
+async def project_from_uuid(project_uuid: str) -> Project:
     """Get the project data given a UUID.
 
     Args:
@@ -876,45 +935,49 @@ def project_from_uuid(project_uuid: str) -> Project:
     Returns:
         Project | None: data for the requested project.
     """
-    with Database() as db:
-        project_result = db.execute_return(
-            "SELECT uuid, name, owner_id, view, "
-            "samples_per_page, public, description, created_at, updated_at "
-            "FROM projects WHERE uuid = %s;",
-            [project_uuid],
-        )
-        if len(project_result) == 0:
-            raise HTTPException(
-                status.HTTP_404_NOT_FOUND,
-                "ERROR: Project could not be found.",
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT uuid, name, owner_id, view, "
+                "samples_per_page, public, description, created_at, updated_at "
+                "FROM projects WHERE uuid = %s;",
+                [project_uuid],
             )
-        project_result = project_result[0]
-        owner_result = db.execute_return(
-            "SELECT name from users WHERE id = %s;", [project_result[2]]
-        )
-        if len(owner_result) > 0:
-            return Project(
-                uuid=str(project_result[0]),
-                name=str(project_result[1]),
-                owner_name=str(owner_result[0][0]),
-                view=match_instance_view(str(project_result[3])),
-                editor=False,
-                samples_per_page=project_result[4]
-                if isinstance(project_result[4], int)
-                else 10,
-                public=bool(project_result[5]),
-                description=str(project_result[6]),
-                created_at=project_result[7].isoformat(),
-                updated_at=project_result[8].isoformat(),
+            project_result = await cur.fetchall()
+            if len(project_result) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Project could not be found.",
+                )
+            project_result = project_result[0]
+
+            await cur.execute(
+                "SELECT name from users WHERE id = %s;", [project_result[2]]
             )
-        else:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Could not load project owner.",
-            )
+            owner_result = await cur.fetchall()
+            if len(owner_result) > 0:
+                return Project(
+                    uuid=str(project_result[0]),
+                    name=str(project_result[1]),
+                    owner_name=str(owner_result[0][0]),
+                    view=match_instance_view(str(project_result[3])),
+                    editor=False,
+                    samples_per_page=project_result[4]
+                    if isinstance(project_result[4], int)
+                    else 10,
+                    public=bool(project_result[5]),
+                    description=str(project_result[6]),
+                    created_at=project_result[7].isoformat(),
+                    updated_at=project_result[8].isoformat(),
+                )
+            else:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Could not load project owner.",
+                )
 
 
-def report_from_id(report_id: int) -> Report:
+async def report_from_id(report_id: int) -> Report:
     """Get the report data given a ID.
 
     Args:
@@ -923,50 +986,55 @@ def report_from_id(report_id: int) -> Report:
     Returns:
         Report | None: data for the requested report.
     """
-    with Database() as db:
-        report_result = db.execute_return(
-            "SELECT id, name, owner_id, public, description, created_at, updated_at "
-            "FROM reports WHERE id = %s;",
-            [report_id],
-        )
-        if len(report_result) == 0:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Report could not be found.",
-            )
-        else:
-            report_result = report_result[0]
-        owner_result = db.execute_return(
-            "SELECT name FROM users WHERE id = %s;", [report_result[2]]
-        )
-        if len(owner_result) > 0:
-            linked_projects = db.execute_return(
-                "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, owner_id, public, description, created_at, "
+                "updated_at FROM reports WHERE id = %s;",
                 [report_id],
             )
-            owner_result = owner_result[0]
-
-            return Report(
-                id=report_result[0] if isinstance(report_result[0], int) else -1,
-                name=str(report_result[1]),
-                owner_name=str(owner_result[0]),
-                linked_projects=[]
-                if len(linked_projects) == 0
-                else list(map(lambda linked: str(linked[0]), linked_projects)),
-                editor=False,
-                public=bool(report_result[3]),
-                description=str(report_result[4]),
-                created_at=report_result[5].isoformat(),
-                updated_at=report_result[6].isoformat(),
+            report_result = await cur.fetchall()
+            if len(report_result) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Report could not be found.",
+                )
+            else:
+                report_result = report_result[0]
+            await cur.execute(
+                "SELECT name FROM users WHERE id = %s;", [report_result[2]]
             )
-        else:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Could not load report owner.",
-            )
+            owner_result = await cur.fetchall()
+
+            if len(owner_result) > 0:
+                await cur.execute(
+                    "SELECT project_uuid FROM report_project WHERE report_id = %s;",
+                    [report_id],
+                )
+                linked_projects = await cur.fetchall()
+                owner_result = owner_result[0]
+
+                return Report(
+                    id=report_result[0] if isinstance(report_result[0], int) else -1,
+                    name=str(report_result[1]),
+                    owner_name=str(owner_result[0]),
+                    linked_projects=[]
+                    if len(linked_projects) == 0
+                    else list(map(lambda linked: str(linked[0]), linked_projects)),
+                    editor=False,
+                    public=bool(report_result[3]),
+                    description=str(report_result[4]),
+                    created_at=report_result[5].isoformat(),
+                    updated_at=report_result[6].isoformat(),
+                )
+            else:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Could not load report owner.",
+                )
 
 
-def report_elements(report_id: int) -> list[ReportElement] | None:
+async def report_elements(report_id: int) -> list[ReportElement] | None:
     """Get all elements of a report.
 
     Args:
@@ -975,12 +1043,15 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
     Returns:
         list[ReportElement] | None: list of elements in the report.
     """
-    db = Database()
-    element_result = db.connect_execute_return(
-        "SELECT id, type, data, position FROM report_elements "
-        "WHERE report_id = %s ORDER BY position;",
-        [report_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, type, data, position FROM report_elements "
+                "WHERE report_id = %s ORDER BY position;",
+                [report_id],
+            )
+            element_result = await cur.fetchall()
+
     if element_result is not None:
         return list(
             map(
@@ -995,7 +1066,7 @@ def report_elements(report_id: int) -> list[ReportElement] | None:
         )
 
 
-def project_state(
+async def project_state(
     project_uuid: str, user: User | None, project: Project
 ) -> ProjectState | None:
     """Get the state variables of a project.
@@ -1008,168 +1079,187 @@ def project_state(
     Returns:
         ProjectState | None: state variables of the requested project.
     """
-    with Database() as db:
-        metric_results = db.execute_return(
-            "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
-            [project_uuid],
-        )
-        metrics = list(
-            map(
-                lambda metric: Metric(
-                    id=metric[0],
-                    name=metric[1],
-                    type=metric[2],
-                    columns=metric[3],
-                ),
-                metric_results,
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+                [project_uuid],
             )
-        )
-
-        slice_results = db.execute_return(
-            "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid = %s;",
-            [
-                project_uuid,
-            ],
-        )
-        slices = list(
-            map(
-                lambda slice: Slice(
-                    id=slice[0],
-                    slice_name=slice[1],
-                    folder_id=slice[2],
-                    filter_predicates=FilterPredicateGroup(
-                        predicates=json.loads(slice[3])["predicates"],
-                        join=Join.OMITTED,
+            metric_results = await cur.fetchall()
+            metrics = list(
+                map(
+                    lambda metric: Metric(
+                        id=metric[0],
+                        name=metric[1],
+                        type=metric[2],
+                        columns=metric[3],
                     ),
-                ),
-                slice_results,
-            )
-        )
-
-        folder_results = db.execute_return(
-            "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
-            [
-                project_uuid,
-            ],
-        )
-        folders = list(
-            map(
-                lambda folder: Folder(id=folder[0], name=folder[1]),
-                folder_results,
-            )
-        )
-
-        tags_result = db.execute_return(
-            "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
-            [
-                project_uuid,
-            ],
-        )
-        tags: list[Tag] = []
-        for tag_result in tags_result:
-            data_results = db.execute_return(
-                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
-                    sql.Identifier(f"{project_uuid}_tags_datapoints")
-                ),
-                [
-                    tag_result[0],
-                ],
-            )
-            tags.append(
-                Tag(
-                    id=tag_result[0],
-                    tag_name=tag_result[1],
-                    folder_id=tag_result[2],
-                    data_ids=[]
-                    if len(data_results) == 0
-                    else [d[0] for d in data_results],
+                    metric_results,
                 )
             )
 
-        column_results = db.execute_return(
-            sql.SQL(
-                "SELECT column_id, name, type, model, data_type FROM {} ORDER BY name;"
-            ).format(sql.Identifier(f"{project_uuid}_column_map")),
-        )
-
-        columns = list(
-            map(
-                lambda column: ZenoColumn(
-                    id=column[0],
-                    name=column[1],
-                    column_type=column[2],
-                    model=column[3],
-                    data_type=column[4],
-                ),
-                column_results,
+            await cur.execute(
+                "SELECT id, name, folder_id, filter FROM slices "
+                "WHERE project_uuid = %s;",
+                [
+                    project_uuid,
+                ],
             )
-        )
+            slice_results = await cur.fetchall()
 
-        model_results = db.execute_return(
-            sql.SQL("SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;").format(
-                sql.Identifier(f"{project_uuid}_column_map")
-            ),
-        )
-        models = [m[0] for m in model_results]
-
-        if user is not None:
-            # Check whether the user or an org of the user have project edit rights
-            user_editor = db.execute_return(
-                "SELECT editor FROM user_project WHERE user_id = %s AND "
-                "project_uuid = %s",
-                [user.id, project_uuid],
-            )
-            org_editor = db.execute_return(
-                "SELECT * FROM organization_project AS r JOIN user_organization "
-                "AS o ON r.organization_id = o.organization_id "
-                "WHERE r.project_uuid = %s AND o.user_id = %s AND r.editor = TRUE;",
-                [project_uuid, user.id],
-            )
-            project.editor = len(org_editor) > 0 or (
-                bool(user_editor[0][0]) if len(user_editor) > 0 else False
+            slices = list(
+                map(
+                    lambda slice: Slice(
+                        id=slice[0],
+                        slice_name=slice[1],
+                        folder_id=slice[2],
+                        filter_predicates=FilterPredicateGroup(
+                            predicates=json.loads(slice[3])["predicates"],
+                            join=Join.OMITTED,
+                        ),
+                    ),
+                    slice_results,
+                )
             )
 
-        has_data = db.execute_return(
-            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
-            "table_schema = 'public' AND table_name = %s);",
-            [project_uuid],
-        )
-        if len(has_data) > 0:
-            has_data = has_data[0][0]
-        else:
-            has_data = False
-
-        num_likes = db.execute_return(
-            "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
-        )
-
-        user_liked = False
-        if user is not None:
-            user_liked = db.execute_return(
-                "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s AND "
-                "user_id = %s);",
-                [project_uuid, user.id],
+            await cur.execute(
+                "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
+                [
+                    project_uuid,
+                ],
             )
-            if len(user_liked) > 0:
-                user_liked = bool(user_liked[0][0])
+            folder_results = await cur.fetchall()
+            folders = list(
+                map(
+                    lambda folder: Folder(id=folder[0], name=folder[1]),
+                    folder_results,
+                )
+            )
+
+            await cur.execute(
+                "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
+                [
+                    project_uuid,
+                ],
+            )
+            tags_result = await cur.fetchall()
+
+            tags: list[Tag] = []
+            for tag_result in tags_result:
+                await cur.execute(
+                    sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                        sql.Identifier(f"{project_uuid}_tags_datapoints")
+                    ),
+                    [
+                        tag_result[0],
+                    ],
+                )
+                data_results = await cur.fetchall()
+                tags.append(
+                    Tag(
+                        id=tag_result[0],
+                        tag_name=tag_result[1],
+                        folder_id=tag_result[2],
+                        data_ids=[]
+                        if len(data_results) == 0
+                        else [d[0] for d in data_results],
+                    )
+                )
+
+            await cur.execute(
+                sql.SQL(
+                    "SELECT column_id, name, type, model, data_type FROM {} "
+                    "ORDER BY name;"
+                ).format(sql.Identifier(f"{project_uuid}_column_map")),
+            )
+            column_results = await cur.fetchall()
+
+            columns = list(
+                map(
+                    lambda column: ZenoColumn(
+                        id=column[0],
+                        name=column[1],
+                        column_type=column[2],
+                        model=column[3],
+                        data_type=column[4],
+                    ),
+                    column_results,
+                )
+            )
+
+            await cur.execute(
+                sql.SQL(
+                    "SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;"
+                ).format(sql.Identifier(f"{project_uuid}_column_map")),
+            )
+            model_results = await cur.fetchall()
+            models = [m[0] for m in model_results]
+
+            if user is not None:
+                # Check whether the user or an org of the user have project edit rights
+                await cur.execute(
+                    "SELECT editor FROM user_project WHERE user_id = %s AND "
+                    "project_uuid = %s",
+                    [user.id, project_uuid],
+                )
+                user_editor = await cur.fetchall()
+                await cur.execute(
+                    "SELECT * FROM organization_project AS r JOIN user_organization "
+                    "AS o ON r.organization_id = o.organization_id "
+                    "WHERE r.project_uuid = %s AND o.user_id = %s AND r.editor = TRUE;",
+                    [project_uuid, user.id],
+                )
+                org_editor = await cur.fetchall()
+
+                project.editor = len(org_editor) > 0 or (
+                    bool(user_editor[0][0]) if len(user_editor) > 0 else False
+                )
+
+            await cur.execute(
+                "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
+                "table_schema = 'public' AND table_name = %s);",
+                [project_uuid],
+            )
+            has_data = await cur.fetchall()
+            if len(has_data) > 0:
+                has_data = has_data[0][0]
             else:
-                user_liked = False
+                has_data = False
 
-        return ProjectState(
-            project=project,
-            metrics=metrics,
-            folders=folders,
-            columns=columns,
-            slices=slices,
-            tags=tags,
-            models=models,
-            has_data=has_data,
-            num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
-            user_liked=user_liked,
-        )
+            await cur.execute(
+                "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            num_likes = await cur.fetchall()
+
+            user_liked = False
+            if user is not None:
+                await cur.execute(
+                    "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s "
+                    "AND user_id = %s);",
+                    [project_uuid, user.id],
+                )
+                user_liked = await cur.fetchall()
+                if len(user_liked) > 0:
+                    user_liked = bool(user_liked[0][0])
+                else:
+                    user_liked = False
+
+            return ProjectState(
+                project=project,
+                metrics=metrics,
+                folders=folders,
+                columns=columns,
+                slices=slices,
+                tags=tags,
+                models=models,
+                has_data=has_data,
+                num_likes=num_likes[0][0] if isinstance(num_likes[0][0], int) else 0,
+                user_liked=user_liked,
+            )
 
 
-def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats:
+async def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats:
     """Get statistics for a specified project.
 
     Args:
@@ -1179,54 +1269,66 @@ def project_stats(project_uuid: str, user_id: int | None = None) -> ProjectStats
     Returns:
         ProjectStats | None: statistics of the specified project.
     """
-    with Database() as db:
-        has_data = db.execute_return(
-            "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
-            "table_schema = 'public' AND table_name = %s);",
-            [project_uuid],
-        )
-        if len(has_data) > 0 and has_data[0][0]:
-            num_instances = db.execute_return(
-                sql.SQL("SELECT COUNT(*) FROM {};").format(sql.Identifier(project_uuid))
-            )[0][0]
-            num_models = db.execute_return(
-                sql.SQL("SELECT COUNT(DISTINCT model) FROM {};").format(
-                    sql.Identifier(f"{project_uuid}_column_map")
-                )
-            )[0][0]
-        else:
-            num_instances = 0
-            num_models = 0
-
-        num_charts = db.execute_return(
-            "SELECT COUNT(*) FROM charts WHERE project_uuid = %s;", [project_uuid]
-        )
-        num_likes = db.execute_return(
-            "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;", [project_uuid]
-        )
-
-        user_liked = False
-        if user_id is not None:
-            user_liked = db.execute_return(
-                "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s AND "
-                "user_id = %s);",
-                [project_uuid, user_id],
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT EXISTS (SELECT FROM information_schema.tables WHERE "
+                "table_schema = 'public' AND table_name = %s);",
+                [project_uuid],
             )
-            if len(user_liked) > 0:
-                user_liked = bool(user_liked[0][0])
+            has_data = await cur.fetchall()
+            if len(has_data) > 0 and has_data[0][0]:
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(*) FROM {};").format(
+                        sql.Identifier(project_uuid)
+                    )
+                )
+                num_instances = await cur.fetchall()
+                num_instances = num_instances[0][0]
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(DISTINCT model) FROM {};").format(
+                        sql.Identifier(f"{project_uuid}_column_map")
+                    )
+                )
+                num_models = await cur.fetchall()
+                num_models = num_models[0][0]
             else:
-                user_liked = False
+                num_instances = 0
+                num_models = 0
 
-        return ProjectStats(
-            num_instances=num_instances,
-            num_models=num_models,
-            num_charts=num_charts[0][0],
-            num_likes=num_likes[0][0],
-            user_liked=user_liked,
-        )
+            await cur.execute(
+                "SELECT COUNT(*) FROM charts WHERE project_uuid = %s;", [project_uuid]
+            )
+            num_charts = await cur.fetchall()
+            await cur.execute(
+                "SELECT COUNT(*) FROM project_like WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            num_likes = await cur.fetchall()
+
+            user_liked = False
+            if user_id is not None:
+                await cur.execute(
+                    "SELECT EXISTS(SELECT 1 FROM project_like WHERE project_uuid = %s "
+                    "AND user_id = %s);",
+                    [project_uuid, user_id],
+                )
+                user_liked = await cur.fetchall()
+                if len(user_liked) > 0:
+                    user_liked = bool(user_liked[0][0])
+                else:
+                    user_liked = False
+
+            return ProjectStats(
+                num_instances=num_instances,
+                num_models=num_models,
+                num_charts=num_charts[0][0],
+                num_likes=num_likes[0][0],
+                user_liked=user_liked,
+            )
 
 
-def report_stats(report_id: int, user_id: int | None = None) -> ReportStats:
+async def report_stats(report_id: int, user_id: int | None = None) -> ReportStats:
     """Get statistics for a specified report.
 
     Args:
@@ -1236,39 +1338,45 @@ def report_stats(report_id: int, user_id: int | None = None) -> ReportStats:
     Returns:
         ReportStats | None: statistics of the specified report.
     """
-    with Database() as db:
-        num_projects = db.execute_return(
-            "SELECT COUNT(*) FROM report_project WHERE report_id = %s;",
-            [report_id],
-        )
-        num_elements = db.execute_return(
-            "SELECT COUNT(*) FROM report_elements " "WHERE report_id = %s;", [report_id]
-        )
-        num_likes = db.execute_return(
-            "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [report_id]
-        )
-
-        user_liked = False
-        if user_id is not None:
-            user_liked = db.execute_return(
-                "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
-                "user_id = %s);",
-                [report_id, user_id],
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT COUNT(*) FROM report_project WHERE report_id = %s;",
+                [report_id],
             )
-            if len(user_liked) > 0:
-                user_liked = bool(user_liked[0][0])
-            else:
-                user_liked = False
+            num_projects = await cur.fetchall()
+            await cur.execute(
+                "SELECT COUNT(*) FROM report_elements " "WHERE report_id = %s;",
+                [report_id],
+            )
+            num_elements = await cur.fetchall()
+            await cur.execute(
+                "SELECT COUNT(*) FROM report_like WHERE report_id = %s;", [report_id]
+            )
+            num_likes = await cur.fetchall()
 
-        return ReportStats(
-            num_projects=num_projects[0][0],
-            num_elements=num_elements[0][0],
-            num_likes=num_likes[0][0],
-            user_liked=user_liked,
-        )
+            user_liked = False
+            if user_id is not None:
+                await cur.execute(
+                    "SELECT EXISTS(SELECT 1 FROM report_like WHERE report_id = %s AND "
+                    "user_id = %s);",
+                    [report_id, user_id],
+                )
+                user_liked = await cur.fetchall()
+                if len(user_liked) > 0:
+                    user_liked = bool(user_liked[0][0])
+                else:
+                    user_liked = False
+
+            return ReportStats(
+                num_projects=num_projects[0][0],
+                num_elements=num_elements[0][0],
+                num_likes=num_likes[0][0],
+                user_liked=user_liked,
+            )
 
 
-def metrics(project_uuid: str) -> list[Metric]:
+async def metrics(project_uuid: str) -> list[Metric]:
     """Get all metrics for a specified project.
 
     Args:
@@ -1277,11 +1385,13 @@ def metrics(project_uuid: str) -> list[Metric]:
     Returns:
         list[Metric]: list of metrics used with the project.
     """
-    db = Database()
-    metric_results = db.connect_execute_return(
-        "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
-        [project_uuid],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            metric_results = await cur.fetchall()
     return list(
         map(
             lambda metric: Metric(
@@ -1295,7 +1405,9 @@ def metrics(project_uuid: str) -> list[Metric]:
     )
 
 
-def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric | None]:
+async def metrics_by_id(
+    metric_ids: list[int], project_uuid: str
+) -> dict[int, Metric | None]:
     """Get a list of metrics by their ids.
 
     Args:
@@ -1305,12 +1417,16 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
     Returns:
         list[Metric]: list of metrics as requested by the user.
     """
-    db = Database()
-    metric_results = db.connect_execute_return(
-        "SELECT id, name, type, columns FROM metrics"
-        " WHERE project_uuid = %s AND id = ANY(%s);",
-        [project_uuid, [metric_ids]],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT id, name, type, columns FROM metrics WHERE project_uuid = "
+                    "%s AND id = ANY(%s);"
+                ),
+                [project_uuid, metric_ids],
+            )
+            metric_results = await cur.fetchall()
     if len(metric_results) == 0:
         return {}
 
@@ -1325,7 +1441,7 @@ def metrics_by_id(metric_ids: list[int], project_uuid: str) -> dict[int, Metric 
     return ret
 
 
-def slice_by_id(slice_id: int) -> Slice:
+async def slice_by_id(slice_id: int) -> Slice:
     """Get a single slice by its ID.
 
     Args:
@@ -1334,11 +1450,14 @@ def slice_by_id(slice_id: int) -> Slice:
     Returns:
         Slice | None: slice as requested by the user.
     """
-    db = Database()
-    slice_result = db.connect_execute_return(
-        "SELECT id, name, folder_id, filter, project_uuid FROM slices WHERE id = %s;",
-        [slice_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, folder_id, filter, project_uuid FROM slices "
+                "WHERE id = %s;",
+                [slice_id],
+            )
+            slice_result = await cur.fetchall()
 
     if len(slice_result) == 0:
         raise HTTPException(
@@ -1357,7 +1476,7 @@ def slice_by_id(slice_id: int) -> Slice:
     )
 
 
-def tag_by_id(tag_id: int) -> Tag:
+async def tag_by_id(tag_id: int) -> Tag:
     """Get a single tag by its ID.
 
     Args:
@@ -1366,38 +1485,42 @@ def tag_by_id(tag_id: int) -> Tag:
     Returns:
         Tag | None: tag as requested by the user.
     """
-    with Database() as db:
-        tag_result = db.connect_execute_return(
-            "SELECT id, name, folder_id, project_uuid FROM tags WHERE id = %s;",
-            [tag_id],
-        )
-
-        if len(tag_result) == 0:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Tag could not be found."
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, folder_id, project_uuid FROM tags WHERE id = %s;",
+                [tag_id],
             )
-        else:
-            tag_result = tag_result[0]
+            tag_result = await cur.fetchall()
 
-        data_ids = db.connect_execute_return(
-            sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
-                sql.Identifier(f"{tag_result[3]}_tags_datapoints")
-            ),
-            [
-                tag_result[0],
-            ],
-        )
+            if len(tag_result) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Tag could not be found.",
+                )
+            else:
+                tag_result = tag_result[0]
 
-        return Tag(
-            id=tag_result[0],
-            tag_name=tag_result[1],
-            data_ids=[data_ids[0] for data_ids in data_ids],
-            folder_id=tag_result[2],
-            project_uuid=tag_result[3],
-        )
+            await cur.execute(
+                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                    sql.Identifier(f"{tag_result[3]}_tags_datapoints")
+                ),
+                [
+                    tag_result[0],
+                ],
+            )
+            data_ids = await cur.fetchall()
+
+            return Tag(
+                id=tag_result[0],
+                tag_name=tag_result[1],
+                data_ids=[data_ids[0] for data_ids in data_ids],
+                folder_id=tag_result[2],
+                project_uuid=tag_result[3],
+            )
 
 
-def folders(project: str) -> list[Folder]:
+async def folders(project: str) -> list[Folder]:
     """Get a list of all folders in a project.
 
     Args:
@@ -1406,13 +1529,15 @@ def folders(project: str) -> list[Folder]:
     Returns:
         list[Folder]: list of folders created in the project.
     """
-    db = Database()
-    folder_results = db.connect_execute_return(
-        "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
-        [
-            project,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, project_uuid FROM folders WHERE project_uuid = %s;",
+                [
+                    project,
+                ],
+            )
+            folder_results = await cur.fetchall()
     return list(
         map(
             lambda folder: Folder(id=folder[0], name=folder[1]),
@@ -1421,7 +1546,7 @@ def folders(project: str) -> list[Folder]:
     )
 
 
-def folder(id: int) -> Folder | None:
+async def folder(id: int) -> Folder | None:
     """Get a single folder by its ID.
 
     Args:
@@ -1430,24 +1555,27 @@ def folder(id: int) -> Folder | None:
     Returns:
         Folder | None: folder as requested by the user.
     """
-    db = Database()
-    folder_result = db.connect_execute_return(
-        "SELECT id, name, project_uuid FROM folders WHERE id = %s;",
-        [
-            id,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, project_uuid FROM folders WHERE id = %s;",
+                [
+                    id,
+                ],
+            )
+            folder_result = await cur.fetchall()
     return (
         Folder(
             id=folder_result[0][0] if isinstance(folder_result[0][0], int) else 0,
             name=str(folder_result[0][1]),
+            project_uuid=str(folder_result[0][2]),
         )
         if len(folder_result) > 0
         else None
     )
 
 
-def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
+async def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     """Get a list of all slices of a project with certain IDs.
 
     Args:
@@ -1460,26 +1588,31 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     """
     if ids is not None and len(ids) == 0:
         return []
-    db = Database()
-    if ids is None:
-        slice_results = db.connect_execute_return(
-            "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid = %s;",
-            [
-                project,
-            ],
-        )
-    else:
-        slice_results = db.connect_execute_return(
-            "SELECT id, name, folder_id, filter, "
-            "array_position(%s::integer[],id) as ord FROM slices "
-            "WHERE project_uuid = %s AND id = ANY(%s) "
-            "ORDER BY ord;",
-            [
-                ids,
-                project,
-                ids,
-            ],
-        )
+
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if ids is None:
+                await cur.execute(
+                    "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid "
+                    "= %s;",
+                    [
+                        project,
+                    ],
+                )
+            else:
+                await cur.execute(
+                    "SELECT id, name, folder_id, filter, "
+                    "array_position(%s::integer[],id) as ord FROM slices "
+                    "WHERE project_uuid = %s AND id = ANY(%s) "
+                    "ORDER BY ord;",
+                    [
+                        ids,
+                        project,
+                        ids,
+                    ],
+                )
+            slice_results = await cur.fetchall()
+
     return list(
         map(
             lambda slice: Slice(
@@ -1496,7 +1629,7 @@ def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     )
 
 
-def chart(project_uuid: str, chart_id: int) -> Chart:
+async def chart(project_uuid: str, chart_id: int) -> Chart:
     """Get a project chart by its ID.
 
     Args:
@@ -1507,15 +1640,18 @@ def chart(project_uuid: str, chart_id: int) -> Chart:
     Returns:
         Chart | None: the requested chart.
     """
-    db = Database()
-    chart_result = db.connect_execute_return(
-        "SELECT id, name, type, parameters FROM "
-        "charts WHERE id = %s AND project_uuid = %s;",
-        [
-            chart_id,
-            project_uuid,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, type, parameters FROM "
+                "charts WHERE id = %s AND project_uuid = %s;",
+                [
+                    chart_id,
+                    project_uuid,
+                ],
+            )
+            chart_result = await cur.fetchall()
+
     if len(chart_result) == 0:
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Chart could not be found."
@@ -1529,7 +1665,7 @@ def chart(project_uuid: str, chart_id: int) -> Chart:
     )
 
 
-def charts(project_uuid: str) -> list[Chart]:
+async def charts(project_uuid: str) -> list[Chart]:
     """Get a list of all charts created in the project.
 
     Args:
@@ -1538,14 +1674,17 @@ def charts(project_uuid: str) -> list[Chart]:
     Returns:
         list[Chart]: list of all the charts in the project.
     """
-    db = Database()
-    chart_results = db.connect_execute_return(
-        "SELECT id, name, type, parameters FROM charts WHERE project_uuid = %s"
-        " ORDER BY created_at;",
-        [
-            project_uuid,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, type, parameters FROM charts WHERE project_uuid = %s"
+                " ORDER BY created_at;",
+                [
+                    project_uuid,
+                ],
+            )
+            chart_results = await cur.fetchall()
+
     return list(
         map(
             lambda chart: Chart(
@@ -1560,7 +1699,7 @@ def charts(project_uuid: str) -> list[Chart]:
     )
 
 
-def columns(project: str) -> list[ZenoColumn]:
+async def columns(project: str) -> list[ZenoColumn]:
     """Get a list of all columns in the project's data table.
 
     Args:
@@ -1569,12 +1708,15 @@ def columns(project: str) -> list[ZenoColumn]:
     Returns:
         list[ZenoColumn]: list of all the project's data columns.
     """
-    db = Database()
-    column_results = db.connect_execute_return(
-        sql.SQL("SELECT column_id, name, type, model, data_type FROM {};").format(
-            sql.Identifier(f"{project}_column_map")
-        ),
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL(
+                    "SELECT column_id, name, type, model, data_type FROM {}"
+                    " ORDER BY name;"
+                ).format(sql.Identifier(f"{project}_column_map"))
+            )
+            column_results = await cur.fetchall()
 
     return list(
         map(
@@ -1638,7 +1780,7 @@ async def histogram_buckets(
                 }
 
 
-def table_data_paginated(
+async def table_data_paginated(
     project: str,
     filter_sql: sql.Composed | None,
     req: TableRequest,
@@ -1657,75 +1799,75 @@ def table_data_paginated(
     Returns:
         SQLTable: the resulting slice of the data as requested by the user.
     """
-    with Database() as db:
-        if db.cur is None:
-            return SQLTable(table=[], columns=[])
-        filter_results = None
-        columns = []
+    filter_results = None
+    columns = []
 
-        diff_sql = sql.SQL("")
-        if req.diff_column_1 is not None and req.diff_column_2 is not None:
-            if req.diff_column_1.data_type == MetadataType.CONTINUOUS:
-                diff_sql = sql.SQL(", {} - {} AS diff").format(
-                    sql.Identifier(req.diff_column_1.id),
-                    sql.Identifier(req.diff_column_2.id),
-                )
-            else:
-                diff_sql = sql.SQL(", {} = {} AS diff").format(
-                    sql.Identifier(req.diff_column_1.id),
-                    sql.Identifier(req.diff_column_2.id),
-                )
-
-        filter = sql.SQL("")
-        if filter_sql is not None:
-            filter = sql.SQL("WHERE ") + filter_sql
-
-        order_sql = sql.SQL("")
-        if req.sort[0]:
-            sort = req.sort[0].id
-            if sort == "":
-                sort = "diff"
-
-            order_sql = sql.SQL("ORDER BY {} {}").format(
-                sql.Identifier(sort),
-                sql.SQL("DESC" if req.sort[1] else "ASC"),
+    diff_sql = sql.SQL("")
+    if req.diff_column_1 is not None and req.diff_column_2 is not None:
+        if req.diff_column_1.data_type == MetadataType.CONTINUOUS:
+            diff_sql = sql.SQL(", {} - {} AS diff").format(
+                sql.Identifier(req.diff_column_1.id),
+                sql.Identifier(req.diff_column_2.id),
             )
         else:
-            id_column = db.execute_return(
-                sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
-                    sql.Identifier(f"{project}_column_map")
-                ),
+            diff_sql = sql.SQL(", {} = {} AS diff").format(
+                sql.Identifier(req.diff_column_1.id),
+                sql.Identifier(req.diff_column_2.id),
             )
-            if len(id_column) > 0:
-                id_column = id_column[0][0]
-                # Collate does natural sort,
-                # (https://www.postgresql.org/docs/11/collation.html#id-1.6.10.4.5.7.5)
-                # See: https://dbfiddle.uk/cptUkufH
-                order_sql = sql.SQL("ORDER BY {} COLLATE numeric ASC").format(
-                    sql.Identifier(id_column)
+
+    filter = sql.SQL("")
+    if filter_sql is not None:
+        filter = sql.SQL("WHERE ") + filter_sql
+
+    order_sql = sql.SQL("")
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if req.sort[0]:
+                sort = req.sort[0].id
+                if sort == "":
+                    sort = "diff"
+
+                order_sql = sql.SQL("ORDER BY {} {}").format(
+                    sql.Identifier(sort),
+                    sql.SQL("DESC" if req.sort[1] else "ASC"),
                 )
+            else:
+                await cur.execute(
+                    sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(
+                        sql.Identifier(f"{project}_column_map")
+                    ),
+                )
+                id_column = await cur.fetchall()
+                if len(id_column) > 0:
+                    id_column = id_column[0][0]
+                    # Collate does natural sort,
+                    # (https://www.postgresql.org/docs/11/collation.html#id-1.6.10.4.5.7.5)
+                    # See: https://dbfiddle.uk/cptUkufH
+                    order_sql = sql.SQL("ORDER BY {} COLLATE numeric ASC").format(
+                        sql.Identifier(id_column)
+                    )
 
-        final_statement = sql.SQL(" ").join(
-            [
-                sql.SQL("SELECT *"),
-                diff_sql,
-                sql.SQL("FROM {}").format(sql.Identifier(project)),
-                filter,
-                order_sql,
-                sql.SQL("LIMIT {} OFFSET {};").format(
-                    sql.Literal(req.limit), sql.Literal(req.offset)
-                ),
-            ]
-        )
-        db.cur.execute(final_statement)
+            final_statement = sql.SQL(" ").join(
+                [
+                    sql.SQL("SELECT *"),
+                    diff_sql,
+                    sql.SQL("FROM {}").format(sql.Identifier(project)),
+                    filter,
+                    order_sql,
+                    sql.SQL("LIMIT {} OFFSET {};").format(
+                        sql.Literal(req.limit), sql.Literal(req.offset)
+                    ),
+                ]
+            )
+            await cur.execute(final_statement)
 
-        if db.cur.description is not None:
-            columns = [desc[0] for desc in db.cur.description]
-        filter_results = db.cur.fetchall()
-        return SQLTable(table=filter_results, columns=columns)
+            if cur.description is not None:
+                columns = [desc[0] for desc in cur.description]
+            filter_results = await cur.fetchall()
+            return SQLTable(table=filter_results, columns=columns)
 
 
-def slice_element_options(
+async def slice_element_options(
     slice: Slice, project_uuid: str, model_name: str | None
 ) -> SliceElementOptions | None:
     """Get options to render slice element in reports.
@@ -1739,76 +1881,81 @@ def slice_element_options(
     Returns:
         SliceElementOptions | None: options for the slice element.
     """
-    with Database() as db:
-        project = db.execute_return(
-            "SELECT uuid, name, view, samples_per_page, public, description, owner_id, "
-            "created_at, updated_at FROM projects WHERE uuid = %s;",
-            [project_uuid],
-        )
-        owner_name = db.execute_return(
-            "SELECT name FROM users WHERE id = %s", [project[0][6]]
-        )
-
-        filter = table_filter(
-            project_uuid,
-            model_name,
-            filter_predicates=FilterPredicateGroup(
-                predicates=slice.filter_predicates.predicates,
-                join=Join.OMITTED,
-            ),
-        )
-
-        if filter is not None:
-            slice_size = db.execute_return(
-                sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
-                    sql.Identifier(project_uuid)
-                )
-                + filter
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT uuid, name, view, samples_per_page, public, description, "
+                "owner_id, created_at, updated_at FROM projects WHERE uuid = %s;",
+                [project_uuid],
             )
-        else:
-            slice_size = [[0]]
+            project = await cur.fetchall()
 
-        column_names = db.execute_return(
-            sql.SQL(
-                "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
-            ).format(sql.Identifier(f"{project_uuid}_column_map")),
-            [model_name],
-        )
-        id_column = ""
-        data_column = None
-        label_column = None
-        model_column = None
-        for col_id, col_type in column_names:
-            if col_type == ZenoColumnType.ID:
-                id_column = col_id
-            elif col_type == ZenoColumnType.DATA:
-                data_column = col_id
-            elif col_type == ZenoColumnType.LABEL:
-                label_column = col_id
-            elif col_type == ZenoColumnType.OUTPUT:
-                model_column = col_id
+            await cur.execute("SELECT name FROM users WHERE id = %s", [project[0][6]])
+            owner_name = await cur.fetchall()
 
-        return SliceElementOptions(
-            slice_name=slice.slice_name,
-            slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
-            id_column=id_column,
-            data_column=data_column,
-            label_column=label_column,
-            model_column=model_column,
-            project=Project(
-                uuid=project[0][0],
-                name=project[0][1],
-                description=project[0][5],
-                owner_name=owner_name[0][0],
-                view=match_instance_view(project[0][2]),
-                editor=False,
-                created_at=project[0][7].isoformat(),
-                updated_at=project[0][8].isoformat(),
-            ),
-        )
+            filter = await table_filter(
+                project_uuid,
+                model_name,
+                filter_predicates=FilterPredicateGroup(
+                    predicates=slice.filter_predicates.predicates,
+                    join=Join.OMITTED,
+                ),
+            )
+
+            if filter is not None:
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
+                        sql.Identifier(project_uuid)
+                    )
+                    + filter
+                )
+                slice_size = await cur.fetchall()
+            else:
+                slice_size = [[0]]
+
+            await cur.execute(
+                sql.SQL(
+                    "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
+                ).format(sql.Identifier(f"{project_uuid}_column_map")),
+                [model_name],
+            )
+            column_names = await cur.fetchall()
+
+    id_column = ""
+    data_column = None
+    label_column = None
+    model_column = None
+    for col_id, col_type in column_names:
+        if col_type == ZenoColumnType.ID:
+            id_column = col_id
+        elif col_type == ZenoColumnType.DATA:
+            data_column = col_id
+        elif col_type == ZenoColumnType.LABEL:
+            label_column = col_id
+        elif col_type == ZenoColumnType.OUTPUT:
+            model_column = col_id
+
+    return SliceElementOptions(
+        slice_name=slice.slice_name,
+        slice_size=slice_size[0][0] if len(slice_size) > 0 else 0,
+        id_column=id_column,
+        data_column=data_column,
+        label_column=label_column,
+        model_column=model_column,
+        project=Project(
+            uuid=project[0][0],
+            name=project[0][1],
+            description=project[0][5],
+            owner_name=owner_name[0][0],
+            view=match_instance_view(project[0][2]),
+            editor=False,
+            created_at=project[0][7].isoformat(),
+            updated_at=project[0][8].isoformat(),
+        ),
+    )
 
 
-def tag_element_options(
+async def tag_element_options(
     tag: Tag, project_uuid: str, model_name: str | None
 ) -> TagElementOptions:
     """Get options to render tag element in reports.
@@ -1821,88 +1968,93 @@ def tag_element_options(
     Returns:
         TagElementOptions | None: options for the tag element.
     """
-    with Database() as db:
-        tag_ids = db.execute_return(
-            sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
-                sql.Identifier(f"{project_uuid}_tags_datapoints")
-            ),
-            [
-                tag.id,
-            ],
-        )
-
-        project = db.execute_return(
-            "SELECT uuid, name, view, samples_per_page, public, description, owner_id, "
-            "created_at, updated_at FROM projects WHERE uuid = %s;",
-            [project_uuid],
-        )
-        if len(project) == 0:
-            raise HTTPException(
-                status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "ERROR: Could not find corresponding project.",
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                    sql.Identifier(f"{project_uuid}_tags_datapoints")
+                ),
+                [
+                    tag.id,
+                ],
             )
+            tag_ids = await cur.fetchall()
 
-        owner_name = db.execute_return(
-            "SELECT name FROM users WHERE id = %s", [project[0][6]]
-        )
-
-        filter = table_filter(
-            project_uuid,
-            model_name,
-            data_ids=[tag_id[0] for tag_id in tag_ids],
-        )
-
-        if filter is not None:
-            tag_size = db.execute_return(
-                sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
-                    sql.Identifier(project_uuid)
+            await cur.execute(
+                "SELECT uuid, name, view, samples_per_page, public, description, "
+                "owner_id, created_at, updated_at FROM projects WHERE uuid = %s;",
+                [project_uuid],
+            )
+            project = await cur.fetchall()
+            if len(project) == 0:
+                raise HTTPException(
+                    status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "ERROR: Could not find corresponding project.",
                 )
-                + filter
+
+            await cur.execute("SELECT name FROM users WHERE id = %s", [project[0][6]])
+            owner_name = await cur.fetchall()
+
+            filter = await table_filter(
+                project_uuid,
+                model_name,
+                data_ids=[tag_id[0] for tag_id in tag_ids],
             )
-        else:
-            tag_size = [[0]]
 
-        column_names = db.execute_return(
-            sql.SQL(
-                "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
-            ).format(sql.Identifier(f"{project_uuid}_column_map")),
-            [model_name],
-        )
-        id_column = ""
-        data_column = None
-        label_column = None
-        model_column = None
-        for col_id, col_type in column_names:
-            if col_type == ZenoColumnType.ID:
-                id_column = col_id
-            elif col_type == ZenoColumnType.DATA:
-                data_column = col_id
-            elif col_type == ZenoColumnType.LABEL:
-                label_column = col_id
-            elif col_type == ZenoColumnType.OUTPUT:
-                model_column = col_id
+            if filter is not None:
+                await cur.execute(
+                    sql.SQL("SELECT COUNT(*) FROM {} WHERE ").format(
+                        sql.Identifier(project_uuid)
+                    )
+                    + filter
+                )
+                tag_size = await cur.fetchall()
+            else:
+                tag_size = [[0]]
 
-        return TagElementOptions(
-            tag_name=tag.tag_name,
-            tag_size=tag_size[0][0] if len(tag_size) > 0 else 0,
-            id_column=id_column,
-            data_column=data_column,
-            label_column=label_column,
-            model_column=model_column,
-            project=Project(
-                uuid=project[0][0],
-                name=project[0][1],
-                description=project[0][5],
-                owner_name=owner_name[0][0],
-                view=match_instance_view(project[0][2]),
-                editor=False,
-                created_at=project[0][7].isoformat(),
-                updated_at=project[0][8].isoformat(),
-            ),
-        )
+            await cur.execute(
+                sql.SQL(
+                    "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
+                ).format(sql.Identifier(f"{project_uuid}_column_map")),
+                [model_name],
+            )
+            column_names = await cur.fetchall()
+
+    id_column = ""
+    data_column = None
+    label_column = None
+    model_column = None
+    for col_id, col_type in column_names:
+        if col_type == ZenoColumnType.ID:
+            id_column = col_id
+        elif col_type == ZenoColumnType.DATA:
+            data_column = col_id
+        elif col_type == ZenoColumnType.LABEL:
+            label_column = col_id
+        elif col_type == ZenoColumnType.OUTPUT:
+            model_column = col_id
+
+    return TagElementOptions(
+        tag_name=tag.tag_name,
+        tag_size=tag_size[0][0] if len(tag_size) > 0 else 0,
+        id_column=id_column,
+        data_column=data_column,
+        label_column=label_column,
+        model_column=model_column,
+        project=Project(
+            uuid=project[0][0],
+            name=project[0][1],
+            description=project[0][5],
+            owner_name=owner_name[0][0],
+            view=match_instance_view(project[0][2]),
+            editor=False,
+            created_at=project[0][7].isoformat(),
+            updated_at=project[0][8].isoformat(),
+        ),
+    )
 
 
-def slice_or_tag_table(
+async def slice_or_tag_table(
     project_uuid: str,
     filter_sql: sql.Composed | None,
     req: SliceTableRequest | TagTableRequest,
@@ -1921,35 +2073,34 @@ def slice_or_tag_table(
     Returns:
         SQLTable: the resulting slice of the data as requested by the user.
     """
-    with Database() as db:
-        if db.cur is None:
-            return SQLTable(table=[], columns=[])
-        filter_results = None
-        columns = []
+    filter_results = None
+    columns = []
 
-        filter = sql.SQL("")
-        if filter_sql is not None:
-            filter = sql.SQL("WHERE ") + filter_sql
+    filter = sql.SQL("")
+    if filter_sql is not None:
+        filter = sql.SQL("WHERE ") + filter_sql
 
-        final_statement = sql.SQL(" ").join(
-            [
-                sql.SQL("SELECT *"),
-                sql.SQL("FROM {}").format(sql.Identifier(project_uuid)),
-                filter,
-                sql.SQL("LIMIT {} OFFSET {};").format(
-                    sql.Literal(req.limit), sql.Literal(req.offset)
-                ),
-            ]
-        )
-        db.cur.execute(final_statement)
+    final_statement = sql.SQL(" ").join(
+        [
+            sql.SQL("SELECT *"),
+            sql.SQL("FROM {}").format(sql.Identifier(project_uuid)),
+            filter,
+            sql.SQL("LIMIT {} OFFSET {};").format(
+                sql.Literal(req.limit), sql.Literal(req.offset)
+            ),
+        ]
+    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(final_statement)
 
-        if db.cur.description is not None:
-            columns = [desc[0] for desc in db.cur.description]
-        filter_results = db.cur.fetchall()
-        return SQLTable(table=filter_results, columns=columns)
+            if cur.description is not None:
+                columns = [desc[0] for desc in cur.description]
+            filter_results = await cur.fetchall()
+            return SQLTable(table=filter_results, columns=columns)
 
 
-def slice_instance_ids(
+async def slice_instance_ids(
     project_uuid: str, filter_sql: sql.Composed | None, id_column: ZenoColumn
 ) -> list[str]:
     """Get all data ids for a slice.
@@ -1962,24 +2113,25 @@ def slice_instance_ids(
     Returns:
         list[str]: list of instance ids that belong to the slice.
     """
-    with Database() as db:
-        filter = sql.SQL("")
-        if filter_sql is not None:
-            filter = sql.SQL("WHERE ") + filter_sql
+    filter = sql.SQL("")
+    if filter_sql is not None:
+        filter = sql.SQL("WHERE ") + filter_sql
 
-        final_statement = sql.SQL(" ").join(
-            [
-                sql.SQL("SELECT {} FROM {}").format(
-                    sql.Identifier(id_column.id), sql.Identifier(project_uuid)
-                ),
-                filter,
-            ]
-        )
-        results = db.execute_return(final_statement)
-        return list(map(lambda res: str(res[0]), results))
+    final_statement = sql.SQL(" ").join(
+        [
+            sql.SQL("SELECT {} FROM {}").format(
+                sql.Identifier(id_column.id), sql.Identifier(project_uuid)
+            ),
+            filter,
+        ]
+    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(final_statement)
+            return list(map(lambda res: str(res[0]), await cur.fetchall()))
 
 
-def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
+async def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
     """Get the filtered data table for the current project.
 
     Args:
@@ -1992,34 +2144,39 @@ def table_data(project: str, filter_sql: sql.Composed | None) -> SQLTable:
     Returns:
         SQLTable: the filtered data table for the project.
     """
-    with Database() as db:
-        filter_results = None
-        columns = []
-        if filter_sql is None:
-            if db.cur is not None:
-                db.cur.execute(
-                    sql.SQL("SELECT * FROM {};").format(sql.Identifier(f"{project}")),
-                )
-                if db.cur.description is not None:
-                    columns = [desc[0] for desc in db.cur.description]
-                filter_results = db.cur.fetchall()
-        else:
-            if db.cur is not None:
-                db.cur.execute(
-                    sql.SQL("SELECT * FROM {} WHERE ").format(sql.Identifier(project))
-                    + filter_sql
-                )
-                if db.cur.description is not None:
-                    columns = [desc[0] for desc in db.cur.description]
-                filter_results = db.cur.fetchall()
-        return (
-            SQLTable(table=filter_results, columns=columns)
-            if filter_results is not None
-            else SQLTable(table=[], columns=[])
-        )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            filter_results = None
+            columns = []
+            if filter_sql is None:
+                if cur is not None:
+                    await cur.execute(
+                        sql.SQL("SELECT * FROM {};").format(
+                            sql.Identifier(f"{project}")
+                        ),
+                    )
+                    if cur.description is not None:
+                        columns = [desc[0] for desc in cur.description]
+                    filter_results = await cur.fetchall()
+            else:
+                if cur is not None:
+                    await cur.execute(
+                        sql.SQL("SELECT * FROM {} WHERE ").format(
+                            sql.Identifier(project)
+                        )
+                        + filter_sql
+                    )
+                    if cur.description is not None:
+                        columns = [desc[0] for desc in cur.description]
+                    filter_results = await cur.fetchall()
+            return (
+                SQLTable(table=filter_results, columns=columns)
+                if filter_results is not None
+                else SQLTable(table=[], columns=[])
+            )
 
 
-def column(
+async def column(
     project: str, column: ZenoColumn, filter_sql: sql.Composed | None = None
 ) -> list[str | int | float | bool]:
     """Get the data for one column of the project's data table.
@@ -2034,24 +2191,26 @@ def column(
         list[str | int | float | bool]: the data that is stored in the requested
             column.
     """
-    db = Database()
-    if filter_sql is None:
-        column_result = db.connect_execute_return(
-            sql.SQL("SELECT {} FROM {}").format(
-                sql.Identifier(column.id), sql.Identifier(project)
-            ),
-        )
-    else:
-        column_result = db.connect_execute_return(
-            sql.SQL("SELECT {} FROM {} WHERE ").format(
-                sql.Identifier(column.id), sql.Identifier(project)
-            )
-            + filter_sql,
-        )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if filter_sql is None:
+                await cur.execute(
+                    sql.SQL("SELECT {} FROM {}").format(
+                        sql.Identifier(column.id), sql.Identifier(project)
+                    ),
+                )
+            else:
+                await cur.execute(
+                    sql.SQL("SELECT {} FROM {} WHERE ").format(
+                        sql.Identifier(column.id), sql.Identifier(project)
+                    )
+                    + filter_sql,
+                )
+            column_result = await cur.fetchall()
     return list(map(lambda column: column[0], column_result))
 
 
-def tags(project: str) -> list[Tag]:
+async def tags(project: str) -> list[Tag]:
     """Get a list of all tags created for a project.
 
     Args:
@@ -2063,39 +2222,42 @@ def tags(project: str) -> list[Tag]:
     Returns:
         list[Tag]: the list of tags associated with a project.
     """
-    with Database() as db:
-        tags_result = db.execute_return(
-            "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
-            [
-                project,
-            ],
-        )
-        if len(tags_result) == 0:
-            return []
-        tags: list[Tag] = []
-        for tag_result in tags_result:
-            data_results = db.execute_return(
-                sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
-                    sql.Identifier(f"{project}_tags_datapoints")
-                ),
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, folder_id FROM tags WHERE project_uuid = %s",
                 [
-                    tag_result[0],
+                    project,
                 ],
             )
-            tags.append(
-                Tag(
-                    id=tag_result[0],
-                    tag_name=tag_result[1],
-                    folder_id=tag_result[2],
-                    data_ids=[]
-                    if len(data_results) == 0
-                    else [d[0] for d in data_results],
+            tags_result = await cur.fetchall()
+            if len(tags_result) == 0:
+                return []
+            tags: list[Tag] = []
+            for tag_result in tags_result:
+                await cur.execute(
+                    sql.SQL("SELECT data_id FROM {} WHERE tag_id = %s").format(
+                        sql.Identifier(f"{project}_tags_datapoints")
+                    ),
+                    [
+                        tag_result[0],
+                    ],
                 )
-            )
-        return tags
+                data_results = await cur.fetchall()
+                tags.append(
+                    Tag(
+                        id=tag_result[0],
+                        tag_name=tag_result[1],
+                        folder_id=tag_result[2],
+                        data_ids=[]
+                        if len(data_results) == 0
+                        else [d[0] for d in data_results],
+                    )
+                )
+            return tags
 
 
-def user(name: str) -> User | None:
+async def user(name: str) -> User | None:
     """Get the user with a specific name.
 
     Args:
@@ -2104,10 +2266,13 @@ def user(name: str) -> User | None:
     Returns:
         User | None: the requested user.
     """
-    db = Database()
-    user = db.connect_execute_return(
-        "SELECT id, name, cognito_id FROM users WHERE name = %s", [name]
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, cognito_id FROM users WHERE name = %s", [name]
+            )
+            user = await cur.fetchall()
+
     if len(user) == 0:
         return None
     user = user[0]
@@ -2119,14 +2284,16 @@ def user(name: str) -> User | None:
     )
 
 
-def users() -> list[User]:
+async def users() -> list[User]:
     """Get a list of all registered users.
 
     Returns:
         list[User]: all registered users.
     """
-    db = Database()
-    users = db.connect_execute_return("SELECT id, name, cognito_id FROM users;")
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT id, name, cognito_id FROM users;")
+            users = await cur.fetchall()
     return list(
         map(
             lambda user: User(id=user[0], name=user[1], cognito_id=user[2], admin=None),
@@ -2135,14 +2302,16 @@ def users() -> list[User]:
     )
 
 
-def organizations() -> list[Organization]:
+async def organizations() -> list[Organization]:
     """Get a list of all organizations.
 
     Returns:
         list[Organization]: all organizations in the database.
     """
-    db = Database()
-    organizations = db.connect_execute_return("SELECT id, name FROM organizations;")
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute("SELECT id, name FROM organizations;")
+            organizations = await cur.fetchall()
     return list(
         map(
             lambda organization: Organization(
@@ -2153,7 +2322,7 @@ def organizations() -> list[Organization]:
     )
 
 
-def user_organizations(user: User) -> list[Organization]:
+async def user_organizations(user: User) -> list[Organization]:
     """Get the organizations that a user is a member of.
 
     Args:
@@ -2163,43 +2332,46 @@ def user_organizations(user: User) -> list[Organization]:
         list[Organization]: all organizations the user is a member of.
     """
     organizations: list[Organization] = []
-    with Database() as db:
-        organizations_result = db.execute_return(
-            "SELECT o.id, o.name, uo.admin FROM organizations AS o "
-            "JOIN user_organization AS uo ON o.id = uo.organization_id "
-            "WHERE uo.user_id = %s;",
-            [user.id],
-        )
-        if len(organizations_result) == 0:
-            return organizations
-        for org in organizations_result:
-            members = db.execute_return(
-                "SELECT u.id, u.name, uo.admin FROM users as u "
-                "JOIN user_organization as uo ON u.id = uo.user_id "
-                "WHERE uo.organization_id = %s;",
-                [org[0]],
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT o.id, o.name, uo.admin FROM organizations AS o "
+                "JOIN user_organization AS uo ON o.id = uo.organization_id "
+                "WHERE uo.user_id = %s;",
+                [user.id],
             )
-            organizations.append(
-                Organization(
-                    id=org[0],
-                    name=org[1],
-                    admin=org[2],
-                    members=list(
-                        map(
-                            lambda member: User(
-                                id=member[0],
-                                name=member[1],
-                                admin=member[2],
-                            ),
-                            members,
-                        )
-                    ),
+            organizations_result = await cur.fetchall()
+            if len(organizations_result) == 0:
+                return organizations
+            for org in organizations_result:
+                await cur.execute(
+                    "SELECT u.id, u.name, uo.admin FROM users as u "
+                    "JOIN user_organization as uo ON u.id = uo.user_id "
+                    "WHERE uo.organization_id = %s;",
+                    [org[0]],
                 )
-            )
-        return organizations
+                members = await cur.fetchall()
+                organizations.append(
+                    Organization(
+                        id=org[0],
+                        name=org[1],
+                        admin=org[2],
+                        members=list(
+                            map(
+                                lambda member: User(
+                                    id=member[0],
+                                    name=member[1],
+                                    admin=member[2],
+                                ),
+                                members,
+                            )
+                        ),
+                    )
+                )
+            return organizations
 
 
-def project_users(project: str) -> list[User]:
+async def project_users(project: str) -> list[User]:
     """Get all the users that have access to a project.
 
     Args:
@@ -2208,12 +2380,15 @@ def project_users(project: str) -> list[User]:
     Returns:
         list[User]: the list of users who can access the project.
     """
-    db = Database()
-    project_users = db.connect_execute_return(
-        "SELECT u.id, u.name, up.editor FROM users as u "
-        "JOIN user_project AS up ON u.id = up.user_id WHERE up.project_uuid = %s",
-        [project],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT u.id, u.name, up.editor FROM users as u "
+                "JOIN user_project AS up ON u.id = up.user_id "
+                "WHERE up.project_uuid = %s",
+                [project],
+            )
+            project_users = await cur.fetchall()
     return list(
         map(
             lambda user: User(id=user[0], name=user[1], admin=user[2]),
@@ -2222,7 +2397,7 @@ def project_users(project: str) -> list[User]:
     )
 
 
-def report_users(report_id: int) -> list[User]:
+async def report_users(report_id: int) -> list[User]:
     """Get all the users that have access to a report.
 
     Args:
@@ -2231,12 +2406,14 @@ def report_users(report_id: int) -> list[User]:
     Returns:
         list[User]: the list of users who can access the report.
     """
-    db = Database()
-    report_users = db.connect_execute_return(
-        "SELECT u.id, u.name, ur.editor FROM users as u "
-        "JOIN user_report AS ur ON u.id = ur.user_id WHERE ur.report_id = %s",
-        [report_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT u.id, u.name, ur.editor FROM users as u "
+                "JOIN user_report AS ur ON u.id = ur.user_id WHERE ur.report_id = %s",
+                [report_id],
+            )
+            report_users = await cur.fetchall()
     return list(
         map(
             lambda user: User(id=user[0], name=user[1], admin=user[2]),
@@ -2245,7 +2422,7 @@ def report_users(report_id: int) -> list[User]:
     )
 
 
-def project_orgs(project: str) -> list[Organization]:
+async def project_orgs(project: str) -> list[Organization]:
     """Get all the organizations that have access to a project.
 
     Args:
@@ -2254,13 +2431,15 @@ def project_orgs(project: str) -> list[Organization]:
     Returns:
         list[Organization]: the list of organizations who can access the project.
     """
-    db = Database()
-    project_organizations = db.connect_execute_return(
-        "SELECT o.id, o.name, op.editor FROM organizations as o "
-        "JOIN organization_project AS op ON o.id = op.organization_id "
-        "WHERE op.project_uuid = %s",
-        [project],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT o.id, o.name, op.editor FROM organizations as o "
+                "JOIN organization_project AS op ON o.id = op.organization_id "
+                "WHERE op.project_uuid = %s",
+                [project],
+            )
+            project_organizations = await cur.fetchall()
     return list(
         map(
             lambda org: Organization(id=org[0], name=org[1], members=[], admin=org[2]),
@@ -2269,7 +2448,7 @@ def project_orgs(project: str) -> list[Organization]:
     )
 
 
-def report_orgs(report_id: int) -> list[Organization]:
+async def report_orgs(report_id: int) -> list[Organization]:
     """Get all the organizations that have access to a report.
 
     Args:
@@ -2278,13 +2457,15 @@ def report_orgs(report_id: int) -> list[Organization]:
     Returns:
         list[Organization]: the list of organizations who can access the report.
     """
-    db = Database()
-    report_organizations = db.connect_execute_return(
-        "SELECT o.id, o.name, orep.editor FROM organizations as o "
-        "JOIN organization_report AS orep ON o.id = orep.organization_id "
-        "WHERE orep.report_id = %s",
-        [report_id],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT o.id, o.name, orep.editor FROM organizations as o "
+                "JOIN organization_report AS orep ON o.id = orep.organization_id "
+                "WHERE orep.report_id = %s",
+                [report_id],
+            )
+            report_organizations = await cur.fetchall()
     return list(
         map(
             lambda org: Organization(id=org[0], name=org[1], members=[], admin=org[2]),
@@ -2293,7 +2474,7 @@ def report_orgs(report_id: int) -> list[Organization]:
     )
 
 
-def filtered_short_string_column_values(
+async def filtered_short_string_column_values(
     project: str, req: StringFilterRequest
 ) -> list[str]:
     """Select distinct string values of a column and return their short representation.
@@ -2305,22 +2486,23 @@ def filtered_short_string_column_values(
     Returns:
         list[str]: the filtered string column data.
     """
-    db = Database()
-
     if req.operation == Operation.LIKE or req.operation == Operation.ILIKE:
         req.filter_string = "%" + req.filter_string + "%"
 
-    returned_strings = db.connect_execute_return(
-        sql.SQL("SELECT {} from {} WHERE {} {} %s;").format(
-            sql.Identifier(req.column.id),
-            sql.Identifier(project),
-            sql.Identifier(req.column.id),
-            sql.SQL(req.operation.literal()),
-        ),
-        [
-            req.filter_string,
-        ],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT {} from {} WHERE {} {} %s;").format(
+                    sql.Identifier(req.column.id),
+                    sql.Identifier(project),
+                    sql.Identifier(req.column.id),
+                    sql.SQL(req.operation.literal()),
+                ),
+                [
+                    req.filter_string,
+                ],
+            )
+            returned_strings = await cur.fetchall()
 
     short_ret: list[str] = []
     if len(returned_strings) == 0:
@@ -2338,7 +2520,7 @@ def filtered_short_string_column_values(
     return short_ret
 
 
-def system_exists(project_uuid: str, system_name: str) -> bool:
+async def system_exists(project_uuid: str, system_name: str) -> bool:
     """Check whether a system exists for a project.
 
     Args:
@@ -2349,16 +2531,18 @@ def system_exists(project_uuid: str, system_name: str) -> bool:
         bool: whether the system exists.
 
     Raises:
-        Exception: something went wrong while checking whether the system exists.
+        HTTPException: something went wrong while checking whether the system exists.
     """
-    db = Database()
-    exists = db.connect_execute_return(
-        sql.SQL("SELECT EXISTS(SELECT 1 FROM {} " "WHERE model = %s);").format(
-            sql.Identifier(f"{project_uuid}_column_map")
-        ),
-        [system_name],
-    )
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                sql.SQL("SELECT EXISTS(SELECT 1 FROM {} " "WHERE model = %s);").format(
+                    sql.Identifier(f"{project_uuid}_column_map")
+                ),
+                [system_name],
+            )
+            exists = await cur.fetchall()
     if len(exists) > 0:
         return bool(exists[0][0])
     else:
-        raise Exception("Error while checking whether system exists.")
+        raise HTTPException(status_code=500, detail="Could not check if system exists")

@@ -24,7 +24,7 @@ router = APIRouter(tags=["zeno"])
     response_model=list[Tag],
     tags=["zeno"],
 )
-def get_tags(project_uuid: str, request: Request):
+async def get_tags(project_uuid: str, request: Request):
     """Get all tags for a project.
 
     Args:
@@ -34,8 +34,8 @@ def get_tags(project_uuid: str, request: Request):
     Returns:
         list[Tag]: list of all of a project's tags.
     """
-    util.project_access_valid(project_uuid, request)
-    return select.tags(project_uuid)
+    await util.project_access_valid(project_uuid, request)
+    return await select.tags(project_uuid)
 
 
 @router.post(
@@ -43,7 +43,7 @@ def get_tags(project_uuid: str, request: Request):
     response_model=list[Tag],
     tags=["zeno"],
 )
-def get_tags_for_projects(project_uuids: list[str]):
+async def get_tags_for_projects(project_uuids: list[str]):
     """Get all tags for a list of projects.
 
     Args:
@@ -52,7 +52,7 @@ def get_tags_for_projects(project_uuids: list[str]):
     Returns:
         list[Tag]: all tags for the specified projects.
     """
-    return select.tags_for_projects(project_uuids)
+    return await select.tags_for_projects(project_uuids)
 
 
 @router.post(
@@ -60,7 +60,7 @@ def get_tags_for_projects(project_uuids: list[str]):
     response_model=int,
     tags=["zeno"],
 )
-def add_tag(
+async def add_tag(
     tag: Tag,
     project_uuid: str,
     request: Request,
@@ -81,8 +81,8 @@ def add_tag(
     Returns:
         int: id of the newly created tag.
     """
-    util.project_editor(project_uuid, request)
-    id = insert.tag(project_uuid, tag)
+    await util.project_editor(project_uuid, request)
+    id = await insert.tag(project_uuid, tag)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -99,7 +99,7 @@ def add_tag(
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-def update_tag(tag: Tag, project_uuid: str, request: Request):
+async def update_tag(tag: Tag, project_uuid: str, request: Request):
     """Update a tag in the database.
 
     Args:
@@ -107,18 +107,20 @@ def update_tag(tag: Tag, project_uuid: str, request: Request):
         project_uuid (str): project to which the tag belongs.
         request (Request): http request to get user information from.
     """
-    util.project_editor(project_uuid, request)
-    update.tag(tag, project_uuid)
+    await util.project_editor(project_uuid, request)
+    await update.tag(tag, project_uuid)
 
 
-@router.delete("/tag", tags=["zeno"], dependencies=[Depends(util.auth)])
-def delete_tag(project_uuid: str, tag: Tag, request: Request):
+@router.delete(
+    "/tag/{project_uuid}/{tag_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_tag(project_uuid: str, tag_id: int, request: Request):
     """Delete a tag from the database.
 
     Args:
         project_uuid (str): project to which the tag belongs.
-        tag (Tag): tag to be deleted from the database.
+        tag_id (int): id of the tag to be deleted.
         request (Request): http request to get user information from.
     """
-    util.project_editor(project_uuid, request)
-    delete.tag(tag)
+    await util.project_editor(project_uuid, request)
+    await delete.tag(tag_id)

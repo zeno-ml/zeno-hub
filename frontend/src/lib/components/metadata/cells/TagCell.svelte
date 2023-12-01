@@ -39,7 +39,7 @@
 			}
 			return { slices: [], metadata: { ...m.metadata }, tags: [] };
 		});
-		zenoClient.deleteTag(tag).then(() => {
+		zenoClient.deleteTag($project.uuid, tag.id).then(() => {
 			tags.update((t) => t.filter((t) => t.id !== tag.id));
 		});
 		tagIds.set([]);
