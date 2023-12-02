@@ -8,7 +8,6 @@ import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_s
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Body_upload_system_schema } from '../models/Body_upload_system_schema';
 import type { Chart } from '../models/Chart';
-import type { ChartResponse } from '../models/ChartResponse';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -284,10 +283,10 @@ export class ZenoService {
 	 * ChartResponse: chart spec and data.
 	 * @param chartId
 	 * @param projectUuid
-	 * @returns ChartResponse Successful Response
+	 * @returns Chart Successful Response
 	 * @throws ApiError
 	 */
-	public getChart(chartId: number, projectUuid: string): CancelablePromise<ChartResponse> {
+	public getChart(chartId: number, projectUuid: string): CancelablePromise<Chart> {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/chart/{owner}/{project}/{chart_id}',
@@ -296,39 +295,6 @@ export class ZenoService {
 			},
 			query: {
 				project_uuid: projectUuid
-			},
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Chart Data
-	 * Get the data for a chart.
-	 *
-	 * Args:
-	 * project_uuid (str): UUID of the project to get a chart from.
-	 * chart_id (int): id of the chart to be fetched.
-	 * request (Request): http request to get user information from.
-	 *
-	 * Raises:
-	 * HTTPException: error if the chart data could not be fetched.
-	 *
-	 * Returns:
-	 * str: data for the chart in json representation.
-	 * @param projectUuid
-	 * @param chartId
-	 * @returns string Successful Response
-	 * @throws ApiError
-	 */
-	public getChartData(projectUuid: string, chartId: number): CancelablePromise<string> {
-		return this.httpRequest.request({
-			method: 'GET',
-			url: '/chart-data/{project_uuid}/{chart_id}',
-			path: {
-				project_uuid: projectUuid,
-				chart_id: chartId
 			},
 			errors: {
 				422: `Validation Error`
@@ -408,10 +374,10 @@ export class ZenoService {
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
-	 * @returns any Successful Response
+	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
-	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<any> {
+	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<string> {
 		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/chart/{project_uuid}',

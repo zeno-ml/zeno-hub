@@ -14,8 +14,7 @@ import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
 from zeno_backend.classes.amplitude import AmplitudeHandler
-from zeno_backend.classes.chart import Chart, ChartResponse
-from zeno_backend.processing.chart import chart_data
+from zeno_backend.classes.chart import Chart
 
 router = APIRouter(tags=["zeno"])
 
@@ -41,7 +40,7 @@ async def get_charts(project_uuid: str, request: Request):
 
 @router.get(
     "/chart/{owner}/{project}/{chart_id}",
-    response_model=ChartResponse,
+    response_model=Chart,
     tags=["zeno"],
 )
 async def get_chart(project_uuid: str, chart_id: int, request: Request):
@@ -59,32 +58,7 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         ChartResponse: chart spec and data.
     """
     await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
-    return ChartResponse(chart=chart, chart_data=await chart_data(chart, project_uuid))
-
-
-@router.get(
-    "/chart-data/{project_uuid}/{chart_id}",
-    response_model=str,
-    tags=["zeno"],
-)
-async def get_chart_data(project_uuid: str, chart_id: int, request: Request):
-    """Get the data for a chart.
-
-    Args:
-        project_uuid (str): UUID of the project to get a chart from.
-        chart_id (int): id of the chart to be fetched.
-        request (Request): http request to get user information from.
-
-    Raises:
-        HTTPException: error if the chart data could not be fetched.
-
-    Returns:
-        str: data for the chart in json representation.
-    """
-    await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
-    return await chart_data(chart, project_uuid)
+    return await select.chart(project_uuid, chart_id)
 
 
 @router.post(
@@ -150,7 +124,12 @@ async def add_chart(
     return id
 
 
-@router.patch("/chart/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
+@router.patch(
+    "/chart/{project_uuid}",
+    response_model=str,
+    tags=["zeno"],
+    dependencies=[Depends(util.auth)],
+)
 async def update_chart(chart: Chart, project_uuid: str, request: Request):
     """Update a chart.
 
@@ -160,7 +139,7 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await update.chart(chart, project_uuid)
+    return await update.chart(chart, project_uuid)
 
 
 @router.delete(

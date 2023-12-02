@@ -215,6 +215,7 @@ async def update_slice(slice: Slice, project: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project, request)
+    await update.reset_chart_data(project)
     await update.slice(slice, project)
 
 

@@ -1,32 +1,20 @@
 <script lang="ts">
-	import Spinner from '$lib/components/general/Spinner.svelte';
 	import { chartMap } from '$lib/util/charts';
-	import { ChartType, type Chart, type ZenoService } from '$lib/zenoapi';
-	import { getContext } from 'svelte';
-
-	const zenoClient = getContext('zenoClient') as ZenoService;
+	import { ChartType, type Chart } from '$lib/zenoapi';
 
 	export let chart: Chart;
 	export let width: number;
-
-	$: chartData = zenoClient.getChartData(chart.projectUuid, chart.id);
 </script>
 
-{#await chartData}
-	<div class="m-auto flex w-full justify-center text-center">
-		<Spinner />
+<div class="w-full">
+	<h3 class="text-lg font-semibold">{chart.name}</h3>
+	<div>
+		<svelte:component
+			this={chartMap[chart.type]}
+			{chart}
+			{width}
+			data={JSON.parse(chart.data || '{}')}
+			height={chart.type == ChartType.RADAR ? 600 : 400}
+		/>
 	</div>
-{:then data}
-	<div class="w-full">
-		<h3 class="text-lg font-semibold">{chart.name}</h3>
-		<div>
-			<svelte:component
-				this={chartMap[chart.type]}
-				{chart}
-				{width}
-				data={JSON.parse(data)}
-				height={chart.type == ChartType.RADAR ? 600 : 400}
-			/>
-		</div>
-	</div>
-{/await}
+</div>

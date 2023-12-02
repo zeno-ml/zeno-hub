@@ -257,6 +257,9 @@ async def dataset(project_uuid: str):
                     sql.Identifier(f"{project_uuid}_tags_datapoints")
                 )
             )
+            await cur.execute(
+                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+            )
             await conn.commit()
 
 
@@ -289,6 +292,9 @@ async def system(project_uuid: str, system_name: str):
                     ),
                     [column[0]],
                 )
+            await cur.execute(
+                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+            )
             await conn.commit()
 
 

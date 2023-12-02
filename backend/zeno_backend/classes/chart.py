@@ -233,6 +233,7 @@ class Chart(CamelModel):
         type (ChartType): the type of the chart.
         parameters (XCParameters | TableParameters | BeeswarmParameters |
             RadarParameters | HeatmapParameters): the parameters of the chart.
+        data (str): the JSON string data of the chart.
     """
 
     id: int
@@ -246,19 +247,7 @@ class Chart(CamelModel):
         | RadarParameters
         | HeatmapParameters
     )
-
-    def __hash__(self) -> int:
-        """Hash the chart parameters.
-
-        Returns:
-            int: hash of the chart parameters.
-        """
-        return hash(
-            hash(self.name)
-            + hash(self.type)
-            + hash(self.parameters)
-            + hash(self.project_uuid)
-        )
+    data: str | None = None
 
 
 class ParametersEncoder(json.JSONEncoder):

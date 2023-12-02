@@ -120,7 +120,9 @@ async def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-async def projects(user: User, home_request: HomeRequest) -> list[Project]:
+async def projects(
+    user: User, home_request: HomeRequest = HomeRequest()
+) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
@@ -265,7 +267,9 @@ async def public_projects(home_request: HomeRequest) -> list[Project]:
     return projects
 
 
-async def reports(user: User, home_request: HomeRequest) -> list[Report]:
+async def reports(
+    user: User, home_request: HomeRequest = HomeRequest()
+) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
@@ -827,7 +831,7 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
         async with conn.cursor() as cur:
             await cur.execute(
                 sql.SQL(
-                    "SELECT id, name, type, parameters, project_uuid"
+                    "SELECT id, name, type, parameters, data, project_uuid"
                     " FROM charts WHERE project_uuid IN ({})"
                 ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
             )
@@ -843,7 +847,8 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
                 name=r[1],
                 type=r[2],
                 parameters=json.loads(r[3]),
-                project_uuid=r[4],
+                data=json.dumps(r[4]),
+                project_uuid=r[5],
             ),
             chart_results,
         )
@@ -1643,7 +1648,7 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, type, parameters FROM "
+                "SELECT id, name, type, parameters, data FROM "
                 "charts WHERE id = %s AND project_uuid = %s;",
                 [
                     chart_id,
@@ -1662,6 +1667,7 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
         type=chart_result[0][2],
         project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
+        data=json.dumps(chart_result[0][4]),
     )
 
 
