@@ -119,6 +119,23 @@ async def chart(chart_id: int):
             await conn.commit()
 
 
+async def chart_data(project_uuid: str):
+    """Deletes chart data from all charts for a given project.
+
+    Args:
+        project_uuid (str): the id of the project to delete chart data from.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+                [
+                    project_uuid,
+                ],
+            )
+            await conn.commit()
+
+
 async def tag(tag_id: int):
     """Deletes a tag from an existing project.
 

@@ -14,7 +14,7 @@ from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.select import user as get_user
-from zeno_backend.processing.chart import chart_data
+from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def folder(folder: Folder, project: str):
@@ -61,7 +61,7 @@ async def chart(chart: Chart, project: str):
         chart (Chart): the chart data to use for the update.
         project (str): the project the user is currently working with.
     """
-    chart_output = await chart_data(chart, project)
+    chart_output = await calculate_chart_data(chart, project)
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -82,18 +82,20 @@ async def chart(chart: Chart, project: str):
     return chart_output
 
 
-async def reset_chart_data(project: str):
-    """Reset the data for all charts in a project.
+async def chart_data(chart_id: int, data: str):
+    """Add chart data to chart entry.
 
     Args:
-        project (str): the project to reset the chart data for.
+        chart_id (int): the chart id.
+        data (str): the chart data to use for the update.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+                "UPDATE charts SET data = %s WHERE id = %s;",
                 [
-                    project,
+                    data,
+                    chart_id,
                 ],
             )
 

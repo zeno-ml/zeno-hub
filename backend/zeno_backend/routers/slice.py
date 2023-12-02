@@ -87,6 +87,8 @@ async def get_slices_for_projects(req: list[str], request: Request):
     Returns:
         list[Slice]: all slices in all specifiec projects.
     """
+    if len(req) == 0:
+        return []
     for project in req:
         await util.project_access_valid(project, request)
     return await select.slices_for_projects(req)
@@ -215,7 +217,7 @@ async def update_slice(slice: Slice, project: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project, request)
-    await update.reset_chart_data(project)
+    await delete.chart_data(project)
     await update.slice(slice, project)
 
 

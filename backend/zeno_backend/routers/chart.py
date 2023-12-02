@@ -15,6 +15,7 @@ import zeno_backend.database.update as update
 import zeno_backend.util as util
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.chart import Chart
+from zeno_backend.processing.chart import calculate_chart_data
 
 router = APIRouter(tags=["zeno"])
 
@@ -58,7 +59,13 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         ChartResponse: chart spec and data.
     """
     await util.project_access_valid(project_uuid, request)
-    return await select.chart(project_uuid, chart_id)
+    chart = await select.chart(project_uuid, chart_id)
+    if chart.data is None:
+        chart_output = await calculate_chart_data(chart, project_uuid)
+        await update.chart_data(chart_id, chart_output)
+        chart.data = chart_output
+
+    return chart
 
 
 @router.post(
@@ -76,9 +83,18 @@ async def get_charts_for_projects(project_uuids: list[str], request: Request):
     Returns:
         list[Chart]: all charts for the list of projects
     """
+    if len(project_uuids) == 0:
+        return []
+
     for project_uuid in project_uuids:
         await util.project_access_valid(project_uuid, request)
-    return await select.charts_for_projects(project_uuids)
+    charts = await select.charts_for_projects(project_uuids)
+    for c in charts:
+        if c.data is None:
+            chart_output = await calculate_chart_data(c, c.project_uuid)
+            await update.chart_data(c.id, chart_output)
+            c.data = chart_output
+    return charts
 
 
 @router.post(

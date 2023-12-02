@@ -52,6 +52,8 @@ async def get_tags_for_projects(project_uuids: list[str]):
     Returns:
         list[Tag]: all tags for the specified projects.
     """
+    if len(project_uuids) == 0:
+        return []
     return await select.tags_for_projects(project_uuids)
 
 

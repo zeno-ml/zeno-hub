@@ -847,7 +847,7 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
                 name=r[1],
                 type=r[2],
                 parameters=json.loads(r[3]),
-                data=json.dumps(r[4]),
+                data=json.dumps(r[4]) if r[4] is not None else None,
                 project_uuid=r[5],
             ),
             chart_results,
@@ -1659,15 +1659,17 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
 
     if len(chart_result) == 0:
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Chart could not be found."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Chart could not be found.",
         )
+
     return Chart(
         id=chart_result[0][0],
         name=chart_result[0][1],
         type=chart_result[0][2],
         project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
-        data=json.dumps(chart_result[0][4]),
+        data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
     )
 
 
