@@ -1,7 +1,8 @@
 version: "3"
+name: zeno-test
 services:
   frontend:
-    container_name: zeno-frontend
+    container_name: zeno-frontend-test
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
@@ -9,7 +10,7 @@ services:
       - "5173:5173"
     command: npm run preview -- --port 5173 --host 0.0.0.0
   backend:
-    container_name: zeno-backend
+    container_name: zeno-backend-test
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -29,7 +30,7 @@ services:
       DB_PASSWORD: mypassword
     command: poetry run uvicorn --factory zeno_backend.server:get_server --host 0.0.0.0 --timeout-keep-alive 75
   postgres:
-    container_name: zeno-postgres
+    container_name: zeno-postgres-test
     image: postgres:latest
     environment:
       POSTGRES_DB: zeno
