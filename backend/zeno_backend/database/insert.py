@@ -673,7 +673,7 @@ async def chart(project: str, chart: Chart) -> int | None:
     Returns:
         int | None: the id of the newly created chart.
     """
-    chart_output = await calculate_chart_data(chart, project)
+    chart_data = await calculate_chart_data(chart, project)
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -684,7 +684,7 @@ async def chart(project: str, chart: Chart) -> int | None:
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_output,
+                    chart_data,
                     project,
                 ],
             )

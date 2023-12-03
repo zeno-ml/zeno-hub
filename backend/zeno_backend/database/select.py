@@ -1669,7 +1669,7 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
         type=chart_result[0][2],
         project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
-        data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
+        data=json.dumps(chart_result[0][4]),
     )
 
 

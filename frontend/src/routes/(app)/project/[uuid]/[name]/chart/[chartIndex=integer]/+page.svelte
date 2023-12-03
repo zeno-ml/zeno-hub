@@ -9,15 +9,16 @@
 	import { project } from '$lib/stores';
 	import { chartMap } from '$lib/util/charts';
 	import type { Chart, ZenoService } from '$lib/zenoapi';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 
 	export let data;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let mounted = false;
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
-	let chartData = JSON.parse(chart.data || '{}');
+	let chartData = chart.data ? JSON.parse(chart.data) : undefined;
 	let updatingData = false;
 
 	$: updateEditUrl(isChartEdit);
@@ -37,13 +38,20 @@
 
 	function updateChart(chart: Chart) {
 		updatingData = true;
-		if ($project && $project.editor && browser) {
+		if (mounted && $project && $project.editor && browser) {
 			zenoClient.updateChart($project.uuid, chart).then((d) => {
 				chartData = JSON.parse(d);
 				updatingData = false;
 			});
+		} else {
+			updatingData = false;
 		}
 	}
+
+	// Prevent calling updateChart on mount
+	onMount(() => {
+		mounted = true;
+	});
 </script>
 
 <div class={`flex w-full overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
@@ -58,9 +66,11 @@
 	{:else}
 		<ViewHeader bind:isChartEdit />
 	{/if}
-	<div class={`flex h-full flex-col overflow-auto pl-2`}>
-		<ChartContainer chartName={chart.name} loading={updatingData}>
-			<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
-		</ChartContainer>
-	</div>
+	{#if chartData}
+		<div class={`flex h-full flex-col overflow-auto pl-2`}>
+			<ChartContainer chartName={chart.name} loading={updatingData}>
+				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
+			</ChartContainer>
+		</div>
+	{/if}
 </div>

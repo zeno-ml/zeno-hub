@@ -208,17 +208,17 @@ async def add_all_slices(
 
 
 @router.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_slice(slice: Slice, project: str, request: Request):
+async def update_slice(slice: Slice, project_uuid: str, request: Request):
     """Update a slice in the database.
 
     Args:
         slice (Slice): new values of the slice to be updated.
-        project (str): project to which the slice belongs.
+        project_uuid (str): project uuid to which the slice belongs.
         request (Request): http request to get user information from.
     """
-    await util.project_editor(project, request)
-    await delete.chart_data(project)
-    await update.slice(slice, project)
+    await util.project_editor(project_uuid, request)
+    await update.clear_chart_data(project_uuid)
+    await update.slice(slice, project_uuid)
 
 
 @router.delete(
@@ -233,4 +233,5 @@ async def delete_slice(project_uuid: str, slice_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
+    await update.clear_chart_data(project_uuid)
     await delete.slice(slice_id)

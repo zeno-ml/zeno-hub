@@ -289,7 +289,7 @@ export class ZenoService {
 	public getChart(chartId: number, projectUuid: string): CancelablePromise<Chart> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/chart/{owner}/{project}/{chart_id}',
+			url: '/chart/{project}/{chart_id}',
 			path: {
 				chart_id: chartId
 			},
@@ -2159,19 +2159,19 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * slice (Slice): new values of the slice to be updated.
-	 * project (str): project to which the slice belongs.
+	 * project_uuid (str): project uuid to which the slice belongs.
 	 * request (Request): http request to get user information from.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public updateSlice(project: string, requestBody: Slice): CancelablePromise<any> {
+	public updateSlice(projectUuid: string, requestBody: Slice): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/slice/{project}',
-			path: {
-				project: project
+			query: {
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',

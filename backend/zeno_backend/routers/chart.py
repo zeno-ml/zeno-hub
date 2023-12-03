@@ -40,7 +40,7 @@ async def get_charts(project_uuid: str, request: Request):
 
 
 @router.get(
-    "/chart/{owner}/{project}/{chart_id}",
+    "/chart/{project}/{chart_id}",
     response_model=Chart,
     tags=["zeno"],
 )
@@ -61,9 +61,9 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
     await util.project_access_valid(project_uuid, request)
     chart = await select.chart(project_uuid, chart_id)
     if chart.data is None:
-        chart_output = await calculate_chart_data(chart, project_uuid)
-        await update.chart_data(chart_id, chart_output)
-        chart.data = chart_output
+        chart_data = await calculate_chart_data(chart, project_uuid)
+        await update.chart_data(chart_id, chart_data)
+        chart.data = chart_data
 
     return chart
 
@@ -91,9 +91,9 @@ async def get_charts_for_projects(project_uuids: list[str], request: Request):
     charts = await select.charts_for_projects(project_uuids)
     for c in charts:
         if c.data is None:
-            chart_output = await calculate_chart_data(c, c.project_uuid)
-            await update.chart_data(c.id, chart_output)
-            c.data = chart_output
+            chart_data = await calculate_chart_data(c, c.project_uuid)
+            await update.chart_data(c.id, chart_data)
+            c.data = chart_data
     return charts
 
 

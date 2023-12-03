@@ -8,13 +8,15 @@
 
 <div class="w-full">
 	<h3 class="text-lg font-semibold">{chart.name}</h3>
-	<div>
-		<svelte:component
-			this={chartMap[chart.type]}
-			{chart}
-			{width}
-			data={JSON.parse(chart.data || '{}')}
-			height={chart.type == ChartType.RADAR ? 600 : 400}
-		/>
-	</div>
+	{#if chart.data}
+		<div>
+			<svelte:component
+				this={chartMap[chart.type]}
+				{chart}
+				{width}
+				data={JSON.parse(chart.data)}
+				height={chart.type == ChartType.RADAR ? 600 : 400}
+			/>
+		</div>
+	{/if}
 </div>

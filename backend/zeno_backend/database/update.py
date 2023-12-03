@@ -61,7 +61,7 @@ async def chart(chart: Chart, project: str):
         chart (Chart): the chart data to use for the update.
         project (str): the project the user is currently working with.
     """
-    chart_output = await calculate_chart_data(chart, project)
+    chart_data = await calculate_chart_data(chart, project)
 
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -74,12 +74,12 @@ async def chart(chart: Chart, project: str):
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_output,
+                    chart_data,
                     chart.id,
                 ],
             )
 
-    return chart_output
+    return chart_data
 
 
 async def chart_data(chart_id: int, data: str):
@@ -98,6 +98,23 @@ async def chart_data(chart_id: int, data: str):
                     chart_id,
                 ],
             )
+
+
+async def clear_chart_data(project_uuid: str):
+    """Set chart data from all charts for a given project to NULL.
+
+    Args:
+        project_uuid (str): the id of the project to null chart data from.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+                [
+                    project_uuid,
+                ],
+            )
+            await conn.commit()
 
 
 async def tag(tag: Tag, project: str):

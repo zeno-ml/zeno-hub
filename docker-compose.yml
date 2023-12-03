@@ -43,6 +43,7 @@ services:
       POSTGRES_PASSWORD: mypassword
     volumes:
       - ./backend/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+    # Uncomment to enable logging of every SQL statement
     # command: "-c log_statement=all"
     ports:
       # Use a different port to avoid clashes with local postgres
