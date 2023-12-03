@@ -1,43 +1,13 @@
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+-- Users 
+COPY public.users (id, name, cognito_id, api_key_hash) FROM stdin;
+1	test	d909891e-40e1-70e7-b811-604d7c353f82	1facba10b91b388560792afe71a2f840d4e7e7ed0a366c81faf0cca572fc01aa
+\.
 
-SET default_tablespace = '';
+-- Projects
+COPY public.projects (uuid, name, owner_id, view, samples_per_page, public, description, created_at, updated_at) FROM stdin;
+f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	t		2023-11-21 18:40:29.449311	2023-11-21 18:40:29.449311
+\.
 
-SET default_table_access_method = heap;
-
---
--- Name: charts; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.charts (
-    id integer NOT NULL,
-    project_uuid text NOT NULL,
-    name text NOT NULL,
-    type text NOT NULL,
-    parameters text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE public.charts OWNER TO myuser;
-ALTER TABLE public.charts ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.charts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274; Type: TABLE; Schema: public; Owner: myuser
---
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" (
     "cd8b6e6a-02b4-45fb-b615-e374af2929f1" text,
     "40e1c98e-426d-456c-ac4c-63fefd2fa7ea" text,
@@ -69,9 +39,6 @@ CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" (
 );
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" OWNER TO myuser;
 
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_column_map; Type: TABLE; Schema: public; Owner: myuser
---
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" (
     column_id text NOT NULL,
     name text NOT NULL,
@@ -82,9 +49,6 @@ CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" (
 );
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" OWNER TO myuser;
 
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints; Type: TABLE; Schema: public; Owner: myuser
---
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" (
     id integer NOT NULL,
     tag_id integer NOT NULL,
@@ -100,338 +64,6 @@ ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" ALTER 
     CACHE 1
 );
 
---
--- Name: folders; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.folders (
-    id integer NOT NULL,
-    project_uuid text NOT NULL,
-    name text NOT NULL
-);
-ALTER TABLE public.folders OWNER TO myuser;
-ALTER TABLE public.folders ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.folders_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: metrics; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.metrics (
-    id integer NOT NULL,
-    project_uuid text NOT NULL,
-    name text NOT NULL,
-    type text NOT NULL,
-    columns text[] NOT NULL
-);
-ALTER TABLE public.metrics OWNER TO myuser;
-ALTER TABLE public.metrics ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.metrics_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: organization_project; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.organization_project (
-    id integer NOT NULL,
-    organization_id integer NOT NULL,
-    project_uuid text NOT NULL,
-    editor boolean DEFAULT false NOT NULL
-);
-ALTER TABLE public.organization_project OWNER TO myuser;
-ALTER TABLE public.organization_project ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.organization_project_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: organization_report; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.organization_report (
-    id integer NOT NULL,
-    organization_id integer NOT NULL,
-    report_id integer NOT NULL,
-    editor boolean DEFAULT false NOT NULL
-);
-ALTER TABLE public.organization_report OWNER TO myuser;
-ALTER TABLE public.organization_report ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.organization_report_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: organizations; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.organizations (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-ALTER TABLE public.organizations OWNER TO myuser;
-ALTER TABLE public.organizations ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.organizations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: project_like; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.project_like (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    project_uuid text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE public.project_like OWNER TO myuser;
-ALTER TABLE public.project_like ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.project_like_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: projects; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.projects (
-    uuid text NOT NULL,
-    name text NOT NULL,
-    owner_id integer NOT NULL,
-    view text NOT NULL,
-    samples_per_page integer DEFAULT 30 NOT NULL,
-    public boolean DEFAULT false NOT NULL,
-    description text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE public.projects OWNER TO myuser;
-
---
--- Name: report_elements; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.report_elements (
-    id integer NOT NULL,
-    report_id integer NOT NULL,
-    type text NOT NULL,
-    data text,
-    "position" integer NOT NULL
-);
-ALTER TABLE public.report_elements OWNER TO myuser;
-ALTER TABLE public.report_elements ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.report_elements_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: report_like; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.report_like (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    report_id integer NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE public.report_like OWNER TO myuser;
-ALTER TABLE public.report_like ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.report_like_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: report_project; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.report_project (
-    id integer NOT NULL,
-    report_id integer NOT NULL,
-    project_uuid text NOT NULL
-);
-ALTER TABLE public.report_project OWNER TO myuser;
-ALTER TABLE public.report_project ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.report_project_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: reports; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.reports (
-    id integer NOT NULL,
-    name text NOT NULL,
-    owner_id integer NOT NULL,
-    public boolean DEFAULT false NOT NULL,
-    description text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-ALTER TABLE public.reports OWNER TO myuser;
-ALTER TABLE public.reports ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.reports_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: slices; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.slices (
-    id integer NOT NULL,
-    name text NOT NULL,
-    folder_id integer,
-    filter text,
-    project_uuid text NOT NULL
-);
-ALTER TABLE public.slices OWNER TO myuser;
-ALTER TABLE public.slices ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.slices_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.tags (
-    id integer NOT NULL,
-    name text NOT NULL,
-    folder_id integer,
-    project_uuid text NOT NULL
-);
-ALTER TABLE public.tags OWNER TO myuser;
-ALTER TABLE public.tags ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.tags_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: user_organization; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.user_organization (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    organization_id integer NOT NULL,
-    admin boolean DEFAULT false NOT NULL
-);
-ALTER TABLE public.user_organization OWNER TO myuser;
-ALTER TABLE public.user_organization ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.user_organization_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: user_project; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.user_project (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    project_uuid text NOT NULL,
-    editor boolean DEFAULT false NOT NULL
-);
-ALTER TABLE public.user_project OWNER TO myuser;
-ALTER TABLE public.user_project ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.user_project_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: user_report; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.user_report (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    report_id integer NOT NULL,
-    editor boolean DEFAULT false NOT NULL
-);
-ALTER TABLE public.user_report OWNER TO myuser;
-ALTER TABLE public.user_report ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.user_report_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: myuser
---
-CREATE TABLE public.users (
-    id integer NOT NULL,
-    name text NOT NULL,
-    cognito_id text,
-    api_key_hash text
-);
-ALTER TABLE public.users OWNER TO myuser;
-ALTER TABLE public.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public.users_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
-);
-
---
--- Data for Name: charts; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.charts (id, project_uuid, name, type, parameters, created_at, updated_at) FROM stdin;
-1	f93ccc54-f701-4da8-b816-696e166f3274	Bar Chart	BAR	{"slices": [-1], "metric": 1, "models": ["ChatGPT five-shot", "ChatGPT zero-shot", "GPT4 five-shot", "NLLB MOE"], "color_channel": "MODELS", "x_channel": "SLICES"}	2023-11-22 02:07:11.925495	2023-11-22 02:07:19.314338
-\.
-
---
--- Data for Name: f93ccc54-f701-4da8-b816-696e166f3274; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public."f93ccc54-f701-4da8-b816-696e166f3274" ("cd8b6e6a-02b4-45fb-b615-e374af2929f1", "40e1c98e-426d-456c-ac4c-63fefd2fa7ea", "ae0a815d-8056-4fd7-b23b-7dff6349f1d7", "b66e1bab-3f82-4b80-b3b8-6227edcbfa72", "73abd558-9130-46ef-9a3e-f3880a843f54", "31da8a49-1bc4-433c-a020-3e339fe73db6", "6b98e9f5-700f-4496-b29d-e99bf0583bf9", "753af311-c305-4fff-9af7-ed1d11b87e3e", "32e663eb-3f50-49c4-aed3-68fcd41e4362", "7c513417-3c4d-4202-b197-9000e5a0d631", "234c424a-5b2d-4857-8474-88a339f422da", "a592b153-5e8c-4c4e-9c50-3845346fdc2c", "7c1f7666-ade7-4f8a-a08a-524ce694ade1", "4f355cf9-fefb-4c5d-8fe6-7b83747668af", "afbf0571-995d-4fb6-bccd-22746e8165ab", "554a5469-3fcc-4d69-b2e7-368f5c8ae415", "3d07fb4b-e083-455c-a2d7-2576bf9e9828", "41098de7-32af-439a-aac1-7927c164d256", "1523d495-b06b-4d77-911d-b68f0706d0b4", "4326db70-c1c4-4360-adf4-d2fb6d32f746", "fe4764f8-e605-4549-81e4-9e4fceb98b2b", "6929515e-ab3e-4e95-92ca-2ca8470977a0", "66a426e3-51a0-4d78-bf36-ac9efa6dd7ed", "b3ca5727-598f-4084-b12b-f23e33920f69", "65a69902-0abf-4591-87c2-0c6e577fb134", "b608d4b9-ab1b-496b-a540-d2ace315b253", "754de41d-bc29-4a91-a803-8638bb679ee9") FROM stdin;
 Water is spilling over the levee in a section 100 feet wide.	Mvura iri kurasikira kumahombekombe kunzvimbo yakafara mafiti 100.	sna_Latn	17288	60	66	Latn	Mvura iri kuyerera ichidarika dhamu racho muchikamu chakareba mamita 100.	29.498274219505795	73	1	1.106060606060606	Mvura yakasvika pamusoro pezviri 100 zviri kumusha.	23.818279892225917	51	1	0.7727272727272727	Mvura inorwadza pachigaro chekudzvanyirirwa chisarudzo chekugadzirwa 100 mutoro.	20.193358594528075	80	1	1.2121212121212122	Mvura iri kumhanya kubva pamadhibhizi pamunhu unewe 100 mafuti.	28.109558571213668	63	1	0.9545454545454546
 The find also grants insight into the evolution of feathers in birds.	Lolokutfolakele kuniketa kucondza kwekushintjashintja kwetimphiko tetinyoni.	ssw_Latn	10149	69	76	Latn	Lokutfolakele kuphindze kusente sicondze indlela tinsiba tetinyoni letakheka ngayo.	41.590475756606985	83	1	1.0921052631578947	Kutsi kufikelela kutsi kungaba yini emvakokwenyuka kwemabele kwezintfombi emacici.	23.025029625777783	82	1	1.0789473684210527	Le findi yiya kunguqula kutsi kutsi kungakatsi kwezintswane ezintswaneni zematsatsi.	19.153043390192963	84	2	1.105263157894737	Lokutsatfola lokunye kuvumela ukwati lokubona kutsi tintfo tetinyoni tikhuphuke kanjani.	33.12838255225255	88	1	1.1578947368421053
@@ -463,9 +95,6 @@ Lions are the most social cats, living in large groups called prides.	الأسو
 All I say to people is you treat us the way we treat you.	हम लोगन से एही कह ही कि तू हमनीं से ओइसने व्यवहार कर जइसन हमनीं तोरा लोगन से करो हय।	mag_Deva	6335	57	84	Deva	हम सब लोग से कहऽ हियो कि जैसन हम तोरा साथ व्यवहार करबो, ओयसन तूँ हमरा साथ व्यवहार करहो।	26.29890950086872	87	1	1.0357142857142858	मैं लोगन के सबके लई बोलौ हौं तुम हमके जैसे तुम हमके बर्ताव करेंगे, वैसे हम तुमके बर्ताव करेंगे।	13.4207301839389	95	1	1.130952380952381	मैं लोगों कहता हूँ कि आप हमें वैसा ही सम्मान करें जैसा हम आपका करते हैं।	12.927658192839356	72	1	0.8571428571428571	हमरा सब कहबा लगी लोगन से छई कि ऊ हमरा एगो तरह से व्यवहार करो जेसे हम ऊ के साथ करो छी।	28.888706285475696	85	1	1.0119047619047619
 \.
 
---
--- Data for Name: f93ccc54-f701-4da8-b816-696e166f3274_column_map; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" (column_id, name, type, model, data_type, histogram) FROM stdin;
 753af311-c305-4fff-9af7-ed1d11b87e3e	prediction	OUTPUT	NLLB MOE	NOMINAL	\N
 32e663eb-3f50-49c4-aed3-68fcd41e4362	chrf	FEATURE	NLLB MOE	CONTINUOUS	\N
@@ -496,24 +125,12 @@ fe4764f8-e605-4549-81e4-9e4fceb98b2b	max repeated words	FEATURE	ChatGPT zero-sho
 ae0a815d-8056-4fd7-b23b-7dff6349f1d7	trg_lang	FEATURE	\N	NOMINAL	[{"size": null, "bucket": "lim_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "mag_Deva", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "fra_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ajp_Arab", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "hau_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "tpi_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "sna_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ibo_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "kmr_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "war_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ckb_Arab", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "pbt_Arab", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "tam_Taml", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ron_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "gle_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ssw_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "ukr_Cyrl", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "acm_Arab", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "lvs_Latn", "metric": null, "bucket_end": null, "filtered_size": null}, {"size": null, "bucket": "kat_Geor", "metric": null, "bucket_end": null, "filtered_size": null}]
 \.
 
---
--- Data for Name: f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" (id, tag_id, data_id) FROM stdin;
 1	1	15186
 2	1	10126
 3	1	18105
 \.
 
---
--- Data for Name: folders; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.folders (id, project_uuid, name) FROM stdin;
-\.
-
---
--- Data for Name: metrics; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public.metrics (id, project_uuid, name, type, columns) FROM stdin;
 1	f93ccc54-f701-4da8-b816-696e166f3274	chrf	mean	{chrf}
 2	f93ccc54-f701-4da8-b816-696e166f3274	avg source length	mean	{"source length"}
@@ -521,40 +138,23 @@ COPY public.metrics (id, project_uuid, name, type, columns) FROM stdin;
 4	f93ccc54-f701-4da8-b816-696e166f3274	avg length ratio	mean	{"length ratio"}
 \.
 
---
--- Data for Name: organization_project; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.organization_project (id, organization_id, project_uuid, editor) FROM stdin;
+COPY public.slices (id, name, folder_id, filter, project_uuid) FROM stdin;
+1	short latin	\N	{"predicates": [{"predicates": [{"column": {"id": "31da8a49-1bc4-433c-a020-3e339fe73db6", "name": "label length", "column_type": "FEATURE", "data_type": "CONTINUOUS", "model": null}, "operation": "LTE", "value": "70", "join": " "}], "join": " "}, {"predicates": [{"column": {"id": "6b98e9f5-700f-4496-b29d-e99bf0583bf9", "name": "language script", "column_type": "FEATURE", "data_type": "NOMINAL", "model": null}, "operation": "EQUAL", "value": "Latn", "join": " "}], "join": "AND"}], "join": " "}	f93ccc54-f701-4da8-b816-696e166f3274
 \.
 
---
--- Data for Name: organization_report; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.organization_report (id, organization_id, report_id, editor) FROM stdin;
+COPY public.tags (id, name, folder_id, project_uuid) FROM stdin;
+1	random tag	\N	f93ccc54-f701-4da8-b816-696e166f3274
 \.
 
---
--- Data for Name: organizations; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.organizations (id, name) FROM stdin;
+COPY public.charts (id, project_uuid, name, type, parameters, created_at, updated_at) FROM stdin;
+1	f93ccc54-f701-4da8-b816-696e166f3274	Bar Chart	BAR	{"slices": [-1], "metric": 1, "models": ["ChatGPT five-shot", "ChatGPT zero-shot", "GPT4 five-shot", "NLLB MOE"], "color_channel": "MODELS", "x_channel": "SLICES"}	2023-11-22 02:07:11.925495	2023-11-22 02:07:19.314338
 \.
 
---
--- Data for Name: project_like; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.project_like (id, user_id, project_uuid, created_at) FROM stdin;
+-- Reports
+COPY public.reports (id, name, owner_id, public, description, created_at, updated_at) FROM stdin;
+1	Translation Report	1	f		2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
 \.
 
---
--- Data for Name: projects; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.projects (uuid, name, owner_id, view, samples_per_page, public, description, created_at, updated_at) FROM stdin;
-f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	t		2023-11-21 18:40:29.449311	2023-11-21 18:40:29.449311
-\.
-
---
--- Data for Name: report_elements; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;
 4	1	TEXT	Here is my new report.	0
 3	1	SLICE	{"sliceId":1,"modelName":"GPT4 five-shot"}	1
@@ -562,381 +162,11 @@ COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;
 2	1	TAG	{"tagId":1,"modelName":"ChatGPT five-shot"}	2
 \.
 
---
--- Data for Name: report_like; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.report_like (id, user_id, report_id, created_at) FROM stdin;
-\.
-
---
--- Data for Name: report_project; Type: TABLE DATA; Schema: public; Owner: myuser
---
 COPY public.report_project (id, report_id, project_uuid) FROM stdin;
 1	1	f93ccc54-f701-4da8-b816-696e166f3274
 \.
 
---
--- Data for Name: reports; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.reports (id, name, owner_id, public, description, created_at, updated_at) FROM stdin;
-1	Translation Report	1	f		2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
-\.
-
---
--- Data for Name: slices; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.slices (id, name, folder_id, filter, project_uuid) FROM stdin;
-1	short latin	\N	{"predicates": [{"predicates": [{"column": {"id": "31da8a49-1bc4-433c-a020-3e339fe73db6", "name": "label length", "column_type": "FEATURE", "data_type": "CONTINUOUS", "model": null}, "operation": "LTE", "value": "70", "join": " "}], "join": " "}, {"predicates": [{"column": {"id": "6b98e9f5-700f-4496-b29d-e99bf0583bf9", "name": "language script", "column_type": "FEATURE", "data_type": "NOMINAL", "model": null}, "operation": "EQUAL", "value": "Latn", "join": " "}], "join": "AND"}], "join": " "}	f93ccc54-f701-4da8-b816-696e166f3274
-\.
-
---
--- Data for Name: tags; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.tags (id, name, folder_id, project_uuid) FROM stdin;
-1	random tag	\N	f93ccc54-f701-4da8-b816-696e166f3274
-\.
-
---
--- Data for Name: user_organization; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.user_organization (id, user_id, organization_id, admin) FROM stdin;
-\.
-
---
--- Data for Name: user_project; Type: TABLE DATA; Schema: public; Owner: myuser
---
+-- Access
 COPY public.user_project (id, user_id, project_uuid, editor) FROM stdin;
 1	1	f93ccc54-f701-4da8-b816-696e166f3274	t
 \.
-
---
--- Data for Name: user_report; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.user_report (id, user_id, report_id, editor) FROM stdin;
-\.
-
-
---
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: myuser
---
-COPY public.users (id, name, cognito_id, api_key_hash) FROM stdin;
-1	test	d909891e-40e1-70e7-b811-604d7c353f82	1facba10b91b388560792afe71a2f840d4e7e7ed0a366c81faf0cca572fc01aa
-\.
-
---
--- Name: charts charts_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.charts
-    ADD CONSTRAINT charts_pkey PRIMARY KEY (id);
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_column_map f93ccc54-f701-4da8-b816-696e166f3274_column_map_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public."f93ccc54-f701-4da8-b816-696e166f3274_column_map"
-    ADD CONSTRAINT "f93ccc54-f701-4da8-b816-696e166f3274_column_map_pkey" PRIMARY KEY (column_id);
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274 f93ccc54-f701-4da8-b816-696e166f3274_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public."f93ccc54-f701-4da8-b816-696e166f3274"
-    ADD CONSTRAINT "f93ccc54-f701-4da8-b816-696e166f3274_pkey" PRIMARY KEY ("b66e1bab-3f82-4b80-b3b8-6227edcbfa72");
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints"
-    ADD CONSTRAINT "f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints_pkey" PRIMARY KEY (id);
-
---
--- Name: folders folders_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.folders
-    ADD CONSTRAINT folders_pkey PRIMARY KEY (id);
-
---
--- Name: metrics metrics_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.metrics
-    ADD CONSTRAINT metrics_pkey PRIMARY KEY (id);
-
---
--- Name: organization_project organization_project_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_project
-    ADD CONSTRAINT organization_project_pkey PRIMARY KEY (id);
-
---
--- Name: organization_report organization_report_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_report
-    ADD CONSTRAINT organization_report_pkey PRIMARY KEY (id);
-
---
--- Name: organizations organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organizations
-    ADD CONSTRAINT organizations_pkey PRIMARY KEY (id);
-
---
--- Name: project_like project_like_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.project_like
-    ADD CONSTRAINT project_like_pkey PRIMARY KEY (id);
-
---
--- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT projects_pkey PRIMARY KEY (uuid);
-
---
--- Name: report_elements report_elements_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_elements
-    ADD CONSTRAINT report_elements_pkey PRIMARY KEY (id);
-
---
--- Name: report_like report_like_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_like
-    ADD CONSTRAINT report_like_pkey PRIMARY KEY (id);
-
---
--- Name: report_project report_project_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_project
-    ADD CONSTRAINT report_project_pkey PRIMARY KEY (id);
-
---
--- Name: reports reports_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.reports
-    ADD CONSTRAINT reports_pkey PRIMARY KEY (id);
-
---
--- Name: slices slices_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.slices
-    ADD CONSTRAINT slices_pkey PRIMARY KEY (id);
-
---
--- Name: tags tags_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
-
---
--- Name: user_organization user_organization_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_organization
-    ADD CONSTRAINT user_organization_pkey PRIMARY KEY (id);
-
---
--- Name: user_project user_project_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_project
-    ADD CONSTRAINT user_project_pkey PRIMARY KEY (id);
-
---
--- Name: user_report user_report_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_report
-    ADD CONSTRAINT user_report_pkey PRIMARY KEY (id);
-
---
--- Name: users users_api_key_hash_key; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_api_key_hash_key UNIQUE (api_key_hash);
-
---
--- Name: users users_cognito_id_key; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_cognito_id_key UNIQUE (cognito_id);
-
---
--- Name: users users_name_key; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_name_key UNIQUE (name);
-
---
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.users
-    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-
---
--- Name: charts charts_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.charts
-    ADD CONSTRAINT charts_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoin_data_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints"
-    ADD CONSTRAINT "f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoin_data_id_fkey" FOREIGN KEY (data_id) REFERENCES public."f93ccc54-f701-4da8-b816-696e166f3274"("b66e1bab-3f82-4b80-b3b8-6227edcbfa72") ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoint_tag_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints"
-    ADD CONSTRAINT "f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoint_tag_id_fkey" FOREIGN KEY (tag_id) REFERENCES public.tags(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: folders folders_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.folders
-    ADD CONSTRAINT folders_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON DELETE CASCADE;
-
---
--- Name: metrics metrics_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.metrics
-    ADD CONSTRAINT metrics_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: organization_project organization_project_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_project
-    ADD CONSTRAINT organization_project_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: organization_project organization_project_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_project
-    ADD CONSTRAINT organization_project_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: organization_report organization_report_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_report
-    ADD CONSTRAINT organization_report_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: organization_report organization_report_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.organization_report
-    ADD CONSTRAINT organization_report_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: project_like project_like_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.project_like
-    ADD CONSTRAINT project_like_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: project_like project_like_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.project_like
-    ADD CONSTRAINT project_like_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: projects projects_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT projects_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: report_elements report_elements_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_elements
-    ADD CONSTRAINT report_elements_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: report_like report_like_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_like
-    ADD CONSTRAINT report_like_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: report_like report_like_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_like
-    ADD CONSTRAINT report_like_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: report_project report_project_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_project
-    ADD CONSTRAINT report_project_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: report_project report_project_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.report_project
-    ADD CONSTRAINT report_project_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: reports reports_owner_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.reports
-    ADD CONSTRAINT reports_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: slices slices_folder_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.slices
-    ADD CONSTRAINT slices_folder_id_fkey FOREIGN KEY (folder_id) REFERENCES public.folders(id) ON UPDATE CASCADE ON DELETE SET NULL;
-
---
--- Name: slices slices_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.slices
-    ADD CONSTRAINT slices_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: tags tags_folder_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT tags_folder_id_fkey FOREIGN KEY (folder_id) REFERENCES public.folders(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: tags tags_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.tags
-    ADD CONSTRAINT tags_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_organization user_organization_organization_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_organization
-    ADD CONSTRAINT user_organization_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES public.organizations(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_organization user_organization_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_organization
-    ADD CONSTRAINT user_organization_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_project user_project_project_uuid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_project
-    ADD CONSTRAINT user_project_project_uuid_fkey FOREIGN KEY (project_uuid) REFERENCES public.projects(uuid) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_project user_project_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_project
-    ADD CONSTRAINT user_project_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_report user_report_report_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_report
-    ADD CONSTRAINT user_report_report_id_fkey FOREIGN KEY (report_id) REFERENCES public.reports(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- Name: user_report user_report_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: myuser
---
-ALTER TABLE ONLY public.user_report
-    ADD CONSTRAINT user_report_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
---
--- PostgreSQL database dump complete
---
-
-CREATE COLLATION public.numeric (provider = icu, locale = 'en-u-kn-true');

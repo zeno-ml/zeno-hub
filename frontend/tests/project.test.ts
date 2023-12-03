@@ -35,6 +35,6 @@ test('can filter by tag', async ({ page }) => {
 	await page.getByText('random tag').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toContainText(
-		'He built a WiFi door bell, he said.'
+		"It's worth half an hour to stroll about the intriguing village."
 	);
 });
