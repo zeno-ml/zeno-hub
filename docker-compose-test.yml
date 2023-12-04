@@ -3,21 +3,24 @@ name: zeno-test
 services:
   frontend:
     container_name: zeno-frontend-test
-    env_file:
-      - ./frontend/.env.test
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
     ports:
       - "5173:5173"
+    environment:
+      HUB_USERNAME: ${HUB_USERNAME}
+      HUB_PASSWORD: ${HUB_PASSWORD}
+      ZENO_USER_POOL_AUTH_REGION: ${ZENO_USER_POOL_AUTH_REGION}
+      ZENO_USER_POOL_CLIENT_ID: ${ZENO_USER_POOL_CLIENT_ID}
+      ZENO_USER_POOL_ID: ${ZENO_USER_POOL_ID}
+      PUBLIC_BACKEND_ENDPOINT: http://zeno-backend-test:8000
     command: npm run preview -- --port 5173 --host 0.0.0.0
   backend:
     container_name: zeno-backend-test
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    env_file:
-      - ./frontend/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -30,6 +33,9 @@ services:
       DB_NAME: zeno
       DB_USER: myuser
       DB_PASSWORD: mypassword
+      ZENO_USER_POOL_AUTH_REGION: ${ZENO_USER_POOL_AUTH_REGION}
+      ZENO_USER_POOL_CLIENT_ID: ${ZENO_USER_POOL_CLIENT_ID}
+      ZENO_USER_POOL_ID: ${ZENO_USER_POOL_ID}
     command: poetry run uvicorn --factory zeno_backend.server:get_server --host 0.0.0.0 --timeout-keep-alive 75
   postgres:
     container_name: zeno-postgres-test

@@ -73,8 +73,6 @@ We are using playwright to test Zeno full-stack.
 To spin up a dummy database, server, and frontend, there is a separate test `docker compose` file that can be used to run tests.
 You should stop your dev docker containers to prevent port clashes.
 
-You will need to slightly change your `.env` file.
-Use `PUBLIC_BACKEND_ENDPOINT = "http://zeno-backend-test:8000"` for the public backend endpoint, and set the `HUB_USERNAME` and `HUB_PASSWORD` for the test account.
-You can get these variables from someone on the Zeno team.
+`docker compose -f docker-compose-test.yml --env-file frontend/.env up -d`
 
-Then, you can either run playwrite from the frontend using `npm run test` or use the playwright vscode extension which gives you some more debugging options.
+Then, you can either run playwright from the frontend using `npm run test` or use the playwright vscode extension which gives you some more debugging options.
