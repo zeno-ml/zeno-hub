@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import CopyProjectPopup from '$lib/components/popups/CopyProjectPopup.svelte';
 	import { clickOutside } from '$lib/util/clickOutside';
@@ -33,7 +32,6 @@
 	const report = 'id' in entry ? (entry as Report) : null;
 	const projectStats = 'uuid' in entry ? (stats as ProjectStats) : null;
 	const reportStats = 'id' in entry ? (stats as ReportStats) : null;
-	const exploreTab = $page.route.id === '/(app)/home';
 
 	let showOptions = false;
 	let hovering = false;
@@ -108,7 +106,7 @@
 						showOptions = false;
 					}}
 				>
-					{#if hovering && (project || (project && !exploreTab) || (report && !exploreTab && user?.name === entry.ownerName))}
+					{#if hovering && ((project && user) || (report && user?.name === entry.ownerName))}
 						<button
 							class="rounded-md hover:bg-primary-mid"
 							on:click={(e) => {
