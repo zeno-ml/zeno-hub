@@ -11,7 +11,6 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
-from zeno_backend.classes.homepage import HomeRequest
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
@@ -112,7 +111,7 @@ async def get_projects(current_user=Depends(util.auth.claim())):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("User not logged in"),
         )
-    return await select.projects(user, HomeRequest())
+    return await select.projects(user)
 
 
 @router.post("/like-project/{project_uuid}", tags=["zeno"])

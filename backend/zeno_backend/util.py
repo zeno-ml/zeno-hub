@@ -6,7 +6,6 @@ from fastapi import HTTPException, Request, status
 from fastapi_cloudauth.cognito import Cognito
 
 from zeno_backend import util
-from zeno_backend.classes.homepage import HomeRequest
 from zeno_backend.classes.user import User
 from zeno_backend.database import select
 
@@ -63,9 +62,7 @@ async def project_access_valid(project: str | None, request: Request):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unauthorized",
             )
-        available_project_ids = map(
-            lambda x: x.uuid, await select.projects(user, HomeRequest())
-        )
+        available_project_ids = [x.uuid for x in await select.projects(user)]
         if project not in available_project_ids:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -90,10 +87,9 @@ async def project_editor(project_uuid: str, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
         )
-    available_project_ids = map(
-        lambda x: x.uuid,
-        filter(lambda y: y.editor, await select.projects(user, HomeRequest())),
-    )
+    available_project_ids = [
+        project.uuid for project in await select.projects(user) if project.editor
+    ]
     if project_uuid not in available_project_ids:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -119,9 +115,7 @@ async def report_access_valid(report: int, request: Request):
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Unauthorized",
             )
-        available_report_ids = map(
-            lambda x: x.id, await select.reports(user, HomeRequest())
-        )
+        available_report_ids = [x.id for x in await select.reports(user)]
         if report not in available_report_ids:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -146,10 +140,9 @@ async def report_editor(report_id: int, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
         )
-    available_report_ids = map(
-        lambda x: x.id,
-        filter(lambda y: y.editor, await select.reports(user, HomeRequest())),
-    )
+    available_report_ids = [
+        report.id for report in await select.reports(user) if report.editor
+    ]
     if report_id not in available_report_ids:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -176,6 +169,6 @@ async def get_user_from_token(request: Request) -> User | None:
             os.environ["ZENO_USER_POOL_ID"],
             os.environ["ZENO_USER_POOL_CLIENT_ID"],
         )
-        return await select.user((user_dict["username"]))
+        return await select.user(user_dict["username"])
     except cognitojwt.CognitoJWTException:
         return None

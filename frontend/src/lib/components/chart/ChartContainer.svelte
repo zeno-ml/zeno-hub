@@ -15,6 +15,8 @@
 		{/if}
 	</div>
 	<div>
-		<slot />
+		{#if !loading}
+			<slot />
+		{/if}
 	</div>
 </div>
