@@ -48,7 +48,7 @@ jobs:
       ZENO_USER_POOL_AUTH_REGION: ${{ secrets.ZENO_USER_POOL_AUTH_REGION }}
       ZENO_USER_POOL_CLIENT_ID: ${{ secrets.ZENO_USER_POOL_CLIENT_ID }}
       ZENO_USER_POOL_ID: ${{ secrets.ZENO_USER_POOL_ID }}
-      HUB_USERNAME: ${{ secrets.HUB_USERNAME }}
+      HUB_USERNAME: test
       HUB_PASSWORD: ${{ secrets.HUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
