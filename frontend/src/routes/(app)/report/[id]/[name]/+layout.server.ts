@@ -2,7 +2,9 @@ import { getClientAndUser } from '$lib/api/client';
 import type { ApiError, ReportResponse } from '$lib/zenoapi';
 import { error, redirect } from '@sveltejs/kit';
 
-export async function load({ cookies, params, url }) {
+export async function load({ cookies, params, url, depends }) {
+	depends('app:report');
+
 	const { zenoClient, cognitoUser } = await getClientAndUser(cookies, url);
 
 	let reportResponse: ReportResponse;
@@ -32,6 +34,11 @@ export async function load({ cookies, params, url }) {
 			);
 		}
 	}
+	const [charts, slices, tags] = await Promise.all([
+		zenoClient.getChartsForProjects(reportResponse.report.linkedProjects),
+		zenoClient.getSlicesForProjects(reportResponse.report.linkedProjects),
+		zenoClient.getTagsForProjects(reportResponse.report.linkedProjects)
+	]);
 
 	if (reportResponse.report.name !== decodeURI(params.name)) {
 		throw redirect(
@@ -43,6 +50,9 @@ export async function load({ cookies, params, url }) {
 	return {
 		report: reportResponse.report,
 		reportElements: reportResponse.reportElements,
+		charts,
+		slices,
+		tags,
 		cognitoUser: cognitoUser,
 		numLikes: reportResponse.numLikes,
 		userLiked: reportResponse.userLiked

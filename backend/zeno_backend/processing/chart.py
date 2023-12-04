@@ -346,7 +346,7 @@ async def heatmap_data(chart: Chart, project: str) -> str:
     return json.dumps({"table": elements})
 
 
-async def chart_data(chart: Chart, project: str) -> str:
+async def calculate_chart_data(chart: Chart, project: str) -> str:
     """Extract the chart data for a specific chart that the user created.
 
     Args:

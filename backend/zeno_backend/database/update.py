@@ -14,6 +14,7 @@ from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.select import user as get_user
+from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def folder(folder: Folder, project: str):
@@ -60,19 +61,60 @@ async def chart(chart: Chart, project: str):
         chart (Chart): the chart data to use for the update.
         project (str): the project the user is currently working with.
     """
+    chart_data = await calculate_chart_data(chart, project)
+
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "UPDATE charts SET project_uuid = %s, name = %s, type = %s, "
-                "parameters = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
+                "parameters = %s, data = %s, updated_at = CURRENT_TIMESTAMP "
+                "WHERE id = %s;",
                 [
                     project,
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
+                    chart_data,
                     chart.id,
                 ],
             )
+
+    return chart_data
+
+
+async def chart_data(chart_id: int, data: str):
+    """Add chart data to chart entry.
+
+    Args:
+        chart_id (int): the chart id.
+        data (str): the chart data to use for the update.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE charts SET data = %s WHERE id = %s;",
+                [
+                    data,
+                    chart_id,
+                ],
+            )
+
+
+async def clear_chart_data(project_uuid: str):
+    """Set chart data from all charts for a given project to NULL.
+
+    Args:
+        project_uuid (str): the id of the project to null chart data from.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+                [
+                    project_uuid,
+                ],
+            )
+            await conn.commit()
 
 
 async def tag(tag: Tag, project: str):
@@ -275,6 +317,14 @@ async def project_metrics(project_config: Project):
                         "DELETE FROM metrics WHERE project_uuid = %s AND id = %s;",
                         [project_config.uuid, metric.id],
                     )
+                    # also reset chart data since definition changed
+                    await cur.execute(
+                        "UPDATE charts SET data = NULL WHERE project_uuid = %s;",
+                        [
+                            project_config.uuid,
+                        ],
+                    )
+
                 # if there is a match, we don't have to add the metric
                 else:
                     new_metrics.pop(index)

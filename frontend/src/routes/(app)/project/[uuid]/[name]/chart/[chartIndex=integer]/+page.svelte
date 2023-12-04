@@ -9,16 +9,16 @@
 	import { project } from '$lib/stores';
 	import { chartMap } from '$lib/util/charts';
 	import type { Chart, ZenoService } from '$lib/zenoapi';
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 
 	export let data;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
+	let mounted = false;
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
-	let chartData: { table: Record<string, unknown> } | undefined = data.chartData;
-
+	let chartData = chart.data ? JSON.parse(chart.data) : undefined;
 	let updatingData = false;
 
 	$: updateEditUrl(isChartEdit);
@@ -38,15 +38,20 @@
 
 	function updateChart(chart: Chart) {
 		updatingData = true;
-		if ($project && $project.editor && browser) {
-			zenoClient.updateChart($project.uuid, chart).then(() =>
-				zenoClient.getChartData($project.uuid, chart.id).then((d) => {
-					chartData = JSON.parse(d);
-					updatingData = false;
-				})
-			);
+		if (mounted && $project && $project.editor && browser) {
+			zenoClient.updateChart($project.uuid, chart).then((d) => {
+				chartData = JSON.parse(d);
+				updatingData = false;
+			});
+		} else {
+			updatingData = false;
 		}
 	}
+
+	// Prevent calling updateChart on mount
+	onMount(() => {
+		mounted = true;
+	});
 </script>
 
 <div class={`flex w-full overflow-hidden ${isChartEdit ? 'flex-row' : 'flex-col'}`}>
