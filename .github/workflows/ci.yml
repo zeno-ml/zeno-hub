@@ -71,7 +71,7 @@ jobs:
       - name: Run Playwright tests
         run: |
           cd frontend
-          npx playwright test
+          HUB_PASSWORD=$HUB_PASSWORD HUB_USERNAME=test npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
