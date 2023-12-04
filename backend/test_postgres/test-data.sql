@@ -126,9 +126,9 @@ ae0a815d-8056-4fd7-b23b-7dff6349f1d7	trg_lang	FEATURE	\N	NOMINAL	[{"size": null,
 \.
 
 COPY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" (id, tag_id, data_id) FROM stdin;
-1	1	15186
-2	1	10126
-3	1	18105
+1	1	7678
+2	1	7189
+3	1	6335
 \.
 
 COPY public.metrics (id, project_uuid, name, type, columns) FROM stdin;
@@ -157,9 +157,9 @@ COPY public.reports (id, name, owner_id, public, description, created_at, update
 
 COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;
 4	1	TEXT	Here is my new report.	0
-3	1	SLICE	{"sliceId":1,"modelName":"GPT4 five-shot"}	1
+3	1	SLICE	{"sliceId":1,"systemName":"GPT4 five-shot"}	1
 1	1	CHART	1	3
-2	1	TAG	{"tagId":1,"modelName":"ChatGPT five-shot"}	2
+2	1	TAG	{"tagId":1,"systemName":"ChatGPT five-shot"}	2
 \.
 
 COPY public.report_project (id, report_id, project_uuid) FROM stdin;

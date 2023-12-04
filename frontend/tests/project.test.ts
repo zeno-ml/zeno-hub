@@ -27,7 +27,7 @@ test('can filter by slice', async ({ page }) => {
 	await page.getByText('short latin').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toContainText(
-		'Water is spilling over the levee in a section 100 feet wide.'
+		"That didn't seem to make sense to me; it certainly wasn't fair."
 	);
 });
 
@@ -35,6 +35,6 @@ test('can filter by tag', async ({ page }) => {
 	await page.getByText('random tag').click();
 	const grid = await page.locator('.grid').first();
 	await expect(grid.getByRole('button').first()).toContainText(
-		"It's worth half an hour to stroll about the intriguing village."
+		'All I say to people is you treat us the way we treat you.'
 	);
 });
