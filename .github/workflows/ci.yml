@@ -44,18 +44,20 @@ jobs:
 
   test-integration:
     runs-on: ubuntu-latest
+    env:
+      ZENO_USER_POOL_AUTH_REGION: ${{ secrets.ZENO_USER_POOL_AUTH_REGION}}
+      ZENO_USER_POOL_CLIENT_ID: ${{ secrets.ZENO_USER_POOL_CLIENT_ID}}
+      ZENO_USER_POOL_ID: ${{ secrets.ZENO_USER_POOL_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-      - name: Set up secrets
-        run: echo "${{ secrets.ZENO_HUB_ENV }}" > frontend/.env
       - name: Install node
         run: |
           cd frontend
           npm ci
       - name: Set up docker containers
         run: |
-          docker compose -f ./docker-compose-test.yml --env-file frontend/.env up -d
+          docker compose -f ./docker-compose-test.yml up -d
       - name: Install Playwright Browsers
         run: |
           cd frontend
