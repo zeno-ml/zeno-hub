@@ -44,10 +44,10 @@
 			const chartId = chartOptions[0].id;
 			data = `${chartId}`;
 		} else if (e.detail.label === ReportElementType.SLICE) {
-			sliceElementSpec = { sliceId: sliceOptions[0].id, modelName: null };
+			sliceElementSpec = { sliceId: sliceOptions[0].id, systemName: null };
 			data = JSON.stringify(sliceElementSpec);
 		} else if (e.detail.label === ReportElementType.TAG) {
-			tagElementSpec = { tagId: tagOptions[0].id, modelName: null };
+			tagElementSpec = { tagId: tagOptions[0].id, systemName: null };
 			data = JSON.stringify(tagElementSpec);
 		} else if (e.detail.label === ReportElementType.TEXT) {
 			data = '';

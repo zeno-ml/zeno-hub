@@ -98,14 +98,14 @@ class SliceElementSpec(CamelModel):
     """Specification for slice element in a Zeno report."""
 
     slice_id: int
-    model_name: str | None = None
+    system_name: str | None = None
 
 
 class TagElementSpec(CamelModel):
     """Specification for tag element in a Zeno report."""
 
     tag_id: int
-    model_name: str | None = None
+    system_name: str | None = None
 
 
 class SliceElementOptions(CamelModel):
@@ -118,7 +118,7 @@ class SliceElementOptions(CamelModel):
         id_column (str): name of the column containing the instance id.
         data_column (str | None): name of the column containing the instance data.
         label_column (str | None): name of the column containing the instance label.
-        model_column (str | None): name of the column containing the instance model.
+        system_column (str | None): name of the column containing the instance model.
     """
 
     project: Project
@@ -127,7 +127,7 @@ class SliceElementOptions(CamelModel):
     id_column: str
     data_column: str | None = None
     label_column: str | None = None
-    model_column: str | None = None
+    system_column: str | None = None
 
 
 class TagElementOptions(CamelModel):
@@ -140,7 +140,7 @@ class TagElementOptions(CamelModel):
         id_column (str): name of the column containing the instance id.
         data_column (str | None): name of the column containing the instance data.
         label_column (str | None): name of the column containing the instance label.
-        model_column (str | None): name of the column containing the instance model.
+        system_column (str | None): name of the column containing the instance model.
     """
 
     project: Project
@@ -149,4 +149,4 @@ class TagElementOptions(CamelModel):
     id_column: str
     data_column: str | None = None
     label_column: str | None = None
-    model_column: str | None = None
+    system_column: str | None = None
