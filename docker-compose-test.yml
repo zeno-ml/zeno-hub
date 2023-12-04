@@ -5,13 +5,10 @@ services:
     container_name: zeno-frontend-test
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules/
+      dockerfile: Dockerfile.prod
     ports:
       - "5173:5173"
-    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    command: npm run preview -- --port 5173 --host 0.0.0.0
   backend:
     container_name: zeno-backend-test
     build:
@@ -35,14 +32,14 @@ services:
   postgres:
     container_name: zeno-postgres-test
     build:
-      context: ./backend/test_postgres
+      context: ./db
       dockerfile: Dockerfile
     environment:
       POSTGRES_DB: zeno
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
     volumes:
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       # Use a different port to avoid clashes with local postgres
       - "5431:5432"

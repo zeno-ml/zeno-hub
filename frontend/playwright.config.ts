@@ -1,7 +1,7 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: './.env' });
+dotenv.config({ path: '.env' });
 
 const config: PlaywrightTestConfig = {
 	reporter: 'html',
