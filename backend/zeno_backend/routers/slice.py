@@ -233,5 +233,11 @@ async def delete_slice(project_uuid: str, slice_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await update.clear_chart_data(project_uuid)
-    await delete.slice(slice_id)
+    slice = await select.slice_by_id(slice_id)
+    if slice.project_uuid == project_uuid:
+        await delete.slice(slice_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )

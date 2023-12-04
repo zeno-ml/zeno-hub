@@ -125,4 +125,11 @@ async def delete_tag(project_uuid: str, tag_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.tag(tag_id)
+    tag = await select.tag_by_id(tag_id)
+    if tag.project_uuid == project_uuid:
+        await delete.tag(tag_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )

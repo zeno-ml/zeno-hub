@@ -170,4 +170,11 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.chart(chart_id)
+    chart = await select.chart(project_uuid, chart_id)
+    if chart is not None:
+        await delete.chart(chart_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
+        )
