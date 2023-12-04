@@ -42,7 +42,7 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
     volumes:
-      - ./backend/test-data.sql:/docker-entrypoint-initdb.d/test-data.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       # Use a different port to avoid clashes with local postgres
       - "5431:5432"
