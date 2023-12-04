@@ -3,6 +3,8 @@ name: zeno-test
 services:
   frontend:
     container_name: zeno-frontend-test
+    env_file:
+      - ./frontend/.env.test
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
