@@ -40,7 +40,7 @@ All the TypeScript classes that refer to server functionality used in the fronte
 
 ## Development Installation
 
-The recommended way to locally develop is to use `Docker` and `docker-compose`. We still recommend you install the frontend and backend locally to enable linting and testing.
+The recommended way to locally develop is to use `Docker` and `docker compose`. We still recommend you install the frontend and backend locally to enable linting and testing.
 
 1. We recommend you use [`VSCode`](https://code.visualstudio.com/) as your editor.
 2. Install [`Docker`](https://docs.docker.com/get-docker/), [`npm`](https://www.npmjs.com/get-npm), and [`poetry`](https://python-poetry.org/docs/#installation).
@@ -49,7 +49,7 @@ The recommended way to locally develop is to use `Docker` and `docker-compose`. 
 5. Configure Poetry to make local virtualenv with `poetry config virtualenvs.in-project true`. You can select this as the Python interpreter in VSCode.
 6. Install the backend with `poetry install` in the `backend/` directory.
 7. We suggest you install the VSCode extensions as specified in `.vscode/extensions.json`.
-8. Run `docker-compose up -d` in the root directory to start the backend and frontend servers.
+8. Run `docker compose up -d` in the root directory to start the backend and frontend servers.
 9. Navigate to `localhost:5173` to start using Zeno. Any changes you make to the frontend or backend code will be live-reloaded.
 
 ## Making a release
@@ -66,3 +66,13 @@ To do so, you need to have the following environment variables set:
 - AWS_REGION: The region you're building in
 - DOCKER_USERNAME: A username for docker to pull docker images
 - DOCKER_PASSWORD: The password for the username
+
+## Running Tests
+
+We are using playwright to test Zeno full-stack.
+To spin up a dummy database, server, and frontend, there is a separate test `docker compose` file that can be used to run tests.
+You should stop your dev docker containers to prevent port clashes.
+
+`docker compose -f docker-compose-test.yml --env-file frontend/.env up -d`
+
+Then, you can either run playwright from the frontend using `npm run test` or use the playwright vscode extension which gives you some more debugging options.
