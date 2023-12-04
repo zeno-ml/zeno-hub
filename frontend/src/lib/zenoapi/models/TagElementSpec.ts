@@ -8,5 +8,5 @@
  */
 export type TagElementSpec = {
 	tagId: number;
-	modelName?: string | null;
+	systemName?: string | null;
 };

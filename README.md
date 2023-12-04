@@ -9,6 +9,13 @@
 [Zeno Hub](https://hub.zenoml.com) is an interactive AI evaluation platform.
 With Zeno, you can go from exploring your data and model outputs to creating rich visualizations and reports. Learn more about Zeno at [zenoml.com](https://zenoml.com)
 
+## Self-Hosting
+
+We recommend you use the [hosted version of Zeno](https://hub.zenoml.com), but you can run Zeno locally with `docker-compose`:
+
+1. [Send us an email](hello@zenoml.com) to get the environment variables to put in `/frontend/.env`
+2. Run `docker-compose up -d`
+
 ## Development
 
 Zeno Hub consists of three Docker containers:

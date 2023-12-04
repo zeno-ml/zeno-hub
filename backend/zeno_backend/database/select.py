@@ -1876,14 +1876,14 @@ async def table_data_paginated(
 
 
 async def slice_element_options(
-    slice: Slice, project_uuid: str, model_name: str | None
+    slice: Slice, project_uuid: str, system_name: str | None
 ) -> SliceElementOptions | None:
     """Get options to render slice element in reports.
 
     Args:
         slice (Slice): the slice to get report options for.
         project_uuid (str): the project the user is currently working with.
-        model_name (str | None): the model name to get slice options for.
+        system_name (str | None): the system name to get slice options for.
 
 
     Returns:
@@ -1903,7 +1903,7 @@ async def slice_element_options(
 
             filter = await table_filter(
                 project_uuid,
-                model_name,
+                system_name,
                 filter_predicates=FilterPredicateGroup(
                     predicates=slice.filter_predicates.predicates,
                     join=Join.OMITTED,
@@ -1925,14 +1925,14 @@ async def slice_element_options(
                 sql.SQL(
                     "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
                 ).format(sql.Identifier(f"{project_uuid}_column_map")),
-                [model_name],
+                [system_name],
             )
             column_names = await cur.fetchall()
 
     id_column = ""
     data_column = None
     label_column = None
-    model_column = None
+    system_column = None
     for col_id, col_type in column_names:
         if col_type == ZenoColumnType.ID:
             id_column = col_id
@@ -1941,7 +1941,7 @@ async def slice_element_options(
         elif col_type == ZenoColumnType.LABEL:
             label_column = col_id
         elif col_type == ZenoColumnType.OUTPUT:
-            model_column = col_id
+            system_column = col_id
 
     return SliceElementOptions(
         slice_name=slice.slice_name,
@@ -1949,7 +1949,7 @@ async def slice_element_options(
         id_column=id_column,
         data_column=data_column,
         label_column=label_column,
-        model_column=model_column,
+        system_column=system_column,
         project=Project(
             uuid=project[0][0],
             name=project[0][1],
@@ -1964,14 +1964,14 @@ async def slice_element_options(
 
 
 async def tag_element_options(
-    tag: Tag, project_uuid: str, model_name: str | None
+    tag: Tag, project_uuid: str, system_name: str | None
 ) -> TagElementOptions:
     """Get options to render tag element in reports.
 
     Args:
         tag (Tag): the tag to get report options for.
         project_uuid (str): the project the user is currently working with.
-        model_name (str | None): the model name to get tag options for.
+        system_name (str | None): the system name to get tag options for.
 
     Returns:
         TagElementOptions | None: options for the tag element.
@@ -2005,7 +2005,7 @@ async def tag_element_options(
 
             filter = await table_filter(
                 project_uuid,
-                model_name,
+                system_name,
                 data_ids=[tag_id[0] for tag_id in tag_ids],
             )
 
@@ -2024,14 +2024,14 @@ async def tag_element_options(
                 sql.SQL(
                     "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
                 ).format(sql.Identifier(f"{project_uuid}_column_map")),
-                [model_name],
+                [system_name],
             )
             column_names = await cur.fetchall()
 
     id_column = ""
     data_column = None
     label_column = None
-    model_column = None
+    system_column = None
     for col_id, col_type in column_names:
         if col_type == ZenoColumnType.ID:
             id_column = col_id
@@ -2040,7 +2040,7 @@ async def tag_element_options(
         elif col_type == ZenoColumnType.LABEL:
             label_column = col_id
         elif col_type == ZenoColumnType.OUTPUT:
-            model_column = col_id
+            system_column = col_id
 
     return TagElementOptions(
         tag_name=tag.tag_name,
@@ -2048,7 +2048,7 @@ async def tag_element_options(
         id_column=id_column,
         data_column=data_column,
         label_column=label_column,
-        model_column=model_column,
+        system_column=system_column,
         project=Project(
             uuid=project[0][0],
             name=project[0][1],

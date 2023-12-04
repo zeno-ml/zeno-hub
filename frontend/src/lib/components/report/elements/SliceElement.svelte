@@ -28,7 +28,7 @@
 		zenoClient
 			.getSliceTable({
 				sliceId: sliceElementSpec.sliceId,
-				model: sliceElementSpec.modelName,
+				model: sliceElementSpec.systemName,
 				offset: page * 2,
 				limit: 2
 			} as SliceTableRequest)
@@ -50,7 +50,7 @@
 
 	function encodeParams() {
 		const params = {
-			model: sliceElementSpec?.modelName,
+			model: sliceElementSpec?.systemName,
 			metric: undefined,
 			comparisonModel: undefined,
 			comparisonColumn: undefined,
@@ -67,9 +67,9 @@
 		<div class="mb-2 flex items-center">
 			<h3 class="text-lg">
 				Slice <span class="font-semibold">{sliceElementOptions.sliceName} </span>
-				{#if sliceElementSpec.modelName}
+				{#if sliceElementSpec.systemName}
 					model
-					<span class="font-semibold">{sliceElementSpec.modelName}</span>
+					<span class="font-semibold">{sliceElementSpec.systemName}</span>
 				{/if}
 			</h3>
 			<Button
@@ -107,7 +107,7 @@
 							<InstanceView
 								view={sliceElementOptions.project.view}
 								dataColumn={sliceElementOptions.dataColumn}
-								modelColumn={sliceElementOptions.modelColumn}
+								systemColumn={sliceElementOptions.systemColumn}
 								labelColumn={sliceElementOptions.labelColumn}
 								entry={inst}
 							/>

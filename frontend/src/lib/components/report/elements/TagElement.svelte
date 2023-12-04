@@ -29,7 +29,7 @@
 		zenoClient
 			.getTagTable({
 				tagId: tagElementSpec.tagId,
-				model: tagElementSpec.modelName,
+				model: tagElementSpec.systemName,
 				offset: page * 2,
 				limit: 2
 			} as TagTableRequest)
@@ -48,7 +48,7 @@
 
 	function encodeParams() {
 		const params = {
-			model: tagElementSpec?.modelName,
+			model: tagElementSpec?.systemName,
 			metric: undefined,
 			comparisonModel: undefined,
 			comparisonColumn: undefined,
@@ -65,9 +65,9 @@
 		<div class="mb-2 flex items-center">
 			<h3 class="text-lg">
 				Tag <span class="font-semibold">{tagElementOptions.tagName} </span>
-				{#if tagElementSpec.modelName}
+				{#if tagElementSpec.systemName}
 					model
-					<span class="font-semibold">{tagElementSpec.modelName}</span>
+					<span class="font-semibold">{tagElementSpec.systemName}</span>
 				{/if}
 			</h3>
 			<Button
@@ -104,7 +104,7 @@
 							<InstanceView
 								view={tagElementOptions.project.view}
 								dataColumn={tagElementOptions.dataColumn}
-								modelColumn={tagElementOptions.modelColumn}
+								systemColumn={tagElementOptions.systemColumn}
 								labelColumn={tagElementOptions.labelColumn}
 								entry={inst}
 							/>

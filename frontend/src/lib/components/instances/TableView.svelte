@@ -73,7 +73,7 @@
 		$filterSelection;
 		updateTable();
 	}
-	$: modelColumn = $columns.find(
+	$: systemColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
 	)?.id;
 
@@ -165,7 +165,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each table as tableContent (`${tableContent[idColumn]}_${modelColumn}`)}
+			{#each table as tableContent (`${tableContent[idColumn]}_${systemColumn}`)}
 				<tr class="border-b border-grey-lighter">
 					<td class="border border-grey-lighter p-3 align-top">
 						{tableContent[idColumn]}
@@ -180,7 +180,7 @@
 										view={$project.view}
 										{dataColumn}
 										{labelColumn}
-										{modelColumn}
+										{systemColumn}
 										entry={tableContent}
 										selectable={$project.editor}
 									/>
