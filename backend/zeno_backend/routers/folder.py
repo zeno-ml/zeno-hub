@@ -63,7 +63,7 @@ async def add_folder(project: str, name: str, request: Request):
 
 @router.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
 async def update_folder(folder: Folder, project: str, request: Request):
-    """Updatae a folder in the database.
+    """Update a folder in the database.
 
     Args:
         folder (Folder): new folder specification.
@@ -90,6 +90,16 @@ async def delete_folder(
         request (Request): http request to get user information from.
         delete_slices (bool, optional): Whether to also delete all slices in the folder.
             Defaults to False.
+    
+    Raises:
+        HTTPException: error if folder in a different project than specified.
     """
     await util.project_editor(project_uuid, request)
-    await delete.folder(folder_id, delete_slices)
+    folder = await select.folder(folder_id)
+    if (folder.project_uuid == project_uuid):
+        await delete.folder(folder_id, delete_slices)
+    else:
+        raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Unauthorized",
+            )
