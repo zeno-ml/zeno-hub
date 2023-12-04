@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
 	reporter: 'html',
 	testDir: 'tests',
 	testMatch: /(.+\.)?(test|spec)\.[jt]s/,
-	retries: 2,
+	retries: 1,
 	use: {
 		baseURL: 'http://localhost:5173'
 	}
