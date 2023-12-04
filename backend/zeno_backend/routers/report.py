@@ -178,7 +178,7 @@ async def get_slice_element_options(
     await util.project_access_valid(project_uuid, request)
 
     return await select.slice_element_options(
-        slice, project_uuid, slice_element_spec.model_name
+        slice, project_uuid, slice_element_spec.system_name
     )
 
 
@@ -208,7 +208,7 @@ async def get_tag_element_options(tag_element_spec: TagElementSpec, request: Req
         )
     await util.project_access_valid(project_uuid, request)
     return await select.tag_element_options(
-        tag, project_uuid, tag_element_spec.model_name
+        tag, project_uuid, tag_element_spec.system_name
     )
 
 

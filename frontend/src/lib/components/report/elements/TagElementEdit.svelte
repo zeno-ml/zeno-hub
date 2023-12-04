@@ -40,7 +40,7 @@
 	function updateTagModel(e: CustomEvent) {
 		tagElementSpec = {
 			tagId: tagElementSpec.tagId,
-			modelName: e.detail.label
+			systemName: e.detail.label
 		};
 		element = { ...element, data: JSON.stringify(tagElementSpec) };
 		zenoClient.updateReportElement(reportId, {
@@ -69,7 +69,7 @@
 {#if models.length > 0}
 	<div class="mt-3" />
 	<Svelecte
-		bind:value={tagElementSpec.modelName}
+		bind:value={tagElementSpec.systemName}
 		labelAsValue={true}
 		options={models}
 		on:change={updateTagModel}

@@ -12,7 +12,7 @@
 	export let entry: Record<string, unknown>;
 	export let dataColumn: string | undefined | null;
 	export let labelColumn: string | undefined | null;
-	export let modelColumn: string | undefined | null;
+	export let systemColumn: string | undefined | null;
 	export let selectable = false;
 
 	const ajv = new Ajv();
@@ -102,13 +102,13 @@
 								: entry[labelColumn]}
 						/>
 					{/if}
-					{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
+					{#if systemColumn && entry[systemColumn] !== undefined && viewSpec.output}
 						<svelte:component
 							this={elementMap[viewSpec.output.type]}
 							spec={viewSpec.output}
-							data={typeof entry[modelColumn] === 'object'
-								? JSON.stringify(entry[modelColumn])
-								: entry[modelColumn]}
+							data={typeof entry[systemColumn] === 'object'
+								? JSON.stringify(entry[systemColumn])
+								: entry[systemColumn]}
 						/>
 					{/if}
 				</table>
@@ -136,16 +136,16 @@
 						/>
 					</div>
 				{/if}
-				{#if modelColumn && entry[modelColumn] !== undefined && viewSpec.output}
+				{#if systemColumn && entry[systemColumn] !== undefined && viewSpec.output}
 					<hr class="-mx-4 my-4 text-grey-lighter" />
 					<div class="flex {isComplexElement(viewSpec.output.type) ? 'flex-col' : 'flex-row'}">
 						<span class="pr-2 font-semibold">output: </span>
 						<svelte:component
 							this={elementMap[viewSpec.output.type]}
 							spec={viewSpec.output}
-							data={typeof entry[modelColumn] === 'object'
-								? JSON.stringify(entry[modelColumn])
-								: entry[modelColumn]}
+							data={typeof entry[systemColumn] === 'object'
+								? JSON.stringify(entry[systemColumn])
+								: entry[systemColumn]}
 						/>
 					</div>
 				{/if}
