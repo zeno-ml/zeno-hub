@@ -1,13 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { login } from './login';
 
 test.beforeEach(async ({ page }) => {
-	await page.goto('/login');
-
-	await page.getByLabel('username').fill(process.env.HUB_USERNAME || '');
-	await page.getByLabel('password').fill(process.env.HUB_PASSWORD || '');
-	await page.getByRole('button', { name: 'Login' }).click();
-
-	await page.waitForURL('/home/test');
+	await login(page);
 });
 
 test('can go to report', async ({ page }) => {
