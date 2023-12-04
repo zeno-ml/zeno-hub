@@ -108,7 +108,7 @@
 						showOptions = false;
 					}}
 				>
-					{#if hovering && (project || (project && !exploreTab) || (report && !exploreTab && user?.name === entry.ownerName))}
+					{#if hovering && ((project && user) || (report && user?.name === entry.ownerName))}
 						<button
 							class="rounded-md hover:bg-primary-mid"
 							on:click={(e) => {
