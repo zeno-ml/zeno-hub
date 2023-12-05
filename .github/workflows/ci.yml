@@ -49,9 +49,17 @@ jobs:
       ZENO_USER_POOL_CLIENT_ID: ${{ secrets.ZENO_USER_POOL_CLIENT_ID }}
       ZENO_USER_POOL_ID: ${{ secrets.ZENO_USER_POOL_ID }}
       HUB_PASSWORD: ${{ secrets.HUB_PASSWORD }}
+      HUB_API_KEY: ${{ secrets.HUB_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
+      - uses: actions/setup-python@v2
+      - name: Install Zeno Client
+        run: |
+          python -m pip install --upgrade pip
+          pip install zeno-client
+          pip install tqdm
+          pip install pytest
       - name: Install node
         run: |
           cd frontend
@@ -71,6 +79,9 @@ jobs:
         run: |
           cd frontend
           HUB_PASSWORD=$HUB_PASSWORD HUB_USERNAME=test npx playwright test
+      - name: Run client tests
+        run: |
+          HUB_API_KEY=$HUB_API_KEY pytest backend/tests/*
       - uses: actions/upload-artifact@v3
         if: always()
         with:

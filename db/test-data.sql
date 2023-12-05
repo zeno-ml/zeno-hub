@@ -1,6 +1,6 @@
 -- Users 
 COPY public.users (id, name, cognito_id, api_key_hash) FROM stdin;
-1	test	d909891e-40e1-70e7-b811-604d7c353f82	1facba10b91b388560792afe71a2f840d4e7e7ed0a366c81faf0cca572fc01aa
+1	test	d909891e-40e1-70e7-b811-604d7c353f82	26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
 \.
 
 -- Projects
