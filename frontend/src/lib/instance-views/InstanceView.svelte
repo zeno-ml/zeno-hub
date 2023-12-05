@@ -42,7 +42,7 @@
 	}
 
 	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
-	$: entryId = idColumn ? (entry[idColumn.id] as string) : '';
+	$: entryId = idColumn ? (entry[idColumn.id] as string) : null;
 
 	$: highlighted = selectable ? $selectionIds.includes(entryId) : false;
 </script>

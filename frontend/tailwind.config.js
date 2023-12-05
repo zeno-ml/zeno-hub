@@ -41,10 +41,6 @@ export default {
 		extend: {
 			gridTemplateColumns: {
 				home: 'repeat(auto-fill, minmax(275px, 1fr))'
-			},
-			minWidth: {
-				'small-instance': '400px',
-				'large-instance': '800px'
 			}
 		}
 	},
