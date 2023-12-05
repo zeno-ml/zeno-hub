@@ -62,16 +62,21 @@ async def add_folder(project: str, name: str, request: Request):
 
 
 @router.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_folder(folder: Folder, project: str, request: Request):
+async def update_folder(folder: Folder, project_uuid: str, request: Request):
     """Update a folder in the database.
 
     Args:
         folder (Folder): new folder specification.
-        project (str): project that the folder belongs to.
+        project_uuid (str): project that the folder belongs to.
         request (Request): http request to get user information from.
     """
-    await util.project_editor(project, request)
-    await update.folder(folder, project)
+    await util.project_editor(project_uuid, request)
+    if (folder.project_uuid == project_uuid):
+        await update.folder(folder, project_uuid)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
 
 
 @router.delete(
@@ -100,6 +105,5 @@ async def delete_folder(
         await delete.folder(folder_id, delete_slices)
     else:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized",
+            status_code=status.HTTP_401_UNAUTHORIZED
         )
