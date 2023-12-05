@@ -114,7 +114,10 @@ async def update_tag(project_uuid: str, tag: Tag, request: Request):
     if selected_tag.project_uuid == project_uuid:
         await update.tag(tag, project_uuid)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tag's project UUID does not match project UUID.",
+        )
 
 
 @router.delete(
@@ -133,4 +136,7 @@ async def delete_tag(project_uuid: str, tag_id: int, request: Request):
     if tag.project_uuid == project_uuid:
         await delete.tag(tag_id)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tag's project UUID does not match project UUID.",
+        )
