@@ -44,7 +44,9 @@ def get_db_pool(
         db["user"] = os.environ["DB_USER"]
         db["password"] = os.environ["DB_PASSWORD"]
 
-    pool = AsyncConnectionPool(" ".join([f"{k}={v}" for k, v in db.items()]))
+    pool = AsyncConnectionPool(
+        " ".join([f"{k}={v}" for k, v in db.items()]), min_size=8, max_size=16
+    )
     loop = asyncio.get_running_loop()
     asyncio.run_coroutine_threadsafe(pool.open(), loop)
 
