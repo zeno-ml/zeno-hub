@@ -1,6 +1,6 @@
 -- Users 
 COPY public.users (id, name, cognito_id, api_key_hash) FROM stdin;
-1	test	d909891e-40e1-70e7-b811-604d7c353f82	1facba10b91b388560792afe71a2f840d4e7e7ed0a366c81faf0cca572fc01aa
+1	test	d909891e-40e1-70e7-b811-604d7c353f82	26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
 \.
 
 -- Projects
@@ -131,12 +131,13 @@ COPY public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" (id, tag_id, 
 3	1	6335
 \.
 
-COPY public.metrics (id, project_uuid, name, type, columns) FROM stdin;
-1	f93ccc54-f701-4da8-b816-696e166f3274	chrf	mean	{chrf}
-2	f93ccc54-f701-4da8-b816-696e166f3274	avg source length	mean	{"source length"}
-3	f93ccc54-f701-4da8-b816-696e166f3274	avg max repeated words	mean	{"max repeated words"}
-4	f93ccc54-f701-4da8-b816-696e166f3274	avg length ratio	mean	{"length ratio"}
+COPY public.metrics (project_uuid, name, type, columns) FROM stdin;
+f93ccc54-f701-4da8-b816-696e166f3274	chrf	mean	{chrf}
+f93ccc54-f701-4da8-b816-696e166f3274	avg source length	mean	{"source length"}
+f93ccc54-f701-4da8-b816-696e166f3274	avg max repeated words	mean	{"max repeated words"}
+f93ccc54-f701-4da8-b816-696e166f3274	avg length ratio	mean	{"length ratio"}
 \.
+SELECT setval('public.metrics_id_seq', COALESCE((SELECT MAX(id) FROM public.metrics), 1));
 
 COPY public.slices (id, name, folder_id, filter, project_uuid) FROM stdin;
 1	short latin	\N	{"predicates": [{"predicates": [{"column": {"id": "31da8a49-1bc4-433c-a020-3e339fe73db6", "name": "label length", "column_type": "FEATURE", "data_type": "CONTINUOUS", "model": null}, "operation": "LTE", "value": "70", "join": " "}], "join": " "}, {"predicates": [{"column": {"id": "6b98e9f5-700f-4496-b29d-e99bf0583bf9", "name": "language script", "column_type": "FEATURE", "data_type": "NOMINAL", "model": null}, "operation": "EQUAL", "value": "Latn", "join": " "}], "join": "AND"}], "join": " "}	f93ccc54-f701-4da8-b816-696e166f3274
@@ -167,6 +168,7 @@ COPY public.report_project (id, report_id, project_uuid) FROM stdin;
 \.
 
 -- Access
-COPY public.user_project (id, user_id, project_uuid, editor) FROM stdin;
-1	1	f93ccc54-f701-4da8-b816-696e166f3274	t
+COPY public.user_project (user_id, project_uuid, editor) FROM stdin;
+1	f93ccc54-f701-4da8-b816-696e166f3274	t
 \.
+SELECT setval('public.user_project_id_seq', COALESCE((SELECT MAX(id) FROM public.user_project), 1));
