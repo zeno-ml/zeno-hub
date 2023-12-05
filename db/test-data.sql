@@ -171,4 +171,4 @@ COPY public.report_project (id, report_id, project_uuid) FROM stdin;
 COPY public.user_project (id, user_id, project_uuid, editor) FROM stdin;
 1	1	f93ccc54-f701-4da8-b816-696e166f3274	t
 \.
-SELECT setval('public.user_project_id_seq', COALESCE((SELECT MAX(id) FROM public.metrics), 1));
+SELECT setval('public.user_project_id_seq', COALESCE((SELECT MAX(id) FROM public.user_project), 1));
