@@ -1453,7 +1453,10 @@ async def slice(slice_id: int) -> Slice:
         slice_id (int): id of the slice to be fetched.
 
     Returns:
-        Slice | None: slice as requested by the user.
+        Slice: slice as requested by the user.
+
+    Raises:
+        HTTPException: slice could not be found.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1466,7 +1469,7 @@ async def slice(slice_id: int) -> Slice:
 
     if len(slice_result) == 0:
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Slice could not be found."
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "Slice could not be found."
         )
 
     return Slice(
@@ -1551,14 +1554,17 @@ async def folders(project: str) -> list[Folder]:
     )
 
 
-async def folder(id: int) -> Folder | None:
+async def folder(id: int) -> Folder:
     """Get a single folder by its ID.
 
     Args:
         id (int): id of the folder to be fetched.
 
     Returns:
-        Folder | None: folder as requested by the user.
+        Folder: folder as requested by the user.
+
+    Raises:
+        HTTPException: folder could not be found.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1569,14 +1575,14 @@ async def folder(id: int) -> Folder | None:
                 ],
             )
             folder_result = await cur.fetchall()
-    return (
-        Folder(
-            id=folder_result[0][0] if isinstance(folder_result[0][0], int) else 0,
-            name=str(folder_result[0][1]),
-            project_uuid=str(folder_result[0][2]),
+    if len(folder_result) == 0:
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "Folder could not be found."
         )
-        if len(folder_result) > 0
-        else None
+    return Folder(
+        id=folder_result[0][0],
+        name=folder_result[0][1],
+        project_uuid=folder_result[0][2],
     )
 
 

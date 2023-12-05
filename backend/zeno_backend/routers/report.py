@@ -341,7 +341,9 @@ async def update_report_user(report_id: int, user: User, request: Request):
     await update.report_user(report_id, user)
 
 
-@router.patch("/report-org/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
+@router.patch(
+    "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
 async def update_report_org(
     report_id: int, organization: Organization, request: Request
 ):

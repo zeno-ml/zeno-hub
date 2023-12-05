@@ -101,12 +101,12 @@ async def add_tag(
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_tag(tag: Tag, project_uuid: str, request: Request):
+async def update_tag(project_uuid: str, tag: Tag, request: Request):
     """Update a tag in the database.
 
     Args:
-        tag (Tag): updated tag.
         project_uuid (str): project to which the tag belongs.
+        tag (Tag): updated tag.
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)

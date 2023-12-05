@@ -15,7 +15,7 @@ router = APIRouter(tags=["zeno"])
     response_model=str,
     tags=["zeno"],
 )
-async def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
+async def get_filtered_table(project_uuid: str, req: TableRequest, request: Request):
     """Get the data in a project's table.
 
     Args:

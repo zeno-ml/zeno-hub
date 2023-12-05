@@ -13,35 +13,35 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/folders/{project}",
+    "/folders/{project_uuid}",
     response_model=list[Folder],
     tags=["zeno"],
 )
-async def get_folders(project: str, request: Request):
+async def get_folders(project_uuid: str, request: Request):
     """Get all folders for a specific project.
 
     Args:
-        project (str): project to get all folders for.
+        project_uuid (str): project to get all folders for.
         request (Request): http request to get user information from.
 
     Returns:
         list[Folder]: all folders for a specific project.
     """
-    await util.project_access_valid(project, request)
-    return await select.folders(project)
+    await util.project_access_valid(project_uuid, request)
+    return await select.folders(project_uuid)
 
 
 @router.post(
-    "/folder/{project}",
+    "/folder/{project_uuid}",
     response_model=int,
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def add_folder(project: str, name: str, request: Request):
+async def add_folder(project_uuid: str, name: str, request: Request):
     """Add a folder to a project.
 
     Args:
-        project (str): project to add the folder to.
+        project_uuid (str): project to add the folder to.
         name (str): name of the folder to be added.
         request (Request): http request to get user information from.
 
@@ -51,8 +51,8 @@ async def add_folder(project: str, name: str, request: Request):
     Returns:
         int: id of the newly created folder.
     """
-    await util.project_editor(project, request)
-    id = await insert.folder(project, name)
+    await util.project_editor(project_uuid, request)
+    id = await insert.folder(project_uuid, name)
     if id is None:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -61,8 +61,10 @@ async def add_folder(project: str, name: str, request: Request):
     return id
 
 
-@router.patch("/folder/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_folder(folder: Folder, project_uuid: str, request: Request):
+@router.patch(
+    "/folder/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def update_folder(project_uuid: str, folder: Folder, request: Request):
     """Update a folder in the database.
 
     Args:
@@ -75,7 +77,10 @@ async def update_folder(folder: Folder, project_uuid: str, request: Request):
     if selected_folder.project_uuid == project_uuid:
         await update.folder(folder, project_uuid)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match folder's project UUID.",
+        )
 
 
 @router.delete(
@@ -103,4 +108,7 @@ async def delete_folder(
     if folder.project_uuid == project_uuid:
         await delete.folder(folder_id, delete_slices)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match folder's project UUID.",
+        )

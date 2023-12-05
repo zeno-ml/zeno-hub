@@ -21,7 +21,7 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/charts/{owner}/{project}",
+    "/charts/{project_uuid}",
     response_model=list[Chart],
     tags=["zeno"],
 )
@@ -146,7 +146,7 @@ async def add_chart(
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def update_chart(chart: Chart, project_uuid: str, request: Request):
+async def update_chart(project_uuid: str, chart: Chart, request: Request):
     """Update a chart.
 
     Args:
@@ -159,7 +159,10 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
     if selected_chart.project_uuid == project_uuid:
         return await update.chart(chart, project_uuid)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )
 
 
 @router.delete(
@@ -178,4 +181,7 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
     if chart.project_uuid == project_uuid:
         await delete.chart(chart_id)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )

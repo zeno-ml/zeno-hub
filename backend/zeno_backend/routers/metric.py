@@ -42,12 +42,12 @@ async def get_metrics(project_uuid: str, request: Request):
     response_model=list[GroupMetric],
     tags=["zeno"],
 )
-async def get_metrics_filtered(req: MetricRequest, project_uuid: str, request: Request):
+async def get_metrics_filtered(project_uuid: str, req: MetricRequest, request: Request):
     """Get all metrics that match a metrics query.
 
     Args:
-        req (MetricRequest): request specification for the metrics to be fetched.
         project_uuid (str): UUID of the project to fetch metrics for.
+        req (MetricRequest): request specification for the metrics to be fetched.
         request (Request): http request to get user information from.
 
     Returns:
@@ -82,13 +82,13 @@ async def get_metrics_filtered(req: MetricRequest, project_uuid: str, request: R
     tags=["zeno"],
 )
 async def get_metric_for_tag(
-    metric_key: TagMetricKey, project_uuid: str, request: Request
+    project_uuid: str, metric_key: TagMetricKey, request: Request
 ):
     """Get the metric for a specific tag.
 
     Args:
-        metric_key (TagMetricKey): specification for which tag to calculate the metric.
         project_uuid (str): UUID of the project to calculate the metric for.
+        metric_key (TagMetricKey): specification for which tag to calculate the metric.
         request (Request): http request to get user information from.
 
     Returns:

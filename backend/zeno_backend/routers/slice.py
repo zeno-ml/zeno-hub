@@ -20,40 +20,40 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/slices/{project}",
+    "/slices/{project_uuid}",
     response_model=list[Slice],
     tags=["zeno"],
 )
-async def get_slices(project: str, request: Request):
+async def get_slices(project_uuid: str, request: Request):
     """Fetch all slices of a project.
 
     Args:
-        project (str): project to fetch all slices for.
+        project_uuid (str): project to fetch all slices for.
         request (Request): http request to get user information from.
 
     Returns:
         list[Slice]: requested slices.
     """
-    await util.project_access_valid(project, request)
-    return await select.slices(project)
+    await util.project_access_valid(project_uuid, request)
+    return await select.slices(project_uuid)
 
 
 @router.post(
-    "/slice-finder/{project}",
+    "/slice-finder/{project_uuid}",
     tags=["zeno"],
     response_model=SliceFinderReturn,
 )
 async def run_slice_finder(
+    project_uuid: str,
     req: SliceFinderRequest,
-    project: str,
     request: Request,
     current_user=Depends(util.auth.claim()),
 ):
     """Run slice finder to recommend slices to the user.
 
     Args:
+        project_uuid (str): project to run slice finder for.
         req (SliceFinderRequest): request to slice finder algorithm specifying params.
-        project (str): project to run slice finder for.
         request (Request): http request to get user information from.
         current_user (Any, optional): user who initiated the slice finder request.
             Defaults to Depends(util.auth.claim()).
@@ -61,15 +61,15 @@ async def run_slice_finder(
     Returns:
         SliceFinderReturn: the result of the slice finder algorithm.
     """
-    await util.project_editor(project, request)
+    await util.project_editor(project_uuid, request)
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Ran Slice Finder",
             user_id=current_user["sub"],
-            event_properties={"project_uuid": project},
+            event_properties={"project_uuid": project_uuid},
         )
     )
-    return await slice_finder(project, req)
+    return await slice_finder(project_uuid, req)
 
 
 @router.post(
@@ -95,12 +95,12 @@ async def get_slices_for_projects(req: list[str], request: Request):
 
 
 @router.post(
-    "/slice/{project}",
+    "/slice/{project_uuid}",
     response_model=int,
     tags=["zeno"],
 )
 async def add_slice(
-    project: str,
+    project_uuid: str,
     slice: Slice,
     request: Request,
     current_user=Depends(util.auth.claim()),
@@ -108,7 +108,7 @@ async def add_slice(
     """Add a slice to a project.
 
     Args:
-        project (str): project to add the slice to.
+        project_uuid (str): project to add the slice to.
         slice (Slice): slice to be added to the project.
         request (Request): http request to get user information from.
         current_user (Any, optional): User who wants to add a slice to a project.
@@ -120,13 +120,13 @@ async def add_slice(
     Returns:
         int: id of the newly added slice.
     """
-    await util.project_editor(project, request)
-    id = await insert.slice(project, slice)
+    await util.project_editor(project_uuid, request)
+    id = await insert.slice(project_uuid, slice)
     AmplitudeHandler().track(
         BaseEvent(
             event_type="Slice Created",
             user_id=current_user["sub"],
-            event_properties={"project_uuid": project},
+            event_properties={"project_uuid": project_uuid},
         )
     )
     return id
@@ -154,32 +154,29 @@ async def get_slice_instance_ids(
     """
     slice = await select.slice(slice_id)
     project_uuid = slice.project_uuid
-
     if project_uuid is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
         )
 
     await util.project_access_valid(project_uuid, request)
-
     filter_sql = await table_filter(project_uuid, model, slice.filter_predicates)
-
     return await select.slice_instance_ids(project_uuid, filter_sql, id_column)
 
 
 @router.post(
-    "/all-slices/{project}",
+    "/all-slices/{project_uuid}",
     response_model=list[int],
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
 async def add_all_slices(
-    project: str, column: ZenoColumn, request: Request, name: str | None = None
+    project_uuid: str, column: ZenoColumn, request: Request, name: str | None = None
 ):
     """Add all slices for a column's values.
 
     Args:
-        project (str): project to add the slices to.
+        project_uuid (str): project to add the slices to.
         column (ZenoColumn): column to add all slices for.
         request (Request): http request to get user information from.
         name (str | None, optional): name of the folder the slices should be added to.
@@ -191,9 +188,9 @@ async def add_all_slices(
     Returns:
         list[int]: ids of all added slices.
     """
-    await util.project_editor(project, request)
+    await util.project_editor(project_uuid, request)
     try:
-        ids = await insert.all_slices_for_column(project, column, name)
+        ids = await insert.all_slices_for_column(project_uuid, column, name)
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -207,8 +204,8 @@ async def add_all_slices(
     return ids
 
 
-@router.patch("/slice/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_slice(slice: Slice, project_uuid: str, request: Request):
+@router.patch("/slice/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
+async def update_slice(project_uuid: str, slice: Slice, request: Request):
     """Update a slice in the database.
 
     Args:
@@ -222,7 +219,10 @@ async def update_slice(slice: Slice, project_uuid: str, request: Request):
         await update.clear_chart_data(project_uuid)
         await update.slice(slice, project_uuid)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Slice UUID does not match project UUID",
+        )
 
 
 @router.delete(
@@ -242,4 +242,7 @@ async def delete_slice(project_uuid: str, slice_id: int, request: Request):
         await update.clear_chart_data(project_uuid)
         await delete.slice(slice_id)
     else:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Slice UUID does not match project UUID",
+        )
