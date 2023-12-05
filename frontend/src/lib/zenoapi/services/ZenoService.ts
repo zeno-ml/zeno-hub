@@ -257,8 +257,8 @@ export class ZenoService {
 	public getCharts(projectUuid: string): CancelablePromise<Array<Chart>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/charts/{owner}/{project}',
-			query: {
+			url: '/charts/{project_uuid}',
+			path: {
 				project_uuid: projectUuid
 			},
 			errors: {
@@ -424,21 +424,21 @@ export class ZenoService {
 	 * Get all folders for a specific project.
 	 *
 	 * Args:
-	 * project (str): project to get all folders for.
+	 * project_uuid (str): project to get all folders for.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Folder]: all folders for a specific project.
-	 * @param project
+	 * @param projectUuid
 	 * @returns Folder Successful Response
 	 * @throws ApiError
 	 */
-	public getFolders(project: string): CancelablePromise<Array<Folder>> {
+	public getFolders(projectUuid: string): CancelablePromise<Array<Folder>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/folders/{project}',
+			url: '/folders/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			errors: {
 				422: `Validation Error`
@@ -451,7 +451,7 @@ export class ZenoService {
 	 * Add a folder to a project.
 	 *
 	 * Args:
-	 * project (str): project to add the folder to.
+	 * project_uuid (str): project to add the folder to.
 	 * name (str): name of the folder to be added.
 	 * request (Request): http request to get user information from.
 	 *
@@ -460,17 +460,17 @@ export class ZenoService {
 	 *
 	 * Returns:
 	 * int: id of the newly created folder.
-	 * @param project
+	 * @param projectUuid
 	 * @param name
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public addFolder(project: string, name: string): CancelablePromise<number> {
+	public addFolder(projectUuid: string, name: string): CancelablePromise<number> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/folder/{project}',
+			url: '/folder/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			query: {
 				name: name
@@ -483,23 +483,23 @@ export class ZenoService {
 
 	/**
 	 * Update Folder
-	 * Updatae a folder in the database.
+	 * Update a folder in the database.
 	 *
 	 * Args:
 	 * folder (Folder): new folder specification.
-	 * project (str): project that the folder belongs to.
+	 * project_uuid (str): project that the folder belongs to.
 	 * request (Request): http request to get user information from.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public updateFolder(project: string, requestBody: Folder): CancelablePromise<any> {
+	public updateFolder(projectUuid: string, requestBody: Folder): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
-			url: '/folder/{project}',
+			url: '/folder/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -519,6 +519,9 @@ export class ZenoService {
 	 * request (Request): http request to get user information from.
 	 * delete_slices (bool, optional): Whether to also delete all slices in the folder.
 	 * Defaults to False.
+	 *
+	 * Raises:
+	 * HTTPException: error if folder in a different project than specified.
 	 * @param projectUuid
 	 * @param folderId
 	 * @param deleteSlices
@@ -563,8 +566,8 @@ export class ZenoService {
 	public getModels(projectUuid: string): CancelablePromise<Array<string>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/models/{project}',
-			query: {
+			url: '/models/{project_uuid}',
+			path: {
 				project_uuid: projectUuid
 			},
 			errors: {
@@ -665,26 +668,26 @@ export class ZenoService {
 	 * Select distinct string values of a column and return their short representation.
 	 *
 	 * Args:
-	 * project (str): the project for which to filter the column
+	 * project_uuid (str): the project for which to filter the column
 	 * req (StringFilterRequest): the specification of the filter operation.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[str]: the filtered string column data.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns string Successful Response
 	 * @throws ApiError
 	 */
 	public filterStringMetadata(
-		project: string,
+		projectUuid: string,
 		requestBody: StringFilterRequest
 	): CancelablePromise<Array<string>> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/string-filter/{project}',
+			url: '/string-filter/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -726,8 +729,8 @@ export class ZenoService {
 	 * Get all metrics that match a metrics query.
 	 *
 	 * Args:
-	 * req (MetricRequest): request specification for the metrics to be fetched.
 	 * project_uuid (str): UUID of the project to fetch metrics for.
+	 * req (MetricRequest): request specification for the metrics to be fetched.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
@@ -760,8 +763,8 @@ export class ZenoService {
 	 * Get the metric for a specific tag.
 	 *
 	 * Args:
-	 * metric_key (TagMetricKey): specification for which tag to calculate the metric.
 	 * project_uuid (str): UUID of the project to calculate the metric for.
+	 * metric_key (TagMetricKey): specification for which tag to calculate the metric.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
@@ -836,8 +839,8 @@ export class ZenoService {
 	public getProjectState(projectUuid: string): CancelablePromise<ProjectState> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/project-state/{uuid}',
-			query: {
+			url: '/project-state/{project_uuid}',
+			path: {
 				project_uuid: projectUuid
 			},
 			errors: {
@@ -1633,6 +1636,34 @@ export class ZenoService {
 	}
 
 	/**
+	 * Update Report Org
+	 * Update a organization's privileges for a report.
+	 *
+	 * Args:
+	 * report_id (int): the report to update user privileges for.
+	 * organization (Organization): updated organization privileges.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public updateReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'PATCH',
+			url: '/report-org/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Delete Report Org
 	 * Remove an organizations from a report.
 	 *
@@ -1650,34 +1681,6 @@ export class ZenoService {
 			method: 'DELETE',
 			url: '/report-org/{report_id}',
 			path: {
-				report_id: reportId
-			},
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Update Report Org
-	 * Update a organization's privileges for a report.
-	 *
-	 * Args:
-	 * report_id (int): the report to update user privileges for.
-	 * organization (Organization): updated organization privileges.
-	 * request (Request): http request to get user information from.
-	 * @param reportId
-	 * @param requestBody
-	 * @returns any Successful Response
-	 * @throws ApiError
-	 */
-	public updateReportOrg(reportId: number, requestBody: Organization): CancelablePromise<any> {
-		return this.httpRequest.request({
-			method: 'PATCH',
-			url: '/report-org/{project}',
-			query: {
 				report_id: reportId
 			},
 			body: requestBody,
@@ -2033,21 +2036,21 @@ export class ZenoService {
 	 * Fetch all slices of a project.
 	 *
 	 * Args:
-	 * project (str): project to fetch all slices for.
+	 * project_uuid (str): project to fetch all slices for.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * list[Slice]: requested slices.
-	 * @param project
+	 * @param projectUuid
 	 * @returns Slice Successful Response
 	 * @throws ApiError
 	 */
-	public getSlices(project: string): CancelablePromise<Array<Slice>> {
+	public getSlices(projectUuid: string): CancelablePromise<Array<Slice>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/slices/{project}',
+			url: '/slices/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			errors: {
 				422: `Validation Error`
@@ -2060,28 +2063,28 @@ export class ZenoService {
 	 * Run slice finder to recommend slices to the user.
 	 *
 	 * Args:
+	 * project_uuid (str): project to run slice finder for.
 	 * req (SliceFinderRequest): request to slice finder algorithm specifying params.
-	 * project (str): project to run slice finder for.
 	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): user who initiated the slice finder request.
 	 * Defaults to Depends(util.auth.claim()).
 	 *
 	 * Returns:
 	 * SliceFinderReturn: the result of the slice finder algorithm.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns SliceFinderReturn Successful Response
 	 * @throws ApiError
 	 */
 	public runSliceFinder(
-		project: string,
+		projectUuid: string,
 		requestBody: SliceFinderRequest
 	): CancelablePromise<SliceFinderReturn> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/slice-finder/{project}',
+			url: '/slice-finder/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -2122,7 +2125,7 @@ export class ZenoService {
 	 * Add a slice to a project.
 	 *
 	 * Args:
-	 * project (str): project to add the slice to.
+	 * project_uuid (str): project to add the slice to.
 	 * slice (Slice): slice to be added to the project.
 	 * request (Request): http request to get user information from.
 	 * current_user (Any, optional): User who wants to add a slice to a project.
@@ -2133,17 +2136,17 @@ export class ZenoService {
 	 *
 	 * Returns:
 	 * int: id of the newly added slice.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
-	public addSlice(project: string, requestBody: Slice): CancelablePromise<number> {
+	public addSlice(projectUuid: string, requestBody: Slice): CancelablePromise<number> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/slice/{project}',
+			url: '/slice/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -2169,8 +2172,8 @@ export class ZenoService {
 	public updateSlice(projectUuid: string, requestBody: Slice): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
-			url: '/slice/{project}',
-			query: {
+			url: '/slice/{project_uuid}',
+			path: {
 				project_uuid: projectUuid
 			},
 			body: requestBody,
@@ -2227,7 +2230,7 @@ export class ZenoService {
 	 * Add all slices for a column's values.
 	 *
 	 * Args:
-	 * project (str): project to add the slices to.
+	 * project_uuid (str): project to add the slices to.
 	 * column (ZenoColumn): column to add all slices for.
 	 * request (Request): http request to get user information from.
 	 * name (str | None, optional): name of the folder the slices should be added to.
@@ -2238,22 +2241,22 @@ export class ZenoService {
 	 *
 	 * Returns:
 	 * list[int]: ids of all added slices.
-	 * @param project
+	 * @param projectUuid
 	 * @param requestBody
 	 * @param name
 	 * @returns number Successful Response
 	 * @throws ApiError
 	 */
 	public addAllSlices(
-		project: string,
+		projectUuid: string,
 		requestBody: ZenoColumn,
 		name?: string | null
 	): CancelablePromise<Array<number>> {
 		return this.httpRequest.request({
 			method: 'POST',
-			url: '/all-slices/{project}',
+			url: '/all-slices/{project_uuid}',
 			path: {
-				project: project
+				project_uuid: projectUuid
 			},
 			query: {
 				name: name
@@ -2478,8 +2481,8 @@ export class ZenoService {
 	 * Update a tag in the database.
 	 *
 	 * Args:
-	 * tag (Tag): updated tag.
 	 * project_uuid (str): project to which the tag belongs.
+	 * tag (Tag): updated tag.
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody

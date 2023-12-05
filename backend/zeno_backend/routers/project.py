@@ -36,7 +36,7 @@ async def is_project_public(project_uuid: str, request: Request):
     return select.project_public(project_uuid)
 
 
-@router.get("/project-state/{uuid}", response_model=ProjectState, tags=["zeno"])
+@router.get("/project-state/{project_uuid}", response_model=ProjectState, tags=["zeno"])
 async def get_project_state(
     project_uuid: str,
     request: Request,

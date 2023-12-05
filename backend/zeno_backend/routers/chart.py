@@ -21,7 +21,7 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/charts/{owner}/{project}",
+    "/charts/{project_uuid}",
     response_model=list[Chart],
     tags=["zeno"],
 )
@@ -59,7 +59,7 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         ChartResponse: chart spec and data.
     """
     await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
+    chart = await select.chart(chart_id)
     if chart.data is None:
         chart_data = await calculate_chart_data(chart, project_uuid)
         await update.chart_data(chart_id, chart_data)
@@ -146,7 +146,7 @@ async def add_chart(
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
-async def update_chart(chart: Chart, project_uuid: str, request: Request):
+async def update_chart(project_uuid: str, chart: Chart, request: Request):
     """Update a chart.
 
     Args:
@@ -155,7 +155,14 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    return await update.chart(chart, project_uuid)
+    selected_chart = await select.chart(chart.id)
+    if selected_chart.project_uuid == project_uuid:
+        return await update.chart(chart, project_uuid)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )
 
 
 @router.delete(
@@ -170,4 +177,11 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.chart(chart_id)
+    chart = await select.chart(chart_id)
+    if chart.project_uuid == project_uuid:
+        await delete.chart(chart_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )

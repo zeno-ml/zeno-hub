@@ -101,16 +101,23 @@ async def add_tag(
 
 
 @router.patch("/tag/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_tag(tag: Tag, project_uuid: str, request: Request):
+async def update_tag(project_uuid: str, tag: Tag, request: Request):
     """Update a tag in the database.
 
     Args:
-        tag (Tag): updated tag.
         project_uuid (str): project to which the tag belongs.
+        tag (Tag): updated tag.
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await update.tag(tag, project_uuid)
+    selected_tag = await select.tag(tag.id)
+    if selected_tag.project_uuid == project_uuid:
+        await update.tag(tag, project_uuid)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tag's project UUID does not match project UUID.",
+        )
 
 
 @router.delete(
@@ -125,4 +132,11 @@ async def delete_tag(project_uuid: str, tag_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.tag(tag_id)
+    tag = await select.tag(tag_id)
+    if tag.project_uuid == project_uuid:
+        await delete.tag(tag_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tag's project UUID does not match project UUID.",
+        )
