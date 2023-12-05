@@ -43,8 +43,14 @@
 
 	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
 	$: entryId = idColumn ? (entry[idColumn.id] as string) : null;
+	$: highlighted = selectable && entryId ? $selectionIds.includes(entryId) : false;
 
-	$: highlighted = selectable ? $selectionIds.includes(entryId) : false;
+	function updateSelection() {
+		if (!entryId) return;
+		$selectionIds?.includes(entryId)
+			? selectionIds.set($selectionIds.filter((id) => id !== entryId))
+			: selectionIds.set([...$selectionIds, entryId]);
+	}
 </script>
 
 {#if JSONParseError}
@@ -73,13 +79,7 @@
 					{entryId}
 				</div>
 				{#if selectable && (hovering || $selectionIds.includes(entryId))}
-					<Checkbox
-						checked={$selectionIds.includes(entryId)}
-						on:click={() =>
-							$selectionIds?.includes(entryId)
-								? selectionIds.set($selectionIds.filter((id) => id !== entryId))
-								: selectionIds.set([...$selectionIds, entryId])}
-					/>
+					<Checkbox checked={$selectionIds.includes(entryId)} on:click={updateSelection} />
 				{/if}
 			</div>
 		{/if}
