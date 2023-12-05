@@ -7,6 +7,7 @@
 	import { browser } from '$app/environment';
 	import Help from '$lib/components/general/Help.svelte';
 	import Error from '$lib/instance-views/Error.svelte';
+	import Button from '@smui/button/src/Button.svelte';
 	import { samples } from './samples.js';
 	import { setURLParameters, type URLParams } from './util.js';
 
@@ -42,9 +43,17 @@
 </div>
 
 <div class="flex h-full w-full flex-col p-4">
-	<h1 class="mb-2 text-2xl font-bold">Zeno View Playground</h1>
+	<div class="mb-4 flex h-12 items-center">
+		<a href="/" class="shrink-0">
+			<img src="/zeno-logo.png" class="h-8" alt="diamond tesselation logo" />
+		</a>
+		<h1 class="ml-3 text-2xl font-bold">Instance View Playground</h1>
+		<div class="ml-auto mr-2">
+			<Button variant="raised" href="https://zenoml.com/docs/views/">Read the Docs</Button>
+		</div>
+	</div>
 	<div class="flex w-full items-center pb-4">
-		<h2 class="pr-4 text-xl">Examples:</h2>
+		<h2 class="pr-4 text-xl">Standard Views:</h2>
 		<div class="flex items-center overflow-x-auto">
 			{#each Object.keys(samples) as currentSample}
 				<button

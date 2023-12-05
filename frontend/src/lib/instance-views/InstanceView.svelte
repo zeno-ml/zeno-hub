@@ -42,9 +42,15 @@
 	}
 
 	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
-	$: entryId = idColumn ? (entry[idColumn.id] as string) : '';
+	$: entryId = idColumn ? (entry[idColumn.id] as string) : null;
+	$: highlighted = selectable && entryId ? $selectionIds.includes(entryId) : false;
 
-	$: highlighted = selectable ? $selectionIds.includes(entryId) : false;
+	function updateSelection() {
+		if (!entryId) return;
+		$selectionIds?.includes(entryId)
+			? selectionIds.set($selectionIds.filter((id) => id !== entryId))
+			: selectionIds.set([...$selectionIds, entryId]);
+	}
 </script>
 
 {#if JSONParseError}
@@ -67,21 +73,17 @@
 		tabindex="0"
 		role="button"
 	>
-		<div class="flex h-10 w-full items-center justify-between pl-4">
-			<div class="text-xs text-grey-light">
-				{entryId}
+		{#if entryId}
+			<div class="flex h-10 w-full items-center justify-between pl-4">
+				<div class="text-xs text-grey-darker">
+					{entryId}
+				</div>
+				{#if selectable && (hovering || $selectionIds.includes(entryId))}
+					<Checkbox checked={$selectionIds.includes(entryId)} on:click={updateSelection} />
+				{/if}
 			</div>
-			{#if selectable && (hovering || $selectionIds.includes(entryId))}
-				<Checkbox
-					checked={$selectionIds.includes(entryId)}
-					on:click={() =>
-						$selectionIds?.includes(entryId)
-							? selectionIds.set($selectionIds.filter((id) => id !== entryId))
-							: selectionIds.set([...$selectionIds, entryId])}
-				/>
-			{/if}
-		</div>
-		<div class="px-4 pb-4">
+		{/if}
+		<div class="px-4 pb-4 {!entryId ? 'pt-4' : ''}">
 			{#if viewSpec.displayType === 'table'}
 				<table class="overflow-x-auto break-words rounded border border-grey-lighter p-4">
 					{#if dataColumn && entry[dataColumn] !== undefined && viewSpec.data}
@@ -125,8 +127,8 @@
 					</div>
 				{/if}
 				{#if labelColumn && entry[labelColumn] !== undefined && viewSpec.label}
-					<div class="flex {isComplexElement(viewSpec.label.type) ? 'flex-col' : 'flex-row'} mt-2">
-						<span class="pr-2 font-semibold">label: </span>
+					<div class="mt-2 text-grey-darker">label</div>
+					<div class="flex {isComplexElement(viewSpec.label.type) ? 'flex-col' : 'flex-row'}">
 						<svelte:component
 							this={elementMap[viewSpec.label.type]}
 							spec={viewSpec.label}
@@ -137,9 +139,8 @@
 					</div>
 				{/if}
 				{#if systemColumn && entry[systemColumn] !== undefined && viewSpec.output}
-					<hr class="-mx-4 my-4 text-grey-lighter" />
+					<div class="mt-2 text-grey-darker">output</div>
 					<div class="flex {isComplexElement(viewSpec.output.type) ? 'flex-col' : 'flex-row'}">
-						<span class="pr-2 font-semibold">output: </span>
 						<svelte:component
 							this={elementMap[viewSpec.output.type]}
 							spec={viewSpec.output}

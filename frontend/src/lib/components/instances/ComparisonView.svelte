@@ -180,7 +180,7 @@
 </script>
 
 <div class="h-full w-full overflow-auto" bind:this={instanceContainer}>
-	<table class="mt-2 w-full table-fixed">
+	<table class="mt-2 w-full min-w-[1000px] table-fixed">
 		<colgroup>
 			<col style="width: 45%;" />
 			<col style="width: 45%;" />
@@ -274,32 +274,28 @@
 							<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
 							{modelValueAndDiff($model, tableContent)}
 						</p>
-						<div class="instance">
-							<InstanceView
-								view={$project.view}
-								{dataColumn}
-								{labelColumn}
-								systemColumn={modelAColumn}
-								entry={tableContent}
-								selectable={$project.editor}
-							/>
-						</div>
+						<InstanceView
+							view={$project.view}
+							{dataColumn}
+							{labelColumn}
+							systemColumn={modelAColumn}
+							entry={tableContent}
+							selectable={$project.editor}
+						/>
 					</td>
 					<td class="p-3 align-baseline">
 						<p class="mb-2">
 							<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
 							{modelValueAndDiff($comparisonModel, tableContent)}
 						</p>
-						<div class="instance">
-							<InstanceView
-								view={$project.view}
-								{dataColumn}
-								{labelColumn}
-								systemColumn={modelBColumn}
-								entry={tableContent}
-								selectable={$project.editor}
-							/>
-						</div>
+						<InstanceView
+							view={$project.view}
+							{dataColumn}
+							{labelColumn}
+							systemColumn={modelBColumn}
+							entry={tableContent}
+							selectable={$project.editor}
+						/>
 					</td>
 					{#if $model !== undefined && $comparisonModel !== undefined}
 						<td class="p-3 align-text-top"

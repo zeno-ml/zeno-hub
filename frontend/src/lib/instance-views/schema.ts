@@ -71,4 +71,5 @@ export interface ViewSchema {
 	label?: ViewUnion;
 	output?: ViewUnion;
 	displayType?: DisplayType;
+	size?: 'medium' | 'large';
 }
