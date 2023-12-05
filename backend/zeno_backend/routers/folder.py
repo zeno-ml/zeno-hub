@@ -71,7 +71,8 @@ async def update_folder(folder: Folder, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if folder.project_uuid == project_uuid:
+    selected_folder = await select.folder(folder.id)
+    if selected_folder.project_uuid == project_uuid:
         await update.folder(folder, project_uuid)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

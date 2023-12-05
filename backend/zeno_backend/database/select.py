@@ -1446,7 +1446,7 @@ async def metrics_by_id(
     return ret
 
 
-async def slice_by_id(slice_id: int) -> Slice:
+async def slice(slice_id: int) -> Slice:
     """Get a single slice by its ID.
 
     Args:
@@ -1481,7 +1481,7 @@ async def slice_by_id(slice_id: int) -> Slice:
     )
 
 
-async def tag_by_id(tag_id: int) -> Tag:
+async def tag(tag_id: int) -> Tag:
     """Get a single tag by its ID.
 
     Args:
@@ -1634,13 +1634,11 @@ async def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     )
 
 
-async def chart(project_uuid: str, chart_id: int) -> Chart:
+async def chart(chart_id: int) -> Chart:
     """Get a project chart by its ID.
 
     Args:
-        project_uuid (str): the project the user is currently working with.
         chart_id (int): the ID of the chart to be fetched.
-
 
     Returns:
         Chart | None: the requested chart.
@@ -1648,12 +1646,9 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, type, parameters, data FROM "
-                "charts WHERE id = %s AND project_uuid = %s;",
-                [
-                    chart_id,
-                    project_uuid,
-                ],
+                "SELECT id, name, type, parameters, data, project_uuid FROM "
+                "charts WHERE id = %s",
+                [chart_id],
             )
             chart_result = await cur.fetchall()
 
@@ -1667,9 +1662,9 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
         id=chart_result[0][0],
         name=chart_result[0][1],
         type=chart_result[0][2],
-        project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
         data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
+        project_uuid=chart_result[0][5],
     )
 
 

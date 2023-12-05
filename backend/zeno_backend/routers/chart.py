@@ -59,7 +59,7 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         ChartResponse: chart spec and data.
     """
     await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
+    chart = await select.chart(chart_id)
     if chart.data is None:
         chart_data = await calculate_chart_data(chart, project_uuid)
         await update.chart_data(chart_id, chart_data)
@@ -155,7 +155,8 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if chart.project_uuid == project_uuid:
+    selected_chart = await select.chart(chart.id)
+    if selected_chart.project_uuid == project_uuid:
         return await update.chart(chart, project_uuid)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
@@ -173,8 +174,8 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
-    if chart is not None:
+    chart = await select.chart(chart_id)
+    if chart.project_uuid == project_uuid:
         await delete.chart(chart_id)
     else:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

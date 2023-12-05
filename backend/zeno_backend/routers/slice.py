@@ -152,7 +152,7 @@ async def get_slice_instance_ids(
     Returns:
         list[str]: all ids of the slice.
     """
-    slice = await select.slice_by_id(slice_id)
+    slice = await select.slice(slice_id)
     project_uuid = slice.project_uuid
 
     if project_uuid is None:
@@ -217,7 +217,8 @@ async def update_slice(slice: Slice, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if slice.project_uuid == project_uuid:
+    selected_slice = await select.slice(slice.id)
+    if selected_slice.project_uuid == project_uuid:
         await update.clear_chart_data(project_uuid)
         await update.slice(slice, project_uuid)
     else:
@@ -236,7 +237,7 @@ async def delete_slice(project_uuid: str, slice_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    slice = await select.slice_by_id(slice_id)
+    slice = await select.slice(slice_id)
     if slice.project_uuid == project_uuid:
         await update.clear_chart_data(project_uuid)
         await delete.slice(slice_id)
