@@ -110,12 +110,10 @@ async def update_tag(tag: Tag, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if (tag.project_uuid == project_uuid):
+    if tag.project_uuid == project_uuid:
         await update.tag(tag, project_uuid)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 @router.delete(
@@ -134,6 +132,4 @@ async def delete_tag(project_uuid: str, tag_id: int, request: Request):
     if tag.project_uuid == project_uuid:
         await delete.tag(tag_id)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

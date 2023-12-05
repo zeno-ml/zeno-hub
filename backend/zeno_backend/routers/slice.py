@@ -221,9 +221,7 @@ async def update_slice(slice: Slice, project_uuid: str, request: Request):
         await update.clear_chart_data(project_uuid)
         await update.slice(slice, project_uuid)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 @router.delete(
@@ -243,6 +241,4 @@ async def delete_slice(project_uuid: str, slice_id: int, request: Request):
         await update.clear_chart_data(project_uuid)
         await delete.slice(slice_id)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

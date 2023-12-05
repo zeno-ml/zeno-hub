@@ -71,12 +71,10 @@ async def update_folder(folder: Folder, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if (folder.project_uuid == project_uuid):
+    if folder.project_uuid == project_uuid:
         await update.folder(folder, project_uuid)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 @router.delete(
@@ -104,6 +102,4 @@ async def delete_folder(
     if folder.project_uuid == project_uuid:
         await delete.folder(folder_id, delete_slices)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)

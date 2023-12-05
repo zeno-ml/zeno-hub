@@ -155,12 +155,10 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    if (chart.project_uuid == project_uuid):
+    if chart.project_uuid == project_uuid:
         return await update.chart(chart, project_uuid)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 @router.delete(
@@ -179,6 +177,4 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
     if chart is not None:
         await delete.chart(chart_id)
     else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
