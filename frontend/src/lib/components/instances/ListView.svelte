@@ -66,7 +66,7 @@
 		updateTable();
 	}
 
-	$: modelColumn = $columns.find(
+	$: systemColumn = $columns.find(
 		(col) => col.columnType === ZenoColumnType.OUTPUT && col.model === $model
 	)?.id;
 
@@ -117,13 +117,13 @@
 	grid-auto-rows: min-content;"
 	bind:this={listContainer}
 >
-	{#each table as inst (`${inst[idColumn]}_${modelColumn}`)}
+	{#each table as inst (`${inst[idColumn]}_${systemColumn}`)}
 		<div class="mr-2 mt-2">
 			<InstanceView
 				view={$project.view}
 				{dataColumn}
 				{labelColumn}
-				{modelColumn}
+				{systemColumn}
 				entry={inst}
 				selectable={$project.editor}
 			/>

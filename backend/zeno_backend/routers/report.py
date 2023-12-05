@@ -168,7 +168,7 @@ async def get_slice_element_options(
     Returns:
         SliceElementOptions | None: options of a report's slice element.
     """
-    slice = await select.slice_by_id(slice_element_spec.slice_id)
+    slice = await select.slice(slice_element_spec.slice_id)
     project_uuid = slice.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -178,7 +178,7 @@ async def get_slice_element_options(
     await util.project_access_valid(project_uuid, request)
 
     return await select.slice_element_options(
-        slice, project_uuid, slice_element_spec.model_name
+        slice, project_uuid, slice_element_spec.system_name
     )
 
 
@@ -200,7 +200,7 @@ async def get_tag_element_options(tag_element_spec: TagElementSpec, request: Req
     Returns:
         TagElementOptions | None: options of a report's tag element.
     """
-    tag = await select.tag_by_id(tag_element_spec.tag_id)
+    tag = await select.tag(tag_element_spec.tag_id)
     project_uuid = tag.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -208,7 +208,7 @@ async def get_tag_element_options(tag_element_spec: TagElementSpec, request: Req
         )
     await util.project_access_valid(project_uuid, request)
     return await select.tag_element_options(
-        tag, project_uuid, tag_element_spec.model_name
+        tag, project_uuid, tag_element_spec.system_name
     )
 
 
@@ -341,7 +341,9 @@ async def update_report_user(report_id: int, user: User, request: Request):
     await update.report_user(report_id, user)
 
 
-@router.patch("/report-org/{project}", tags=["zeno"], dependencies=[Depends(util.auth)])
+@router.patch(
+    "/report-org/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
 async def update_report_org(
     report_id: int, organization: Organization, request: Request
 ):

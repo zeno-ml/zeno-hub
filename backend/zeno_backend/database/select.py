@@ -120,7 +120,9 @@ async def models(project: str) -> list[str]:
     return [m[0] for m in model_results]
 
 
-async def projects(user: User, home_request: HomeRequest) -> list[Project]:
+async def projects(
+    user: User, home_request: HomeRequest = HomeRequest()
+) -> list[Project]:
     """Get all projects available to the user.
 
     Args:
@@ -265,7 +267,9 @@ async def public_projects(home_request: HomeRequest) -> list[Project]:
     return projects
 
 
-async def reports(user: User, home_request: HomeRequest) -> list[Report]:
+async def reports(
+    user: User, home_request: HomeRequest = HomeRequest()
+) -> list[Report]:
     """Get all reports available to the user.
 
     Args:
@@ -827,7 +831,7 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
         async with conn.cursor() as cur:
             await cur.execute(
                 sql.SQL(
-                    "SELECT id, name, type, parameters, project_uuid"
+                    "SELECT id, name, type, parameters, data, project_uuid"
                     " FROM charts WHERE project_uuid IN ({})"
                 ).format(sql.SQL(",").join(map(sql.Literal, project_uuids)))
             )
@@ -843,7 +847,8 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
                 name=r[1],
                 type=r[2],
                 parameters=json.loads(r[3]),
-                project_uuid=r[4],
+                data=json.dumps(r[4]) if r[4] is not None else None,
+                project_uuid=r[5],
             ),
             chart_results,
         )
@@ -1441,14 +1446,17 @@ async def metrics_by_id(
     return ret
 
 
-async def slice_by_id(slice_id: int) -> Slice:
+async def slice(slice_id: int) -> Slice:
     """Get a single slice by its ID.
 
     Args:
         slice_id (int): id of the slice to be fetched.
 
     Returns:
-        Slice | None: slice as requested by the user.
+        Slice: slice as requested by the user.
+
+    Raises:
+        HTTPException: slice could not be found.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1461,7 +1469,7 @@ async def slice_by_id(slice_id: int) -> Slice:
 
     if len(slice_result) == 0:
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Slice could not be found."
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "Slice could not be found."
         )
 
     return Slice(
@@ -1476,7 +1484,7 @@ async def slice_by_id(slice_id: int) -> Slice:
     )
 
 
-async def tag_by_id(tag_id: int) -> Tag:
+async def tag(tag_id: int) -> Tag:
     """Get a single tag by its ID.
 
     Args:
@@ -1546,14 +1554,17 @@ async def folders(project: str) -> list[Folder]:
     )
 
 
-async def folder(id: int) -> Folder | None:
+async def folder(id: int) -> Folder:
     """Get a single folder by its ID.
 
     Args:
         id (int): id of the folder to be fetched.
 
     Returns:
-        Folder | None: folder as requested by the user.
+        Folder: folder as requested by the user.
+
+    Raises:
+        HTTPException: folder could not be found.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1564,14 +1575,14 @@ async def folder(id: int) -> Folder | None:
                 ],
             )
             folder_result = await cur.fetchall()
-    return (
-        Folder(
-            id=folder_result[0][0] if isinstance(folder_result[0][0], int) else 0,
-            name=str(folder_result[0][1]),
-            project_uuid=str(folder_result[0][2]),
+    if len(folder_result) == 0:
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, "Folder could not be found."
         )
-        if len(folder_result) > 0
-        else None
+    return Folder(
+        id=folder_result[0][0],
+        name=folder_result[0][1],
+        project_uuid=folder_result[0][2],
     )
 
 
@@ -1629,13 +1640,11 @@ async def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
     )
 
 
-async def chart(project_uuid: str, chart_id: int) -> Chart:
+async def chart(chart_id: int) -> Chart:
     """Get a project chart by its ID.
 
     Args:
-        project_uuid (str): the project the user is currently working with.
         chart_id (int): the ID of the chart to be fetched.
-
 
     Returns:
         Chart | None: the requested chart.
@@ -1643,25 +1652,25 @@ async def chart(project_uuid: str, chart_id: int) -> Chart:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, type, parameters FROM "
-                "charts WHERE id = %s AND project_uuid = %s;",
-                [
-                    chart_id,
-                    project_uuid,
-                ],
+                "SELECT id, name, type, parameters, data, project_uuid FROM "
+                "charts WHERE id = %s",
+                [chart_id],
             )
             chart_result = await cur.fetchall()
 
     if len(chart_result) == 0:
         raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR, "ERROR: Chart could not be found."
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Chart could not be found.",
         )
+
     return Chart(
         id=chart_result[0][0],
         name=chart_result[0][1],
         type=chart_result[0][2],
-        project_uuid=project_uuid,
         parameters=json.loads(chart_result[0][3]),
+        data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
+        project_uuid=chart_result[0][5],
     )
 
 
@@ -1868,14 +1877,14 @@ async def table_data_paginated(
 
 
 async def slice_element_options(
-    slice: Slice, project_uuid: str, model_name: str | None
+    slice: Slice, project_uuid: str, system_name: str | None
 ) -> SliceElementOptions | None:
     """Get options to render slice element in reports.
 
     Args:
         slice (Slice): the slice to get report options for.
         project_uuid (str): the project the user is currently working with.
-        model_name (str | None): the model name to get slice options for.
+        system_name (str | None): the system name to get slice options for.
 
 
     Returns:
@@ -1895,7 +1904,7 @@ async def slice_element_options(
 
             filter = await table_filter(
                 project_uuid,
-                model_name,
+                system_name,
                 filter_predicates=FilterPredicateGroup(
                     predicates=slice.filter_predicates.predicates,
                     join=Join.OMITTED,
@@ -1917,14 +1926,14 @@ async def slice_element_options(
                 sql.SQL(
                     "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
                 ).format(sql.Identifier(f"{project_uuid}_column_map")),
-                [model_name],
+                [system_name],
             )
             column_names = await cur.fetchall()
 
     id_column = ""
     data_column = None
     label_column = None
-    model_column = None
+    system_column = None
     for col_id, col_type in column_names:
         if col_type == ZenoColumnType.ID:
             id_column = col_id
@@ -1933,7 +1942,7 @@ async def slice_element_options(
         elif col_type == ZenoColumnType.LABEL:
             label_column = col_id
         elif col_type == ZenoColumnType.OUTPUT:
-            model_column = col_id
+            system_column = col_id
 
     return SliceElementOptions(
         slice_name=slice.slice_name,
@@ -1941,7 +1950,7 @@ async def slice_element_options(
         id_column=id_column,
         data_column=data_column,
         label_column=label_column,
-        model_column=model_column,
+        system_column=system_column,
         project=Project(
             uuid=project[0][0],
             name=project[0][1],
@@ -1956,14 +1965,14 @@ async def slice_element_options(
 
 
 async def tag_element_options(
-    tag: Tag, project_uuid: str, model_name: str | None
+    tag: Tag, project_uuid: str, system_name: str | None
 ) -> TagElementOptions:
     """Get options to render tag element in reports.
 
     Args:
         tag (Tag): the tag to get report options for.
         project_uuid (str): the project the user is currently working with.
-        model_name (str | None): the model name to get tag options for.
+        system_name (str | None): the system name to get tag options for.
 
     Returns:
         TagElementOptions | None: options for the tag element.
@@ -1997,7 +2006,7 @@ async def tag_element_options(
 
             filter = await table_filter(
                 project_uuid,
-                model_name,
+                system_name,
                 data_ids=[tag_id[0] for tag_id in tag_ids],
             )
 
@@ -2016,14 +2025,14 @@ async def tag_element_options(
                 sql.SQL(
                     "SELECT column_id, type FROM {} WHERE model = %s OR model IS NULL;"
                 ).format(sql.Identifier(f"{project_uuid}_column_map")),
-                [model_name],
+                [system_name],
             )
             column_names = await cur.fetchall()
 
     id_column = ""
     data_column = None
     label_column = None
-    model_column = None
+    system_column = None
     for col_id, col_type in column_names:
         if col_type == ZenoColumnType.ID:
             id_column = col_id
@@ -2032,7 +2041,7 @@ async def tag_element_options(
         elif col_type == ZenoColumnType.LABEL:
             label_column = col_id
         elif col_type == ZenoColumnType.OUTPUT:
-            model_column = col_id
+            system_column = col_id
 
     return TagElementOptions(
         tag_name=tag.tag_name,
@@ -2040,7 +2049,7 @@ async def tag_element_options(
         id_column=id_column,
         data_column=data_column,
         label_column=label_column,
-        model_column=model_column,
+        system_column=system_column,
         project=Project(
             uuid=project[0][0],
             name=project[0][1],

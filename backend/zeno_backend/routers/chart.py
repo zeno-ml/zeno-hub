@@ -14,14 +14,14 @@ import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
 from zeno_backend.classes.amplitude import AmplitudeHandler
-from zeno_backend.classes.chart import Chart, ChartResponse
-from zeno_backend.processing.chart import chart_data
+from zeno_backend.classes.chart import Chart
+from zeno_backend.processing.chart import calculate_chart_data
 
 router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/charts/{owner}/{project}",
+    "/charts/{project_uuid}",
     response_model=list[Chart],
     tags=["zeno"],
 )
@@ -40,8 +40,8 @@ async def get_charts(project_uuid: str, request: Request):
 
 
 @router.get(
-    "/chart/{owner}/{project}/{chart_id}",
-    response_model=ChartResponse,
+    "/chart/{project}/{chart_id}",
+    response_model=Chart,
     tags=["zeno"],
 )
 async def get_chart(project_uuid: str, chart_id: int, request: Request):
@@ -59,32 +59,13 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         ChartResponse: chart spec and data.
     """
     await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
-    return ChartResponse(chart=chart, chart_data=await chart_data(chart, project_uuid))
+    chart = await select.chart(chart_id)
+    if chart.data is None:
+        chart_data = await calculate_chart_data(chart, project_uuid)
+        await update.chart_data(chart_id, chart_data)
+        chart.data = chart_data
 
-
-@router.get(
-    "/chart-data/{project_uuid}/{chart_id}",
-    response_model=str,
-    tags=["zeno"],
-)
-async def get_chart_data(project_uuid: str, chart_id: int, request: Request):
-    """Get the data for a chart.
-
-    Args:
-        project_uuid (str): UUID of the project to get a chart from.
-        chart_id (int): id of the chart to be fetched.
-        request (Request): http request to get user information from.
-
-    Raises:
-        HTTPException: error if the chart data could not be fetched.
-
-    Returns:
-        str: data for the chart in json representation.
-    """
-    await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(project_uuid, chart_id)
-    return await chart_data(chart, project_uuid)
+    return chart
 
 
 @router.post(
@@ -102,9 +83,18 @@ async def get_charts_for_projects(project_uuids: list[str], request: Request):
     Returns:
         list[Chart]: all charts for the list of projects
     """
+    if len(project_uuids) == 0:
+        return []
+
     for project_uuid in project_uuids:
         await util.project_access_valid(project_uuid, request)
-    return await select.charts_for_projects(project_uuids)
+    charts = await select.charts_for_projects(project_uuids)
+    for c in charts:
+        if c.data is None:
+            chart_data = await calculate_chart_data(c, c.project_uuid)
+            await update.chart_data(c.id, chart_data)
+            c.data = chart_data
+    return charts
 
 
 @router.post(
@@ -150,8 +140,13 @@ async def add_chart(
     return id
 
 
-@router.patch("/chart/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_chart(chart: Chart, project_uuid: str, request: Request):
+@router.patch(
+    "/chart/{project_uuid}",
+    response_model=str,
+    tags=["zeno"],
+    dependencies=[Depends(util.auth)],
+)
+async def update_chart(project_uuid: str, chart: Chart, request: Request):
     """Update a chart.
 
     Args:
@@ -160,7 +155,14 @@ async def update_chart(chart: Chart, project_uuid: str, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await update.chart(chart, project_uuid)
+    selected_chart = await select.chart(chart.id)
+    if selected_chart.project_uuid == project_uuid:
+        return await update.chart(chart, project_uuid)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )
 
 
 @router.delete(
@@ -175,4 +177,11 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
         request (Request): http request to get user information from.
     """
     await util.project_editor(project_uuid, request)
-    await delete.chart(chart_id)
+    chart = await select.chart(chart_id)
+    if chart.project_uuid == project_uuid:
+        await delete.chart(chart_id)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Project UUID does not match chart's project UUID.",
+        )

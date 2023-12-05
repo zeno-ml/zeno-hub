@@ -23,7 +23,7 @@ async def project_copy(project_uuid: str, copy_spec: ProjectCopy, user: User):
         HTTPException: something went wrong in the process of copying a project in
             the database.
     """
-    if select.project_exists(user.id, copy_spec.name) and user.name is not None:
+    if await select.project_exists(user.id, copy_spec.name) and user.name is not None:
         raise HTTPException(
             status_code=400,
             detail="Project with this name already exists.",

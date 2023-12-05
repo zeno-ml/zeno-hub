@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {
 		ReportElementType,
-		ZenoService,
 		type Chart,
 		type Report,
 		type ReportElement,
@@ -16,30 +15,19 @@
 		mdiTrashCanOutline
 	} from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import { getContext } from 'svelte';
 	import AddElementButton from './AddElementButton.svelte';
 	import Element from './Element.svelte';
 	import ElementEdit from './ElementEdit.svelte';
 
 	export let element: ReportElement;
 	export let report: Report;
-	export let selectedProjects: string[];
 	export let editId: number;
 	export let showConfirmDelete: number;
+	export let chartOptions: Chart[] = [];
+	export let sliceOptions: Slice[] = [];
+	export let tagOptions: Tag[] = [];
 	export let addElement: (elementIndex: number) => void;
 	export let swapElementPositions: (elementId: number | null | undefined, position: number) => void;
-
-	const zenoClient = getContext('zenoClient') as ZenoService;
-
-	let chartOptions: Chart[] = [];
-	let sliceOptions: Slice[] = [];
-	let tagOptions: Tag[] = [];
-
-	$: if (selectedProjects.length > 0) {
-		zenoClient.getChartsForProjects(selectedProjects).then((r) => (chartOptions = r));
-		zenoClient.getSlicesForProjects(selectedProjects).then((r) => (sliceOptions = r));
-		zenoClient.getTagsForProjects(selectedProjects).then((r) => (tagOptions = r));
-	}
 </script>
 
 <div
@@ -86,15 +74,7 @@
 	{#if editId === element.id}
 		<div class={`flex ${element.type === ReportElementType.TEXT ? 'flex-row' : 'flex-col'}`}>
 			<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-				{#await sliceOptions then sliceOptions}
-					<ElementEdit
-						bind:element
-						{chartOptions}
-						{sliceOptions}
-						{tagOptions}
-						reportId={report.id}
-					/>
-				{/await}
+				<ElementEdit bind:element {chartOptions} {sliceOptions} {tagOptions} reportId={report.id} />
 			</div>
 			<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
 				<Element {element} {chartOptions} />

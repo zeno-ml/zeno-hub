@@ -15,7 +15,7 @@ router = APIRouter(tags=["zeno"])
     response_model=str,
     tags=["zeno"],
 )
-async def get_filtered_table(req: TableRequest, project_uuid: str, request: Request):
+async def get_filtered_table(project_uuid: str, req: TableRequest, request: Request):
     """Get the data in a project's table.
 
     Args:
@@ -55,7 +55,7 @@ async def get_slice_table(slice_table_request: SliceTableRequest, request: Reque
     Returns:
         json: json representation of the requested data.
     """
-    slice = await select.slice_by_id(slice_table_request.slice_id)
+    slice = await select.slice(slice_table_request.slice_id)
     project_uuid = slice.project_uuid
     if project_uuid is None:
         raise HTTPException(
@@ -94,7 +94,7 @@ async def get_tag_table(tag_table_request: TagTableRequest, request: Request):
     Returns:
         json: json representation of the requested data.
     """
-    tag = await select.tag_by_id(tag_table_request.tag_id)
+    tag = await select.tag(tag_table_request.tag_id)
     project_uuid = tag.project_uuid
     if project_uuid is None:
         raise HTTPException(

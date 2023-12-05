@@ -32,4 +32,6 @@
 			<TagElement {element} />
 		{/if}
 	</div>
+{:else}
+	<p>ERROR: Unable to load report element.</p>
 {/if}

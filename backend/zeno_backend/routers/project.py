@@ -11,7 +11,6 @@ import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
-from zeno_backend.classes.homepage import HomeRequest
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
@@ -37,7 +36,7 @@ async def is_project_public(project_uuid: str, request: Request):
     return select.project_public(project_uuid)
 
 
-@router.get("/project-state/{uuid}", response_model=ProjectState, tags=["zeno"])
+@router.get("/project-state/{project_uuid}", response_model=ProjectState, tags=["zeno"])
 async def get_project_state(
     project_uuid: str,
     request: Request,
@@ -112,7 +111,7 @@ async def get_projects(current_user=Depends(util.auth.claim())):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=("User not logged in"),
         )
-    return await select.projects(user, HomeRequest())
+    return await select.projects(user)
 
 
 @router.post("/like-project/{project_uuid}", tags=["zeno"])

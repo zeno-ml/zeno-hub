@@ -17,7 +17,6 @@ export type { Body_upload_dataset_schema } from './models/Body_upload_dataset_sc
 export type { Body_upload_system } from './models/Body_upload_system';
 export type { Body_upload_system_schema } from './models/Body_upload_system_schema';
 export type { Chart } from './models/Chart';
-export type { ChartResponse } from './models/ChartResponse';
 export { ChartType } from './models/ChartType';
 export { EntrySort } from './models/EntrySort';
 export { EntryTypeFilter } from './models/EntryTypeFilter';

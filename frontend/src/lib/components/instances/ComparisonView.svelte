@@ -278,7 +278,7 @@
 							view={$project.view}
 							{dataColumn}
 							{labelColumn}
-							modelColumn={modelAColumn}
+							systemColumn={modelAColumn}
 							entry={tableContent}
 							selectable={$project.editor}
 						/>
@@ -292,7 +292,7 @@
 							view={$project.view}
 							{dataColumn}
 							{labelColumn}
-							modelColumn={modelBColumn}
+							systemColumn={modelBColumn}
 							entry={tableContent}
 							selectable={$project.editor}
 						/>

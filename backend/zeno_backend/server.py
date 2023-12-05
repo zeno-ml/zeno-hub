@@ -1,10 +1,11 @@
 """The FastAPI server for the Zeno backend. Provides endpoints to load data."""
 import logging
 import os
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from zeno_backend.routers import (
@@ -78,6 +79,19 @@ def get_server() -> FastAPI:
     api_app.include_router(slice.router)
     api_app.include_router(table.router)
     api_app.include_router(tag.router)
+
+    @api_app.middleware("http")
+    async def log_process_time(request: Request, call_next):
+        start_time = time.time()
+        logging.info(f"{request.method}\t {request.url.path}")
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        logging.info(
+            f"{request.method}\t {request.url.path} "
+            f"{response.status_code} {process_time:.2f}ms"
+        )
+        return response
+
     app.mount("/api", api_app)
 
     # ping server route to check if live

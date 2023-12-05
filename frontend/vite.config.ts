@@ -9,6 +9,12 @@ export default defineConfig({
 				changeOrigin: true,
 				secure: false,
 				rewrite: (path) => path.replace(/^\/dockerzeno/, '')
+			},
+			'/testdockerzeno': {
+				target: 'http://zeno-backend-test:8000',
+				changeOrigin: true,
+				secure: false,
+				rewrite: (path) => path.replace(/^\/testdockerzeno/, '')
 			}
 		},
 		fs: {

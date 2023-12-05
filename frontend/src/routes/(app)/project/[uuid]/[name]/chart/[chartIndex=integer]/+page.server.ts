@@ -1,21 +1,20 @@
 import { getClient } from '$lib/api/client';
-import type { ApiError, ChartResponse } from '$lib/zenoapi';
+import type { ApiError, Chart } from '$lib/zenoapi';
 import { error } from '@sveltejs/kit';
 
 export async function load({ params, cookies, url }) {
 	const zenoClient = await getClient(cookies, url);
 
-	let chartResult: ChartResponse;
+	let chart: Chart;
 	try {
-		chartResult = await zenoClient.getChart(parseInt(params.chartIndex), params.uuid);
+		chart = await zenoClient.getChart(parseInt(params.chartIndex), params.uuid);
 	} catch (e) {
 		const err = e as ApiError;
 		throw error(err.status, err.body.detail);
 	}
 
 	return {
-		chart: chartResult.chart,
-		chartData: JSON.parse(chartResult.chartData),
+		chart,
 		chartIndex: parseInt(params.chartIndex)
 	};
 }

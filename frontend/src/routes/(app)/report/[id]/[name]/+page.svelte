@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { invalidate } from '$app/navigation';
 	import Header from '$lib/components/general/Header.svelte';
 	import Help from '$lib/components/general/Help.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
@@ -49,6 +50,7 @@
 	function updateReportProjects(e: CustomEvent) {
 		const projectUuids = e.detail.map((p: Project) => p.uuid);
 		zenoClient.updateReportProjects(data.report.id, projectUuids);
+		invalidate('app:report');
 	}
 
 	function swapElementPositions(elementId: number | null | undefined, position: number) {
@@ -166,9 +168,11 @@
 								bind:element
 								bind:editId
 								bind:showConfirmDelete
+								chartOptions={data.charts}
+								sliceOptions={data.slices}
+								tagOptions={data.tags}
 								{swapElementPositions}
 								{addElement}
-								{selectedProjects}
 								report={data.report}
 							/>
 						</div>
@@ -177,9 +181,11 @@
 							bind:element
 							bind:editId
 							bind:showConfirmDelete
+							chartOptions={data.charts}
+							sliceOptions={data.slices}
+							tagOptions={data.tags}
 							{swapElementPositions}
 							{addElement}
-							{selectedProjects}
 							report={data.report}
 						/>
 					{/if}

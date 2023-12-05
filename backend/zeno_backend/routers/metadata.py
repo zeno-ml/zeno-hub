@@ -26,7 +26,7 @@ router = APIRouter(tags=["zeno"])
 
 
 @router.get(
-    "/models/{project}",
+    "/models/{project_uuid}",
     response_model=list[str],
     tags=["zeno"],
 )
@@ -177,22 +177,22 @@ async def calculate_histograms(
 
 
 @router.post(
-    "/string-filter/{project}",
+    "/string-filter/{project_uuid}",
     response_model=list[str],
     tags=["zeno"],
 )
 async def filter_string_metadata(
-    project: str, req: StringFilterRequest, request: Request
+    project_uuid: str, req: StringFilterRequest, request: Request
 ):
     """Select distinct string values of a column and return their short representation.
 
     Args:
-        project (str): the project for which to filter the column
+        project_uuid (str): the project for which to filter the column
         req (StringFilterRequest): the specification of the filter operation.
         request (Request): http request to get user information from.
 
     Returns:
         list[str]: the filtered string column data.
     """
-    await util.project_access_valid(project, request)
-    return await select.filtered_short_string_column_values(project, req)
+    await util.project_access_valid(project_uuid, request)
+    return await select.filtered_short_string_column_values(project_uuid, req)

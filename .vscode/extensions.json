@@ -5,6 +5,7 @@
     "ms-python.python",
     "njpwerner.autodocstring",
     "bradlc.vscode-tailwindcss",
-    "charliermarsh.ruff"
+    "charliermarsh.ruff",
+    "ms-playwright.playwright"
   ]
 }
