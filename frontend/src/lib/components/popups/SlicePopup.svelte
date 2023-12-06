@@ -217,18 +217,11 @@
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
 		<div class="flex flex-row-reverse items-center">
 			{#if checkNominalSinglePredicateNoEntry(predicateGroup)}
-				<Button
-					variant="outlined"
-					on:click={createAllSlices}
-				>
+				<Button variant="outlined" on:click={createAllSlices}>
 					{'Create Slices for all Values'}
 				</Button>
 			{:else}
-				<Button
-					variant="outlined"
-					on:click={saveSlice}
-					disabled={!isValidPredicates}
-				>
+				<Button variant="outlined" on:click={saveSlice} disabled={!isValidPredicates}>
 					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
 				</Button>
 			{/if}
