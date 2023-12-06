@@ -30,7 +30,6 @@
 	let error: string | undefined = undefined;
 
 	// Track original settings when editing.
-	let originalName = '';
 	let originalPredicates;
 
 	$: isValidPredicates = checkValidPredicates(predicateGroup.predicates);
@@ -81,7 +80,6 @@
 			sliceName = sliceToEdit.sliceName;
 			predicateGroup = sliceToEdit.filterPredicates;
 			folderId = sliceToEdit.folderId === null ? undefined : sliceToEdit.folderId;
-			originalName = sliceName;
 			// deep copy of predicate group to avoid sharing nested objects
 			originalPredicates = JSON.parse(JSON.stringify(predicateGroup));
 
