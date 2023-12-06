@@ -220,7 +220,6 @@
 				<Button
 					variant="outlined"
 					on:click={createAllSlices}
-					disabled={$slices.some((slice) => slice.sliceName === sliceName)}
 				>
 					{'Create Slices for all Values'}
 				</Button>
@@ -228,11 +227,7 @@
 				<Button
 					variant="outlined"
 					on:click={saveSlice}
-					disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
-						(sliceToEdit &&
-							originalName !== sliceName &&
-							$slices.some((slice) => slice.sliceName === sliceName)) ||
-						!isValidPredicates}
+					disabled={!isValidPredicates}
 				>
 					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
 				</Button>
@@ -240,9 +235,6 @@
 			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
 				cancel
 			</Button>
-			{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
-				<p style:margin-right="10px" style:color="red">slice already exists</p>
-			{/if}
 		</div>
 		{#if error}
 			<div class="flex flex-row-reverse items-center">

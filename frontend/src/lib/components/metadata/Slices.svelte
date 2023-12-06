@@ -61,7 +61,7 @@
 	{#each $folders as folder}
 		<FolderCell {folder} />
 	{/each}
-	{#each $slices.filter((s) => s.folderId === null || s.folderId === undefined) as s (s.sliceName)}
+	{#each $slices.filter((s) => s.folderId === null || s.folderId === undefined) as s (s.id)}
 		<SliceCell compare={$page.url.href.includes('compare')} slice={s} />
 	{/each}
 </div>

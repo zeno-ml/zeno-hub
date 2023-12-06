@@ -640,25 +640,18 @@ async def all_slices_for_column(
                     folder_id=None if folder_id is None else folder_id[0],
                 )
                 await cur.execute(
-                    sql.SQL(
-                        "SELECT id FROM slices WHERE name={} AND project_uuid={};"
-                    ).format(slice.slice_name, project)
+                    "INSERT INTO slices (name, filter, project_uuid, folder_id) "
+                    "VALUES (%s,%s,%s,%s) RETURNING id;",
+                    [
+                        slice.slice_name,
+                        json.dumps(slice.filter_predicates, cls=PredicatesEncoder),
+                        project,
+                        slice.folder_id,
+                    ],
                 )
-                exists = await cur.fetchall()
-                if len(exists) == 0:
-                    await cur.execute(
-                        "INSERT INTO slices (name, filter, project_uuid, folder_id) "
-                        "VALUES (%s,%s,%s,%s) RETURNING id;",
-                        [
-                            slice.slice_name,
-                            json.dumps(slice.filter_predicates, cls=PredicatesEncoder),
-                            project,
-                            slice.folder_id,
-                        ],
-                    )
-                    id = await cur.fetchone()
-                    if id is not None:
-                        ids.append(id[0])
+                id = await cur.fetchone()
+                if id is not None:
+                    ids.append(id[0])
     return ids
 
 
