@@ -20,7 +20,7 @@
 	<div class="flex">
 		<p class="pr-2 text-base font-semibold text-grey-dark">{likes}</p>
 		<button
-			class=" h-6 w-6 {report ? 'fill-secondary' : 'fill-primary-dark'}"
+			class=" h-6 w-6 {report ? 'fill-report' : 'fill-project'}"
 			on:mouseover={() => (hovering = true)}
 			on:mouseout={() => (hovering = false)}
 			on:focus={() => (hovering = true)}

@@ -89,15 +89,15 @@
 >
 	<div
 		class="relative flex w-full flex-col rounded-t-md text-center align-middle {project
-			? 'bg-primary-light'
-			: 'bg-secondary-light'} bg-opacity-50"
+			? 'bg-project-lighter'
+			: 'bg-report-lighter'}"
 	>
 		<div class="mt-2 flex h-9 w-full items-center justify-between px-3">
 			<div class="flex items-center justify-center">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
-					class="w-6 {report ? 'fill-secondary' : 'fill-primary-dark'}"
+					class="w-6 {report ? 'fill-report' : 'fill-project'}"
 				>
 					<path d={project ? mdiViewGridOutline : mdiFileChartOutline} />
 				</svg>
@@ -109,7 +109,7 @@
 				>
 					{#if hovering && ((project && user) || (report && user?.name === entry.ownerName))}
 						<button
-							class="rounded-md {project ? 'hover:bg-primary-light' : 'hover:bg-secondary-light'}"
+							class="rounded-md {project ? 'hover:bg-project-light' : 'hover:bg-report-light'}"
 							on:click={(e) => {
 								e.stopPropagation();
 								showOptions = !showOptions;

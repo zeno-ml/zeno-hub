@@ -36,6 +36,20 @@ export default {
 			},
 			white: {
 				DEFAULT: '#ffffff'
+			},
+			project: {
+				DEFAULT: '#5549DD',
+				dark: '#3723ff',
+				mid: '#8aa2ff',
+				light: '#b4c3ff',
+				lighter: '#E4EAFF'
+			},
+			report: {
+				DEFAULT: '#ffa800',
+				dark: '#ff8e05',
+				mid: '#ffc146',
+				light: '#ffe6b5',
+				lighter: '#fff4f4'
 			}
 		},
 		extend: {
