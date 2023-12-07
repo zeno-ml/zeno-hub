@@ -9,7 +9,7 @@
 <div class="w-full">
 	<h3 class="text-lg font-semibold">{chart.name}</h3>
 	{#if chart.data}
-		<div>
+		<div class="text-center">
 			<svelte:component
 				this={chartMap[chart.type]}
 				{chart}
