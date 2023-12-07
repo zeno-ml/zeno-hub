@@ -9,7 +9,6 @@
 	let jsonData: Record<string, View> | undefined = undefined;
 	let errorMessage: string | undefined = undefined;
 
-	$: keys = jsonData ? Object.keys(jsonData) : [];
 	$: try {
 		jsonData = JSON.parse(data);
 		errorMessage = undefined;
@@ -27,13 +26,15 @@
 	<Error type="Incorrect Data" message={errorMessage} />
 {:else}
 	<div class="flex flex-col">
-		{#each keys as key}
-			{#if spec.keys && spec.keys[key] !== undefined && spec.keys[key].type !== undefined}
+		{#each Object.keys(spec.keys) as key}
+			{#if key in jsonData}
 				<svelte:component
 					this={resolveElementType(key)}
 					spec={spec.keys[key]}
 					data={typeof jsonData[key] === 'object' ? JSON.stringify(jsonData[key]) : jsonData[key]}
 				/>
+			{:else}
+				<p class="text-error">ERROR: no data for key <b>{key}</b></p>
 			{/if}
 		{/each}
 	</div>
