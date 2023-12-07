@@ -38,11 +38,11 @@ export default {
 				DEFAULT: '#ffffff'
 			},
 			project: {
-				DEFAULT: '#5549DD',
-				dark: '#3723ff',
-				mid: '#8aa2ff',
-				light: '#b4c3ff',
-				lighter: '#E4EAFF'
+				DEFAULT: '#35a6ff',
+				dark: '#3580ff',
+				mid: '#8acbff',
+				light: '#b3deff',
+				lighter: '#e4f3ff'
 			},
 			report: {
 				DEFAULT: '#ffa800',
