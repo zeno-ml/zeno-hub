@@ -1,4 +1,5 @@
 version: "3"
+name: zeno
 services:
   frontend:
     container_name: zeno-frontend
