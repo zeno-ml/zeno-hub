@@ -99,6 +99,7 @@ async def create_project(
     """
     user = await select.user_by_api_key(api_key)
 
+    # Ensure the project view is valid
     match_instance_view(project.view)
 
     if await select.project_exists(user.id, project.name):
