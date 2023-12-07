@@ -3,7 +3,6 @@
 	import Banner from '$lib/components/general/Banner.svelte';
 	import Instances from '$lib/components/instances/Instances.svelte';
 	import MetadataPanel from '$lib/components/metadata/MetadataPanel.svelte';
-	import ProjectHeader from '$lib/components/project/ProjectHeader.svelte';
 	import Button from '@smui/button';
 
 	export let data;
@@ -33,18 +32,10 @@
 		</Banner>
 	</div>
 {:else}
-	<div class="flex h-full min-h-0 w-full min-w-0 flex-grow flex-col">
-		<ProjectHeader
-			project={data.project}
-			likes={data.numLikes}
-			liked={data.userLiked}
-			user={data.user}
-		/>
-		<div class="flex h-full min-h-0 w-full min-w-0">
-			<MetadataPanel compare={data.compare} />
-			<div class="flex w-full min-w-0 flex-col px-3">
-				<Instances compare={data.compare} />
-			</div>
+	<div class="flex h-full min-h-0 w-full min-w-0 flex-grow flex-row">
+		<MetadataPanel compare={data.compare} />
+		<div class="flex min-h-0 w-full min-w-0 flex-col px-3">
+			<Instances compare={data.compare} />
 		</div>
 	</div>
 {/if}

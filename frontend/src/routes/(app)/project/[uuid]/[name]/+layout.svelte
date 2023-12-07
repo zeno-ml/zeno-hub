@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Help from '$lib/components/general/Help.svelte';
+	import ProjectHeader from '$lib/components/project/ProjectHeader.svelte';
 	import ProjectSidebar from '$lib/components/project/ProjectSidebar.svelte';
 	import {
 		columns,
@@ -81,4 +82,12 @@
 </div>
 
 <ProjectSidebar user={data.user} />
-<slot />
+<div class="flex h-full w-full flex-col">
+	<ProjectHeader
+		project={data.project}
+		likes={data.numLikes}
+		liked={data.userLiked}
+		user={data.user}
+	/>
+	<slot />
+</div>
