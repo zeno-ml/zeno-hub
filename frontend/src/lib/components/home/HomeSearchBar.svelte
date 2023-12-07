@@ -4,10 +4,12 @@
 	import Fab from '@smui/fab';
 	import { Input } from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
+	import Spinner from '../general/Spinner.svelte';
 
 	export let searchText: string;
 	export let typeFilter: EntryTypeFilter;
 	export let sort: EntrySort;
+	export let loading = false;
 
 	let dispatch = createEventDispatcher();
 	let tempSearchText = searchText;
@@ -45,6 +47,9 @@
 		{/if}
 	</div>
 	<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
+		{#if loading}
+			<Spinner width={24} height={24} />
+		{/if}
 		<div class="ml-4 flex items-center">
 			<p class="mr-1 text-grey-dark">Filter:</p>
 			<select class="h-full px-2" bind:value={typeFilter} on:change={() => dispatch('change')}>

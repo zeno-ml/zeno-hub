@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Banner from '$lib/components/general/Banner.svelte';
-	import Spinner from '$lib/components/general/Spinner.svelte';
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import { inViewport } from '$lib/util/viewport.js';
@@ -18,6 +17,7 @@
 	let loading = false;
 
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
+		loading = true;
 		zenoClient
 			.getHomeDetails({
 				userName: data.cognitoUser.name,
@@ -28,6 +28,7 @@
 			})
 			.then((res) => {
 				entries = res;
+				loading = false;
 			});
 	}
 
@@ -61,6 +62,7 @@
 	bind:typeFilter
 	bind:searchText
 	bind:sort
+	{loading}
 	on:change={() => updateEntries(searchText, typeFilter, sort)}
 />
 <div class="mb-4 grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
@@ -83,12 +85,6 @@
 			/>
 		{/if}
 	{/each}
-	{#if loading}
-		<div class="flex h-full w-full flex-col items-center justify-center">
-			<Spinner />
-			<span class="text-grey-dark">loading more...</span>
-		</div>
-	{/if}
 </div>
 {#if entries.length === 0}
 	<Banner>
