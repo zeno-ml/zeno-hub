@@ -19,6 +19,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
 from zeno_backend.database import delete, insert, select, update
+from zeno_backend.database.util import match_instance_view
 
 # Bump only for breaking changes
 MIN_CLIENT_VERSION = "0.1.9"
@@ -97,6 +98,8 @@ async def create_project(
         api_key (str, optional): API key.
     """
     user = await select.user_by_api_key(api_key)
+
+    match_instance_view(project.view)
 
     if await select.project_exists(user.id, project.name):
         project_uuid = await select.project_uuid(user.name, project.name)
