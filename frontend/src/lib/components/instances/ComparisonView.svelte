@@ -276,10 +276,16 @@
 						</p>
 						<InstanceView
 							view={$project.view}
+							{idColumn}
 							{dataColumn}
 							{labelColumn}
 							systemColumn={modelAColumn}
 							entry={tableContent}
+							highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+							on:select={() =>
+								$selectionIds?.includes(tableContent[idColumn] + '')
+									? selectionIds.set($selectionIds.filter((id) => id !== tableContent[idColumn]))
+									: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 							selectable={$project.editor}
 						/>
 					</td>
@@ -290,10 +296,16 @@
 						</p>
 						<InstanceView
 							view={$project.view}
+							{idColumn}
 							{dataColumn}
 							{labelColumn}
 							systemColumn={modelBColumn}
 							entry={tableContent}
+							highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+							on:select={() =>
+								$selectionIds?.includes(tableContent[idColumn] + '')
+									? selectionIds.set($selectionIds.filter((id) => id !== tableContent[idColumn]))
+									: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 							selectable={$project.editor}
 						/>
 					</td>

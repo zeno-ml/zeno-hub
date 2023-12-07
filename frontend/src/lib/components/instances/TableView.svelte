@@ -178,10 +178,18 @@
 								<div class="min-w-[400px]">
 									<InstanceView
 										view={$project.view}
+										{idColumn}
 										{dataColumn}
 										{labelColumn}
 										{systemColumn}
 										entry={tableContent}
+										highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+										on:select={() =>
+											$selectionIds?.includes(tableContent[idColumn] + '')
+												? selectionIds.set(
+														$selectionIds.filter((id) => id !== tableContent[idColumn])
+												  )
+												: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 										selectable={$project.editor}
 									/>
 								</div>

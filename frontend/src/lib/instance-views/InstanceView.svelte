@@ -3,18 +3,20 @@
 	import { elementMap, isComplexElement } from '$lib/instance-views/resolve.js';
 	import type { ViewSchema } from '$lib/instance-views/schema';
 	import schema from '$lib/instance-views/schema.json';
-	import { columns, selectionIds } from '$lib/stores';
-	import { ZenoColumnType } from '$lib/zenoapi';
 	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
 	import Ajv from 'ajv';
+	import { createEventDispatcher } from 'svelte';
 
 	export let view: string;
 	export let entry: Record<string, unknown>;
+	export let idColumn: string | undefined | null;
 	export let dataColumn: string | undefined | null;
 	export let labelColumn: string | undefined | null;
 	export let systemColumn: string | undefined | null;
 	export let selectable = false;
+	export let highlighted = false;
 
+	const dispatch = createEventDispatcher();
 	const ajv = new Ajv();
 	ajv.addSchema(schema);
 	const validate = ajv.getSchema('#/definitions/ViewSchema');
@@ -27,30 +29,19 @@
 	$: try {
 		viewSpec = JSON.parse(view);
 		JSONParseError = '';
-		if (validate) {
-			if (!validate(viewSpec)) {
-				schemaValidationError = ajv.errorsText(validate.errors, {
-					dataVar: 'View Specification',
-					separator: '\n'
-				});
-			} else {
-				schemaValidationError = '';
-			}
+		if (validate && !validate(viewSpec)) {
+			schemaValidationError = ajv.errorsText(validate.errors, {
+				dataVar: 'View Specification',
+				separator: '\n'
+			});
+		} else {
+			schemaValidationError = '';
 		}
 	} catch (error) {
 		JSONParseError = error as string;
 	}
 
-	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID);
-	$: entryId = idColumn ? (entry[idColumn.id] as string) : null;
-	$: highlighted = selectable && entryId ? $selectionIds.includes(entryId) : false;
-
-	function updateSelection() {
-		if (!entryId) return;
-		$selectionIds?.includes(entryId)
-			? selectionIds.set($selectionIds.filter((id) => id !== entryId))
-			: selectionIds.set([...$selectionIds, entryId]);
-	}
+	$: entryId = idColumn ? (entry[idColumn] as string) : null;
 </script>
 
 {#if JSONParseError}
@@ -78,8 +69,8 @@
 				<div class="text-xs text-grey-darker">
 					{entryId}
 				</div>
-				{#if selectable && (hovering || $selectionIds.includes(entryId))}
-					<Checkbox checked={$selectionIds.includes(entryId)} on:click={updateSelection} />
+				{#if selectable && (hovering || highlighted)}
+					<Checkbox checked={highlighted} on:click={() => dispatch('select')} />
 				{/if}
 			</div>
 		{/if}
