@@ -1,20 +1,24 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
+	import Spinner from '$lib/components/general/Spinner.svelte';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 
 	export let form;
 
+	let submitted = false;
 	let redirect = '';
 	if (browser) {
 		const urlParams = new URLSearchParams(window.location.search);
 		redirect = urlParams.get('redirect') ?? '';
 	}
+
+	$: submitted = form?.error ? false : submitted;
 </script>
 
 <form
-	class="flex flex-col items-center justify-center rounded-xl bg-background p-12"
+	class="relative flex flex-col items-center justify-center rounded-xl bg-background p-12"
 	method="POST"
 	action="?/login"
 	use:enhance
@@ -37,7 +41,9 @@
 			label="Password"
 			class="w-56"
 		/>
-		<Button type="submit" variant="raised" class="mb-4 mt-5">Login</Button>
+		<Button type="submit" variant="raised" class="mb-4 mt-5" on:click={() => (submitted = true)}>
+			Login
+		</Button>
 		{#if form?.error}
 			<p class="mt-4 text-center font-semibold text-error">
 				{form.error}
@@ -48,4 +54,9 @@
 			Don't have an account? <a href="/signup/" class="text-primary">Sign up now!</a>
 		</p>
 	</div>
+	{#if submitted}
+		<div class="absolute right-2 top-2">
+			<Spinner width={24} height={24} />
+		</div>
+	{/if}
 </form>
