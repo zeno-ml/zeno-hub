@@ -33,8 +33,6 @@
 					spec={spec.keys[key]}
 					data={typeof jsonData[key] === 'object' ? JSON.stringify(jsonData[key]) : jsonData[key]}
 				/>
-			{:else}
-				<p class="text-error">ERROR: no data for key <b>{key}</b></p>
 			{/if}
 		{/each}
 	</div>
