@@ -2,7 +2,6 @@
 import json
 
 from psycopg import sql
-
 from zeno_backend.classes.chart import Chart, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
@@ -422,24 +421,27 @@ async def report_element(element: ReportElement):
     Args:
         element (ReportElement): the element to be updated.
     """
-    async with db_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute(
-                "UPDATE report_elements SET type = %s, data = %s, position = %s"
-                " WHERE id = %s RETURNING report_id;",
-                [
-                    element.type,
-                    element.data,
-                    element.position,
-                    element.id,
-                ],
-            )
-            report_id = await cur.fetchall()
-            await cur.execute(
-                "UPDATE reports SET updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
-                [report_id[0][0]],
-            )
-            await conn.commit()
+    try:
+        async with db_pool.connection() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "UPDATE report_elements SET type = %s, data = %s, position = %s"
+                    " WHERE id = %s RETURNING report_id;",
+                    [
+                        element.type,
+                        element.data,
+                        element.position,
+                        element.id,
+                    ],
+                )
+                report_id = await cur.fetchall()
+                await cur.execute(
+                    "UPDATE reports SET updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
+                    [report_id[0][0]],
+                )
+                await conn.commit()
+    except Exception as e:
+        raise Exception("Failed to update report element. Error: " + str(e))
 
 
 async def report_user(report_id: int, user: User):
@@ -449,13 +451,16 @@ async def report_user(report_id: int, user: User):
         report_id (int): the report for which to update the access.
         user (User): the user for which to update the access.
     """
-    async with db_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute(
-                "UPDATE user_report SET editor = %s WHERE report_id = %s"
-                " AND user_id = %s;",
-                [user.admin, report_id, user.id],
-            )
+    try:
+        async with db_pool.connection() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "UPDATE user_report SET editor = %s WHERE report_id = %s"
+                    " AND user_id = %s;",
+                    [user.admin, report_id, user.id],
+                )
+    except Exception as e:
+        raise Exception("Failed to update user's report access. Error: " + str(e))
 
 
 async def report_org(report_id: int, organization: Organization):
@@ -465,10 +470,13 @@ async def report_org(report_id: int, organization: Organization):
         report_id (int): the report for which to update the access.
         organization (Organization): the organization for which to update the access.
     """
-    async with db_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute(
-                "UPDATE organization_report SET editor = %s WHERE report_id = %s "
-                "AND organization_id = %s;",
-                [organization.admin, report_id, organization.id],
-            )
+    try:
+        async with db_pool.connection() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute(
+                    "UPDATE organization_report SET editor = %s WHERE report_id = %s "
+                    "AND organization_id = %s;",
+                    [organization.admin, report_id, organization.id],
+                )
+    except Exception as e:
+        raise Exception("Failed to update organization's report access. Error: " + str(e))
