@@ -89,8 +89,8 @@
 >
 	<div
 		class="relative flex w-full flex-col rounded-t-md text-center align-middle {project
-			? 'bg-project-lighter'
-			: 'bg-report-lighter'}"
+			? 'bg-project-light'
+			: 'bg-report-light'}"
 	>
 		<div class="mt-2 flex h-9 w-full items-center justify-between px-3">
 			<div class="flex items-center justify-center">
