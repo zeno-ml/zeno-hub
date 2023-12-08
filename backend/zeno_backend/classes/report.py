@@ -47,6 +47,24 @@ class Report(CamelModel):
     created_at: str = ""
     updated_at: str = ""
 
+    def update_element(self, element: ReportElement):
+        try:
+            update.report_element(element)
+        except Exception as e:
+            raise Exception("Failed to update report element. Error: " + str(e))
+
+    def update_user_access(self, user: User):
+        try:
+            update.report_user(self.id, user)
+        except Exception as e:
+            raise Exception("Failed to update user's report access. Error: " + str(e))
+
+    def update_org_access(self, organization: Organization):
+        try:
+            update.report_org(self.id, organization)
+        except Exception as e:
+            raise Exception("Failed to update organization's report access. Error: " + str(e))
+
 
 class ReportElement(CamelModel):
     """Representation of an element of a Zeno report.
