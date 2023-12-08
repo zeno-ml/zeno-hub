@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
-	import { collapseHeader, models, project } from '$lib/stores';
+	import { collapseHeader, metrics, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import type { User } from '$lib/zenoapi';
 	import {
@@ -44,12 +44,14 @@
 				<img class="mt-3 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
 			</a>
 			<div class="mt-3 flex flex-col">
-				<HeaderIcon
-					pageName={'home'}
-					tooltipContent={'Summary landing page'}
-					icon={mdiHomeOutline}
-					on:click={() => goto(getProjectRouteFromURL($page.url))}
-				/>
+				{#if $models.length > 0 && $metrics.length > 0}
+					<HeaderIcon
+						pageName={'home'}
+						tooltipContent={'Summary landing page'}
+						icon={mdiHomeOutline}
+						on:click={() => goto(getProjectRouteFromURL($page.url))}
+					/>
+				{/if}
 				<HeaderIcon
 					pageName={'explore'}
 					tooltipContent={'Explore your data and system outputs'}
