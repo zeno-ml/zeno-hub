@@ -20,6 +20,7 @@ import type { MetricRequest } from '../models/MetricRequest';
 import type { Organization } from '../models/Organization';
 import type { Project } from '../models/Project';
 import type { ProjectCopy } from '../models/ProjectCopy';
+import type { ProjectHomeElement } from '../models/ProjectHomeElement';
 import type { ProjectState } from '../models/ProjectState';
 import type { Report } from '../models/Report';
 import type { ReportElement } from '../models/ReportElement';
@@ -841,6 +842,33 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/project-state/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Project Home Elements
+	 * Get all elements on a project's home page.
+	 *
+	 * Args:
+	 * project_uuid (str): id of the project for which to fetch elements.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * list[ProjectHomeElement]: all elements on the project's home page.
+	 * @param projectUuid
+	 * @returns ProjectHomeElement Successful Response
+	 * @throws ApiError
+	 */
+	public getProjectHomeElements(projectUuid: string): CancelablePromise<Array<ProjectHomeElement>> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/project-home-elements/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
 			},

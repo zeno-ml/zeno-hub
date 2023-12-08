@@ -10,6 +10,7 @@ import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
+import zeno_backend.processing.project_home as project_home
 import zeno_backend.util as util
 from zeno_backend.classes.project import (
     Project,
@@ -73,10 +74,13 @@ async def get_project_home_elements(project_uuid: str, request: Request):
         request (Request): http request to get user information from.
 
     Returns:
-        list[ProjectHomeElement] | None: all elements on the project's home page.
+        list[ProjectHomeElement]: all elements on the project's home page.
     """
     await util.project_access_valid(project_uuid, request)
-    return await select.project_home_elements(project_uuid)
+    elements = await select.project_home_elements(project_uuid)
+    if elements is None:
+        elements = await project_home.create_project_home(project_uuid)
+    return elements
 
 
 @router.get(
