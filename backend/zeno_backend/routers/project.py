@@ -78,7 +78,7 @@ async def get_project_home_elements(project_uuid: str, request: Request):
     """
     await util.project_access_valid(project_uuid, request)
     elements = await select.project_home_elements(project_uuid)
-    if elements is None:
+    if len(elements) == 0:
         elements = await project_home.create_project_home(project_uuid)
     return elements
 

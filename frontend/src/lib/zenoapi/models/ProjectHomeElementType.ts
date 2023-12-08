@@ -9,4 +9,4 @@
  * Attributes:
  * CHART: chart element for a report.
  */
-export type ProjectHomeElementType = {};
+export type ProjectHomeElementType = string;

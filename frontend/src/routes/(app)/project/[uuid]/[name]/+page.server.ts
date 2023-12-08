@@ -1,20 +1,22 @@
 import { getClient } from '$lib/api/client.js';
-import type { ApiError, ProjectHomeElement } from '$lib/zenoapi/index.js';
-import { error } from '@sveltejs/kit';
 
-export async function load({ params, cookies, url }) {
+export async function load({ params, cookies, url, parent }) {
+	const { project } = await parent();
 	const zenoClient = await getClient(cookies, url);
 
-	let elements: ProjectHomeElement[];
+	const elements = await zenoClient.getProjectHomeElements(params.uuid);
 
-	try {
-		elements = await zenoClient.getProjectHomeElements(params.uuid);
-	} catch (e) {
-		const err = e as ApiError;
-		throw error(err.status, err.body.detail);
-	}
+	const charts = await Promise.all(
+		elements
+			.filter((element) => element.type === 'CHART')
+			.map(
+				(element) =>
+					(element.id && zenoClient.getChart(element.id, project.uuid)) ?? Promise.resolve(null)
+			)
+	);
 
 	return {
-		elements: elements
+		elements: elements,
+		charts: Promise.all(charts)
 	};
 }

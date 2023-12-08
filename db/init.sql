@@ -25,9 +25,9 @@ CREATE TABLE project_home_elements (
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
     type text NOT NULL,
     data text,
-    x_pos integer NOT NULL
-    y_pos integer NOT NULL
-    width integer NOT NULL
+    x_pos integer NOT NULL,
+    y_pos integer NOT NULL,
+    width integer NOT NULL,
     height integer NOT NULL
 );
 

@@ -39,7 +39,7 @@ class Project(CamelModel):
     updated_at: str = ""
 
 
-class ProjectHomeElementType(Enum):
+class ProjectHomeElementType(str, Enum):
     """Enumeration of possible elements on a project's home in Zeno.
 
     Attributes:

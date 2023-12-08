@@ -987,7 +987,7 @@ async def project_from_uuid(project_uuid: str) -> Project:
                 )
 
 
-async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement] | None:
+async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement]:
     """Get the project data given a UUID.
 
     Args:
@@ -1005,21 +1005,18 @@ async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement] |
             )
             project_home_elements_result = await cur.fetchall()
 
-    if project_home_elements_result is not None:
-        return list(
-            map(
-                lambda element: ProjectHomeElement(
-                    id=element[0],
-                    type=element[1],
-                    data=element[2],
-                    x_pos=element[3],
-                    y_pos=element[4],
-                    width=element[5],
-                    height=element[6],
-                ),
-                project_home_elements_result,
-            )
+    return [
+        ProjectHomeElement(
+            id=element[0],
+            type=element[1],
+            data=element[2],
+            x_pos=element[3],
+            y_pos=element[4],
+            width=element[5],
+            height=element[6],
         )
+        for element in project_home_elements_result
+    ]
 
 
 async def report_from_id(report_id: int) -> Report:
