@@ -22,7 +22,7 @@
 	<Header user={data.user} bind:showNewReport />
 	{#if isExplore}
 		<div
-			class="mx-6 flex flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
+			class="mx-6 mb-4 flex flex-col items-center justify-center rounded-md bg-primary text-white sm:flex-row"
 		>
 			<div class="p-6">
 				{#if !data.user}

@@ -180,7 +180,7 @@
 </script>
 
 <div class="h-full w-full overflow-auto" bind:this={instanceContainer}>
-	<table class="mt-2 w-full min-w-[1000px] table-fixed">
+	<table class="w-full min-w-[1000px] table-fixed">
 		<colgroup>
 			<col style="width: 45%;" />
 			<col style="width: 45%;" />
