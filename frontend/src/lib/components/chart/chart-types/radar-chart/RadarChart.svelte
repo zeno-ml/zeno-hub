@@ -12,8 +12,8 @@
 			size: number;
 		}>;
 	};
-	export let height = 575;
-	export let width: number;
+	export let height = 600;
+	export let width = 600;
 
 	let spec: VegaSpec;
 
