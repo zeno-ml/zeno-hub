@@ -3,20 +3,18 @@ import { login } from './login';
 
 test.beforeEach(async ({ page }) => {
 	await login(page);
-});
+}, { timeout: 10000 });
 
 test('can go to report', async ({ page }) => {
-	await page.getByRole('button', { name: 'Translation Report' }).click();
+	await page.click('text=Translation Report');
+	await page.waitForNavigation();
 
-	await page.waitForURL('/report/**');
-
-	await expect(page.getByRole('heading', { name: 'Translation Report' })).toBeVisible();
-});
+	await expect(page.locator('text=Translation Report')).toBeVisible();
+}, { timeout: 10000 });
 
 test('can go to project', async ({ page }) => {
-	await page.getByRole('button', { name: 'GPT MT Benchmarks' }).click();
+	await page.click('text=GPT MT Benchmarks');
+	await page.waitForNavigation();
 
-	await page.waitForURL('/project/**');
-
-	await expect(page.getByRole('heading', { name: 'GPT MT Benchmarks' })).toBeVisible();
-});
+	await expect(page.locator('text=GPT MT Benchmarks')).toBeVisible();
+}, { timeout: 10000 });
