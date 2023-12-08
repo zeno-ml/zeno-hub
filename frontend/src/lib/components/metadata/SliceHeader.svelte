@@ -35,7 +35,7 @@
 		: '-top-2'} z-10 flex min-h-[40px] items-center justify-between bg-yellowish-light"
 >
 	<div class="flex items-center justify-between">
-		<h4>Slices</h4>
+		<h4 class="text-grey-dark">Slices</h4>
 		<div
 			class="h-6 w-6 cursor-help fill-grey-dark"
 			use:tooltip={{

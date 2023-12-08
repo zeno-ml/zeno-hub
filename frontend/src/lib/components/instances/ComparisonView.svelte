@@ -180,7 +180,7 @@
 </script>
 
 <div class="h-full w-full overflow-auto" bind:this={instanceContainer}>
-	<table class="mt-2 w-full min-w-[1000px] table-fixed">
+	<table class="w-full min-w-[1000px] table-fixed">
 		<colgroup>
 			<col style="width: 45%;" />
 			<col style="width: 45%;" />
@@ -276,10 +276,16 @@
 						</p>
 						<InstanceView
 							view={$project.view}
+							{idColumn}
 							{dataColumn}
 							{labelColumn}
 							systemColumn={modelAColumn}
 							entry={tableContent}
+							highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+							on:select={() =>
+								$selectionIds?.includes(tableContent[idColumn] + '')
+									? selectionIds.set($selectionIds.filter((id) => id !== tableContent[idColumn]))
+									: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 							selectable={$project.editor}
 						/>
 					</td>
@@ -290,10 +296,16 @@
 						</p>
 						<InstanceView
 							view={$project.view}
+							{idColumn}
 							{dataColumn}
 							{labelColumn}
 							systemColumn={modelBColumn}
 							entry={tableContent}
+							highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+							on:select={() =>
+								$selectionIds?.includes(tableContent[idColumn] + '')
+									? selectionIds.set($selectionIds.filter((id) => id !== tableContent[idColumn]))
+									: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 							selectable={$project.editor}
 						/>
 					</td>

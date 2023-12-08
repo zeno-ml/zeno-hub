@@ -113,6 +113,7 @@
 						<InstanceView
 							view={spec}
 							entry={jsonData}
+							idColumn={null}
 							dataColumn="data"
 							labelColumn="label"
 							systemColumn="output"

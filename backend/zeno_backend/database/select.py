@@ -183,7 +183,7 @@ async def projects(
             Project(
                 uuid=res[0],
                 name=res[1],
-                view=match_instance_view(res[3]),
+                view="",
                 samples_per_page=res[4],
                 public=res[5],
                 description=res[6],
@@ -254,7 +254,7 @@ async def public_projects(home_request: HomeRequest) -> list[Project]:
             Project(
                 uuid=res[0],
                 name=res[1],
-                view=match_instance_view(res[3]),
+                view="",
                 samples_per_page=res[4],
                 editor=False,
                 public=True,

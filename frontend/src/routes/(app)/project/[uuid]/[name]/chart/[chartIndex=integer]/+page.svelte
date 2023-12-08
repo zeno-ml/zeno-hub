@@ -67,7 +67,7 @@
 		<ViewHeader bind:isChartEdit />
 	{/if}
 	{#if chartData}
-		<div class={`flex h-full flex-col overflow-auto pl-2`}>
+		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>
 			<ChartContainer chartName={chart.name} loading={updatingData}>
 				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
 			</ChartContainer>

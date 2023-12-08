@@ -130,7 +130,7 @@
 <div class="w-full overflow-auto" bind:this={tableContainer}>
 	<table>
 		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
-			<tr class="border-b border-grey-lighter bg-background">
+			<tr class="box-border border-b border-t border-grey-lighter bg-background">
 				<th class="font-grey p-3 font-semibold">ID</th>
 				{#if $project.view}
 					<th
@@ -178,10 +178,18 @@
 								<div class="min-w-[400px]">
 									<InstanceView
 										view={$project.view}
+										{idColumn}
 										{dataColumn}
 										{labelColumn}
 										{systemColumn}
 										entry={tableContent}
+										highlighted={$selectionIds.includes(tableContent[idColumn] + '')}
+										on:select={() =>
+											$selectionIds?.includes(tableContent[idColumn] + '')
+												? selectionIds.set(
+														$selectionIds.filter((id) => id !== tableContent[idColumn])
+												  )
+												: selectionIds.set([...$selectionIds, tableContent[idColumn] + ''])}
 										selectable={$project.editor}
 									/>
 								</div>

@@ -103,6 +103,7 @@
 						<div class="m-auto mt-0 w-1/2 px-1">
 							<InstanceView
 								view={tagElementOptions.project.view}
+								idColumn={tagElementOptions.idColumn}
 								dataColumn={tagElementOptions.dataColumn}
 								systemColumn={tagElementOptions.systemColumn}
 								labelColumn={tagElementOptions.labelColumn}

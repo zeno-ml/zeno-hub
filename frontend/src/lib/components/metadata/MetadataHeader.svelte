@@ -20,7 +20,7 @@
 	$: sortedMetrics = $metrics.sort((a, b) => a.name.localeCompare(b.name));
 </script>
 
-<div class="sticky -top-2 z-10 flex items-center bg-yellowish-light pb-2.5 pt-1">
+<div class="sticky -top-2 z-10 flex items-center bg-yellowish-light py-1">
 	{#if $model !== undefined && $models.length > 0}
 		<div class="mr-2.5 flex w-1/2 flex-col">
 			<span class="my-1 w-fit text-grey-dark">

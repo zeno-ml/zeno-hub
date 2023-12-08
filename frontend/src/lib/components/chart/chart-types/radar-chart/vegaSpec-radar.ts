@@ -10,13 +10,11 @@ export default function generateSpec(
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
 		random_id: Date.now(), // used to force re-rendering of the chart
-		autosize: { type: 'fit', contains: 'padding' },
-		padding: { left: 5, right: 5, top: 5, bottom: 5 },
-		width: width,
-		height: height,
+		padding: 80,
+		autosize: { type: 'none', contains: 'padding' },
 
 		signals: [
-			{ name: 'radius', update: 'width / 2.3' },
+			{ name: 'radius', update: 'width / 2' },
 			{
 				name: 'hover',
 				value: {},
@@ -122,7 +120,7 @@ export default function generateSpec(
 							},
 							update: {
 								stroke: [{ scale: 'color', field: 'layer_value' }],
-								strokeWidth: [{ test: 'datum.layer_value === hover', value: 5 }, { value: 3 }],
+								strokeWidth: [{ test: 'datum.layer_value === hover', value: 3 }, { value: 3 }],
 								strokeOpacity: [{ test: 'datum.layer_value === hover', value: 0.8 }, { value: 0.4 }]
 							}
 						}
@@ -137,16 +135,11 @@ export default function generateSpec(
 								y: { signal: 'datum.y' }
 							},
 							update: {
-								align: { value: 'center' },
-								baseline: { value: 'middle' },
-								text: { signal: 'round(100*datum.datum.fixed_value)/100' },
+								align: { value: 'right' },
+								text: { signal: 'format(datum.datum.fixed_value, ",.3f")' },
 								fill: { value: 'black' },
 								fontSize: [{ test: 'datum.datum.layer_value === hover', value: 14 }, { value: 12 }],
-								fontWeight: { value: 'bold' },
-								fillOpacity: [
-									{ test: 'datum.datum.layer_value === hover', value: 1 },
-									{ value: 0.4 }
-								]
+								fillOpacity: [{ test: 'datum.datum.layer_value === hover', value: 1 }, { value: 0 }]
 							}
 						}
 					}
@@ -188,6 +181,11 @@ export default function generateSpec(
 								value: 'left'
 							}
 						],
+						labels: {
+							update: {
+								text: { signal: "split(datum.axis_value, ' ')" }
+							}
+						},
 						baseline: [
 							{
 								test: "scale('angular', datum.axis_value) > 0",

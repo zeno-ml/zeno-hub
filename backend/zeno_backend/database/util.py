@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 import pyarrow as pa
+from fastapi import HTTPException
 from pyarrow import DataType
 
 from zeno_backend.classes.base import MetadataType
@@ -58,13 +59,19 @@ def match_instance_view(view: str) -> str:
     Returns:
         str: the view specification for the project.
     """
+    if view == "":
+        return ""
+
     if view.startswith("{"):
         return view
-    views = map(
-        lambda x: x.stem, list(Path("zeno_backend/instance_views").glob("*.json"))
-    )
+
+    views = [x.stem for x in Path("zeno_backend/instance_views").glob("*.json")]
     if view in views:
         return json.dumps(
             json.load(Path(f"zeno_backend/instance_views/{view}.json").open("r"))
         )
-    return ""
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Instance view {view} not found. Available views: {str(views)}",
+        )

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Spinner from '$lib/components/general/Spinner.svelte';
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import { inViewport } from '$lib/util/viewport';
@@ -23,6 +22,7 @@
 	let loading = false;
 
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
+		loading = true;
 		zenoClient
 			.getHomeDetails({
 				searchString,
@@ -32,6 +32,7 @@
 			})
 			.then((res) => {
 				entries = res;
+				loading = false;
 			});
 	}
 
@@ -64,6 +65,7 @@
 	bind:searchText
 	bind:typeFilter
 	bind:sort
+	{loading}
 	on:change={() => updateEntries(searchText, typeFilter, sort)}
 />
 <div class="mb-4 grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
@@ -76,7 +78,4 @@
 			<HomeCard entry={entry.entry} stats={entry.stats} user={data.user} />
 		{/if}
 	{/each}
-	{#if loading}
-		<Spinner width={24} height={24} />
-	{/if}
 </div>
