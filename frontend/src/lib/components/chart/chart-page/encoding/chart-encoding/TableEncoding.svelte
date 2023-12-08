@@ -87,10 +87,10 @@
 				chart = { ...chart, parameters: { ...parameters, metrics: [e.detail as number] } };
 				break;
 			case SlicesMetricsOrModels.SLICES:
-				chart = { ...chart, parameters: { ...parameters, slices: [e.detail as number] } };
+				chart = { ...chart, parameters: { ...parameters, slices: [e.detail.value as number] } };
 				break;
 			case SlicesMetricsOrModels.MODELS:
-				chart = { ...chart, parameters: { ...parameters, models: [e.detail as string] } };
+				chart = { ...chart, parameters: { ...parameters, models: [e.detail.value as string] } };
 				break;
 		}
 	}
@@ -133,7 +133,7 @@
 		on:selected={(e) => selected(e, Dimensions.x)}
 		numberValues={parameters.xChannel === SlicesMetricsOrModels.SLICES
 			? parameters.slices
-			: parameters.fixedChannel === SlicesMetricsOrModels.METRICS
+			: parameters.xChannel === SlicesMetricsOrModels.METRICS
 			  ? parameters.metrics
 			  : []}
 		stringValues={parameters.xChannel === SlicesMetricsOrModels.MODELS ? parameters.models : []}
