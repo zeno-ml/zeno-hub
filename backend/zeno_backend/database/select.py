@@ -4,7 +4,6 @@ import json
 
 from fastapi import HTTPException, status
 from psycopg import sql
-
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
 from zeno_backend.classes.chart import Chart
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
@@ -12,32 +11,21 @@ from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.homepage import EntrySort, HomeRequest
 from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
-from zeno_backend.classes.project import (
-    Project,
-    ProjectState,
-    ProjectStats,
-)
-from zeno_backend.classes.report import (
-    Report,
-    ReportElement,
-    ReportResponse,
-    ReportStats,
-    SliceElementOptions,
-    TagElementOptions,
-)
+from zeno_backend.classes.project import Project, ProjectState, ProjectStats
+from zeno_backend.classes.report import (Report, ReportElement, ReportResponse,
+                                         ReportStats, SliceElementOptions,
+                                         TagElementOptions)
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.slice_finder import SQLTable
-from zeno_backend.classes.table import (
-    SliceTableRequest,
-    TableRequest,
-    TagTableRequest,
-)
+from zeno_backend.classes.table import (SliceTableRequest, TableRequest,
+                                        TagTableRequest)
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, match_instance_view
 from zeno_backend.processing.filtering import table_filter
-from zeno_backend.processing.histogram_processing import calculate_histogram_bucket
+from zeno_backend.processing.histogram_processing import \
+    calculate_histogram_bucket
 
 PROJECTS_BASE_QUERY = sql.SQL(
     """
@@ -1580,9 +1568,20 @@ async def folder(id: int) -> Folder:
             status.HTTP_500_INTERNAL_SERVER_ERROR, "Folder could not be found."
         )
     return Folder(
-        id=folder_result[0][0],
-        name=folder_result[0][1],
-        project_uuid=folder_result[0][2],
+    if folder_result[0][2] not in linked_projects:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The project of the chart is not added to the report.",
+        )
+    chart_project_uuid = folder_result[0][2]
+    if chart_project_uuid not in linked_projects:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"The project of the chart (project_uuid: {chart_project_uuid}) is not added to the report.",
+        )
+    id=folder_result[0][0],
+    name=folder_result[0][1],
+    project_uuid=chart_project_uuid,
     )
 
 
@@ -2352,6 +2351,12 @@ async def user_organizations(user: User) -> list[Organization]:
             organizations_result = await cur.fetchall()
             if len(organizations_result) == 0:
                 return organizations
+    for slice in slice_results:
+        if slice[4] not in linked_projects:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The project of the slice (project_uuid: {slice[4]}) is not added to the report.",
+            )
             for org in organizations_result:
                 await cur.execute(
                     "SELECT u.id, u.name, uo.admin FROM users as u "
@@ -2396,6 +2401,12 @@ async def project_users(project: str) -> list[User]:
                 "JOIN user_project AS up ON u.id = up.user_id "
                 "WHERE up.project_uuid = %s",
                 [project],
+            )
+    for tag_result in tags_result:
+        if tag_result[3] not in linked_projects:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The project of the tag (project_uuid: {tag_result[3]}) is not added to the report.",
             )
             project_users = await cur.fetchall()
     return list(
