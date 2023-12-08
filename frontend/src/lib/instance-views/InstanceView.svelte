@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Error from '$lib/instance-views/Error.svelte';
+	import { default as ErrorComponent } from '$lib/instance-views/Error.svelte';
 	import { elementMap, isComplexElement } from '$lib/instance-views/resolve.js';
 	import type { ViewSchema } from '$lib/instance-views/schema';
 	import schema from '$lib/instance-views/schema.json';
@@ -29,7 +29,9 @@
 	$: try {
 		viewSpec = JSON.parse(view);
 		JSONParseError = '';
-		if (validate && !validate(viewSpec)) {
+		if (!validate) {
+			throw new Error("JSON validator couldn't be initialized");
+		} else if (!validate(viewSpec)) {
 			schemaValidationError = ajv.errorsText(validate.errors, {
 				dataVar: 'View Specification',
 				separator: '\n'
@@ -45,9 +47,9 @@
 </script>
 
 {#if JSONParseError}
-	<Error type="Invalid JSON for View Specification" message={JSONParseError} />
+	<ErrorComponent type="Invalid JSON for View Specification" message={JSONParseError} />
 {:else if schemaValidationError}
-	<Error type="Invalid View Specification" message={schemaValidationError} />
+	<ErrorComponent type="Invalid View Specification" message={schemaValidationError} />
 {:else}
 	<div
 		class="cursor-default overflow-x-auto break-words rounded border border-grey-lighter {highlighted
