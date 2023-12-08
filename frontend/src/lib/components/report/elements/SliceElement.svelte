@@ -113,6 +113,7 @@
 						<div class="m-auto mt-0 {instancesPerPage === 1 ? 'w-full' : 'w-1/2'} px-1">
 							<InstanceView
 								view={sliceElementOptions.project.view}
+								idColumn={sliceElementOptions.idColumn}
 								dataColumn={sliceElementOptions.dataColumn}
 								systemColumn={sliceElementOptions.systemColumn}
 								labelColumn={sliceElementOptions.labelColumn}
