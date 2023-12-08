@@ -26,7 +26,7 @@
 	}
 </script>
 
-<div class="mb-4 mt-4 flex flex-col justify-between md:flex-row md:items-center">
+<div class="mb-4 flex flex-col justify-between md:flex-row md:items-center">
 	<div
 		class="flex h-12 w-96 items-center justify-center rounded-lg border border-solid border-grey-light px-4 py-3 focus-within:shadow-md"
 	>

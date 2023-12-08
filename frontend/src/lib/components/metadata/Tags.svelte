@@ -9,7 +9,7 @@
 {#if $tags.length > 0}
 	<div class="mt-4 flex items-center justify-between">
 		<div class="mb-2 flex items-center justify-between">
-			<h4>Tags</h4>
+			<h4 class="text-grey-dark">Tags</h4>
 			<div
 				class="h-6 w-6 cursor-help fill-grey-darker"
 				use:tooltip={{
