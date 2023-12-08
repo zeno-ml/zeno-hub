@@ -34,25 +34,18 @@
 	zenoClient.getSlices(chart.projectUuid).then((sli) => {
 		slices = sli;
 	});
-
 	let tableRecord: Record<
 		string | number,
 		Record<string | number, { fixedValue: number; size: number }>
 	> = {};
-
 	let sortCol: { column: string | number | undefined; ascending: boolean } = {
 		column: undefined,
 		ascending: true
 	};
 
 	$: parameters = chart.parameters as TableParameters;
-	$: columns =
-		parameters.xChannel === SlicesMetricsOrModels.SLICES
-			? parameters.slices
-			: parameters.xChannel === SlicesMetricsOrModels.METRICS
-			  ? parameters.metrics
-			  : parameters.models;
-	$: rows = parameters.yChannel === SlicesOrModels.SLICES ? parameters.slices : parameters.models;
+	$: columns = [...new Set(data.table.map((cell) => cell.x_value))];
+	$: rows = [...new Set(data.table.map((cell) => cell.y_value))];
 	$: {
 		data, (tableRecord = {});
 		data.table.map((cell) => {
@@ -89,37 +82,32 @@
 	<DataTable>
 		<Head>
 			<Row>
-				<Cell
-					>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'} \ {parameters.xChannel ===
-					SlicesMetricsOrModels.SLICES
-						? 'slices'
-						: parameters.xChannel === SlicesMetricsOrModels.MODELS
-						  ? 'systems'
-						  : 'metrics'}</Cell
-				>
+				<Cell>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'}</Cell>
 				{#each columns as column}
 					<Cell
-						style="width: 140px; max-width: 140px; cursor: pointer;"
+						class="pointer"
 						on:keydown={() => ({})}
 						on:click={() => {
 							if (sortCol.column !== column) {
 								sortCol = { column: column, ascending: true };
-							} else {
+							} else if (sortCol.ascending) {
 								sortCol = { ...sortCol, ascending: !sortCol.ascending };
+							} else {
+								sortCol = { column: undefined, ascending: true };
 							}
 						}}
 					>
-						<div style="display: flex;">
-							<div style="margin:auto;overflow: hidden">
+						<div class="flex">
+							<div class="min-h-[24px] overflow-hidden">
 								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
 									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
 								{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
-									{metrics.find((met) => met.id === column)?.name}
+									{column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name}
 								{:else}
 									{column}
 								{/if}
 							</div>
-							<Icon class="material-icons" style="font-size: 25px;">
+							<Icon class="material-icons">
 								{#if sortCol.column === column && sortCol.ascending}
 									arrow_drop_up
 								{:else if sortCol.column === column}
@@ -131,7 +119,7 @@
 				{/each}
 			</Row>
 		</Head>
-		<Body style="overflow: visible">
+		<Body>
 			{#each rows as row}
 				<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
 			{/each}
