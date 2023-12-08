@@ -36,11 +36,11 @@
 </nav>
 <nav class="z-20 hidden md:flex">
 	<header
-		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
+		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish-light text-grey"
 	>
 		<div class="flex flex-col items-center justify-center">
 			<a href="/">
-				<img class="mt-5 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
+				<img class="mt-3 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
 			</a>
 			{#if $page.url.href.includes('project/')}
 				<div class="mt-3 flex flex-col">

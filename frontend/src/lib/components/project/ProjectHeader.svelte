@@ -14,7 +14,7 @@
 </script>
 
 <div
-	class="flex w-full min-w-0 items-center justify-between overflow-hidden border-b border-b-grey-lighter bg-yellowish-light px-3 py-4"
+	class="flex w-full min-w-0 items-center justify-between overflow-hidden border-b border-b-grey-lighter bg-yellowish-light px-3 py-3"
 >
 	<div class="flex items-center">
 		{#if project.description}

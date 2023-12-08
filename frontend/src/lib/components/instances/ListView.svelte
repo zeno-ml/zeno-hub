@@ -130,7 +130,7 @@
 		</div>
 	{/each}
 </div>
-<Pagination slot="paginate" class="pagination">
+<Pagination slot="paginate" class="pagination border-none">
 	<svelte:fragment slot="rowsPerPage">
 		<Label>Instances Per Page</Label>
 		<select class="ml-2" bind:value={$rowsPerPage}>

@@ -29,7 +29,7 @@
 		{/each}
 		{#if $project.editor && $selectionPredicates !== undefined}
 			<Button
-				class="mx-1"
+				class="ml-1 mr-2"
 				variant="outlined"
 				on:keydown={() => ({})}
 				on:click={() => {

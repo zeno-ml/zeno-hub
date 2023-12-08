@@ -64,11 +64,11 @@
 	<UpdateTagPopup on:close={() => (showUpdateTag = false)} />
 {/if}
 <div class="w-full">
-	<div class="flex min-h-[60px] w-full justify-between border-b border-grey-lighter pt-2.5">
+	<div class="mt-2 flex min-h-[50px] w-full justify-between">
 		<ChipsWrapper />
 	</div>
 	{#if !$page.url.href.includes('compare') || $selectionIds.length > 0 || $editTag !== undefined}
-		<div class="flex w-full flex-wrap items-center border-b border-grey-lighter py-2.5">
+		<div class="flex w-full flex-wrap items-center pb-2">
 			<div class="mr-4 flex items-center">
 				{#if !$page.url.href.includes('compare') && currentResult !== undefined && currentResult.length > 0}
 					{#if currentResult[0].metric !== undefined && currentResult[0].metric !== null}
