@@ -14,6 +14,7 @@ from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
     Project,
+    ProjectHomeElement,
     ProjectState,
     ProjectStats,
 )
@@ -984,6 +985,41 @@ async def project_from_uuid(project_uuid: str) -> Project:
                     status.HTTP_500_INTERNAL_SERVER_ERROR,
                     "ERROR: Could not load project owner.",
                 )
+
+
+async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement] | None:
+    """Get the project data given a UUID.
+
+    Args:
+        project_uuid (str): the uuid of the project for which to fetch home elements.
+
+    Returns:
+        list[ProjectHomeElement]: Elements of the project's home view.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, type, data, x_pos, y_pos, width, height "
+                "FROM project_home_elements WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            project_home_elements_result = await cur.fetchall()
+
+    if project_home_elements_result is not None:
+        return list(
+            map(
+                lambda element: ProjectHomeElement(
+                    id=element[0],
+                    type=element[1],
+                    data=element[2],
+                    x_pos=element[3],
+                    y_pos=element[4],
+                    width=element[5],
+                    height=element[6],
+                ),
+                project_home_elements_result,
+            )
+        )
 
 
 async def report_from_id(report_id: int) -> Report:

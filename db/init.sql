@@ -20,6 +20,17 @@ CREATE TABLE projects (
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE project_home_elements (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    type text NOT NULL,
+    data text,
+    x_pos integer NOT NULL
+    y_pos integer NOT NULL
+    width integer NOT NULL
+    height integer NOT NULL
+);
+
 CREATE TABLE charts (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
