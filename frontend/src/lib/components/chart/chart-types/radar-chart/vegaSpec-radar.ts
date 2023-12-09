@@ -10,7 +10,7 @@ export default function generateSpec(
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
 		random_id: Date.now(), // used to force re-rendering of the chart
-		padding: 80,
+		padding: { left: 100, right: 100, top: 50, bottom: 0 },
 		autosize: { type: 'none', contains: 'padding' },
 
 		signals: [

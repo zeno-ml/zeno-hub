@@ -11,7 +11,8 @@ export async function load({ params, cookies, url, parent }) {
 			.filter((element) => element.type === 'CHART')
 			.map(
 				(element) =>
-					(element.id && zenoClient.getChart(element.id, project.uuid)) ?? Promise.resolve(null)
+					(element.data && zenoClient.getChart(parseInt(element.data), project.uuid)) ??
+					Promise.resolve(null)
 			)
 	);
 

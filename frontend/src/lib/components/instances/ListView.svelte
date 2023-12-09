@@ -15,14 +15,14 @@
 		sort,
 		tagIds
 	} from '$lib/stores';
-	import { Join, ZenoColumnType, ZenoService } from '$lib/zenoapi';
+	import { Join, ZenoColumnType, ZenoService, type MetricKey, type Slice } from '$lib/zenoapi';
 	import { Label } from '@smui/button';
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import Select from '../ui/Select.svelte';
 
-	export let numberOfInstances = 0;
+	export let numberOfInstances = -1;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 	const viewSpec = JSON.parse($project.view) as ViewSchema;
@@ -38,6 +38,32 @@
 				: [5, 15, 30, 60, 100]
 		)
 	].sort((a, b) => a - b);
+
+	if (numberOfInstances === -1) {
+		zenoClient
+			.getMetricsFiltered($project.uuid, {
+				metricKeys: [
+					<MetricKey>{
+						slice: <Slice>{
+							id: 0,
+							sliceName: '',
+							folderId: undefined,
+							filterPredicates: {
+								predicates: [],
+								join: Join._
+							}
+						},
+						model: $model === undefined ? '' : $model,
+						metric: -1
+					}
+				]
+			})
+			.then((r) => {
+				if (r !== undefined && r.length > 0) {
+					numberOfInstances = r[0].size;
+				}
+			});
+	}
 
 	$: idColumn = $columns.find((col) => col.columnType === ZenoColumnType.ID)?.id || '';
 	$: dataColumn = $columns.find((col) => col.columnType === ZenoColumnType.DATA)?.id;

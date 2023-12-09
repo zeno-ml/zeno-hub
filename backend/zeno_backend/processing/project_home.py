@@ -6,6 +6,7 @@ import zeno_backend.database.select as select
 from zeno_backend.classes.chart import (
     Chart,
     ChartType,
+    RadarParameters,
     SlicesMetricsOrModels,
     SlicesOrModels,
     TableParameters,
@@ -36,7 +37,7 @@ async def create_project_home(project_uuid) -> list[ProjectHomeElement]:
             project_uuid=project_uuid,
             type=ChartType.TABLE,
             parameters=TableParameters(
-                metrics=[-1],
+                metrics=[-2],
                 slices=[-1],
                 models=[""],
                 y_channel=SlicesOrModels.MODELS,
@@ -52,6 +53,30 @@ async def create_project_home(project_uuid) -> list[ProjectHomeElement]:
             detail="Could not add overview table to the project.",
         )
 
+    chart_id = await insert.chart(
+        project_uuid,
+        Chart(
+            id=-1,
+            name="Overview Chart",
+            project_uuid=project_uuid,
+            type=ChartType.RADAR,
+            parameters=RadarParameters(
+                metrics=[-2],
+                slices=[-1],
+                models=[""],
+                axis_channel=SlicesMetricsOrModels.METRICS,
+                layer_channel=SlicesOrModels.MODELS,
+                fixed_channel=SlicesMetricsOrModels.SLICES,
+            ),
+        ),
+    )
+
+    if chart_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Could not add overview table to the project.",
+        )
+
     await insert.project_home_element(
         project_uuid,
         ProjectHomeElement(
@@ -61,6 +86,19 @@ async def create_project_home(project_uuid) -> list[ProjectHomeElement]:
             x_pos=0,
             y_pos=0,
             width=40,
+            height=50,
+        ),
+    )
+
+    await insert.project_home_element(
+        project_uuid,
+        ProjectHomeElement(
+            id=-1,
+            type=ProjectHomeElementType.CHART,
+            data=str(chart_id),
+            x_pos=40,
+            y_pos=0,
+            width=60,
             height=50,
         ),
     )

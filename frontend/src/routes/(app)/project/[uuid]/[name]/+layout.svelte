@@ -82,7 +82,7 @@
 </div>
 
 <ProjectSidebar user={data.user} />
-<div class="flex h-full w-full flex-col">
+<div class="flex h-full w-full min-w-0 flex-col">
 	<ProjectHeader
 		project={data.project}
 		likes={data.numLikes}

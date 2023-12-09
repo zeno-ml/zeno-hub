@@ -78,51 +78,49 @@
 	}
 </script>
 
-<div class="my-2">
-	<DataTable>
-		<Head>
-			<Row>
-				<Cell>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'}</Cell>
-				{#each columns as column}
-					<Cell
-						class="pointer"
-						on:keydown={() => ({})}
-						on:click={() => {
-							if (sortCol.column !== column) {
-								sortCol = { column: column, ascending: true };
-							} else if (sortCol.ascending) {
-								sortCol = { ...sortCol, ascending: !sortCol.ascending };
-							} else {
-								sortCol = { column: undefined, ascending: true };
-							}
-						}}
-					>
-						<div class="flex">
-							<div class="min-h-[24px] overflow-hidden">
-								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
-									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
-								{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
-									{column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name}
-								{:else}
-									{column}
-								{/if}
-							</div>
-							<Icon class="material-icons">
-								{#if sortCol.column === column && sortCol.ascending}
-									arrow_drop_up
-								{:else if sortCol.column === column}
-									arrow_drop_down
-								{/if}
-							</Icon>
+<DataTable>
+	<Head>
+		<Row>
+			<Cell>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'}</Cell>
+			{#each columns as column}
+				<Cell
+					class="pointer"
+					on:keydown={() => ({})}
+					on:click={() => {
+						if (sortCol.column !== column) {
+							sortCol = { column: column, ascending: true };
+						} else if (sortCol.ascending) {
+							sortCol = { ...sortCol, ascending: !sortCol.ascending };
+						} else {
+							sortCol = { column: undefined, ascending: true };
+						}
+					}}
+				>
+					<div class="flex">
+						<div class="min-h-[24px] overflow-hidden">
+							{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
+								<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
+							{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
+								{column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name}
+							{:else}
+								{column}
+							{/if}
 						</div>
-					</Cell>
-				{/each}
-			</Row>
-		</Head>
-		<Body>
-			{#each rows as row}
-				<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
+						<Icon class="material-icons">
+							{#if sortCol.column === column && sortCol.ascending}
+								arrow_drop_up
+							{:else if sortCol.column === column}
+								arrow_drop_down
+							{/if}
+						</Icon>
+					</div>
+				</Cell>
 			{/each}
-		</Body>
-	</DataTable>
-</div>
+		</Row>
+	</Head>
+	<Body>
+		{#each rows as row}
+			<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
+		{/each}
+	</Body>
+</DataTable>

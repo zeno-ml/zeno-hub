@@ -9,18 +9,19 @@
 </script>
 
 <button
-	class="m-auto flex cursor-pointer items-center p-3 hover:bg-black-transparent {$page.url.href.includes(
-		pageName
-	)
-		? 'font-medium'
-		: ''}"
+	class="m-auto flex cursor-pointer items-center p-3 hover:bg-black-transparent"
 	on:click
 	use:tooltip={{ text: tooltipContent }}
 >
 	<div class="h-6 w-6 fill-grey">
 		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
 			<path
-				class={`${$page.url.href.includes(pageName) ? 'fill-primary' : 'fill-grey'}`}
+				class={`${
+					$page.url.href.includes(pageName) ||
+					(pageName === 'home' && $page.url.href.split('/').length === 6)
+						? 'fill-primary'
+						: 'fill-grey'
+				}`}
 				d={icon}
 			/>
 		</Icon>
