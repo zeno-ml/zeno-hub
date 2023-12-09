@@ -84,7 +84,7 @@
 </script>
 
 {#each rows as row, i}
-	<div class="h-40">
+	<div class="h-40 text-left">
 		<h4 class="relative mb-2.5">
 			{parameters.fixedDimension === 'y'
 				? parameters.yChannel === SlicesOrModels.MODELS
