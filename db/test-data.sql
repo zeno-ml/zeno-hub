@@ -5,7 +5,7 @@ COPY public.users (id, name, display_name, cognito_id, api_key_hash) FROM stdin;
 
 -- Projects
 COPY public.projects (uuid, name, owner_id, view, samples_per_page, public, description, created_at, updated_at) FROM stdin;
-f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	t	2023-11-21 18:40:29.449311	2023-11-21 18:40:29.449311
+f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	t		2023-11-21 18:40:29.449311	2023-11-21 18:40:29.449311
 \.
 
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" (
@@ -153,7 +153,7 @@ COPY public.charts (id, project_uuid, name, type, parameters, created_at, update
 
 -- Reports
 COPY public.reports (id, name, owner_id, public, description, created_at, updated_at) FROM stdin;
-1	Translation Report	1	f		2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
+1	Translation Report	1	f	 	2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
 \.
 
 COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;
