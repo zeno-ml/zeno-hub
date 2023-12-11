@@ -42,8 +42,8 @@ export default {
 				light: '#f7f1fb'
 			},
 			report: {
-				DEFAULT: '#2955ba',
-				light: '#ebf1ff'
+				DEFAULT: '#000000',
+				light: '#f9f7fb'
 			}
 		},
 		extend: {
