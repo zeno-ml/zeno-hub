@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Report, User, ZenoService } from '$lib/zenoapi';
-	import { mdiFileChartOutline, mdiPlus } from '@mdi/js';
-	import Button from '@smui/button';
+	import { mdiFileChartOutline, mdiLinkVariant, mdiPlus } from '@mdi/js';
+	import Button, { Icon } from '@smui/button';
+	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import LikeButton from './LikeButton.svelte';
 	import UserButton from './UserButton.svelte';
 
@@ -15,6 +17,8 @@
 	export let reportEdit = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	let linkCopied = false;
 </script>
 
 <div class="mx-6 my-5 flex h-8 items-center justify-between">
@@ -45,6 +49,22 @@
 					liked={userLiked}
 					report={report ? true : false}
 				/>
+				<IconButton
+					class="ml-2"
+					on:click={(e) => {
+						e.stopPropagation();
+						linkCopied = true;
+						navigator.clipboard.writeText(window.location.href);
+						setTimeout(() => (linkCopied = false), 2000);
+					}}
+				>
+					<Icon tag="svg" viewBox="0 0 24 24">
+						<path fill="black" d={mdiLinkVariant} />
+					</Icon>
+				</IconButton>
+				{#if linkCopied}
+					<p class="ml-2 text-grey-dark" transition:fade>Report link copied to clipboard</p>
+				{/if}
 			</div>
 		{/if}
 	</div>

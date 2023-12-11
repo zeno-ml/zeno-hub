@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, User, ZenoService } from '$lib/zenoapi';
+	import { mdiLinkVariant } from '@mdi/js';
+	import IconButton, { Icon } from '@smui/icon-button';
 	import { getContext } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import LikeButton from '../general/LikeButton.svelte';
 	import UserButton from '../general/UserButton.svelte';
 
@@ -11,6 +14,8 @@
 	export let user: User | null;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	let linkCopied = false;
 </script>
 
 <div
@@ -30,6 +35,22 @@
 			</h1>
 		{/if}
 		<LikeButton on:like={() => zenoClient.likeProject(project.uuid)} {likes} {liked} {user} />
+		<IconButton
+			class="ml-2"
+			on:click={(e) => {
+				e.stopPropagation();
+				linkCopied = true;
+				navigator.clipboard.writeText(window.location.href.split('/explore')[0]);
+				setTimeout(() => (linkCopied = false), 2000);
+			}}
+		>
+			<Icon tag="svg" viewBox="0 0 24 24">
+				<path fill="black" d={mdiLinkVariant} />
+			</Icon>
+		</IconButton>
+		{#if linkCopied}
+			<p class="ml-2 text-grey-dark" transition:fade>Project link copied to clipboard</p>
+		{/if}
 	</div>
 	<UserButton {user} />
 </div>
