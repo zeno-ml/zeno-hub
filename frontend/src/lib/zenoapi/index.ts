@@ -41,7 +41,7 @@ export type { Organization } from './models/Organization';
 export type { Project } from './models/Project';
 export type { ProjectCopy } from './models/ProjectCopy';
 export type { ProjectHomeElement } from './models/ProjectHomeElement';
-export type { ProjectHomeElementType } from './models/ProjectHomeElementType';
+export { ProjectHomeElementType } from './models/ProjectHomeElementType';
 export type { ProjectState } from './models/ProjectState';
 export type { ProjectStats } from './models/ProjectStats';
 export type { RadarParameters } from './models/RadarParameters';

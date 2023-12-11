@@ -9,4 +9,7 @@
  * Attributes:
  * CHART: chart element for a report.
  */
-export type ProjectHomeElementType = string;
+export enum ProjectHomeElementType {
+	CHART = 'CHART',
+	LIST = 'LIST'
+}
