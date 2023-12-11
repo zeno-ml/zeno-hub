@@ -44,7 +44,7 @@
 		"prettier": "^3.1.0",
 		"prettier-plugin-svelte": "^3.0.3",
 		"prettier-plugin-tailwindcss": "^0.5.7",
-		"publint": "^0.2.5",
+		"publint": "^0.2.6",
 		"shx": "^0.3.4",
 		"simple-svelte-autocomplete": "^2.5.2",
 		"smui-theme": "^7.0.0-beta.8",
