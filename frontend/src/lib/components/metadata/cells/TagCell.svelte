@@ -161,7 +161,7 @@
 {/if}
 <button
 	class="relative mt-1 flex h-9 w-full items-center justify-between overflow-visible rounded border border-grey-lighter px-2.5 {selected
-		? 'bg-greenish-light'
+		? 'bg-secondary-light'
 		: ''}"
 	on:click={setSelected}
 	draggable="true"

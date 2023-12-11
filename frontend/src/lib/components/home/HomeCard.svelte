@@ -88,37 +88,34 @@
 	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
 	<div
-		class="relative flex w-full flex-col rounded-t-md text-center align-middle"
-		style="background: {project ? '#f6f5f6' : '#f9f2ff'}"
+		class="relative flex w-full flex-col rounded-t-md text-center align-middle {project
+			? 'bg-project-light'
+			: 'bg-report-light'}"
 	>
 		<div class="mt-2 flex h-9 w-full items-center justify-between px-3">
 			<div class="flex items-center justify-center">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
-					class="w-6 {report ? 'fill-primary-dark' : 'fill-grey-dark'}"
+					class="w-6 {report ? 'fill-report' : 'fill-project'}"
 				>
 					<path d={project ? mdiViewGridOutline : mdiFileChartOutline} />
 				</svg>
 				<div
-					class="relative ml-2"
+					class="relative ml-2 mt-1"
 					use:clickOutside={() => {
 						showOptions = false;
 					}}
 				>
 					{#if hovering && ((project && user) || (report && user?.name === entry.ownerName))}
 						<button
-							class="rounded-md hover:bg-primary-mid"
+							class="rounded-md {project ? 'hover:bg-project-light' : 'hover:bg-report-light'}"
 							on:click={(e) => {
 								e.stopPropagation();
 								showOptions = !showOptions;
 							}}
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								class="w-6 fill-primary-dark"
-							>
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6">
 								<path fill="black" d={mdiDotsHorizontal} />
 							</svg>
 						</button>
@@ -135,7 +132,13 @@
 					{/if}
 				</div>
 			</div>
-			<LikeButton on:like={likeEntry} likes={stats.numLikes} liked={stats.userLiked} {user} />
+			<LikeButton
+				on:like={likeEntry}
+				likes={stats.numLikes}
+				liked={stats.userLiked}
+				{user}
+				report={report !== null}
+			/>
 		</div>
 		<div
 			class="mb-4 mt-1 flex max-h-[3rem] min-h-[60px] items-center justify-center px-2"

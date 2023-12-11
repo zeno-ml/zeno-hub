@@ -88,9 +88,9 @@
 				{#if $project.editor && ($selectionIds.length > 0 || $editTag !== undefined)}
 					<div class="flex items-center">
 						<button
-							class="mx-1 flex w-fit rounded-2xl border-2 bg-greenish-light {$filterSelection
-								? 'border-greenish'
-								: 'border-greenish-light'} px-2.5 py-1"
+							class="mx-1 flex w-fit rounded-2xl border-2 bg-secondary-light {$filterSelection
+								? 'border-secondary'
+								: 'border-secondary-light'} px-2.5 py-1"
 							on:click={() => filterSelection.set(!$filterSelection)}
 						>
 							<span
@@ -108,7 +108,7 @@
 						</button>
 						<Button
 							variant="outlined"
-							class="!text-greenish"
+							class="!text-secondary"
 							on:keydown={() => ({})}
 							on:click={() => {
 								if ($editTag === undefined) showNewTag = true;
@@ -122,7 +122,7 @@
 						{#if $editTag === undefined && $tags.length > 0}
 							<Button
 								variant="outlined"
-								class="ml-2 !text-greenish"
+								class="ml-2 !text-secondary"
 								on:keydown={() => ({})}
 								on:click={() => {
 									showUpdateTag = true;
@@ -139,8 +139,8 @@
 					<Group>
 						{#each choices as choice}
 							<Button
-								style="background-color: {selected === choice ? 'var(--G5)' : 'var(--G6)'}"
 								variant="outlined"
+								class={selected === choice ? 'bg-grey-lighter' : 'bg-white'}
 								on:click={() => (selected = choice)}>{choice}</Button
 							>
 						{/each}

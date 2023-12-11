@@ -19,7 +19,7 @@ export default {
 				DEFAULT: 'rgb(245 245 245)',
 				light: '#fbfbfa'
 			},
-			greenish: {
+			secondary: {
 				DEFAULT: '#61988e',
 				light: '#d0ebe6'
 			},
@@ -36,6 +36,14 @@ export default {
 			},
 			white: {
 				DEFAULT: '#ffffff'
+			},
+			project: {
+				DEFAULT: '#6a1b9a',
+				light: '#f7f1fb'
+			},
+			report: {
+				DEFAULT: '#3454B4',
+				light: '#ECF1FE'
 			}
 		},
 		extend: {

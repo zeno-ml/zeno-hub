@@ -9,6 +9,7 @@
 	export let likes: number;
 	export let liked: boolean;
 	export let user: User | null;
+	export let report = false;
 
 	let hovering = false;
 
@@ -17,9 +18,9 @@
 
 <div class="flex">
 	<div class="flex">
-		<p class="pr-2 text-base font-semibold text-grey-dark">{likes}</p>
+		<p class="pr-2 text-base font-semibold {report ? 'text-report' : 'text-project'}">{likes}</p>
 		<button
-			class=" h-6 w-6 fill-primary-dark"
+			class=" h-6 w-6 {report ? 'fill-report' : 'fill-project'}"
 			on:mouseover={() => (hovering = true)}
 			on:mouseout={() => (hovering = false)}
 			on:focus={() => (hovering = true)}

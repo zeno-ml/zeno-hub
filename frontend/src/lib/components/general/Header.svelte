@@ -43,6 +43,7 @@
 					{user}
 					likes={numLikes}
 					liked={userLiked}
+					report={report ? true : false}
 				/>
 			</div>
 		{/if}
