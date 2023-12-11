@@ -883,7 +883,7 @@ export class ZenoService {
 	}
 
 	/**
-	 * Get Projects
+	 * Get User Projects
 	 * Get all projects for the current user.
 	 *
 	 * Args:
@@ -895,10 +895,36 @@ export class ZenoService {
 	 * @returns Project Successful Response
 	 * @throws ApiError
 	 */
-	public getProjects(): CancelablePromise<Array<Project>> {
+	public getUserProjects(): CancelablePromise<Array<Project>> {
 		return this.httpRequest.request({
 			method: 'GET',
-			url: '/projects'
+			url: '/user-projects'
+		});
+	}
+
+	/**
+	 * Get Projects
+	 * Get all projects from a list of UUIDs.
+	 *
+	 * Args:
+	 * project_uuids (list[str]): list of project UUIDs to fetch projects for.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * list[Project]: all projects whose UUIDs are in the provided list.
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public getProjects(requestBody: Array<string>): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/projects',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 

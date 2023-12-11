@@ -91,11 +91,11 @@ async def get_project_uuid(owner_name: str, project_name: str, request: Request)
 
 
 @router.get(
-    "/projects",
+    "/user-projects",
     response_model=list[Project],
     tags=["zeno"],
 )
-async def get_projects(current_user=Depends(util.auth.claim())):
+async def get_user_projects(current_user=Depends(util.auth.claim())):
     """Get all projects for the current user.
 
     Args:
@@ -112,6 +112,26 @@ async def get_projects(current_user=Depends(util.auth.claim())):
             detail=("User not logged in"),
         )
     return await select.projects(user)
+
+
+@router.post("/projects", tags=["zeno"])
+async def get_projects(project_uuids: list[str], request: Request):
+    """Get all projects from a list of UUIDs.
+
+    Args:
+        project_uuids (list[str]): list of project UUIDs to fetch projects for.
+        request (Request): http request to get user information from.
+
+    Returns:
+        list[Project]: all projects whose UUIDs are in the provided list.
+    """
+    projects = []
+    for project_uuid in project_uuids:
+        await util.project_access_valid(project_uuid, request)
+        project = await select.project_from_uuid(project_uuid)
+        if project is not None:
+            projects.append(project)
+    return projects
 
 
 @router.post("/like-project/{project_uuid}", tags=["zeno"])
