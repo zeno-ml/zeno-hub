@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
+	import { goto, invalidate } from '$app/navigation';
 	import Header from '$lib/components/general/Header.svelte';
 	import Help from '$lib/components/general/Help.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
@@ -132,22 +132,37 @@
 					})}</span
 				>
 			</div>
-			<hr class="mt-4 text-grey-light" />
 
+			<div class="flex w-full items-center">
+				<p class="mr-2 text-lg">Projects:</p>
+				{#if data.report.editor}
+					{#await zenoClient.getUserProjects() then projects}
+						<Svelecte
+							bind:value={selectedProjects}
+							on:change={updateReportProjects}
+							valueField="uuid"
+							labelField="name"
+							searchable={false}
+							multiple={true}
+							options={projects}
+							renderer={svelecteRendererName}
+						/>
+					{/await}
+				{:else}
+					<div class="flex">
+						{#each data.projects as project}
+							<button
+								class="mr-1 w-fit rounded bg-primary-light px-2.5 py-1"
+								on:click={() =>
+									goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
+							>
+								{project.name}
+							</button>
+						{/each}
+					</div>
+				{/if}
+			</div>
 			{#if data.report.editor}
-				<p class="mb-2 mt-4">Associated Projects</p>
-				{#await zenoClient.getProjects() then projects}
-					<Svelecte
-						bind:value={selectedProjects}
-						on:change={updateReportProjects}
-						valueField="uuid"
-						labelField="name"
-						searchable={false}
-						multiple={true}
-						options={projects}
-						renderer={svelecteRendererName}
-					/>
-				{/await}
 				<hr class="mb-4 mt-4 text-grey-light" />
 				<AddElementButton
 					position={0}

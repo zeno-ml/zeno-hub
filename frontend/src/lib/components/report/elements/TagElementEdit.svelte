@@ -50,7 +50,7 @@
 	}
 </script>
 
-{#await zenoClient.getProjects() then projects}
+{#await zenoClient.getUserProjects() then projects}
 	{@const options = tagOptions.map((s) => {
 		return {
 			name: `${s.tagName} (${projects.find((p) => p.uuid === s.projectUuid)?.name})`,
