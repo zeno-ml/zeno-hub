@@ -15,6 +15,7 @@ from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
     Project,
     ProjectHomeElement,
+    ProjectHomeElementType,
     ProjectState,
     ProjectStats,
 )
@@ -858,6 +859,29 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
             chart_results,
         )
     )
+
+
+async def project_home_chart_ids(project_uuid: str) -> list[int]:
+    """Get all chart IDs for a project's home view.
+
+    Args:
+        project_uuid (str): the UUID of the project.
+
+    Returns:
+        list[int]: the list of chart IDs.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT data FROM project_home_elements WHERE project_uuid = %s "
+                "AND type = %s;",
+                [project_uuid, ProjectHomeElementType.CHART],
+            )
+            chart_results = await cur.fetchall()
+    if len(chart_results) == 0:
+        return []
+
+    return [r[0] for r in chart_results]
 
 
 async def tags_for_projects(project_uuids: list[str]) -> list[Tag]:

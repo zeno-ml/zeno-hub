@@ -15,7 +15,10 @@ export async function load({ params, depends, cookies, url }) {
 		throw error(err.status, err.body.detail);
 	}
 
+	const homeChartIds = await zenoClient.projectHomeChartIds(params.uuid);
+
 	return {
-		charts: charts
+		charts: charts,
+		homeChartIds: homeChartIds
 	};
 }

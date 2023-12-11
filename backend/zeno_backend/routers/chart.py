@@ -68,6 +68,23 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
     return chart
 
 
+@router.get(
+    "/project_home_chart_ids/{project_uuid}", response_model=list[int], tags=["zeno"]
+)
+async def project_home_chart_ids(project_uuid: str, request: Request) -> list[int]:
+    """Get the ids of all charts in a project's home page.
+
+    Args:
+        project_uuid (str): UUID of the project to get the charts for.
+        request (Request): http request to get user information from.
+
+    Returns:
+        list[int]: list of chart ids.
+    """
+    await util.project_access_valid(project_uuid, request)
+    return await select.project_home_chart_ids(project_uuid)
+
+
 @router.post(
     "/charts-for-projects/",
     response_model=list[Chart],

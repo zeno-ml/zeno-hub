@@ -305,6 +305,33 @@ export class ZenoService {
 	}
 
 	/**
+	 * Project Home Chart Ids
+	 * Get the ids of all charts in a project's home page.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get the charts for.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * list[int]: list of chart ids.
+	 * @param projectUuid
+	 * @returns number Successful Response
+	 * @throws ApiError
+	 */
+	public projectHomeChartIds(projectUuid: string): CancelablePromise<Array<number>> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/project_home_chart_ids/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Charts For Projects
 	 * Get all charts for a list of projects.
 	 *
