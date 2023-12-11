@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, User, ZenoService } from '$lib/zenoapi';
-	import { mdiLink } from '@mdi/js';
+	import { mdiLinkVariant } from '@mdi/js';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
@@ -45,7 +45,7 @@
 			}}
 		>
 			<Icon tag="svg" viewBox="0 0 24 24">
-				<path fill="black" d={mdiLink} />
+				<path fill="black" d={mdiLinkVariant} />
 			</Icon>
 		</IconButton>
 		{#if linkCopied}

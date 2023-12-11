@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { Report, User, ZenoService } from '$lib/zenoapi';
-	import { mdiFileChartOutline, mdiLink, mdiPlus } from '@mdi/js';
+	import { mdiFileChartOutline, mdiLinkVariant, mdiPlus } from '@mdi/js';
 	import Button, { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
@@ -58,7 +58,7 @@
 					}}
 				>
 					<Icon tag="svg" viewBox="0 0 24 24">
-						<path fill="black" d={mdiLink} />
+						<path fill="black" d={mdiLinkVariant} />
 					</Icon>
 				</IconButton>
 				{#if linkCopied}
