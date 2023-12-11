@@ -1,11 +1,11 @@
 -- Users 
 COPY public.users (id, name, display_name, cognito_id, api_key_hash) FROM stdin;
-1	test    test	d909891e-40e1-70e7-b811-604d7c353f82	26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
+1   test    test    d909891e-40e1-70e7-b811-604d7c353f82    26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
 \.
 
 -- Projects
 COPY public.projects (uuid, name, owner_id, view, samples_per_page, public, description, created_at, updated_at) FROM stdin;
-f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	t		2023-11-21 18:40:29.449311	2023-11-21 18:40:29.449311
+f93ccc54-f701-4da8-b816-696e166f3274    GPT MT Benchmarks   1   text-classification 10  t   2023-11-21 18:40:29.449311  2023-11-21 18:40:29.449311
 \.
 
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" (
