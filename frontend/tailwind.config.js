@@ -38,12 +38,12 @@ export default {
 				DEFAULT: '#ffffff'
 			},
 			project: {
-				DEFAULT: '#7E2658',
-				light: '#FDF3F9'
+				DEFAULT: '#6a1b9a',
+				light: '#f7f1fb'
 			},
 			report: {
-				DEFAULT: '#6E55B8',
-				light: '#F7F7FF'
+				DEFAULT: '#2955ba',
+				light: '#ebf1ff'
 			}
 		},
 		extend: {
