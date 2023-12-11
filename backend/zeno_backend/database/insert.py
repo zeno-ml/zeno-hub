@@ -734,8 +734,9 @@ async def user(user: User) -> int | None:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO users (name, cognito_id) values(%s, %s) RETURNING id;",
-                [user.name, user.cognito_id],
+                "INSERT INTO users (name, display_name, cognito_id) values(%s, %s, %s) "
+                "RETURNING id;",
+                [user.name, user.display_name, user.cognito_id],
             )
             id = await cur.fetchall()
 

@@ -585,13 +585,17 @@ async def user_by_api_key(api_key: str) -> User:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, cognito_id FROM users WHERE api_key_hash = %s;",
+                "SELECT id, name, display_name, cognito_id FROM users "
+                "WHERE api_key_hash = %s;",
                 [api_key_hash],
             )
             user_res = await cur.fetchall()
     if len(user_res) == 1:
         return User(
-            id=int(user_res[0][0]), name=str(user_res[0][1]), cognito_id=user_res[0][2]
+            id=user_res[0][0],
+            name=user_res[0][1],
+            display_name=user_res[0][2],
+            cognito_id=user_res[0][3],
         )
     raise HTTPException(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -722,7 +726,7 @@ async def report_response(id: int, user: User | None) -> ReportResponse:
                 report_result = report_result[0]
 
             await cur.execute(
-                "SELECT name FROM users WHERE id = %s;", [report_result[2]]
+                "SELECT display_name FROM users WHERE id = %s;", [report_result[2]]
             )
             owner_name = await cur.fetchall()
             if len(owner_name) == 0:
@@ -2278,17 +2282,20 @@ async def user(name: str) -> User | None:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, cognito_id FROM users WHERE name = %s", [name]
+                "SELECT id, name, display_name, cognito_id FROM users WHERE name = %s",
+                [name],
             )
             user = await cur.fetchall()
 
     if len(user) == 0:
         return None
+
     user = user[0]
     return User(
-        id=user[0] if isinstance(user[0], int) else -1,
-        name=str(user[1]),
-        cognito_id=user[2],
+        id=user[0],
+        name=user[1],
+        display_name=user[2],
+        cognito_id=user[3],
         admin=None,
     )
 
@@ -2301,14 +2308,18 @@ async def users() -> list[User]:
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
-            await cur.execute("SELECT id, name, cognito_id FROM users;")
+            await cur.execute("SELECT id, name, display_name, cognito_id FROM users;")
             users = await cur.fetchall()
-    return list(
-        map(
-            lambda user: User(id=user[0], name=user[1], cognito_id=user[2], admin=None),
-            users,
+    return [
+        User(
+            id=user[0],
+            name=user[1],
+            display_name=user[2],
+            cognito_id=user[3],
+            admin=None,
         )
-    )
+        for user in users
+    ]
 
 
 async def organizations() -> list[Organization]:
@@ -2354,7 +2365,7 @@ async def user_organizations(user: User) -> list[Organization]:
                 return organizations
             for org in organizations_result:
                 await cur.execute(
-                    "SELECT u.id, u.name, uo.admin FROM users as u "
+                    "SELECT u.id, u.name, u.display_name, uo.admin FROM users as u "
                     "JOIN user_organization as uo ON u.id = uo.user_id "
                     "WHERE uo.organization_id = %s;",
                     [org[0]],
@@ -2365,16 +2376,15 @@ async def user_organizations(user: User) -> list[Organization]:
                         id=org[0],
                         name=org[1],
                         admin=org[2],
-                        members=list(
-                            map(
-                                lambda member: User(
-                                    id=member[0],
-                                    name=member[1],
-                                    admin=member[2],
-                                ),
-                                members,
+                        members=[
+                            User(
+                                id=member[0],
+                                name=member[1],
+                                display_name=member[2],
+                                admin=member[3],
                             )
-                        ),
+                            for member in members
+                        ],
                     )
                 )
             return organizations
@@ -2392,18 +2402,22 @@ async def project_users(project: str) -> list[User]:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT u.id, u.name, up.editor FROM users as u "
+                "SELECT u.id, u.name, u.display_name, up.editor FROM users as u "
                 "JOIN user_project AS up ON u.id = up.user_id "
                 "WHERE up.project_uuid = %s",
                 [project],
             )
             project_users = await cur.fetchall()
-    return list(
-        map(
-            lambda user: User(id=user[0], name=user[1], admin=user[2]),
-            project_users,
+
+    return [
+        User(
+            id=user[0],
+            name=user[1],
+            display_name=user[2],
+            admin=user[3],
         )
-    )
+        for user in project_users
+    ]
 
 
 async def report_users(report_id: int) -> list[User]:
@@ -2418,17 +2432,21 @@ async def report_users(report_id: int) -> list[User]:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT u.id, u.name, ur.editor FROM users as u "
+                "SELECT u.id, u.name, u.display_name, ur.editor FROM users as u "
                 "JOIN user_report AS ur ON u.id = ur.user_id WHERE ur.report_id = %s",
                 [report_id],
             )
             report_users = await cur.fetchall()
-    return list(
-        map(
-            lambda user: User(id=user[0], name=user[1], admin=user[2]),
-            report_users,
+
+    return [
+        User(
+            id=user[0],
+            name=user[1],
+            display_name=user[2],
+            admin=user[3],
         )
-    )
+        for user in report_users
+    ]
 
 
 async def project_orgs(project: str) -> list[Organization]:
