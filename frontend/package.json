@@ -76,7 +76,7 @@
 		"svelte-highlight": "^7.4.1",
 		"svelte-multiselect": "^10.2.0",
 		"svelte-vega": "^2.1.0",
-		"vega": "^5.25.0",
+		"vega": "^5.26.1",
 		"vega-lite": "^5.16.3"
 	},
 	"type": "module"
