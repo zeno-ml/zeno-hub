@@ -136,7 +136,7 @@
 				</p>
 			</div>
 
-			<div class="mt-2 flex w-full items-center">
+			<div class="mt-2 flex w-full flex-wrap items-center gap-2">
 				<p class="mr-2 text-lg font-medium text-grey-dark">Linked Projects:</p>
 				{#if data.report.editor}
 					{#await zenoClient.getUserProjects() then projects}
@@ -152,18 +152,15 @@
 						/>
 					{/await}
 				{:else}
-					<div class="flex">
-						{#each data.projects as project}
-							<button
-								class="mr-1 flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
-								on:click={() =>
-									goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
-							>
-								<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />
-								<p class="mr-1">{project.name}</p>
-							</button>
-						{/each}
-					</div>
+					{#each data.projects as project}
+						<button
+							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
+							on:click={() => goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
+						>
+							<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />
+							<p class="mr-1">{project.name}</p>
+						</button>
+					{/each}
 				{/if}
 			</div>
 			{#if data.report.editor}
