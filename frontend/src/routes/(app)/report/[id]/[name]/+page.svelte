@@ -119,22 +119,25 @@
 			<h1 class="text-grey-darkest mr-6 pt-4 text-5xl">
 				{data.report.name}
 			</h1>
-			<div class="mt-4 flex items-center">
-				<h5 class="text-lg">Author: {data.report.ownerName}</h5>
-				<span class="ml-4 text-grey-darker"
-					>Updated {new Date(data.report.updatedAt ?? '').toLocaleString('en-US', {
-						weekday: 'long',
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric',
-						hour: 'numeric',
-						minute: 'numeric'
-					})}</span
-				>
+			<p class="mt-2 text-grey-dark">
+				Updated {new Date(data.report.updatedAt ?? '').toLocaleString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric',
+					hour: 'numeric',
+					minute: 'numeric'
+				})}
+			</p>
+			<div class="mt-4 flex items-center text-lg">
+				<p class="mr-2 font-medium text-grey-dark">Author:</p>
+				<p>
+					{data.report.ownerName}
+				</p>
 			</div>
 
-			<div class="flex w-full items-center">
-				<p class="mr-2 text-lg">Projects:</p>
+			<div class="mt-2 flex w-full items-center">
+				<p class="mr-2 text-lg font-medium text-grey-dark">Linked Projects:</p>
 				{#if data.report.editor}
 					{#await zenoClient.getUserProjects() then projects}
 						<Svelecte
@@ -152,11 +155,12 @@
 					<div class="flex">
 						{#each data.projects as project}
 							<button
-								class="mr-1 w-fit rounded bg-primary-light px-2.5 py-1"
+								class="mr-1 flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
 								on:click={() =>
 									goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
 							>
-								{project.name}
+								<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />
+								<p class="mr-1">{project.name}</p>
 							</button>
 						{/each}
 					</div>
@@ -170,7 +174,7 @@
 					alwaysShow={elements.length === 0 ? true : false}
 				/>
 			{/if}
-			<div class="mt-2 flex flex-col">
+			<div class="mt-4 flex flex-col">
 				{#each elements as element (element.id)}
 					{#if data.report.editor}
 						<div
