@@ -51,7 +51,7 @@
 	}
 </script>
 
-{#await zenoClient.getProjects() then projects}
+{#await zenoClient.getUserProjects() then projects}
 	{@const options = sliceOptions.map((s) => {
 		return {
 			name: `${s.sliceName} (${projects.find((p) => p.uuid === s.projectUuid)?.name})`,

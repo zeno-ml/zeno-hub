@@ -18,7 +18,7 @@
 	}
 </script>
 
-{#await zenoClient.getProjects() then projects}
+{#await zenoClient.getUserProjects() then projects}
 	{@const options = chartOptions.map((c) => {
 		return {
 			name: `${c.name} (${projects.find((p) => p.uuid === c.projectUuid)?.name})`,
