@@ -21,7 +21,7 @@
 </script>
 
 {#if element.data !== null && element.data !== undefined}
-	<div class="my-2 ml-2 flex items-center" bind:clientWidth={width}>
+	<div class="my-2 flex items-center" bind:clientWidth={width}>
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART && chartOptions.length > 0}
