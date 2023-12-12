@@ -12,6 +12,7 @@
 	class="m-auto flex cursor-pointer items-center p-3 hover:bg-black-transparent"
 	on:click
 	use:tooltip={{ text: tooltipContent }}
+	aria-label={pageName}
 >
 	<div class="h-6 w-6 fill-grey">
 		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
