@@ -33,7 +33,7 @@ from zeno_backend.classes.table import (
     TagTableRequest,
 )
 from zeno_backend.classes.tag import Tag
-from zeno_backend.classes.user import Organization, User
+from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, match_instance_view
 from zeno_backend.processing.filtering import table_filter
@@ -1073,6 +1073,32 @@ async def report_elements(report_id: int) -> list[ReportElement] | None:
                 element_result,
             )
         )
+
+
+async def report_authors(report_id: int) -> list[Author]:
+    """Get all authors of a report.
+
+    Args:
+        report_id (int): the id of the report to get authors for.
+
+    Returns:
+        list[User]: list of authors in the report.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT user_id, position FROM report_author WHERE report_id = %s;",
+                [report_id],
+            )
+            author_result = await cur.fetchall()
+
+    if author_result is None:
+        return []
+
+    return [
+        Author(user=await user_by_id(author[0]), position=author[1])
+        for author in author_result
+    ]
 
 
 async def project_state(
@@ -2300,6 +2326,39 @@ async def user(name: str) -> User | None:
     )
 
 
+async def user_by_id(id: int) -> User:
+    """Get the user with a specific id.
+
+    Args:
+        id (int): the id of the user for which to fetch the user.
+
+    Returns:
+        User: the requested user.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, name, display_name, cognito_id FROM users WHERE id = %s",
+                [id],
+            )
+            user = await cur.fetchall()
+
+    if len(user) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No user with this id could be found.",
+        )
+
+    user = user[0]
+    return User(
+        id=user[0],
+        name=user[1],
+        display_name=user[2],
+        cognito_id=user[3],
+        admin=None,
+    )
+
+
 async def users() -> list[User]:
     """Get a list of all registered users.
 
@@ -2447,6 +2506,38 @@ async def report_users(report_id: int) -> list[User]:
         )
         for user in report_users
     ]
+
+
+async def report_owner(report_id: int) -> User:
+    """Get the owner of a report.
+
+    Args:
+        report_id (int): the report for which to get the owner.
+
+    Returns:
+        User: the owner of the report.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT u.id, u.name, u.display_name FROM users as u "
+                "JOIN reports AS r ON u.id = r.owner_id WHERE r.id = %s",
+                [report_id],
+            )
+            report_owner = await cur.fetchall()
+
+    if len(report_owner) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No report with this id could be found.",
+        )
+
+    return User(
+        id=report_owner[0][0],
+        name=report_owner[0][1],
+        display_name=report_owner[0][2],
+        admin=True,
+    )
 
 
 async def project_orgs(project: str) -> list[Organization]:

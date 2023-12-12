@@ -117,6 +117,13 @@ CREATE TABLE user_report (
     editor boolean NOT NULL DEFAULT false
 );
 
+CREATE TABLE report_author (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    report_id integer NOT NULL REFERENCES reports(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    position integer NOT NULL,
+);
+
 CREATE TABLE organization_report (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     organization_id integer NOT NULL REFERENCES organizations(id) ON DELETE CASCADE ON UPDATE CASCADE,

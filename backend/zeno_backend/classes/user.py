@@ -35,3 +35,15 @@ class Organization(CamelModel):
     name: str
     members: list[User]
     admin: bool
+
+
+class Author(CamelModel):
+    """Representation of an author in Zeno.
+
+    Attributes:
+        user (User): user that is the author.
+        position (int): position of the author in the list of authors.
+    """
+
+    user: User
+    position: int

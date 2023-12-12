@@ -34,11 +34,14 @@ export async function load({ cookies, params, url, depends }) {
 			);
 		}
 	}
-	const [projects, charts, slices, tags] = await Promise.all([
+	const [projects, charts, slices, tags, authors, users, owner] = await Promise.all([
 		zenoClient.getProjects(reportResponse.report.linkedProjects),
 		zenoClient.getChartsForProjects(reportResponse.report.linkedProjects),
 		zenoClient.getSlicesForProjects(reportResponse.report.linkedProjects),
-		zenoClient.getTagsForProjects(reportResponse.report.linkedProjects)
+		zenoClient.getTagsForProjects(reportResponse.report.linkedProjects),
+		zenoClient.getReportAuthors(reportResponse.report.id),
+		zenoClient.getReportUsers(reportResponse.report.id),
+		zenoClient.getReportOwner(reportResponse.report.id)
 	]);
 
 	if (reportResponse.report.name !== decodeURI(params.name)) {
@@ -57,6 +60,8 @@ export async function load({ cookies, params, url, depends }) {
 		cognitoUser: cognitoUser,
 		numLikes: reportResponse.numLikes,
 		userLiked: reportResponse.userLiked,
-		projects: projects
+		projects: projects,
+		authors: authors,
+		users: [...users, owner]
 	};
 }
