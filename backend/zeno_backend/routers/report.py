@@ -329,7 +329,7 @@ async def add_report_author(report_id: int, author: Author, request: Request):
         request (Request): http request to get user information from.
     """
     await util.report_editor(report_id, request)
-    await insert.report_author(author, report_id)
+    await insert.report_author(report_id, author)
 
 
 @router.post(
@@ -425,7 +425,7 @@ async def update_report_author(report_id: int, author: Author, request: Request)
         request (Request): http request to get user information from.
     """
     await util.report_editor(report_id, request)
-    await update.report_author(author, report_id)
+    await update.report_author(report_id, author)
 
 
 @router.patch("/report/", tags=["zeno"], dependencies=[Depends(util.auth)])

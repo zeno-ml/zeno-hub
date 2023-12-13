@@ -187,8 +187,10 @@
 					minute: 'numeric'
 				})}
 			</p>
-			<div class="mt-4 flex items-center text-lg">
-				<p class="mr-2 font-medium text-grey-dark">Author{authors.length > 1 ? 's' : ''}:</p>
+			<div class="mt-4 flex flex-wrap items-center gap-y-2 text-lg">
+				<p class="mr-2 flex-wrap font-medium text-grey-dark">
+					Author{authors.length > 1 ? 's' : ''}:
+				</p>
 				{#if data.report.editor}
 					<MultiSelect
 						bind:selected={authorsSelected}
@@ -203,13 +205,11 @@
 					</MultiSelect>
 				{:else}
 					{#each authors as author}
-						<div
-							class="mr-1 flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
-						>
+						<div class="mr-1 flex w-fit shrink-0 items-center rounded px-2 py-1">
 							<Icon class="mr-1 h-6 w-6" tag="svg" viewBox="0 0 24 24">
-								<path class="fill-grey" d={mdiAccountCircleOutline} />
+								<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
 							</Icon>
-							<p class="mr-1">{author.user.displayName}</p>
+							<p>{author.user.displayName}</p>
 						</div>
 					{/each}
 				{/if}

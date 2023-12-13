@@ -443,12 +443,12 @@ async def report_element(element: ReportElement):
             await conn.commit()
 
 
-async def report_author(author: Author, report_id: int):
+async def report_author(report_id: int, author: Author):
     """Update an author for a report.
 
     Args:
-        author (Author): the author to be updated.
         report_id (int): the id of the report.
+        author (Author): the author to be updated.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:

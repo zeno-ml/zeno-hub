@@ -38,10 +38,10 @@ class Organization(CamelModel):
 
 
 class Author(CamelModel):
-    """Representation of an author in Zeno.
+    """Zeno report author for displaying author list.
 
     Attributes:
-        user (User): user that is the author.
+        user (User): User object for author.
         position (int): position of the author in the list of authors.
     """
 

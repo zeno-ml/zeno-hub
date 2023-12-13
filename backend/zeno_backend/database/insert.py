@@ -483,12 +483,12 @@ async def report_element(report_id: int, element: ReportElement) -> int | None:
                 return id[0][0]
 
 
-async def report_author(author: Author, report_id: int):
+async def report_author(report_id: int, author: Author):
     """Adds an author to a report.
 
     Args:
-        author (Author): the author to be added.
         report_id (int): the id of the report to be added as an author.
+        author (Author): the author to be added.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:

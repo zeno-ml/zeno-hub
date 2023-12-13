@@ -1092,9 +1092,6 @@ async def report_authors(report_id: int) -> list[Author]:
             )
             author_result = await cur.fetchall()
 
-    if author_result is None:
-        return []
-
     return [
         Author(user=await user_by_id(author[0]), position=author[1])
         for author in author_result
@@ -2330,10 +2327,7 @@ async def user_by_id(id: int) -> User:
     """Get the user with a specific id.
 
     Args:
-        id (int): the id of the user for which to fetch the user.
-
-    Returns:
-        User: the requested user.
+        id (int): the id of the user to fetch.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
