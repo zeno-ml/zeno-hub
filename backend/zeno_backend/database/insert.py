@@ -439,6 +439,14 @@ async def report(name: str, user: User) -> int:
                 [name, user.id, False],
             )
             id = await cur.fetchall()
+
+            # Per default, add the report creator as its first author
+            await cur.execute(
+                "INSERT INTO report_author (user_id, report_id, position) "
+                "VALUES (%s,%s,%s);",
+                [user.id, id, 0],
+            )
+
             await conn.commit()
 
             if len(id) == 0:
