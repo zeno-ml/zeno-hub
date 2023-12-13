@@ -47,7 +47,7 @@
 					{user}
 					likes={numLikes}
 					liked={userLiked}
-					report={report ? true : false}
+					report={false}
 				/>
 				<IconButton
 					class="ml-2"
