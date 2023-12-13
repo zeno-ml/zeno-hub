@@ -187,8 +187,8 @@
 					minute: 'numeric'
 				})}
 			</p>
-			<div class="mt-4 flex flex-wrap items-center gap-y-2 text-lg">
-				<p class="mr-2 flex-wrap font-medium text-grey-dark">
+			<div class="mt-4 flex {!data.report.editor ? 'flex-wrap' : ''} items-center gap-2 gap-x-4">
+				<p class="text-lg text-grey-dark">
 					Author{authors.length > 1 ? 's' : ''}:
 				</p>
 				{#if data.report.editor}
@@ -205,9 +205,9 @@
 					</MultiSelect>
 				{:else}
 					{#each authors as author}
-						<div class="mr-1 flex w-fit shrink-0 items-center rounded px-2 py-1">
+						<div class="flex w-fit shrink-0 items-center rounded">
 							<Icon class="mr-1 h-6 w-6" tag="svg" viewBox="0 0 24 24">
-								<path class="fill-grey-dark" d={mdiAccountCircleOutline} />
+								<path class="fill-primary" d={mdiAccountCircleOutline} />
 							</Icon>
 							<p>{author.user.displayName}</p>
 						</div>
@@ -216,7 +216,7 @@
 			</div>
 
 			<div class="mt-2 flex w-full flex-wrap items-center gap-2">
-				<p class="mr-2 text-lg font-medium text-grey-dark">Linked Projects:</p>
+				<p class="mr-2 text-lg text-grey-dark">Linked Projects:</p>
 				{#if data.report.editor}
 					{#await zenoClient.getUserProjects() then projects}
 						<Svelecte
@@ -233,7 +233,7 @@
 				{:else}
 					{#each data.projects as project}
 						<button
-							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
+							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 transition hover:bg-primary-mid"
 							on:click={() => goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
 						>
 							<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />
