@@ -19,7 +19,7 @@ from zeno_backend.classes.report import (
     TagElementOptions,
     TagElementSpec,
 )
-from zeno_backend.classes.user import Organization, User
+from zeno_backend.classes.user import Author, Organization, User
 
 router = APIRouter(tags=["zeno"])
 
@@ -90,6 +90,21 @@ async def get_report_elements(report_id: int, request: Request):
     return await select.report_elements(report_id)
 
 
+@router.post("/report-authors/{report_id}", tags=["zeno"], response_model=list[Author])
+async def get_report_authors(report_id: int, request: Request):
+    """Get all authors of a report.
+
+    Args:
+        report_id (int): id of the report for which to fetch authors.
+        request (Request): http request to get user information from.
+
+    Returns:
+        list[Author]: all authors that a report contains.
+    """
+    await util.report_access_valid(report_id, request)
+    return await select.report_authors(report_id)
+
+
 @router.post("/like-report/{report_id}", tags=["zeno"])
 async def like_report(report_id: int, current_user=Depends(util.auth.claim())):
     """Like a report as a user.
@@ -108,12 +123,7 @@ async def like_report(report_id: int, current_user=Depends(util.auth.claim())):
     await insert.like_report(user.id, report_id)
 
 
-@router.get(
-    "/report-users/{report_id}",
-    response_model=list[User],
-    tags=["zeno"],
-    dependencies=[Depends(util.auth)],
-)
+@router.get("/report-users/{report_id}", response_model=list[User], tags=["zeno"])
 async def get_report_users(report_id: int, request: Request):
     """Get all users  that have access to a report.
 
@@ -124,8 +134,23 @@ async def get_report_users(report_id: int, request: Request):
     Returns:
         list[User]: the list of users who can access the report.
     """
-    await util.report_editor(report_id, request)
+    await util.report_access_valid(report_id, request)
     return await select.report_users(report_id)
+
+
+@router.get("/report-owner/{report_id}", response_model=User, tags=["zeno"])
+async def get_report_owner(report_id: int, request: Request):
+    """Get the owner of a report.
+
+    Args:
+        report_id (int): the report for which to get the owner.
+        request (Request): http request to get user information from.
+
+    Returns:
+        User: the owner of the report.
+    """
+    await util.report_access_valid(report_id, request)
+    return await select.report_owner(report_id)
 
 
 @router.get(
@@ -294,6 +319,19 @@ async def add_report_element(
     return id
 
 
+@router.post("/report-author/{report_id}", tags=["zeno"])
+async def add_report_author(report_id: int, author: Author, request: Request):
+    """Add an author to a report.
+
+    Args:
+        report_id (int): report to add the author to.
+        author (Author): author to be added to the report.
+        request (Request): http request to get user information from.
+    """
+    await util.report_editor(report_id, request)
+    await insert.report_author(report_id, author)
+
+
 @router.post(
     "/report-user/{report_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
@@ -375,6 +413,19 @@ async def update_report_element(
     """
     await util.report_editor(report_id, request)
     await update.report_element(element)
+
+
+@router.patch("/report-author/{report_id}", tags=["zeno"])
+async def update_report_author(report_id: int, author: Author, request: Request):
+    """Update the author of a report.
+
+    Args:
+        report_id (int): the report to update the author for.
+        author (Author): updated report author.
+        request (Request): http request to get user information from.
+    """
+    await util.report_editor(report_id, request)
+    await update.report_author(report_id, author)
 
 
 @router.patch("/report/", tags=["zeno"], dependencies=[Depends(util.auth)])
@@ -470,3 +521,16 @@ async def delete_report_org(
     """
     await util.report_editor(report_id, request)
     await delete.report_org(report_id, organization)
+
+
+@router.delete("/report-author/{report_id}", tags=["zeno"])
+async def delete_report_author(report_id: int, author: Author, request: Request):
+    """Remove an author from a report.
+
+    Args:
+        report_id (int): id dof the report to remove an author from.
+        author (Author): author to be removed from the report.
+        request (Request): http request to get user information from.
+    """
+    await util.report_editor(report_id, request)
+    await delete.report_author(report_id, author)

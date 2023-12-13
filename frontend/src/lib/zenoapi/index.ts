@@ -10,6 +10,7 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { Author } from './models/Author';
 export type { BeeswarmParameters } from './models/BeeswarmParameters';
 export type { Body_add_organization } from './models/Body_add_organization';
 export type { Body_upload_dataset } from './models/Body_upload_dataset';

@@ -22,7 +22,7 @@ from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
-from zeno_backend.classes.user import Organization, User
+from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
 from zeno_backend.processing.chart import calculate_chart_data
@@ -439,6 +439,14 @@ async def report(name: str, user: User) -> int:
                 [name, user.id, False],
             )
             id = await cur.fetchall()
+
+            # Per default, add the report creator as its first author
+            await cur.execute(
+                "INSERT INTO report_author (user_id, report_id, position) "
+                "VALUES (%s,%s,%s);",
+                [user.id, id, 0],
+            )
+
             await conn.commit()
 
             if len(id) == 0:
@@ -473,6 +481,29 @@ async def report_element(report_id: int, element: ReportElement) -> int | None:
             id = await cur.fetchall()
             if len(id) > 0:
                 return id[0][0]
+
+
+async def report_author(report_id: int, author: Author):
+    """Adds an author to a report.
+
+    Args:
+        report_id (int): the id of the report to be added as an author.
+        author (Author): the author to be added.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            # make room for new element position-wise
+            await cur.execute(
+                "UPDATE report_author SET position = position + 1 "
+                "WHERE report_id = %s AND position >= %s;",
+                [report_id, author.position],
+            )
+            await cur.execute(
+                "INSERT INTO report_author (user_id, report_id, position) "
+                "VALUES (%s,%s,%s);",
+                [author.user.id, report_id, author.position],
+            )
+            await conn.commit()
 
 
 async def like_report(user_id: int, report_id: int):

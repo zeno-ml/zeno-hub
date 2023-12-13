@@ -11,7 +11,7 @@ from zeno_backend.classes.project import Project
 from zeno_backend.classes.report import Report, ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
-from zeno_backend.classes.user import Organization, User
+from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.select import user as get_user
 from zeno_backend.processing.chart import calculate_chart_data
@@ -439,6 +439,23 @@ async def report_element(element: ReportElement):
             await cur.execute(
                 "UPDATE reports SET updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
                 [report_id[0][0]],
+            )
+            await conn.commit()
+
+
+async def report_author(report_id: int, author: Author):
+    """Update an author for a report.
+
+    Args:
+        report_id (int): the id of the report.
+        author (Author): the author to be updated.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE report_author SET position = %s"
+                " WHERE user_id = %s AND report_id = %s;",
+                [author.position, author.user.id, report_id],
             )
             await conn.commit()
 

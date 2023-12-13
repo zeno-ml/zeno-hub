@@ -1,7 +1,7 @@
 """Functions to delete data from the database."""
 from psycopg import sql
 
-from zeno_backend.classes.user import Organization, User
+from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 
 
@@ -197,6 +197,22 @@ async def report_element(id: int):
             await cur.execute(
                 "DELETE FROM report_elements WHERE id = %s;",
                 [id],
+            )
+            await conn.commit()
+
+
+async def report_author(report_id: int, author: Author):
+    """Remove an author from a report.
+
+    Args:
+        report_id (int): the report id from which to remove the author.
+        author (Author): the author to remove.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM report_author WHERE user_id = %s AND report_id = %s;",
+                [author.user.id, report_id],
             )
             await conn.commit()
 

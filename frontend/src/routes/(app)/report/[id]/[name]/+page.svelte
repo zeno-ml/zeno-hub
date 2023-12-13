@@ -7,19 +7,40 @@
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import { svelecteRendererName } from '$lib/util/util.js';
-	import { ReportElementType, ZenoService, type Project } from '$lib/zenoapi';
+	import {
+		ReportElementType,
+		ZenoService,
+		type Author,
+		type Project,
+		type User
+	} from '$lib/zenoapi';
 	import { mdiAccountCircleOutline } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
+	import { MultiSelect } from 'svelte-multiselect';
 
 	export let data;
 
 	let reportEdit = false;
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
+	let authors: Author[] = data.authors.sort((a: Author, b: Author) => a.position - b.position);
 	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
 	let showConfirmDelete = -1;
+	let authorOptions: { id: number; label: string }[] = [
+		...data.users.map((user: User) => {
+			return {
+				id: user.id,
+				label: user.displayName
+			};
+		})
+	];
+	let authorsSelected: { id: number; label: string }[] = data.authors.map((author: Author) => {
+		{
+			return { id: author.user.id, label: author.user.displayName };
+		}
+	});
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -53,6 +74,41 @@
 		const projectUuids = e.detail.map((p: Project) => p.uuid);
 		zenoClient.updateReportProjects(data.report.id, projectUuids);
 		invalidate('app:report');
+	}
+
+	$: updateReportAuthors(authorsSelected);
+
+	function updateReportAuthors(authorsSelected: { id: number; label: string }[]) {
+		const finalList: Author[] = [];
+		authorsSelected.forEach((option: { id: number; label: string }, index: number) => {
+			// Author not yet in list, add it
+			if (!authors.map((author) => author.user.id).includes(option.id)) {
+				const user = data.users.find((user: User) => user.id === option.id);
+				if (user) {
+					const author = { user: user, position: index };
+					zenoClient.addReportAuthor(data.report.id, author);
+					finalList.push(author);
+				}
+				// Author in wrong position, move it
+			} else if (!authors[index] || option.id !== authors[index].user.id) {
+				const user = data.users.find((user: User) => user.id === option.id);
+				if (user) {
+					const author = { user: user, position: index };
+					zenoClient.updateReportAuthor(data.report.id, author);
+					finalList.push(author);
+				}
+				// Author correct, keep it
+			} else {
+				finalList.push(authors[index]);
+			}
+		});
+		// Remove authors that are not in the list anymore
+		authors.forEach((author) => {
+			if (!finalList.find((finalAuthor) => finalAuthor.user.id === author.user.id)) {
+				zenoClient.deleteReportAuthor(data.report.id, author);
+			}
+		});
+		authors = finalList.sort((a, b) => a.position - b.position);
 	}
 
 	function swapElementPositions(elementId: number | null | undefined, position: number) {
@@ -131,18 +187,36 @@
 					minute: 'numeric'
 				})}
 			</p>
-			<div class="mt-4 flex items-center text-lg">
-				<p class="mr-2 font-medium text-grey-dark">Author:</p>
-				<Icon class="mr-1 h-6 w-6" tag="svg" viewBox="0 0 24 24">
-					<path class="fill-grey" d={mdiAccountCircleOutline} />
-				</Icon>
-				<p>
-					{data.report.ownerName}
+			<div class="mt-4 flex {!data.report.editor ? 'flex-wrap' : ''} items-center gap-2 gap-x-4">
+				<p class="text-lg text-grey-dark">
+					Author{authors.length > 1 ? 's' : ''}:
 				</p>
+				{#if data.report.editor}
+					<MultiSelect
+						bind:selected={authorsSelected}
+						options={authorOptions}
+						key={JSON.stringify}
+						liSelectedClass="!bg-primary-light ![&>svg]:fill-primary"
+						ulSelectedClass="!overflow-x-auto !w-full"
+						outerDivClass="!w-full !border-grey-light !py-1 !bg-white"
+						liActiveOptionClass="!bg-primary-light"
+					>
+						<p style="text-wrap: pretty;" slot="selected" let:option>{option.label}</p>
+					</MultiSelect>
+				{:else}
+					{#each authors as author}
+						<div class="flex w-fit shrink-0 items-center rounded">
+							<Icon class="mr-1 h-6 w-6" tag="svg" viewBox="0 0 24 24">
+								<path class="fill-primary" d={mdiAccountCircleOutline} />
+							</Icon>
+							<p>{author.user.displayName}</p>
+						</div>
+					{/each}
+				{/if}
 			</div>
 
 			<div class="mt-2 flex w-full flex-wrap items-center gap-2">
-				<p class="mr-2 text-lg font-medium text-grey-dark">Linked Projects:</p>
+				<p class="mr-2 text-lg text-grey-dark">Linked Projects:</p>
 				{#if data.report.editor}
 					{#await zenoClient.getUserProjects() then projects}
 						<Svelecte
@@ -159,7 +233,7 @@
 				{:else}
 					{#each data.projects as project}
 						<button
-							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 font-medium transition hover:bg-primary-mid"
+							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 transition hover:bg-primary-mid"
 							on:click={() => goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
 						>
 							<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />

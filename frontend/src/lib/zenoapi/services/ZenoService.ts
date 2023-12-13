@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Author } from '../models/Author';
 import type { Body_add_organization } from '../models/Body_add_organization';
 import type { Body_upload_dataset } from '../models/Body_upload_dataset';
 import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_schema';
@@ -1344,6 +1345,33 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Report Authors
+	 * Get all authors of a report.
+	 *
+	 * Args:
+	 * report_id (int): id of the report for which to fetch authors.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * list[Author]: all authors that a report contains.
+	 * @param reportId
+	 * @returns Author Successful Response
+	 * @throws ApiError
+	 */
+	public getReportAuthors(reportId: number): CancelablePromise<Array<Author>> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/report-authors/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Like Report
 	 * Like a report as a user.
 	 *
@@ -1386,6 +1414,33 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/report-users/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Report Owner
+	 * Get the owner of a report.
+	 *
+	 * Args:
+	 * report_id (int): the report for which to get the owner.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * User: the owner of the report.
+	 * @param reportId
+	 * @returns User Successful Response
+	 * @throws ApiError
+	 */
+	public getReportOwner(reportId: number): CancelablePromise<User> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/report-owner/{report_id}',
 			path: {
 				report_id: reportId
 			},
@@ -1539,6 +1594,90 @@ export class ZenoService {
 			method: 'POST',
 			url: '/report-element/{id}',
 			query: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Add Report Author
+	 * Add an author to a report.
+	 *
+	 * Args:
+	 * report_id (int): report to add the author to.
+	 * author (Author): author to be added to the report.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public addReportAuthor(reportId: number, requestBody: Author): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/report-author/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Report Author
+	 * Update the author of a report.
+	 *
+	 * Args:
+	 * report_id (int): the report to update the author for.
+	 * author (Author): updated report author.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public updateReportAuthor(reportId: number, requestBody: Author): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'PATCH',
+			url: '/report-author/{report_id}',
+			path: {
+				report_id: reportId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Report Author
+	 * Remove an author from a report.
+	 *
+	 * Args:
+	 * report_id (int): id dof the report to remove an author from.
+	 * author (Author): author to be removed from the report.
+	 * request (Request): http request to get user information from.
+	 * @param reportId
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteReportAuthor(reportId: number, requestBody: Author): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/report-author/{report_id}',
+			path: {
 				report_id: reportId
 			},
 			body: requestBody,
