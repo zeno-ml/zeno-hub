@@ -4,6 +4,7 @@
 	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
 	import { createEventDispatcher, getContext } from 'svelte';
+	import Select from '../ui/Select.svelte';
 	import Popup from './Popup.svelte';
 
 	const dispatch = createEventDispatcher();
@@ -47,11 +48,12 @@
 
 <Popup on:close>
 	<Content style="display: flex; align-items: center;">
-		<select class="x-2 h-full" bind:value={selectedTag}>
-			{#each $tags as tag}
-				<option value={tag}>{tag.tagName}</option>
-			{/each}
-		</select>
+		<Select
+			bind:value={selectedTag}
+			options={$tags.map((tag) => {
+				return { value: tag, label: tag.tagName };
+			})}
+		/>
 		<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
 			>Cancel</Button
 		>

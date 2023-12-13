@@ -22,6 +22,7 @@
 	import { Pagination } from '@smui/data-table';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
+	import Select from '../ui/Select.svelte';
 
 	export let modelAResult: Promise<GroupMetric[] | undefined>;
 	export let modelBResult: Promise<GroupMetric[] | undefined>;
@@ -325,11 +326,12 @@
 <Pagination slot="paginate" class="pagination">
 	<svelte:fragment slot="rowsPerPage">
 		<Label>Rows Per Page</Label>
-		<select class="ml-2" bind:value={$rowsPerPage}>
-			{#each sampleOptions as option}
-				<option value={option}>{option}</option>
-			{/each}
-		</select>
+		<Select
+			bind:value={$rowsPerPage}
+			options={sampleOptions.map((option) => {
+				return { value: option, label: option };
+			})}
+		/>
 	</svelte:fragment>
 	<svelte:fragment slot="total">
 		{start + 1} -

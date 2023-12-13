@@ -5,6 +5,7 @@
 	import { Input } from '@smui/textfield';
 	import { createEventDispatcher } from 'svelte';
 	import Spinner from '../general/Spinner.svelte';
+	import Select from '../ui/Select.svelte';
 
 	export let searchText: string;
 	export let typeFilter: EntryTypeFilter;
@@ -52,18 +53,26 @@
 		{/if}
 		<div class="ml-4 flex items-center">
 			<p class="mr-1 text-grey-dark">Filter:</p>
-			<select class="h-full px-2" bind:value={typeFilter} on:change={() => dispatch('change')}>
-				<option value={EntryTypeFilter.ALL}>Projects & Reports</option>
-				<option value={EntryTypeFilter.PROJECT}>Projects</option>
-				<option value={EntryTypeFilter.REPORT}>Reports</option>
-			</select>
+			<Select
+				bind:value={typeFilter}
+				on:change={() => dispatch('change')}
+				options={[
+					{ value: EntryTypeFilter.ALL, label: 'Projects & Reports' },
+					{ value: EntryTypeFilter.PROJECT, label: 'Projects' },
+					{ value: EntryTypeFilter.REPORT, label: 'Reports' }
+				]}
+			/>
 		</div>
 		<div class="ml-6 flex items-center">
 			<p class="mr-1 text-grey-dark">Sort:</p>
-			<select class="h-full px-2" bind:value={sort} on:change={() => dispatch('change')}>
-				<option value={EntrySort.RECENT}>Recent</option>
-				<option value={EntrySort.POPULAR}>Popular</option>
-			</select>
+			<Select
+				bind:value={sort}
+				on:change={() => dispatch('change')}
+				options={[
+					{ value: EntrySort.RECENT, label: 'Recent' },
+					{ value: EntrySort.POPULAR, label: 'Popular' }
+				]}
+			/>
 		</div>
 	</div>
 </div>
