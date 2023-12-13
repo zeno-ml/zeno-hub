@@ -90,7 +90,7 @@ async def get_report_elements(report_id: int, request: Request):
     return await select.report_elements(report_id)
 
 
-@router.post("/report-authors/{report_id}", tags=["zeno"])
+@router.post("/report-authors/{report_id}", tags=["zeno"], response_model=list[Author])
 async def get_report_authors(report_id: int, request: Request):
     """Get all authors of a report.
 
@@ -99,7 +99,7 @@ async def get_report_authors(report_id: int, request: Request):
         request (Request): http request to get user information from.
 
     Returns:
-        list[Author] | None: all authors that a report contains.
+        list[Author]: all authors that a report contains.
     """
     await util.report_access_valid(report_id, request)
     return await select.report_authors(report_id)

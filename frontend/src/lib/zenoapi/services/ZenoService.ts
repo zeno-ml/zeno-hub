@@ -1353,12 +1353,12 @@ export class ZenoService {
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
-	 * list[Author] | None: all authors that a report contains.
+	 * list[Author]: all authors that a report contains.
 	 * @param reportId
-	 * @returns any Successful Response
+	 * @returns Author Successful Response
 	 * @throws ApiError
 	 */
-	public getReportAuthors(reportId: number): CancelablePromise<any> {
+	public getReportAuthors(reportId: number): CancelablePromise<Array<Author>> {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/report-authors/{report_id}',
