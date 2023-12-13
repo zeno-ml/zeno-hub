@@ -128,7 +128,7 @@
 	}
 </script>
 
-<div class="w-full overflow-auto" bind:this={tableContainer}>
+<div class="h-full w-full overflow-auto" bind:this={tableContainer}>
 	<table>
 		<thead class="sticky top-0 z-10 cursor-pointer bg-background text-left">
 			<tr class="box-border border-b border-t border-grey-lighter bg-background">
