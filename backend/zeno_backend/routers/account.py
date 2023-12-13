@@ -46,7 +46,13 @@ async def login(name: str, current_user=Depends(util.auth.claim())):
         ) from exc
     if fetched_user is None:
         try:
-            user = User(id=-1, name=name, admin=None, cognito_id=current_user["sub"])
+            user = User(
+                id=-1,
+                name=name,
+                display_name=name,
+                admin=None,
+                cognito_id=current_user["sub"],
+            )
             await insert.user(user)
             await insert.api_key(user)
             AmplitudeHandler().track(
@@ -65,7 +71,12 @@ async def login(name: str, current_user=Depends(util.auth.claim())):
     if fetched_user.cognito_id is None:
         try:
             await update.user(
-                User(id=fetched_user.id, name=name, cognito_id=current_user["sub"])
+                User(
+                    id=fetched_user.id,
+                    name=name,
+                    display_name=name,
+                    cognito_id=current_user["sub"],
+                )
             )
         except Exception as exc:
             raise HTTPException(

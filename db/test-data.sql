@@ -1,6 +1,6 @@
 -- Users 
-COPY public.users (id, name, cognito_id, api_key_hash) FROM stdin;
-1	test	d909891e-40e1-70e7-b811-604d7c353f82	26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
+COPY public.users (id, name, display_name, cognito_id, api_key_hash) FROM stdin;
+1	test	test	d909891e-40e1-70e7-b811-604d7c353f82	26335ee40c6fc75b2466b71b0eda1911f3d1233499fffb478cacc5f692a5c0ac
 \.
 
 -- Projects
@@ -9,59 +9,59 @@ f93ccc54-f701-4da8-b816-696e166f3274	GPT MT Benchmarks	1	text-classification	10	
 \.
 
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" (
-    "cd8b6e6a-02b4-45fb-b615-e374af2929f1" text,
-    "40e1c98e-426d-456c-ac4c-63fefd2fa7ea" text,
-    "ae0a815d-8056-4fd7-b23b-7dff6349f1d7" text,
-    "b66e1bab-3f82-4b80-b3b8-6227edcbfa72" text NOT NULL,
-    "73abd558-9130-46ef-9a3e-f3880a843f54" bigint,
-    "31da8a49-1bc4-433c-a020-3e339fe73db6" bigint,
-    "6b98e9f5-700f-4496-b29d-e99bf0583bf9" text,
-    "753af311-c305-4fff-9af7-ed1d11b87e3e" text,
-    "32e663eb-3f50-49c4-aed3-68fcd41e4362" double precision,
-    "7c513417-3c4d-4202-b197-9000e5a0d631" bigint,
-    "234c424a-5b2d-4857-8474-88a339f422da" bigint,
-    "a592b153-5e8c-4c4e-9c50-3845346fdc2c" double precision,
-    "7c1f7666-ade7-4f8a-a08a-524ce694ade1" text,
-    "4f355cf9-fefb-4c5d-8fe6-7b83747668af" double precision,
-    "afbf0571-995d-4fb6-bccd-22746e8165ab" bigint,
-    "554a5469-3fcc-4d69-b2e7-368f5c8ae415" bigint,
-    "3d07fb4b-e083-455c-a2d7-2576bf9e9828" double precision,
-    "41098de7-32af-439a-aac1-7927c164d256" text,
-    "1523d495-b06b-4d77-911d-b68f0706d0b4" double precision,
-    "4326db70-c1c4-4360-adf4-d2fb6d32f746" bigint,
-    "fe4764f8-e605-4549-81e4-9e4fceb98b2b" bigint,
-    "6929515e-ab3e-4e95-92ca-2ca8470977a0" double precision,
-    "66a426e3-51a0-4d78-bf36-ac9efa6dd7ed" text,
-    "b3ca5727-598f-4084-b12b-f23e33920f69" double precision,
-    "65a69902-0abf-4591-87c2-0c6e577fb134" bigint,
-    "b608d4b9-ab1b-496b-a540-d2ace315b253" bigint,
-    "754de41d-bc29-4a91-a803-8638bb679ee9" double precision
+	"cd8b6e6a-02b4-45fb-b615-e374af2929f1" text,
+	"40e1c98e-426d-456c-ac4c-63fefd2fa7ea" text,
+	"ae0a815d-8056-4fd7-b23b-7dff6349f1d7" text,
+	"b66e1bab-3f82-4b80-b3b8-6227edcbfa72" text NOT NULL,
+	"73abd558-9130-46ef-9a3e-f3880a843f54" bigint,
+	"31da8a49-1bc4-433c-a020-3e339fe73db6" bigint,
+	"6b98e9f5-700f-4496-b29d-e99bf0583bf9" text,
+	"753af311-c305-4fff-9af7-ed1d11b87e3e" text,
+	"32e663eb-3f50-49c4-aed3-68fcd41e4362" double precision,
+	"7c513417-3c4d-4202-b197-9000e5a0d631" bigint,
+	"234c424a-5b2d-4857-8474-88a339f422da" bigint,
+	"a592b153-5e8c-4c4e-9c50-3845346fdc2c" double precision,
+	"7c1f7666-ade7-4f8a-a08a-524ce694ade1" text,
+	"4f355cf9-fefb-4c5d-8fe6-7b83747668af" double precision,
+	"afbf0571-995d-4fb6-bccd-22746e8165ab" bigint,
+	"554a5469-3fcc-4d69-b2e7-368f5c8ae415" bigint,
+	"3d07fb4b-e083-455c-a2d7-2576bf9e9828" double precision,
+	"41098de7-32af-439a-aac1-7927c164d256" text,
+	"1523d495-b06b-4d77-911d-b68f0706d0b4" double precision,
+	"4326db70-c1c4-4360-adf4-d2fb6d32f746" bigint,
+	"fe4764f8-e605-4549-81e4-9e4fceb98b2b" bigint,
+	"6929515e-ab3e-4e95-92ca-2ca8470977a0" double precision,
+	"66a426e3-51a0-4d78-bf36-ac9efa6dd7ed" text,
+	"b3ca5727-598f-4084-b12b-f23e33920f69" double precision,
+	"65a69902-0abf-4591-87c2-0c6e577fb134" bigint,
+	"b608d4b9-ab1b-496b-a540-d2ace315b253" bigint,
+	"754de41d-bc29-4a91-a803-8638bb679ee9" double precision
 );
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274" OWNER TO myuser;
 
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" (
-    column_id text NOT NULL,
-    name text NOT NULL,
-    type text NOT NULL,
-    model text,
-    data_type text NOT NULL,
-    histogram jsonb
+	column_id text NOT NULL,
+	name text NOT NULL,
+	type text NOT NULL,
+	model text,
+	data_type text NOT NULL,
+	histogram jsonb
 );
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_column_map" OWNER TO myuser;
 
 CREATE TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" (
-    id integer NOT NULL,
-    tag_id integer NOT NULL,
-    data_id text NOT NULL
+	id integer NOT NULL,
+	tag_id integer NOT NULL,
+	data_id text NOT NULL
 );
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" OWNER TO myuser;
 ALTER TABLE public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints" ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
-    SEQUENCE NAME public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints_id_seq"
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1
+	SEQUENCE NAME public."f93ccc54-f701-4da8-b816-696e166f3274_tags_datapoints_id_seq"
+	START WITH 1
+	INCREMENT BY 1
+	NO MINVALUE
+	NO MAXVALUE
+	CACHE 1
 );
 
 COPY public."f93ccc54-f701-4da8-b816-696e166f3274" ("cd8b6e6a-02b4-45fb-b615-e374af2929f1", "40e1c98e-426d-456c-ac4c-63fefd2fa7ea", "ae0a815d-8056-4fd7-b23b-7dff6349f1d7", "b66e1bab-3f82-4b80-b3b8-6227edcbfa72", "73abd558-9130-46ef-9a3e-f3880a843f54", "31da8a49-1bc4-433c-a020-3e339fe73db6", "6b98e9f5-700f-4496-b29d-e99bf0583bf9", "753af311-c305-4fff-9af7-ed1d11b87e3e", "32e663eb-3f50-49c4-aed3-68fcd41e4362", "7c513417-3c4d-4202-b197-9000e5a0d631", "234c424a-5b2d-4857-8474-88a339f422da", "a592b153-5e8c-4c4e-9c50-3845346fdc2c", "7c1f7666-ade7-4f8a-a08a-524ce694ade1", "4f355cf9-fefb-4c5d-8fe6-7b83747668af", "afbf0571-995d-4fb6-bccd-22746e8165ab", "554a5469-3fcc-4d69-b2e7-368f5c8ae415", "3d07fb4b-e083-455c-a2d7-2576bf9e9828", "41098de7-32af-439a-aac1-7927c164d256", "1523d495-b06b-4d77-911d-b68f0706d0b4", "4326db70-c1c4-4360-adf4-d2fb6d32f746", "fe4764f8-e605-4549-81e4-9e4fceb98b2b", "6929515e-ab3e-4e95-92ca-2ca8470977a0", "66a426e3-51a0-4d78-bf36-ac9efa6dd7ed", "b3ca5727-598f-4084-b12b-f23e33920f69", "65a69902-0abf-4591-87c2-0c6e577fb134", "b608d4b9-ab1b-496b-a540-d2ace315b253", "754de41d-bc29-4a91-a803-8638bb679ee9") FROM stdin;
@@ -153,7 +153,7 @@ COPY public.charts (id, project_uuid, name, type, parameters, created_at, update
 
 -- Reports
 COPY public.reports (id, name, owner_id, public, description, created_at, updated_at) FROM stdin;
-1	Translation Report	1	f		2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
+1	Translation Report	1	f	 	2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
 \.
 
 COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;

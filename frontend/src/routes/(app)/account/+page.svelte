@@ -32,7 +32,7 @@
 	<Header user={data.user} />
 	<div class="mx-6 mb-6 overflow-y-auto">
 		<h1 class="mb-3 mt-2 text-xl">Account management</h1>
-		<Account name={cognitoUser.name} email={cognitoUser.email} />
+		<Account email={cognitoUser.email} {user} />
 		<hr class="mt-5 text-grey-lighter" />
 		<OrganizationsTable {organizations} {user} />
 		<div class="mt-2">

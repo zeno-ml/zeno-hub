@@ -8,6 +8,8 @@
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
 	import { svelecteRendererName } from '$lib/util/util.js';
 	import { ReportElementType, ZenoService, type Project } from '$lib/zenoapi';
+	import { mdiAccountCircleOutline } from '@mdi/js';
+	import { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 
@@ -131,6 +133,9 @@
 			</p>
 			<div class="mt-4 flex items-center text-lg">
 				<p class="mr-2 font-medium text-grey-dark">Author:</p>
+				<Icon class="mr-1 h-6 w-6" tag="svg" viewBox="0 0 24 24">
+					<path class="fill-grey" d={mdiAccountCircleOutline} />
+				</Icon>
 				<p>
 					{data.report.ownerName}
 				</p>

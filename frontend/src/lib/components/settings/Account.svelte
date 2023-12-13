@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import type { ZenoService } from '$lib/zenoapi';
+	import type { User, ZenoService } from '$lib/zenoapi';
 	import Button from '@smui/button/src/Button.svelte';
 	import Textfield from '@smui/textfield';
 	import { getContext } from 'svelte';
@@ -8,12 +8,15 @@
 	import FeatureFlagsPopup from '../popups/FeatureFlagsPopup.svelte';
 
 	export let email: string;
-	export let name: string;
+	export let user: User;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
 	let api_key = '';
 	let copied = false;
 	let showFeatureFlags = false;
+	let displayNameChanged = false;
+	let displayName = user.displayName;
 
 	function copyKey() {
 		navigator.clipboard.writeText(api_key);
@@ -27,9 +30,34 @@
 {#if showFeatureFlags}
 	<FeatureFlagsPopup on:close={() => (showFeatureFlags = false)} />
 {/if}
-<div class="flex items-center">
-	<Textfield label="Username" value={name} disabled style="margin-right: 40px;" />
-	<Textfield label="Email" value={email} disabled style="margin-right: 40px;" />
+<div class="flex flex-wrap items-center gap-4 gap-x-10">
+	<Textfield label="Username" value={user.name} disabled />
+	<Textfield label="Email" value={email} disabled />
+	<Textfield
+		label="Display Name"
+		bind:value={displayName}
+		on:input={() => (displayNameChanged = true)}
+	/>
+	{#if displayNameChanged}
+		<div class="flex gap-2" in:fade={{ duration: 300 }}>
+			<Button
+				variant="outlined"
+				on:click={() => {
+					displayNameChanged = false;
+					displayName = user.displayName;
+				}}
+			>
+				Cancel
+			</Button>
+			<Button
+				variant="raised"
+				on:click={() =>
+					zenoClient.updateUser({ ...user, displayName }).then(() => (displayNameChanged = false))}
+			>
+				Update
+			</Button>
+		</div>
+	{/if}
 </div>
 <div class="mt-5">
 	{#if $page.url.origin !== 'https://hub.zenoml.com'}

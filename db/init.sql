@@ -3,6 +3,7 @@ CREATE COLLATION numeric (provider = icu, locale = 'en-u-kn-true');
 CREATE TABLE users (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL UNIQUE,
+    display_name text NOT NULL,
     cognito_id text UNIQUE,
     api_key_hash text UNIQUE
 );

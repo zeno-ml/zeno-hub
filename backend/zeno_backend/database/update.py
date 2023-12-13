@@ -182,8 +182,9 @@ async def user(user: User):
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "UPDATE users SET name = %s, cognito_id = %s WHERE id = %s",
-                [user.name, user.cognito_id, user.id],
+                "UPDATE users SET name = %s, display_name = %s, cognito_id = %s "
+                "WHERE id = %s",
+                [user.name, user.display_name, user.cognito_id, user.id],
             )
 
 
