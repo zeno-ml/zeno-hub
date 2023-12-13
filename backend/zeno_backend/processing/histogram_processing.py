@@ -211,15 +211,26 @@ async def histogram_metric_and_count(
             elif col.data_type == MetadataType.CONTINUOUS:
                 case_statement = sql.SQL("CASE ")
                 for i, b in enumerate(buckets):
-                    case_statement += sql.SQL(
-                        "WHEN {} >= {} AND {} < {} THEN {} "
-                    ).format(
-                        sql.Identifier(col_id),
-                        sql.Literal(b.bucket),
-                        sql.Identifier(col_id),
-                        sql.Literal(b.bucket_end),
-                        sql.Literal(i),
-                    )
+                    if i == len(buckets) - 1:
+                        case_statement += sql.SQL(
+                            "WHEN {} >= {} AND {} <= {} THEN {} "
+                        ).format(
+                            sql.Identifier(col_id),
+                            sql.Literal(b.bucket),
+                            sql.Identifier(col_id),
+                            sql.Literal(b.bucket_end),
+                            sql.Literal(i),
+                        )
+                    else:
+                        case_statement += sql.SQL(
+                            "WHEN {} >= {} AND {} < {} THEN {} "
+                        ).format(
+                            sql.Identifier(col_id),
+                            sql.Literal(b.bucket),
+                            sql.Identifier(col_id),
+                            sql.Literal(b.bucket_end),
+                            sql.Literal(i),
+                        )
                 case_statement += sql.SQL("END AS bucket")
                 if calculate_histograms and metric_col_id is not None:
                     statement = sql.SQL("SELECT {}, COUNT(*), AVG({}) FROM {}").format(
