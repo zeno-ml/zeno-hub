@@ -97,7 +97,7 @@
 							}
 						}}
 					>
-						<div class="flex">
+						<div class="flex cursor-pointer transition hover:text-primary-dark">
 							<div class="min-h-[24px] overflow-hidden">
 								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
 									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
