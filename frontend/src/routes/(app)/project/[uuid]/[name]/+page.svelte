@@ -11,15 +11,17 @@
 	}
 </script>
 
-<div class="relative h-full w-full">
-	{#each data.elements as element}
-		<div
-			class="absolute overflow-auto p-2"
-			style="width: {element.width}%; height: {element.height}%; top: {element.yPos}%; left: {element.xPos}%;"
-		>
-			<div class="h-full w-full p-4">
-				<Element {element} />
+<div class="h-full w-full overflow-y-auto">
+	<div class="relative h-full min-h-[800px] w-full">
+		{#each data.elements as element}
+			<div
+				class="absolute overflow-auto p-2"
+				style="width: {element.width}%; height: {element.height}%; top: {element.yPos}%; left: {element.xPos}%;"
+			>
+				<div class="h-full w-full">
+					<Element {element} />
+				</div>
 			</div>
-		</div>
-	{/each}
+		{/each}
+	</div>
 </div>
