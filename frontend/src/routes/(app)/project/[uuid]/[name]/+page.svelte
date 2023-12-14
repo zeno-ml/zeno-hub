@@ -9,17 +9,17 @@
 	if ($models.length === 0 || $metrics.length === 0) {
 		goto(`${$page.url.pathname}/explore`);
 	}
+
+	console.log(data.elements);
 </script>
 
-<div class="relative h-full w-full">
+<div class="grid h-full min-h-0 w-full min-w-0 gap-4 bg-yellowish p-4">
 	{#each data.elements as element}
 		<div
-			class="absolute overflow-auto p-2"
-			style="width: {element.width}%; height: {element.height}%; top: {element.yPos}%; left: {element.xPos}%;"
+			class="overflow-auto bg-white shadow"
+			style="grid-column: {element.xPos} / span {element.width}; grid-row: {element.yPos} / span {element.width};"
 		>
-			<div class="h-full w-full p-4">
-				<Element {element} />
-			</div>
+			<Element {element} />
 		</div>
 	{/each}
 </div>

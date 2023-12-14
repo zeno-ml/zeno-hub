@@ -24,7 +24,7 @@
 </script>
 
 <div
-	class="relative my-2 ml-2 flex h-full w-full flex-col overflow-hidden"
+	class="relative flex h-full w-full flex-col overflow-hidden p-3"
 	bind:clientWidth={width}
 	bind:clientHeight={height}
 >

@@ -40,7 +40,24 @@ export default function generateSpec(
 		],
 
 		data: [
-			{ name: 'table' },
+			{
+				name: 'table',
+
+				transform: [
+					{
+						type: 'joinaggregate',
+						groupby: ['axis_value'],
+						ops: ['max'],
+						fields: ['fixed_value'],
+						as: ['max_fixed_value']
+					},
+					{
+						type: 'formula',
+						as: 'normalized_fixed_value',
+						expr: 'datum.fixed_value / datum.max_fixed_value'
+					}
+				]
+			},
 			{
 				name: 'points',
 				source: 'table',
@@ -67,7 +84,7 @@ export default function generateSpec(
 				range: { signal: '[0, radius]' },
 				zero: true,
 				nice: false,
-				domain: { data: 'table', field: 'fixed_value' }
+				domain: [0, 1] // Normalized range
 			},
 			{
 				name: 'color',
@@ -111,11 +128,11 @@ export default function generateSpec(
 								interpolate: { value: 'linear-closed' },
 								x: {
 									signal:
-										"scale('radial', datum.fixed_value) * cos(scale('angular', datum.axis_value))"
+										"scale('radial', datum.normalized_fixed_value) * cos(scale('angular', datum.axis_value))"
 								},
 								y: {
 									signal:
-										"scale('radial', datum.fixed_value) * sin(scale('angular', datum.axis_value))"
+										"scale('radial', datum.normalized_fixed_value) * sin(scale('angular', datum.axis_value))"
 								}
 							},
 							update: {
