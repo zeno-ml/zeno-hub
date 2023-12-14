@@ -1,12 +1,11 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import Error from '$lib/instance-views/Error.svelte';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import { json } from '@codemirror/lang-json';
-	import CodeMirror from 'svelte-codemirror-editor';
-
-	import { browser } from '$app/environment';
-	import Error from '$lib/instance-views/Error.svelte';
 	import Button from '@smui/button/src/Button.svelte';
+	import CodeMirror from 'svelte-codemirror-editor';
 	import { samples } from './samples.js';
 	import { setURLParameters, type URLParams } from './util.js';
 
