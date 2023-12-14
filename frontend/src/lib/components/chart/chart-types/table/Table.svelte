@@ -52,11 +52,11 @@
 			tableRecord[cell.x_value] === undefined
 				? (tableRecord[cell.x_value] = {
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-					})
+				})
 				: (tableRecord[cell.x_value] = {
 						...tableRecord[cell.x_value],
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-					});
+				});
 		});
 	}
 	$: {
