@@ -13,7 +13,7 @@ test('can see project header', async ({ page }) => {
 });
 
 test('can see overview table', async ({ page }) => {
-	await expect(page.getByRole('heading', { name: 'Overview Table' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Model Performance (Table)' })).toBeVisible();
 });
 
 test.describe('explore', () => {
