@@ -19,6 +19,8 @@
 
 	$: {
 		data;
+		width;
+		height;
 		updateSpec();
 	}
 
