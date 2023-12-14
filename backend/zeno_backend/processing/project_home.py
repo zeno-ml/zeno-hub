@@ -21,6 +21,10 @@ from zeno_backend.classes.project import ProjectHomeElement, ProjectHomeElementT
 async def create_project_home(project_uuid) -> list[ProjectHomeElement]:
     """Create the data for a project's home page.
 
+    The home page is a 3x3 grid of elements indexed from 1.
+    X and Y positions indicate the grid position, width and height the
+    number of grid cells the element occupies.
+
     Args:
         project_uuid (str): the uuid of the project for which to create home elements.
 
@@ -40,10 +44,10 @@ async def create_project_home(project_uuid) -> list[ProjectHomeElement]:
         ProjectHomeElement(
             id=-1,
             type=ProjectHomeElementType.LIST,
-            x_pos=30,
-            y_pos=0,
-            width=70,
-            height=100,
+            x_pos=2,
+            y_pos=1,
+            width=2,
+            height=3,
         ),
     )
 
@@ -68,7 +72,7 @@ async def create_overview_table(project_uuid: str):
         project_uuid,
         Chart(
             id=-1,
-            name="Overview Table",
+            name="Model Performance (Table)",
             project_uuid=project_uuid,
             type=ChartType.TABLE,
             parameters=TableParameters(
@@ -94,10 +98,10 @@ async def create_overview_table(project_uuid: str):
             id=-1,
             type=ProjectHomeElementType.CHART,
             data=str(table_id),
-            x_pos=0,
-            y_pos=0,
-            width=30,
-            height=50,
+            x_pos=1,
+            y_pos=1,
+            width=1,
+            height=1,
         ),
     )
 
@@ -114,7 +118,7 @@ async def create_overview_charts(project_uuid: str, metrics: list[Metric]):
             project_uuid,
             Chart(
                 id=-1,
-                name="Overview Chart",
+                name="Model Performance (Radar)",
                 project_uuid=project_uuid,
                 type=ChartType.RADAR,
                 parameters=RadarParameters(
@@ -140,10 +144,10 @@ async def create_overview_charts(project_uuid: str, metrics: list[Metric]):
                 id=-1,
                 type=ProjectHomeElementType.CHART,
                 data=str(chart_id),
-                x_pos=0,
-                y_pos=50,
-                width=30,
-                height=50,
+                x_pos=1,
+                y_pos=2,
+                width=1,
+                height=1,
             ),
         )
     else:

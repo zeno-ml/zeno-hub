@@ -7,7 +7,7 @@
 	export let height: number;
 </script>
 
-<h3 class="mb-2 text-lg font-semibold">{chart.name}</h3>
+<h3 class="mb-4 font-semibold text-grey-dark">{chart.name}</h3>
 {#if chart.data}
 	<svelte:component
 		this={chartMap[chart.type]}
