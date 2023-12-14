@@ -2,11 +2,13 @@
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, User, ZenoService } from '$lib/zenoapi';
 	import { mdiLinkVariant } from '@mdi/js';
+	import Button from '@smui/button';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import LikeButton from '../general/LikeButton.svelte';
 	import UserButton from '../general/UserButton.svelte';
+	import ProjectPopup from '../popups/ProjectPopup.svelte';
 
 	export let project: Project;
 	export let likes: number;
@@ -16,8 +18,12 @@
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	let linkCopied = false;
+	let projectEdit = false;
 </script>
 
+{#if projectEdit && user !== null}
+	<ProjectPopup config={project} on:close={() => (projectEdit = false)} {user} />
+{/if}
 <div
 	class="flex w-full min-w-0 items-center justify-between overflow-hidden border-b border-b-grey-lighter bg-yellowish-light px-3 py-1"
 >
@@ -52,5 +58,14 @@
 			<p class="ml-2 text-grey-dark" transition:fade>Project link copied to clipboard</p>
 		{/if}
 	</div>
-	<UserButton {user} />
+	<div class="flex h-full shrink-0 items-center">
+		{#if project && project.editor}
+			<Button
+				class="mr-4 mt-2 shrink-0 sm:mt-0"
+				variant="outlined"
+				on:click={() => (projectEdit = true)}>Settings</Button
+			>
+		{/if}
+		<UserButton {user} />
+	</div>
 </div>

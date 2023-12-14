@@ -5,7 +5,6 @@
 	import CodeMirror from 'svelte-codemirror-editor';
 
 	import { browser } from '$app/environment';
-	import Help from '$lib/components/general/Help.svelte';
 	import Error from '$lib/instance-views/Error.svelte';
 	import Button from '@smui/button/src/Button.svelte';
 	import { samples } from './samples.js';
@@ -37,10 +36,6 @@
 		errorMessage = error as string;
 	}
 </script>
-
-<div class="absolute bottom-4 right-4">
-	<Help docsLink="https://zenoml.com/docs/views/" />
-</div>
 
 <div class="flex h-full w-full flex-col p-4">
 	<div class="mb-4 flex h-12 items-center">
