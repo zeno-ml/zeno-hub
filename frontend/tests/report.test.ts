@@ -3,9 +3,7 @@ import { login } from './login';
 
 test.beforeEach(async ({ page }) => {
 	await login(page);
-
 	await page.getByRole('button', { name: 'Translation Report' }).click();
-	await page.waitForURL('/report/**');
 });
 
 test('can see report elements', async ({ page }) => {

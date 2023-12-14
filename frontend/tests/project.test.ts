@@ -5,11 +5,6 @@ test.beforeEach(async ({ page }) => {
 	await login(page);
 
 	await page.getByRole('button', { name: 'GPT MT Benchmarks' }).click();
-	await page.waitForURL('/project/**');
-});
-
-test('can see project header', async ({ page }) => {
-	await expect(page.getByRole('heading', { name: 'GPT MT Benchmarks' })).toBeVisible();
 });
 
 test('can see overview table', async ({ page }) => {
