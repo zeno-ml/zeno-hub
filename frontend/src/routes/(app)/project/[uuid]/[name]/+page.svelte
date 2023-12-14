@@ -11,13 +11,15 @@
 	}
 </script>
 
-<div class="grid h-full min-h-0 w-full min-w-0 gap-4 overflow-auto bg-yellowish p-4">
+<div class="relative h-full w-full">
 	{#each data.elements as element}
 		<div
-			class="min-w-[300px] overflow-auto bg-white shadow"
-			style="grid-column: {element.xPos} / span {element.width}; grid-row: {element.yPos} / span {element.width};"
+			class="absolute overflow-auto p-2"
+			style="width: {element.width}%; height: {element.height}%; top: {element.yPos}%; left: {element.xPos}%;"
 		>
-			<Element {element} />
+			<div class="h-full w-full p-4">
+				<Element {element} />
+			</div>
 		</div>
 	{/each}
 </div>
