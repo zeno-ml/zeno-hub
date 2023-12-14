@@ -1920,10 +1920,17 @@ async def table_data_paginated(
                 if sort == "":
                     sort = "diff"
 
-                order_sql = sql.SQL("ORDER BY {} {}").format(
-                    sql.Identifier(sort),
-                    sql.SQL("DESC" if req.sort[1] else "ASC"),
-                )
+                if req.sort[0].data_type == MetadataType.NOMINAL:
+                    order_sql = sql.SQL("ORDER BY {} COLLATE numeric {}").format(
+                        sql.Identifier(sort),
+                        sql.SQL("ASC" if req.sort[1] else "DESC"),
+                    )
+                else:
+                    order_sql = sql.SQL("ORDER BY {} {}").format(
+                        sql.Identifier(sort),
+                        sql.SQL("ASC" if req.sort[1] else "DESC"),
+                    )
+
             else:
                 await cur.execute(
                     sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(

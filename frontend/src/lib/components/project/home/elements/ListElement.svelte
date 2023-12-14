@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import ListView from '$lib/components/instances/ListView.svelte';
 	import Select from '$lib/components/ui/Select.svelte';
-	import { model, models, project } from '$lib/stores';
+	import { columns, model, models, project, sort } from '$lib/stores';
 	import Button from '@smui/button/src/Button.svelte';
 
 	$: sortedModels = $models.sort((a, b) => a.localeCompare(b));
@@ -18,6 +18,24 @@
 			})
 		]}
 	/>
+	<p class="ml-2 mr-2 font-semibold text-grey-dark">sort by:</p>
+	<Select
+		bind:value={$sort[0]}
+		options={[
+			...$columns.map((column) => {
+				return { value: column, label: column.name };
+			})
+		]}
+	/>
+	<div class="ml-2">
+		<Select
+			bind:value={$sort[1]}
+			options={[
+				{ value: true, label: 'ascending' },
+				{ value: false, label: 'descending' }
+			]}
+		/>
+	</div>
 	<Button
 		on:click={() => goto(`/project/${$project.uuid}/${encodeURIComponent($project.name)}/explore`)}
 		class="ml-auto">Explore</Button

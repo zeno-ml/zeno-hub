@@ -20,10 +20,12 @@
 		selectionIds,
 		selections,
 		slices,
+		sort,
 		tagIds,
 		tags
 	} from '$lib/stores.js';
 	import { setURLParameters } from '$lib/util/util.js';
+	import { ZenoColumnType } from '$lib/zenoapi/index.js';
 
 	export let data;
 
@@ -55,6 +57,7 @@
 				return tag.dataIds;
 			})
 		);
+		sort.set([data.columns.find((col) => col.columnType === ZenoColumnType.ID), true]);
 
 		model.subscribe((mod) => {
 			if ($comparisonModel && $comparisonModel === mod) {
