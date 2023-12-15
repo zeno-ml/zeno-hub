@@ -11,7 +11,7 @@
 	let redirect = '';
 	if (browser) {
 		const urlParams = new URLSearchParams(window.location.search);
-		redirect = urlParams.get('redirect') ?? '';
+		redirect = urlParams.get('redirectTo') ?? '';
 	}
 
 	$: submitted = form?.error ? false : submitted;
