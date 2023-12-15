@@ -1,30 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
 	import { collapseHeader, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
-	import type { User } from '$lib/zenoapi';
 	import {
 		mdiArrowCollapseLeft,
 		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
-		mdiCogOutline,
 		mdiCompare,
 		mdiCompassOutline
 	} from '@mdi/js';
 	import HeaderIcon from '../general/HeaderIcon.svelte';
 
-	export let user: User | null;
-
-	let projectEdit = false;
-
 	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
-{#if projectEdit && user !== null}
-	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
-{/if}
 <nav class="z-20 flex md:hidden">
 	<header
 		class="flex w-full flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
@@ -67,23 +57,13 @@
 				</div>
 			{/if}
 		</div>
-		<div>
+		<div class="flex h-full items-center">
 			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
 				<HeaderIcon
 					pageName={'$collapseHeader'}
 					tooltipContent={$collapseHeader ? 'Expand sidebar' : 'Collapse sidebar'}
 					icon={$collapseHeader ? mdiArrowCollapseRight : mdiArrowCollapseLeft}
 					on:click={() => collapseHeader.set(!$collapseHeader)}
-				/>
-			{/if}
-		</div>
-		<div class="mb-3 flex flex-col items-center justify-center">
-			{#if $page.url.pathname.startsWith('/project/') && $project?.ownerName === user?.name}
-				<HeaderIcon
-					pageName={'editProject'}
-					tooltipContent={"Edit your project's configuration"}
-					icon={mdiCogOutline}
-					on:click={() => (projectEdit = true)}
 				/>
 			{/if}
 		</div>

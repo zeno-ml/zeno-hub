@@ -1,29 +1,28 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { clickOutside } from '$lib/util/clickOutside';
-	import { mdiHelp } from '@mdi/js';
-	import IconButton, { Icon } from '@smui/icon-button';
+	import { tooltip } from '$lib/util/tooltip';
+	import { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { fade } from 'svelte/transition';
 
-	export let docsLink = 'https://zenoml.com/docs/intro';
-	export let optionsBelow = false;
+	export let showOptions = false;
 
-	let showOptions = false;
+	let docsLink = 'https://zenoml.com/docs/intro';
 </script>
 
-<div
-	class="relative z-20 flex flex-col items-end rounded-full border border-l border-primary-dark bg-white"
-	transition:fade={{ delay: 1000, duration: 1000 }}
->
-	<IconButton on:click={() => (showOptions = !showOptions)}>
-		<Icon tag="svg" viewBox="0 0 24 24">
-			<path class="fill-primary-dark" d={mdiHelp} />
-		</Icon>
-	</IconButton>
+<div class="relative">
+	<button
+		class="mr-3 h-8 w-8 rounded-full border border-grey-light text-xl capitalize text-primary transition hover:bg-primary-dark"
+		use:tooltip={{ text: 'Help' }}
+		on:click={() => (showOptions = !showOptions)}
+	>
+		?
+	</button>
+
 	{#if showOptions}
 		<button
-			class="absolute {optionsBelow ? 'top-14' : 'bottom-14'} z-50"
+			class="absolute right-8 top-8 z-50"
 			transition:fade={{ duration: 100 }}
 			use:clickOutside={() => (showOptions = !showOptions)}
 			on:click={(e) => e.stopPropagation()}
