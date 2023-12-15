@@ -30,7 +30,6 @@
 	let error: string | undefined = undefined;
 
 	// Track original settings when editing.
-	let originalName = '';
 	let originalPredicates;
 
 	$: isValidPredicates = checkValidPredicates(predicateGroup.predicates);
@@ -81,7 +80,6 @@
 			sliceName = sliceToEdit.sliceName;
 			predicateGroup = sliceToEdit.filterPredicates;
 			folderId = sliceToEdit.folderId === null ? undefined : sliceToEdit.folderId;
-			originalName = sliceName;
 			// deep copy of predicate group to avoid sharing nested objects
 			originalPredicates = JSON.parse(JSON.stringify(predicateGroup));
 
@@ -217,32 +215,17 @@
 		<FilterGroupEntry index={-1} deletePredicate={() => deletePredicate(-1)} bind:predicateGroup />
 		<div class="flex flex-row-reverse items-center">
 			{#if checkNominalSinglePredicateNoEntry(predicateGroup)}
-				<Button
-					variant="outlined"
-					on:click={createAllSlices}
-					disabled={$slices.some((slice) => slice.sliceName === sliceName)}
-				>
+				<Button variant="outlined" on:click={createAllSlices}>
 					{'Create Slices for all Values'}
 				</Button>
 			{:else}
-				<Button
-					variant="outlined"
-					on:click={saveSlice}
-					disabled={(!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) ||
-						(sliceToEdit &&
-							originalName !== sliceName &&
-							$slices.some((slice) => slice.sliceName === sliceName)) ||
-						!isValidPredicates}
-				>
+				<Button variant="outlined" on:click={saveSlice} disabled={!isValidPredicates}>
 					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
 				</Button>
 			{/if}
 			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
 				cancel
 			</Button>
-			{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
-				<p style:margin-right="10px" style:color="red">slice already exists</p>
-			{/if}
 		</div>
 		{#if error}
 			<div class="flex flex-row-reverse items-center">
