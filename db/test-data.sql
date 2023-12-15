@@ -155,6 +155,7 @@ COPY public.charts (id, project_uuid, name, type, parameters, created_at, update
 COPY public.reports (id, name, owner_id, public, description, created_at, updated_at) FROM stdin;
 1	Translation Report	1	f	 	2023-11-22 02:02:24.789995	2023-11-22 02:10:56.125877
 \.
+SELECT setval('public.reports_id_seq', COALESCE((SELECT MAX(id) FROM public.user_project), 1));
 
 COPY public.report_elements (id, report_id, type, data, "position") FROM stdin;
 4	1	TEXT	Here is my new report.	0
