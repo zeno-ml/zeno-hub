@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import HelpButton from '$lib/components/general/HelpButton.svelte';
 	import Error from '$lib/instance-views/Error.svelte';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import { json } from '@codemirror/lang-json';
@@ -42,8 +43,9 @@
 			<img src="/zeno-logo.png" class="h-8" alt="diamond tesselation logo" />
 		</a>
 		<h1 class="ml-3 text-2xl font-bold">Instance View Playground</h1>
-		<div class="ml-auto mr-2">
-			<Button variant="raised" href="https://zenoml.com/docs/views/">Read the Docs</Button>
+		<div class="ml-auto mr-2 flex items-center">
+			<HelpButton />
+			<Button variant="raised" href="https://zenoml.com/docs/views/">Learn about Views</Button>
 		</div>
 	</div>
 	<div class="flex w-full items-center pb-4">
