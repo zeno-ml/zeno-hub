@@ -14,7 +14,7 @@
 		type User
 	} from '$lib/zenoapi';
 	import { mdiAccountCircleOutline } from '@mdi/js';
-	import Button, { Icon } from '@smui/button';
+	import { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { MultiSelect } from 'svelte-multiselect';
@@ -284,19 +284,24 @@
 					<div class="relative mt-10 w-full rounded bg-primary p-5">
 						<h4 class="text-xl text-white">Enjoyed this report? You can make one too!</h4>
 						<p class="mt-2 text-white">
-							Error analysis, chart authoring, shareable reports, and more with <b>Zeno</b>.
+							Error analysis, chart authoring, shareable reports, and more with <a
+								class="font-bold transition hover:text-primary-dark"
+								href="https://zenoml.com">Zeno</a
+							>.
 						</p>
-						<div class="mt-6">
-							<Button class="bg-white text-white" variant="outlined" href="https://zenoml.com">
+						<div class="mt-4">
+							<button
+								class="rounded border border-white px-4 py-2 font-bold text-white transition hover:bg-primary-dark"
+								on:click={() => (window.location.href = 'https://zenoml.com')}
+							>
 								Learn more
-							</Button>
-							<Button
-								class="ml-4 bg-white text-white"
-								variant="outlined"
-								href="https://zenoml.com/docs/intro"
+							</button>
+							<button
+								class="ml-4 rounded border border-white px-4 py-2 font-bold text-white transition hover:bg-primary-dark"
+								on:click={() => (window.location.href = 'https://zenoml.com/docs/intro')}
 							>
 								Get started
-							</Button>
+							</button>
 						</div>
 						<div class="absolute right-0 top-0 hidden sm:inline">
 							<svg

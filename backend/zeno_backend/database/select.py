@@ -112,7 +112,8 @@ async def models(project: str) -> list[str]:
         async with conn.cursor() as cur:
             await cur.execute(
                 sql.SQL(
-                    "SELECT DISTINCT model FROM {} WHERE model IS NOT NULL;"
+                    "SELECT DISTINCT model FROM {} WHERE model IS NOT NULL "
+                    "ORDER BY model;"
                 ).format(sql.Identifier(f"{project}_column_map"))
             )
             model_results = await cur.fetchall()
@@ -1420,7 +1421,8 @@ async def metrics(project_uuid: str) -> list[Metric]:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s;",
+                "SELECT id, name, type, columns FROM metrics WHERE project_uuid = %s "
+                "ORDER BY name;",
                 [project_uuid],
             )
             metric_results = await cur.fetchall()
@@ -1632,7 +1634,7 @@ async def slices(project: str, ids: list[int] | None = None) -> list[Slice]:
             if ids is None:
                 await cur.execute(
                     "SELECT id, name, folder_id, filter FROM slices WHERE project_uuid "
-                    "= %s;",
+                    "= %s ORDER BY name;",
                     [
                         project,
                     ],
