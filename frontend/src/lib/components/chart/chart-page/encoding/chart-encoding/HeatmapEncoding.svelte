@@ -71,7 +71,6 @@
 	}
 
 	function fixedSelected(e: CustomEvent<number>) {
-		console.log(e.detail);
 		chart = { ...chart, parameters: { ...parameters, metric: e.detail } };
 	}
 </script>
