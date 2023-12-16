@@ -81,6 +81,9 @@
 		let csvContent = 'data:text/csv;charset=utf-8,';
 		const cols = columns.map((column) => {
 			if (parameters.xChannel === SlicesMetricsOrModels.SLICES) {
+				if (column == -1) {
+					return 'all instances';
+				}
 				return slices.find((sli) => sli.id === column)?.sliceName ?? '';
 			} else if (parameters.xChannel === SlicesMetricsOrModels.METRICS) {
 				return column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name ?? '';
@@ -92,7 +95,16 @@
 		csvContent += ',';
 		csvContent += cols.join(',') + '\n';
 		rows.forEach((row) => {
-			csvContent += row + ',';
+			if (parameters.yChannel === SlicesOrModels.SLICES) {
+				if (row == -1) {
+					csvContent += 'all instances';
+				} else {
+					csvContent += slices.find((sli) => sli.id === row)?.sliceName ?? '';
+				}
+			} else {
+				csvContent += row;
+			}
+			csvContent += ',';
 			columns.forEach((column) => {
 				csvContent += tableRecord[column][row].fixedValue + ',';
 			});
