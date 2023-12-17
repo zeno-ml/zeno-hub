@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Chart, RadarParameters } from '$lib/zenoapi';
 	import { Vega, type VegaSpec } from 'svelte-vega';
+	import { config } from '../../config';
 	import generateSpec from './vegaSpec-radar';
 
 	export let chart: Chart;
@@ -43,6 +44,7 @@
 		},
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: config
 	}}
 />

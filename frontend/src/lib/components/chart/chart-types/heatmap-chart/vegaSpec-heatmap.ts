@@ -33,8 +33,6 @@ export default function generateSpec(
 				type: 'ordinal',
 				axis: {
 					labelAngle: -20,
-					labelFontSize: 14,
-					titleFontSize: 14,
 					orient: 'top',
 					titlePadding: 10
 				},
@@ -45,8 +43,6 @@ export default function generateSpec(
 				field: 'y_value',
 				type: 'ordinal',
 				axis: {
-					labelFontSize: 14,
-					titleFontSize: 14,
 					titlePadding: 10
 				},
 				sort: null
@@ -93,7 +89,7 @@ export default function generateSpec(
 				}
 			},
 			{
-				mark: { type: 'text', fontSize: 12 },
+				mark: { type: 'text' },
 				encoding: {
 					text: {
 						field: 'fixed_value',

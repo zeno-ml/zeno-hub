@@ -199,8 +199,7 @@ export default function generateSpec(
 								value: 'bottom'
 							}
 						],
-						fill: { value: 'black' },
-						fontSize: { value: 12 }
+						fill: { value: 'black' }
 					}
 				}
 			}
