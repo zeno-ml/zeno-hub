@@ -99,7 +99,7 @@
 		{/if}
 	</svelte:fragment>
 </EncodingSection>
-<EncodingSection title="Y">
+<EncodingSection title="System">
 	<div class="flex items-center" slot="parameters">
 		<span>fixed</span>
 		<Checkbox

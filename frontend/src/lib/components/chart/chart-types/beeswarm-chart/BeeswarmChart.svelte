@@ -10,6 +10,7 @@
 	import { extent } from 'd3-array';
 	import { getContext } from 'svelte';
 	import { Vega } from 'svelte-vega';
+	import { config } from '../../config';
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
@@ -85,7 +86,7 @@
 
 {#each rows as row, i}
 	<div class="h-40 text-left">
-		<h4 class="relative mb-2.5">
+		<h4 class="relative mb-2.5 text-lg">
 			{parameters.fixedDimension === 'y'
 				? parameters.yChannel === SlicesOrModels.MODELS
 					? parameters.models[0]
@@ -127,7 +128,8 @@
 				},
 				renderer: 'svg',
 				theme: 'vox',
-				downloadFileName: chart.name
+				downloadFileName: chart.name,
+				config: config
 			}}
 		/>
 	</div>

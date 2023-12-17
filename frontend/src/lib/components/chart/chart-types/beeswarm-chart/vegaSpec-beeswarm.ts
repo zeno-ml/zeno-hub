@@ -65,7 +65,6 @@ export default function generateSpec(
 		axes: [
 			{
 				title: xLabel,
-				titleFontSize: 13,
 				titlePadding: 10,
 				orient: 'bottom',
 				scale: 'xscale'
