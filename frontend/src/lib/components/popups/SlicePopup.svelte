@@ -61,7 +61,10 @@
 					) {
 						return false;
 					}
-					if (predicate.operation === Operation.REGEX) {
+					if (
+						predicate.operation === Operation.REGEX ||
+						predicate.operation === Operation.NOT_REGEX
+					) {
 						try {
 							new RegExp(String(predicate.value));
 						} catch (e) {

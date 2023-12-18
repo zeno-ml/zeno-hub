@@ -26,5 +26,6 @@ export enum Operation {
 	GTE = 'GTE',
 	LIKE = 'LIKE',
 	ILIKE = 'ILIKE',
-	REGEX = 'REGEX'
+	REGEX = 'REGEX',
+	NOT_REGEX = 'NOT_REGEX'
 }
