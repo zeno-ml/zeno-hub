@@ -76,7 +76,8 @@ export default function generateSpec(
 					{
 						type: 'symbol',
 						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-						fill: 'color'
+						fill: 'color',
+						offset: 50
 					}
 			  ]
 			: [],
