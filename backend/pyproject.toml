@@ -8,7 +8,7 @@ packages = [{ include = "zeno_backend" }]
 homepage = "https://zenoml.com"
 
 [tool.poetry.dependencies]
-amplitude-analytics = "^1.1.3"
+amplitude-analytics = "^1.1.4"
 cognitojwt = "^1.4.1"
 fastapi = "^0.104.1"
 fastapi-cloudauth = "^0.4.3"
