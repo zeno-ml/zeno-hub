@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { chartMap } from '$lib/util/charts';
-	import { ChartType, type Chart } from '$lib/zenoapi';
+	import { ChartType, type Chart, type ChartConfig } from '$lib/zenoapi';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let width: number;
 </script>
 
@@ -13,6 +14,7 @@
 			<svelte:component
 				this={chartMap[chart.type]}
 				{chart}
+				{chartConfig}
 				{width}
 				data={JSON.parse(chart.data)}
 				height={chart.type == ChartType.RADAR ? 600 : 400}

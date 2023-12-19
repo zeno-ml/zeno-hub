@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartConfig
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.homepage import EntrySort, HomeRequest
@@ -2660,3 +2660,49 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
         return bool(exists[0][0])
     else:
         raise HTTPException(status_code=500, detail="Could not check if system exists")
+
+
+async def chart_config(project_uuid: str) -> ChartConfig:
+    """Get a project's chart configuration.
+
+    Args:
+        project_uuid (str): the project for which to fetch the config.
+
+    Returns:
+        ChartConfig | None: the config if there is one, otherwise None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT font_size from chart_config WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            config = await cur.fetchall()
+
+    if len(config) == 0:
+        return ChartConfig(project_uuid=project_uuid)
+
+    return ChartConfig(project_uuid=project_uuid, font_size=config[0][0])
+
+
+async def has_chart_config(project_uuid: str) -> bool:
+    """Check if a project has a chart configuration.
+
+    Args:
+        project_uuid (str): the project for which to fetch the config.
+
+    Returns:
+        bool: whether or not the project has a chart config.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id from chart_config WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            config = await cur.fetchall()
+
+    if len(config) == 0:
+        return False
+
+    return True

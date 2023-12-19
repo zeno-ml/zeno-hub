@@ -9,6 +9,7 @@ import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_s
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Body_upload_system_schema } from '../models/Body_upload_system_schema';
 import type { Chart } from '../models/Chart';
+import type { ChartConfig } from '../models/ChartConfig';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -304,6 +305,57 @@ export class ZenoService {
 	}
 
 	/**
+	 * Get Chart Config
+	 * Get a project's chart configuration.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project for which to get the configuration.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * ChartConfig: the configuration of all charts in the project.
+	 * @param projectUuid
+	 * @returns ChartConfig Successful Response
+	 * @throws ApiError
+	 */
+	public getChartConfig(projectUuid: string): CancelablePromise<ChartConfig> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Chart Config
+	 * Delete the chart config for a project.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to delete the chart config for.
+	 * request (Request): http request to get the user information from.
+	 * @param projectUuid
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteChartConfig(projectUuid: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Charts For Projects
 	 * Get all charts for a list of projects.
 	 *
@@ -321,6 +373,34 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/charts-for-projects/',
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Configs For Projects
+	 * Get all chart configs for a list of projects.
+	 *
+	 * Args:
+	 * project_uuids (list[str]): list of project UUIDs to fetch charts configs for.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * list[ChartConfig]: all chart configurations for the list of projects.
+	 * @param requestBody
+	 * @returns ChartConfig Successful Response
+	 * @throws ApiError
+	 */
+	public getChartConfigsForProjects(
+		requestBody: Array<string>
+	): CancelablePromise<Array<ChartConfig>> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/chart-configs-for-projects',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -385,6 +465,29 @@ export class ZenoService {
 			path: {
 				project_uuid: projectUuid
 			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Chart Config
+	 * Update or add a chart configuration for a project.
+	 *
+	 * Args:
+	 * chart_config (ChartConfig): chart configuration to be written.
+	 * request (Request): http request to get user information from.
+	 * @param requestBody
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public updateChartConfig(requestBody: ChartConfig): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'PATCH',
+			url: '/chart-config',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

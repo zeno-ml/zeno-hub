@@ -34,12 +34,17 @@ async def project(project: str):
                     sql.Identifier(f"{project}_tags_datapoints")
                 )
             )
-            # Finally, delete the project from the projects table.
+            # Delete the project from the projects table.
             await cur.execute(
                 "DELETE FROM projects WHERE uuid = %s;",
                 [
                     project,
                 ],
+            )
+            # Delete the chart config.
+            await cur.execute(
+                "DELETE FROM chart_config WHERE project_uuid = %s;",
+                [project],
             )
 
             await conn.commit()
@@ -341,4 +346,19 @@ async def systems(project_uuid: str):
                     ),
                     [column[0]],
                 )
+            await conn.commit()
+
+
+async def chart_config(project_uuid: str):
+    """Delete the chart config for a given project.
+
+    Args:
+        project_uuid (str): uuid of the project to delete the chart config for.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "DELETE FROM chart_config WHERE project_uuid = %s;",
+                [project_uuid],
+            )
             await conn.commit()

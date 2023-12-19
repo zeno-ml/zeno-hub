@@ -69,7 +69,13 @@
 	{#if chartData}
 		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>
 			<ChartContainer chartName={chart.name} loading={updatingData}>
-				<svelte:component this={chartMap[chart.type]} {chart} data={chartData} width={900} />
+				<svelte:component
+					this={chartMap[chart.type]}
+					{chart}
+					data={chartData}
+					width={900}
+					chartConfig={data.chartConfig}
+				/>
 			</ChartContainer>
 		</div>
 	{/if}

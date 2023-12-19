@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { ReportElementType, type Chart, type ReportElement } from '$lib/zenoapi';
+	import {
+		ReportElementType,
+		type Chart,
+		type ChartConfig,
+		type ReportElement
+	} from '$lib/zenoapi';
 	import ChartElement from './elements/ChartElement.svelte';
 	import SliceElement from './elements/SliceElement.svelte';
 	import TagElement from './elements/TagElement.svelte';
@@ -7,6 +12,7 @@
 
 	export let element: ReportElement;
 	export let chartOptions: Chart[];
+	export let chartConfigOptions: ChartConfig[];
 
 	let width;
 
@@ -25,7 +31,12 @@
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART && chartOptions.length > 0}
-			<ChartElement chart={chartOptions.filter((c) => c.id === chartId)[0]} {width} />
+			{@const chart = chartOptions.filter((c) => c.id === chartId)[0]}
+			<ChartElement
+				{chart}
+				{width}
+				chartConfig={chartConfigOptions.filter((c) => c.projectUuid === chart.projectUuid)[0]}
+			/>
 		{:else if element.type === ReportElementType.SLICE}
 			<SliceElement {element} />
 		{:else if element.type === ReportElementType.TAG}

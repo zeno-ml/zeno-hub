@@ -196,3 +196,10 @@ class ParametersEncoder(json.JSONEncoder):
             object: a dict to be encoded by a JSON encoder and saved into the database.
         """
         return o.__dict__
+
+
+class ChartConfig(CamelModel):
+    """Configuration for a project's charts."""
+
+    project_uuid: str
+    font_size: int = 16

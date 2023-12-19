@@ -3,7 +3,7 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.chart import Chart, ParametersEncoder
+from zeno_backend.classes.chart import Chart, ChartConfig, ParametersEncoder
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metric import Metric
@@ -484,4 +484,18 @@ async def report_org(report_id: int, organization: Organization):
                 "UPDATE organization_report SET editor = %s WHERE report_id = %s "
                 "AND organization_id = %s;",
                 [organization.admin, report_id, organization.id],
+            )
+
+
+async def chart_config(config: ChartConfig):
+    """Update a project's chart config.
+
+    Args:
+        config (ChartConfig): updated chart config for the project.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "UPDATE chart_config SET font_size = %s " "WHERE project_uuid = %s;",
+                [config.font_size, config.project_uuid],
             )
