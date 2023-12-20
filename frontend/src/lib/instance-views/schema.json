@@ -162,7 +162,6 @@
 					"type": "string"
 				}
 			},
-			"required": ["data"],
 			"type": "object"
 		},
 		"ViewType": {
