@@ -157,15 +157,13 @@
 								{/if}
 							</Icon>
 						</div>
-						<Icon class="material-icons">
-							{#if sortCol.column === column && sortCol.ascending}
-								arrow_drop_up
-							{:else if sortCol.column === column}
-								arrow_drop_down
-							{/if}
-						</Icon>
-					</div>
-				</Cell>
+					</Cell>
+				{/each}
+			</Row>
+		</Head>
+		<Body>
+			{#each rows as row}
+				<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
 			{/each}
 		</Body>
 	</DataTable>
