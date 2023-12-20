@@ -76,35 +76,86 @@
 			}
 		}
 	}
+
+	function saveCSV() {
+		let csvContent = 'data:text/csv;charset=utf-8,';
+		const cols = columns.map((column) => {
+			if (parameters.xChannel === SlicesMetricsOrModels.SLICES) {
+				if (column == -1) {
+					return 'all instances';
+				}
+				return slices.find((sli) => sli.id === column)?.sliceName ?? '';
+			} else if (parameters.xChannel === SlicesMetricsOrModels.METRICS) {
+				return column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name ?? '';
+			} else {
+				return column;
+			}
+		});
+		csvContent += parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
+		csvContent += ',';
+		csvContent += cols.join(',') + '\n';
+		rows.forEach((row) => {
+			if (parameters.yChannel === SlicesOrModels.SLICES) {
+				if (row == -1) {
+					csvContent += 'all instances';
+				} else {
+					csvContent += slices.find((sli) => sli.id === row)?.sliceName ?? '';
+				}
+			} else {
+				csvContent += row;
+			}
+			csvContent += ',';
+			columns.forEach((column) => {
+				csvContent += tableRecord[column][row].fixedValue + ',';
+			});
+			csvContent = csvContent.slice(0, -1);
+			csvContent += '\n';
+		});
+		const encodedUri = encodeURI(csvContent);
+		const link = document.createElement('a');
+		link.setAttribute('href', encodedUri);
+		link.setAttribute('download', chart.name + '.csv');
+		document.body.appendChild(link);
+		link.click();
+	}
 </script>
 
-<DataTable>
-	<Head>
-		<Row>
-			<Cell>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'}</Cell>
-			{#each columns as column}
-				<Cell
-					class="pointer"
-					on:keydown={() => ({})}
-					on:click={() => {
-						if (sortCol.column !== column) {
-							sortCol = { column: column, ascending: true };
-						} else if (sortCol.ascending) {
-							sortCol = { ...sortCol, ascending: !sortCol.ascending };
-						} else {
-							sortCol = { column: undefined, ascending: true };
-						}
-					}}
-				>
-					<div class="flex">
-						<div class="min-h-[24px] overflow-hidden">
-							{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
-								<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
-							{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
-								{column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name}
-							{:else}
-								{column}
-							{/if}
+<div class="my-2">
+	<DataTable>
+		<Head>
+			<Row>
+				<Cell>{parameters.yChannel === SlicesOrModels.SLICES ? 'slices' : 'systems'}</Cell>
+				{#each columns as column}
+					<Cell
+						class="pointer"
+						on:keydown={() => ({})}
+						on:click={() => {
+							if (sortCol.column !== column) {
+								sortCol = { column: column, ascending: true };
+							} else if (sortCol.ascending) {
+								sortCol = { ...sortCol, ascending: !sortCol.ascending };
+							} else {
+								sortCol = { column: undefined, ascending: true };
+							}
+						}}
+					>
+						<div class="flex cursor-pointer transition hover:text-primary-dark">
+							<div class="min-h-[24px] overflow-hidden">
+								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
+									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
+								{:else if parameters.xChannel === SlicesMetricsOrModels.METRICS}
+									{column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name}
+								{:else}
+									{column}
+								{/if}
+							</div>
+							<Icon class="material-icons">
+								{#if sortCol.column === column && sortCol.ascending}
+									arrow_drop_up
+								{:else if sortCol.column === column}
+									arrow_drop_down
+								{/if}
+							</Icon>
 						</div>
 						<Icon class="material-icons">
 							{#if sortCol.column === column && sortCol.ascending}
@@ -116,11 +167,12 @@
 					</div>
 				</Cell>
 			{/each}
-		</Row>
-	</Head>
-	<Body>
-		{#each rows as row}
-			<TableRow {columns} {slices} {tableRecord} {parameters} {row} />
-		{/each}
-	</Body>
-</DataTable>
+		</Body>
+	</DataTable>
+</div>
+<button
+	on:click={saveCSV}
+	class="ml-auto rounded border border-primary-dark px-2 py-0.5 text-primary transition hover:bg-primary-mid"
+>
+	Download CSV
+</button>

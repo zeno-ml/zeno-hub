@@ -1,31 +1,21 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
 	import { collapseHeader, metrics, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
-	import type { User } from '$lib/zenoapi';
 	import {
 		mdiArrowCollapseLeft,
 		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
-		mdiCogOutline,
 		mdiCompare,
 		mdiCompassOutline,
 		mdiHomeOutline
 	} from '@mdi/js';
 	import HeaderIcon from '../general/HeaderIcon.svelte';
 
-	export let user: User | null;
-
-	let projectEdit = false;
-
 	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
-{#if projectEdit && user !== null}
-	<ProjectPopup config={$project} on:close={() => (projectEdit = false)} {user} />
-{/if}
 <nav class="z-20 flex md:hidden">
 	<header
 		class="flex w-full flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
@@ -35,8 +25,8 @@
 		</a>
 	</header>
 </nav>
-<div class="z-20 hidden md:flex">
-	<div
+<nav class="z-20 hidden md:flex">
+	<header
 		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish-light text-grey"
 	>
 		<div class="flex flex-col items-center justify-center">
@@ -74,7 +64,7 @@
 				/>
 			</div>
 		</div>
-		<div>
+		<div class="flex h-full items-center">
 			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}
 				<HeaderIcon
 					pageName={'$collapseHeader'}
@@ -84,15 +74,5 @@
 				/>
 			{/if}
 		</div>
-		<div class="mb-3 flex flex-col items-center justify-center">
-			{#if $project?.ownerName === user?.name}
-				<HeaderIcon
-					pageName={'editProject'}
-					tooltipContent={"Edit your project's configuration"}
-					icon={mdiCogOutline}
-					on:click={() => (projectEdit = true)}
-				/>
-			{/if}
-		</div>
-	</div>
-</div>
+	</header>
+</nav>

@@ -1,13 +1,12 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
+	import HelpButton from '$lib/components/general/HelpButton.svelte';
+	import Error from '$lib/instance-views/Error.svelte';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import { json } from '@codemirror/lang-json';
-	import CodeMirror from 'svelte-codemirror-editor';
-
-	import { browser } from '$app/environment';
-	import Help from '$lib/components/general/Help.svelte';
-	import Error from '$lib/instance-views/Error.svelte';
 	import Button from '@smui/button/src/Button.svelte';
+	import CodeMirror from 'svelte-codemirror-editor';
 	import { samples } from './samples.js';
 	import { setURLParameters, type URLParams } from './util.js';
 
@@ -38,18 +37,15 @@
 	}
 </script>
 
-<div class="absolute bottom-4 right-4">
-	<Help docsLink="https://zenoml.com/docs/views/" />
-</div>
-
 <div class="flex h-full w-full flex-col p-4">
 	<div class="mb-4 flex h-12 items-center">
 		<a href="/" class="shrink-0">
 			<img src="/zeno-logo.png" class="h-8" alt="diamond tesselation logo" />
 		</a>
 		<h1 class="ml-3 text-2xl font-bold">Instance View Playground</h1>
-		<div class="ml-auto mr-2">
-			<Button variant="raised" href="https://zenoml.com/docs/views/">Read the Docs</Button>
+		<div class="ml-auto mr-2 flex items-center">
+			<HelpButton />
+			<Button variant="raised" href="https://zenoml.com/docs/views/">Learn about Views</Button>
 		</div>
 	</div>
 	<div class="flex w-full items-center pb-4">

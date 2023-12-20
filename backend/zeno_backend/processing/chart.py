@@ -321,7 +321,11 @@ async def heatmap_data(chart: Chart, project: str) -> str:
             else:
                 filter_sql = await table_filter(
                     project,
-                    params.model,
+                    (
+                        current_x
+                        if params.x_channel == SlicesOrModels.MODELS
+                        else current_y
+                    ),
                     (
                         current_x.filter_predicates  # type: ignore
                         if x_slice
@@ -329,7 +333,14 @@ async def heatmap_data(chart: Chart, project: str) -> str:
                     ),
                 )
                 metric = await metric_map(
-                    selected_metric, project, params.model, filter_sql
+                    selected_metric,
+                    project,
+                    (
+                        current_x
+                        if params.x_channel == SlicesOrModels.MODELS
+                        else current_y
+                    ),
+                    filter_sql,
                 )
             elements.append(
                 {

@@ -2,6 +2,7 @@
 	import type { Chart, Metric, XCParameters, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
+	import { config } from '../../config';
 	import generateSpec from './vegaSpec-bar';
 
 	export let chart: Chart;
@@ -43,6 +44,7 @@
 		},
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: config
 	}}
 />

@@ -2,6 +2,7 @@
 	import type { Chart, HeatmapParameters, Metric, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
+	import { config } from '../../config';
 	import generateSpec from './vegaSpec-heatmap';
 
 	export let chart: Chart;
@@ -52,6 +53,7 @@
 		height: 700,
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: config
 	}}
 />

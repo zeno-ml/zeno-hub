@@ -13,7 +13,6 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
-from zeno_backend.database.select import user as get_user
 from zeno_backend.processing.chart import calculate_chart_data
 
 
@@ -345,17 +344,13 @@ async def report(report: Report):
     Args:
         report (Report): the configuration of the report.
     """
-    owner_id = await get_user(report.owner_name)
-    if owner_id is None:
-        return
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "UPDATE reports SET name = %s, owner_id = %s, public = %s, "
-                "description = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
+                "UPDATE reports SET name = %s, public = %s, description = %s, "
+                "updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
                 [
                     report.name,
-                    owner_id.id,
                     report.public,
                     report.description,
                     report.id,

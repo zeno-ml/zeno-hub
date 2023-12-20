@@ -75,7 +75,7 @@
 			}}
 		/>
 	</div>
-	<div class="mr-2.5 w-20">
+	<div class="mr-2.5 w-40">
 		{#if predicate.column}
 			{#if predicate.column.dataType === MetadataType.BOOLEAN}
 				<Svelecte
@@ -116,7 +116,8 @@
 						inverseOperationMap[Operation.DIFFERENT],
 						inverseOperationMap[Operation.LIKE],
 						inverseOperationMap[Operation.ILIKE],
-						inverseOperationMap[Operation.REGEX]
+						inverseOperationMap[Operation.REGEX],
+						inverseOperationMap[Operation.NOT_REGEX]
 					]}
 				/>
 			{/if}

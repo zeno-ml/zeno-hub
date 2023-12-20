@@ -28,8 +28,6 @@ export default function generateSpec(
 				type: 'nominal',
 				axis: {
 					labelAngle: 45,
-					labelFontSize: 14,
-					titleFontSize: 14,
 					titlePadding: 10
 				},
 				sort: null
@@ -39,8 +37,6 @@ export default function generateSpec(
 				field: 'y_value',
 				type: 'quantitative',
 				axis: {
-					labelFontSize: 14,
-					titleFontSize: 14,
 					titlePadding: 20
 				},
 				sort: null

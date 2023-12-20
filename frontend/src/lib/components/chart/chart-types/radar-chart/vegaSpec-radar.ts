@@ -213,8 +213,7 @@ export default function generateSpec(parameters: RadarParameters, size: number):
 								value: 'bottom'
 							}
 						],
-						fill: { value: 'black' },
-						fontSize: { value: 12 }
+						fill: { value: 'black' }
 					}
 				}
 			}

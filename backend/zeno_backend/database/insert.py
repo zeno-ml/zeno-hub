@@ -475,7 +475,7 @@ async def report(name: str, user: User) -> int:
             await cur.execute(
                 "INSERT INTO report_author (user_id, report_id, position) "
                 "VALUES (%s,%s,%s);",
-                [user.id, id, 0],
+                [user.id, id[0][0], 0],
             )
 
             await conn.commit()
