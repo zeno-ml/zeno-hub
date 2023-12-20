@@ -10,7 +10,12 @@ from pyarrow import RecordBatch, Schema
 
 import zeno_backend.database.delete as delete
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart, ChartConfig, ParametersEncoder
+from zeno_backend.classes.chart import (
+    Chart,
+    ChartConfig,
+    ConfigEncoder,
+    ParametersEncoder,
+)
 from zeno_backend.classes.filter import (
     FilterPredicate,
     FilterPredicateGroup,
@@ -872,6 +877,6 @@ async def chart_config(config: ChartConfig):
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO chart_config (project_uuid, font_size) VALUES (%s,%s);",
-                [config.project_uuid, config.font_size],
+                "INSERT INTO chart_config (project_uuid, config) VALUES (%s,%s);",
+                [config.project_uuid, json.dumps(config, cls=ConfigEncoder)],
             )

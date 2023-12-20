@@ -203,3 +203,18 @@ class ChartConfig(CamelModel):
 
     project_uuid: str
     font_size: int = 16
+
+
+class ConfigEncoder(json.JSONEncoder):
+    """JSON encoder for chart configurations."""
+
+    def default(self, o: ChartConfig):
+        """Convert chart a config into JSON to be saved in the database.
+
+        Args:
+            o (ChartConfig): chart config to be converted.
+
+        Returns:
+            object: a dict to be encoded by a JSON encoder and saved into the database.
+        """
+        return o.__dict__

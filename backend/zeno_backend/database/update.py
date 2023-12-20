@@ -3,7 +3,12 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.chart import Chart, ChartConfig, ParametersEncoder
+from zeno_backend.classes.chart import (
+    Chart,
+    ChartConfig,
+    ConfigEncoder,
+    ParametersEncoder,
+)
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metric import Metric
@@ -496,6 +501,6 @@ async def chart_config(config: ChartConfig):
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "UPDATE chart_config SET font_size = %s " "WHERE project_uuid = %s;",
-                [config.font_size, config.project_uuid],
+                "UPDATE chart_config SET config = %s WHERE project_uuid = %s;",
+                [json.dumps(config, cls=ConfigEncoder), config.project_uuid],
             )

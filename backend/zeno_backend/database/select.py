@@ -2674,15 +2674,14 @@ async def chart_config(project_uuid: str) -> ChartConfig:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT font_size from chart_config WHERE project_uuid = %s;",
+                "SELECT config from chart_config WHERE project_uuid = %s;",
                 [project_uuid],
             )
             config = await cur.fetchall()
 
     if len(config) == 0:
         return ChartConfig(project_uuid=project_uuid)
-
-    return ChartConfig(project_uuid=project_uuid, font_size=config[0][0])
+    return config[0][0]
 
 
 async def has_chart_config(project_uuid: str) -> bool:

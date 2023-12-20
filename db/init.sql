@@ -148,5 +148,5 @@ CREATE TABLE project_like (
 CREATE TABLE chart_config (
     id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
-    font_size integer NOT NULL
+    config jsonb NOT NULL
 )
