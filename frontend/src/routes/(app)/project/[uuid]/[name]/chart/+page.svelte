@@ -20,7 +20,7 @@
 </script>
 
 {#if chartConfigEdit && $project.editor}
-	<ChartConfigPopup config={data.chartConfig} on:close={() => (chartConfigEdit = false)} />
+	<ChartConfigPopup bind:config={data.chartConfig} on:close={() => (chartConfigEdit = false)} />
 {/if}
 <div class="flex w-full flex-col p-8 pt-5">
 	<div class="mb-1 flex h-12 items-center">
