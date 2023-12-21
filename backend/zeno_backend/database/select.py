@@ -2662,46 +2662,33 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
         raise HTTPException(status_code=500, detail="Could not check if system exists")
 
 
-async def chart_config(project_uuid: str) -> ChartConfig:
+async def chart_config(
+    project_uuid: str, chart_id: int | None = None
+) -> ChartConfig | None:
     """Get a project's chart configuration.
 
     Args:
         project_uuid (str): the project for which to fetch the config.
+        chart_id (int): the chart for which to fetch the config.
 
     Returns:
         ChartConfig | None: the config if there is one, otherwise None.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
-            await cur.execute(
-                "SELECT config from chart_config WHERE project_uuid = %s;",
-                [project_uuid],
-            )
+            if chart_id is None:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE project_uuid = %s "
+                    "AND chart_id IS NULL;",
+                    [project_uuid],
+                )
+            else:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE chart_id = %s;",
+                    [chart_id],
+                )
             config = await cur.fetchall()
 
     if len(config) == 0:
-        return ChartConfig(project_uuid=project_uuid)
+        return None
     return config[0][0]
-
-
-async def has_chart_config(project_uuid: str) -> bool:
-    """Check if a project has a chart configuration.
-
-    Args:
-        project_uuid (str): the project for which to fetch the config.
-
-    Returns:
-        bool: whether or not the project has a chart config.
-    """
-    async with db_pool.connection() as conn:
-        async with conn.cursor() as cur:
-            await cur.execute(
-                "SELECT id from chart_config WHERE project_uuid = %s;",
-                [project_uuid],
-            )
-            config = await cur.fetchall()
-
-    if len(config) == 0:
-        return False
-
-    return True

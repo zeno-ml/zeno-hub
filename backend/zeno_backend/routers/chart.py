@@ -68,19 +68,27 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
     return chart
 
 
-@router.get("/chart-config/{project_uuid}", response_model=ChartConfig, tags=["zeno"])
-async def get_chart_config(project_uuid: str, request: Request):
+@router.post("/chart-config/{project_uuid}", response_model=ChartConfig, tags=["zeno"])
+async def get_chart_config(
+    project_uuid: str, request: Request, chart_id: int | None = None
+):
     """Get a project's chart configuration.
 
     Args:
         project_uuid (str): uuid of the project for which to get the configuration.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
         request (Request): http request to get user information from.
 
     Returns:
         ChartConfig: the configuration of all charts in the project.
     """
     await util.project_access_valid(project_uuid, request)
-    return await select.chart_config(project_uuid)
+    config = await select.chart_config(project_uuid)
+    config = ChartConfig(project_uuid=project_uuid) if config is None else config
+    if chart_id is not None:
+        chart_config = await select.chart_config(project_uuid, chart_id)
+        config = config if chart_config is None else {**config, **chart_config}  # type: ignore
+    return config
 
 
 @router.post(
@@ -110,29 +118,6 @@ async def get_charts_for_projects(project_uuids: list[str], request: Request):
             await update.chart_data(c.id, chart_data)
             c.data = chart_data
     return charts
-
-
-@router.post(
-    "/chart-configs-for-projects", response_model=list[ChartConfig], tags=["zeno"]
-)
-async def get_chart_configs_for_projects(project_uuids: list[str], request: Request):
-    """Get all chart configs for a list of projects.
-
-    Args:
-        project_uuids (list[str]): list of project UUIDs to fetch charts configs for.
-        request (Request): http request to get user information from.
-
-    Returns:
-        list[ChartConfig]: all chart configurations for the list of projects.
-    """
-    if len(project_uuids) == 0:
-        return []
-
-    configs = []
-    for project_uuid in project_uuids:
-        await util.project_access_valid(project_uuid, request)
-        configs.append(await select.chart_config(project_uuid))
-    return configs
 
 
 @router.post(
@@ -204,18 +189,21 @@ async def update_chart(project_uuid: str, chart: Chart, request: Request):
 
 
 @router.patch("/chart-config", tags=["zeno"], dependencies=[Depends(util.auth)])
-async def update_chart_config(chart_config: ChartConfig, request: Request):
+async def update_chart_config(
+    chart_config: ChartConfig, request: Request, chart_id: int | None = None
+):
     """Update or add a chart configuration for a project.
 
     Args:
         chart_config (ChartConfig): chart configuration to be written.
         request (Request): http request to get user information from.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
     """
     await util.project_editor(chart_config.project_uuid, request)
-    if await select.has_chart_config(chart_config.project_uuid):
-        await update.chart_config(chart_config)
+    if await select.chart_config(chart_config.project_uuid, chart_id) is not None:
+        await update.chart_config(chart_config, chart_id)
     else:
-        await insert.chart_config(chart_config)
+        await insert.chart_config(chart_config, chart_id)
 
 
 @router.delete(
@@ -243,12 +231,15 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
 @router.delete(
     "/chart-config/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
-async def delete_chart_config(project_uuid: str, request: Request):
+async def delete_chart_config(
+    project_uuid: str, request: Request, chart_id: int | None = None
+):
     """Delete the chart config for a project.
 
     Args:
         project_uuid (str): uuid of the project to delete the chart config for.
         request (Request): http request to get the user information from.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
     """
     await util.project_editor(project_uuid, request)
-    await delete.chart_config(project_uuid)
+    await delete.chart_config(project_uuid, chart_id)

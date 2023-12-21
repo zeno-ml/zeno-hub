@@ -7,12 +7,13 @@
 	import Popup from './Popup.svelte';
 
 	export let config: ChartConfig;
+	export let chartId: number | null = null;
 
 	const dispatch = createEventDispatcher();
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
 	function updateChartConfig() {
-		zenoClient.updateChartConfig(config).then(() => {
+		zenoClient.updateChartConfig(config, chartId).then(() => {
 			dispatch('close');
 		});
 	}

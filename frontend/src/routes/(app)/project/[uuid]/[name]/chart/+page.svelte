@@ -19,7 +19,7 @@
 	$: charts.set(data.charts);
 </script>
 
-{#if chartConfigEdit && data.user !== null}
+{#if chartConfigEdit && $project.editor}
 	<ChartConfigPopup config={data.chartConfig} on:close={() => (chartConfigEdit = false)} />
 {/if}
 <div class="flex w-full flex-col p-8 pt-5">

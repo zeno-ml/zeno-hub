@@ -349,16 +349,24 @@ async def systems(project_uuid: str):
             await conn.commit()
 
 
-async def chart_config(project_uuid: str):
-    """Delete the chart config for a given project.
+async def chart_config(project_uuid: str, chart_id: int | None = None):
+    """Delete the chart config for a given project or chart.
 
     Args:
         project_uuid (str): uuid of the project to delete the chart config for.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
-            await cur.execute(
-                "DELETE FROM chart_config WHERE project_uuid = %s;",
-                [project_uuid],
-            )
+            if chart_id is None:
+                await cur.execute(
+                    "DELETE FROM chart_config WHERE project_uuid = %s "
+                    "AND chart_id is None;",
+                    [project_uuid],
+                )
+            else:
+                await cur.execute(
+                    "DELETE FROM chart_config WHERE chart_id = %s;",
+                    [chart_id],
+                )
             await conn.commit()

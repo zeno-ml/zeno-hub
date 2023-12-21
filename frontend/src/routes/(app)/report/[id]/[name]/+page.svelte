@@ -259,7 +259,6 @@
 								bind:editId
 								bind:showConfirmDelete
 								chartOptions={data.charts}
-								chartConfigOptions={data.chartConfigs}
 								sliceOptions={data.slices}
 								tagOptions={data.tags}
 								{swapElementPositions}
@@ -273,7 +272,6 @@
 							bind:editId
 							bind:showConfirmDelete
 							chartOptions={data.charts}
-							chartConfigOptions={data.chartConfigs}
 							sliceOptions={data.slices}
 							tagOptions={data.tags}
 							{swapElementPositions}

@@ -2,7 +2,6 @@
 	import {
 		ReportElementType,
 		type Chart,
-		type ChartConfig,
 		type Report,
 		type ReportElement,
 		type Slice,
@@ -25,7 +24,6 @@
 	export let editId: number;
 	export let showConfirmDelete: number;
 	export let chartOptions: Chart[] = [];
-	export let chartConfigOptions: ChartConfig[] = [];
 	export let sliceOptions: Slice[] = [];
 	export let tagOptions: Tag[] = [];
 	export let addElement: (elementIndex: number) => void;
@@ -79,11 +77,11 @@
 				<ElementEdit bind:element {chartOptions} {sliceOptions} {tagOptions} reportId={report.id} />
 			</div>
 			<div class={element.type === ReportElementType.TEXT ? 'w-1/2' : 'w-full'}>
-				<Element {element} {chartOptions} {chartConfigOptions} />
+				<Element {element} {chartOptions} />
 			</div>
 		</div>
 	{:else}
-		<Element {element} {chartOptions} {chartConfigOptions} />
+		<Element {element} {chartOptions} />
 	{/if}
 </div>
 {#if report.editor}

@@ -34,10 +34,9 @@ export async function load({ cookies, params, url, depends }) {
 			);
 		}
 	}
-	const [projects, charts, chartConfigs, slices, tags, authors, users, owner] = await Promise.all([
+	const [projects, charts, slices, tags, authors, users, owner] = await Promise.all([
 		zenoClient.getProjects(reportResponse.report.linkedProjects),
 		zenoClient.getChartsForProjects(reportResponse.report.linkedProjects),
-		zenoClient.getChartConfigsForProjects(reportResponse.report.linkedProjects),
 		zenoClient.getSlicesForProjects(reportResponse.report.linkedProjects),
 		zenoClient.getTagsForProjects(reportResponse.report.linkedProjects),
 		zenoClient.getReportAuthors(reportResponse.report.id),
@@ -56,7 +55,6 @@ export async function load({ cookies, params, url, depends }) {
 		report: reportResponse.report,
 		reportElements: reportResponse.reportElements,
 		charts,
-		chartConfigs,
 		slices,
 		tags,
 		cognitoUser: cognitoUser,

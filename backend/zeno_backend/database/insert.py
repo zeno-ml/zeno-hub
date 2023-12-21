@@ -868,15 +868,17 @@ async def report_org(report_id: int, organization: Organization):
             )
 
 
-async def chart_config(config: ChartConfig):
-    """Add a chart config for a project.
+async def chart_config(config: ChartConfig, chart_id: int | None = None):
+    """Add a chart config for a project or chart.
 
     Args:
         config (ChartConfig): the config to be added to the database.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO chart_config (project_uuid, config) VALUES (%s,%s);",
-                [config.project_uuid, json.dumps(config, cls=ConfigEncoder)],
+                "INSERT INTO chart_config (project_uuid, config, chart_id) "
+                "VALUES (%s,%s,%s);",
+                [config.project_uuid, json.dumps(config, cls=ConfigEncoder), chart_id],
             )

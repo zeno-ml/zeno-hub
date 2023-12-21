@@ -310,20 +310,28 @@ export class ZenoService {
 	 *
 	 * Args:
 	 * project_uuid (str): uuid of the project for which to get the configuration.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
 	 * request (Request): http request to get user information from.
 	 *
 	 * Returns:
 	 * ChartConfig: the configuration of all charts in the project.
 	 * @param projectUuid
+	 * @param chartId
 	 * @returns ChartConfig Successful Response
 	 * @throws ApiError
 	 */
-	public getChartConfig(projectUuid: string): CancelablePromise<ChartConfig> {
+	public getChartConfig(
+		projectUuid: string,
+		chartId?: number | null
+	): CancelablePromise<ChartConfig> {
 		return this.httpRequest.request({
-			method: 'GET',
+			method: 'POST',
 			url: '/chart-config/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
 			},
 			errors: {
 				422: `Validation Error`
@@ -338,16 +346,21 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): uuid of the project to delete the chart config for.
 	 * request (Request): http request to get the user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
 	 * @param projectUuid
+	 * @param chartId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public deleteChartConfig(projectUuid: string): CancelablePromise<any> {
+	public deleteChartConfig(projectUuid: string, chartId?: number | null): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'DELETE',
 			url: '/chart-config/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
 			},
 			errors: {
 				422: `Validation Error`
@@ -373,34 +386,6 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'POST',
 			url: '/charts-for-projects/',
-			body: requestBody,
-			mediaType: 'application/json',
-			errors: {
-				422: `Validation Error`
-			}
-		});
-	}
-
-	/**
-	 * Get Chart Configs For Projects
-	 * Get all chart configs for a list of projects.
-	 *
-	 * Args:
-	 * project_uuids (list[str]): list of project UUIDs to fetch charts configs for.
-	 * request (Request): http request to get user information from.
-	 *
-	 * Returns:
-	 * list[ChartConfig]: all chart configurations for the list of projects.
-	 * @param requestBody
-	 * @returns ChartConfig Successful Response
-	 * @throws ApiError
-	 */
-	public getChartConfigsForProjects(
-		requestBody: Array<string>
-	): CancelablePromise<Array<ChartConfig>> {
-		return this.httpRequest.request({
-			method: 'POST',
-			url: '/chart-configs-for-projects',
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {
@@ -480,14 +465,22 @@ export class ZenoService {
 	 * Args:
 	 * chart_config (ChartConfig): chart configuration to be written.
 	 * request (Request): http request to get user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
 	 * @param requestBody
+	 * @param chartId
 	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public updateChartConfig(requestBody: ChartConfig): CancelablePromise<any> {
+	public updateChartConfig(
+		requestBody: ChartConfig,
+		chartId?: number | null
+	): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/chart-config',
+			query: {
+				chart_id: chartId
+			},
 			body: requestBody,
 			mediaType: 'application/json',
 			errors: {

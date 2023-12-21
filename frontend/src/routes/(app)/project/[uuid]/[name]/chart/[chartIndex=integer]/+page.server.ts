@@ -9,7 +9,7 @@ export async function load({ params, cookies, url }) {
 	let chartConfig: ChartConfig;
 	try {
 		chart = await zenoClient.getChart(parseInt(params.chartIndex), params.uuid);
-		chartConfig = await zenoClient.getChartConfig(params.uuid);
+		chartConfig = await zenoClient.getChartConfig(params.uuid, chart.id);
 	} catch (e) {
 		const err = e as ApiError;
 		throw error(err.status, err.body.detail);
