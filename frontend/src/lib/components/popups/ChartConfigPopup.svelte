@@ -9,6 +9,7 @@
 	export let config: ChartConfig;
 	export let chartId: number | null = null;
 
+	const oldConfig = { ...config };
 	const dispatch = createEventDispatcher();
 	const zenoClient = getContext('zenoClient') as ZenoService;
 
@@ -18,9 +19,14 @@
 		});
 	}
 
+	function resetChartConfig() {
+		config = oldConfig;
+		dispatch('close');
+	}
+
 	function submit(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
-			dispatch('close');
+			resetChartConfig();
 		}
 	}
 </script>
@@ -32,13 +38,13 @@
 	>
 		<h2 class="mb-4 text-xl">Chart Configuration</h2>
 		<div>
-			<Textfield bind:value={config.fontSize} label="Font Size" class="mb-4 w-full" />
+			<Textfield bind:value={config.fontSize} label="Font Size" class="mb-4 w-full" type="number" />
 		</div>
 		<div class="flex items-center self-end">
-			<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
+			<Button style="margin-left: 10px;" variant="outlined" on:click={resetChartConfig}
 				>Cancel</Button
 			>
-			<Button style="margin-left: 5px;" variant="outlined" on:click={() => updateChartConfig()}
+			<Button style="margin-left: 5px;" variant="outlined" on:click={updateChartConfig}
 				>{'Update'}</Button
 			>
 		</div>

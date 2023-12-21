@@ -12,9 +12,9 @@
 
 	export let data;
 
-	let chartConfigEdit = false;
-
 	const zenoClient = getContext('zenoClient') as ZenoService;
+
+	let chartConfigEdit = false;
 
 	$: charts.set(data.charts);
 </script>

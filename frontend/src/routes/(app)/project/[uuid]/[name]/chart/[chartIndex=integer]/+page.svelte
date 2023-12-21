@@ -59,12 +59,12 @@
 		<div
 			class="h-full w-[380px] shrink-0 overflow-y-auto border-r border-r-grey-lighter bg-yellowish-light px-5 pb-20"
 		>
-			<EditHeader bind:isChartEdit bind:chart chartConfig={data.chartConfig} />
+			<EditHeader bind:isChartEdit bind:chart bind:chartConfig={data.chartConfig} />
 			<ViewSelection bind:chart />
 			<Encoding bind:chart />
 		</div>
 	{:else}
-		<ViewHeader bind:isChartEdit chartConfig={data.chartConfig} {chart} />
+		<ViewHeader bind:isChartEdit bind:chartConfig={data.chartConfig} {chart} />
 	{/if}
 	{#if chartData}
 		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>
