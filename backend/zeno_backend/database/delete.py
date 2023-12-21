@@ -361,7 +361,7 @@ async def chart_config(project_uuid: str, chart_id: int | None = None):
             if chart_id is None:
                 await cur.execute(
                     "DELETE FROM chart_config WHERE project_uuid = %s "
-                    "AND chart_id is None;",
+                    "AND chart_id IS NULL;",
                     [project_uuid],
                 )
             else:

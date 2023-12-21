@@ -19,14 +19,23 @@
 		});
 	}
 
-	function resetChartConfig() {
+	function undoChartConfig() {
 		config = oldConfig;
 		dispatch('close');
 	}
 
+	function resetChartConfig() {
+		zenoClient.deleteChartConfig(config.projectUuid, chartId).then(() => {
+			zenoClient.getChartConfig(config.projectUuid, chartId).then((fetchedConfig) => {
+				config = fetchedConfig;
+				dispatch('close');
+			});
+		});
+	}
+
 	function submit(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
-			resetChartConfig();
+			undoChartConfig();
 		}
 	}
 </script>
@@ -41,11 +50,13 @@
 			<Textfield bind:value={config.fontSize} label="Font Size" class="mb-4 w-full" type="number" />
 		</div>
 		<div class="flex items-center self-end">
-			<Button style="margin-left: 10px;" variant="outlined" on:click={resetChartConfig}
+			<Button style="margin-left: 10px;" variant="outlined" on:click={undoChartConfig}
 				>Cancel</Button
 			>
+			<Button style="margin-left: 5px;" variant="outlined" on:click={resetChartConfig}>Reset</Button
+			>
 			<Button style="margin-left: 5px;" variant="outlined" on:click={updateChartConfig}
-				>{'Update'}</Button
+				>Update</Button
 			>
 		</div>
 	</Content>
