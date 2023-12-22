@@ -13,7 +13,7 @@
 	export let slices: Slice[];
 </script>
 
-<Row style="overflow: visible">
+<Row class="overflow-visible">
 	<!-- y cell -->
 	<Cell>
 		{#if parameters.yChannel === SlicesOrModels.SLICES}
