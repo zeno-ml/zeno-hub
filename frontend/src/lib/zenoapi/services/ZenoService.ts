@@ -281,7 +281,7 @@ export class ZenoService {
 	 * HTTPException: error if the chart could not be fetched.
 	 *
 	 * Returns:
-	 * ChartResponse: chart spec and data.
+	 * ChartResponse: chart spec.
 	 * @param chartId
 	 * @param projectUuid
 	 * @returns Chart Successful Response
@@ -296,6 +296,72 @@ export class ZenoService {
 			},
 			query: {
 				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData1(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
 			},
 			errors: {
 				422: `Validation Error`

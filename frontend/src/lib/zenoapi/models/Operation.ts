@@ -16,6 +16,7 @@
  * LIKE: like.
  * ILIKE: ilike.
  * REGEX: regex.
+ * NOT_REGEX: not matching regex.
  */
 export enum Operation {
 	EQUAL = 'EQUAL',

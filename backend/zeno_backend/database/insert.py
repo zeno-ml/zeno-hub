@@ -25,7 +25,6 @@ from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
-from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def api_key(user: User) -> str | None:
@@ -704,18 +703,15 @@ async def chart(project: str, chart: Chart) -> int | None:
     Returns:
         int | None: the id of the newly created chart.
     """
-    chart_data = await calculate_chart_data(chart, project)
-
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO charts (name, type, parameters, data, project_uuid) "
-                "VALUES (%s,%s,%s,%s,%s) RETURNING id;",
+                "INSERT INTO charts (name, type, parameters, project_uuid) "
+                "VALUES (%s,%s,%s,%s) RETURNING id;",
                 [
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_data,
                     project,
                 ],
             )

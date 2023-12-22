@@ -852,7 +852,6 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
                 name=r[1],
                 type=r[2],
                 parameters=json.loads(r[3]),
-                data=json.dumps(r[4]) if r[4] is not None else None,
                 project_uuid=r[5],
             ),
             chart_results,
@@ -1676,7 +1675,7 @@ async def chart(chart_id: int) -> Chart:
         chart_id (int): the ID of the chart to be fetched.
 
     Returns:
-        Chart | None: the requested chart.
+        Chart: the requested chart.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1698,9 +1697,34 @@ async def chart(chart_id: int) -> Chart:
         name=chart_result[0][1],
         type=chart_result[0][2],
         parameters=json.loads(chart_result[0][3]),
-        data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
         project_uuid=chart_result[0][5],
     )
+
+
+async def chart_data(chart_id: int) -> str | None:
+    """Get a chart's data.
+
+    Args:
+        chart_id (int): ID of the chart to get data for.
+
+    Returns:
+        str | None: chart data.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT data FROM charts WHERE id = %s",
+                [chart_id],
+            )
+            chart_result = await cur.fetchall()
+
+    if len(chart_result) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Chart could not be found.",
+        )
+
+    return json.dumps(chart_result[0][0]) if chart_result[0][0] is not None else None
 
 
 async def charts(project_uuid: str) -> list[Chart]:

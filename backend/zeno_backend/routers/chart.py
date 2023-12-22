@@ -56,16 +56,34 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         HTTPException: error if the chart could not be fetched.
 
     Returns:
-        ChartResponse: chart spec and data.
+        ChartResponse: chart spec.
     """
     await util.project_access_valid(project_uuid, request)
-    chart = await select.chart(chart_id)
-    if chart.data is None:
-        chart_data = await calculate_chart_data(chart, project_uuid)
-        await update.chart_data(chart_id, chart_data)
-        chart.data = chart_data
+    return await select.chart(chart_id)
 
-    return chart
+
+@router.get("/chart-data/{project_uuid}/{chart_id}", response_model=str, tags=["Zeno"])
+async def get_chart_data(project_uuid, chart_id: int, request: Request):
+    """Get a chart's data.
+
+    Args:
+        project_uuid (str): UUID of the project to get a chart from.
+        chart_id (int): id of the chart to be fetched.
+        request (Request): http request to get user information from.
+
+    Raises:
+        HTTPException: error if the chart could not be fetched.
+
+    Returns:
+        str: chart data.
+    """
+    await util.project_access_valid(project_uuid, request)
+    data = await select.chart_data(chart_id)
+    if data is None:
+        chart = await select.chart(chart_id)
+        data = await calculate_chart_data(chart, project_uuid)
+        await update.chart_data(chart_id, data)
+    return data
 
 
 @router.post(
@@ -89,11 +107,6 @@ async def get_charts_for_projects(project_uuids: list[str], request: Request):
     for project_uuid in project_uuids:
         await util.project_access_valid(project_uuid, request)
     charts = await select.charts_for_projects(project_uuids)
-    for c in charts:
-        if c.data is None:
-            chart_data = await calculate_chart_data(c, c.project_uuid)
-            await update.chart_data(c.id, chart_data)
-            c.data = chart_data
     return charts
 
 
@@ -142,7 +155,6 @@ async def add_chart(
 
 @router.patch(
     "/chart/{project_uuid}",
-    response_model=str,
     tags=["zeno"],
     dependencies=[Depends(util.auth)],
 )
@@ -157,7 +169,7 @@ async def update_chart(project_uuid: str, chart: Chart, request: Request):
     await util.project_editor(project_uuid, request)
     selected_chart = await select.chart(chart.id)
     if selected_chart.project_uuid == project_uuid:
-        return await update.chart(chart, project_uuid)
+        await update.chart(chart, project_uuid)
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
