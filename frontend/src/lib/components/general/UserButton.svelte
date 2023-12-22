@@ -15,7 +15,7 @@
 	{#if user}
 		{#if $page.route.id?.startsWith('/(app)/home')}
 			<Button
-				class="mr-3 h-full"
+				class="mr-3"
 				variant="outlined"
 				on:click={() => (exploreTab ? goto('/') : goto('/home'))}
 				>{exploreTab ? 'My Hub' : 'Explore'}</Button
