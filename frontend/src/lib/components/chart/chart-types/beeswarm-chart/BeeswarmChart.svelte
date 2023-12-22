@@ -4,16 +4,18 @@
 		ZenoService,
 		type BeeswarmParameters,
 		type Chart,
+		type ChartConfig,
 		type Metric,
 		type Slice
 	} from '$lib/zenoapi';
 	import { extent } from 'd3-array';
 	import { getContext } from 'svelte';
 	import { Vega } from 'svelte-vega';
-	import { config } from '../../config';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -129,7 +131,7 @@
 				renderer: 'svg',
 				theme: 'vox',
 				downloadFileName: chart.name,
-				config: config
+				config: getConfig(chartConfig)
 			}}
 		/>
 	</div>

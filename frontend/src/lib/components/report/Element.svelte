@@ -25,7 +25,8 @@
 		{#if element.type === ReportElementType.TEXT}
 			<TextElement {element} />
 		{:else if element.type === ReportElementType.CHART && chartOptions.length > 0}
-			<ChartElement chart={chartOptions.filter((c) => c.id === chartId)[0]} {width} />
+			{@const chart = chartOptions.filter((c) => c.id === chartId)[0]}
+			<ChartElement {chart} {width} />
 		{:else if element.type === ReportElementType.SLICE}
 			<SliceElement {element} />
 		{:else if element.type === ReportElementType.TAG}

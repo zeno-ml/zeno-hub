@@ -14,7 +14,7 @@ import zeno_backend.database.select as select
 import zeno_backend.database.update as update
 import zeno_backend.util as util
 from zeno_backend.classes.amplitude import AmplitudeHandler
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartConfig
 from zeno_backend.processing.chart import calculate_chart_data
 
 router = APIRouter(tags=["zeno"])
@@ -66,6 +66,29 @@ async def get_chart(project_uuid: str, chart_id: int, request: Request):
         chart.data = chart_data
 
     return chart
+
+
+@router.post("/chart-config/{project_uuid}", response_model=ChartConfig, tags=["zeno"])
+async def get_chart_config(
+    project_uuid: str, request: Request, chart_id: int | None = None
+):
+    """Get a project's chart configuration.
+
+    Args:
+        project_uuid (str): uuid of the project for which to get the configuration.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+        request (Request): http request to get user information from.
+
+    Returns:
+        ChartConfig: the configuration of all charts in the project.
+    """
+    await util.project_access_valid(project_uuid, request)
+    config = await select.chart_config(project_uuid)
+    config = ChartConfig(project_uuid=project_uuid) if config is None else config
+    if chart_id is not None:
+        chart_config = await select.chart_config(project_uuid, chart_id)
+        config = config if chart_config is None else {**config, **chart_config}  # type: ignore
+    return config
 
 
 @router.post(
@@ -165,6 +188,24 @@ async def update_chart(project_uuid: str, chart: Chart, request: Request):
         )
 
 
+@router.patch("/chart-config", tags=["zeno"], dependencies=[Depends(util.auth)])
+async def update_chart_config(
+    chart_config: ChartConfig, request: Request, chart_id: int | None = None
+):
+    """Update or add a chart configuration for a project.
+
+    Args:
+        chart_config (ChartConfig): chart configuration to be written.
+        request (Request): http request to get user information from.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+    """
+    await util.project_editor(chart_config.project_uuid, request)
+    if await select.chart_config(chart_config.project_uuid, chart_id) is not None:
+        await update.chart_config(chart_config, chart_id)
+    else:
+        await insert.chart_config(chart_config, chart_id)
+
+
 @router.delete(
     "/chart/{project_uuid}/{chart_id}", tags=["zeno"], dependencies=[Depends(util.auth)]
 )
@@ -185,3 +226,20 @@ async def delete_chart(project_uuid: str, chart_id: int, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Project UUID does not match chart's project UUID.",
         )
+
+
+@router.delete(
+    "/chart-config/{project_uuid}", tags=["zeno"], dependencies=[Depends(util.auth)]
+)
+async def delete_chart_config(
+    project_uuid: str, request: Request, chart_id: int | None = None
+):
+    """Delete the chart config for a project.
+
+    Args:
+        project_uuid (str): uuid of the project to delete the chart config for.
+        request (Request): http request to get the user information from.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+    """
+    await util.project_editor(project_uuid, request)
+    await delete.chart_config(project_uuid, chart_id)
