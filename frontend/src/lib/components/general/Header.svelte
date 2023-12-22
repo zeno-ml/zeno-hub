@@ -7,6 +7,7 @@
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import HelpButton from './HelpButton.svelte';
 	import LikeButton from './LikeButton.svelte';
 	import UserButton from './UserButton.svelte';
 
@@ -26,9 +27,9 @@
 <div
 	class="{project
 		? 'border-b border-grey-lighter bg-yellowish-light px-3'
-		: 'px-6'} flex h-16 flex-shrink-0 items-center justify-between"
+		: 'px-6'} flex h-16 w-full flex-shrink-0 flex-col items-center justify-between sm:flex-row"
 >
-	<div class="flex h-full items-center">
+	<div class="flex h-full w-full items-center">
 		<a href="/" class="shrink-0">
 			<img src="/zeno-logo.png" class="h-8" alt="diamond tesselation logo" />
 		</a>
@@ -44,10 +45,10 @@
 		{/if}
 		{#if report}
 			<div class="ml-5 hidden items-center sm:flex">
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class=" w-6 fill-grey-dark">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6">
 					<path d={mdiFileChartOutline} />
 				</svg>
-				<p class="ml-1 mr-6 text-grey-dark">{report.name}</p>
+				<h4 class="ml-1 mr-6 text-lg">{report.name}</h4>
 				<LikeButton
 					on:like={() => (report ? zenoClient.likeReport(report.id) : '')}
 					{user}
@@ -60,16 +61,25 @@
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 24 24"
-				class="ml-5 mr-2 w-6 fill-grey-dark"
+				class="ml-5 mr-2 w-6 flex-shrink-0"
 			>
 				<path d={mdiViewGridOutline} />
 			</svg>
 			{#if project.description}
-				<p class="mr-6 text-grey-dark" use:tooltip={{ text: project.description }}>
+				<h1
+					class="mr-6 overflow-ellipsis whitespace-nowrap text-lg"
+					use:tooltip={{ text: project.description }}
+					style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;"
+				>
 					{project.name}
-				</p>
+				</h1>
 			{:else}
-				<p class="mr-6 text-grey-dark">{project.name}</p>
+				<h1
+					class="mr-6 overflow-ellipsis whitespace-nowrap text-lg"
+					style="max-width: 100%; overflow: hidden; text-overflow: ellipsis;"
+				>
+					{project.name}
+				</h1>
 			{/if}
 			<LikeButton
 				on:like={() => (project ? zenoClient.likeProject(project.uuid) : '')}
@@ -100,13 +110,16 @@
 			<p class="ml-2 text-grey-dark" transition:fade>Link copied to clipboard</p>
 		{/if}
 	</div>
-	<div class="flex h-full shrink-0 items-center">
+	<div class="hidden h-full shrink-0 items-center sm:flex">
+		<HelpButton />
 		{#if (report && report.editor) || (project && project.editor)}
-			<Button
-				class="mr-4 mt-2 shrink-0 sm:mt-0"
-				variant="outlined"
-				on:click={() => (editPopup = true)}>Settings</Button
+			<button
+				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-xl text-primary transition hover:bg-primary-mid"
+				on:click={() => (editPopup = true)}
+				use:tooltip={{ text: 'Preferences' }}
 			>
+				⚙
+			</button>
 		{/if}
 		<UserButton {user} />
 	</div>

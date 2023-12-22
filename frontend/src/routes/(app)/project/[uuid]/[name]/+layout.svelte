@@ -91,7 +91,7 @@
 		userLiked={data.userLiked}
 		numLikes={data.numLikes}
 	/>
-	<div class="flex h-full min-h-0 w-full min-w-0 flex-row">
+	<div class="flex h-full min-h-0 w-full min-w-0 flex-col sm:flex-row">
 		<ProjectSidebar />
 		<slot />
 	</div>
