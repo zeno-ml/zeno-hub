@@ -40,7 +40,7 @@
 		class="absolute -top-4 right-14 hidden rounded-md bg-primary-light p-1 transition hover:bg-primary-mid group-hover/edit:block"
 		on:click={() => (showConfirmDelete = element.id ?? -1)}
 	>
-		<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
+		<Icon class="h-5 w-5" tag="svg" viewBox="0 0 24 24">
 			<path class="fill-primary" d={mdiTrashCanOutline} />
 		</Icon>
 	</button>
@@ -51,7 +51,7 @@
 				? (editId = -1)
 				: (editId = element.id)}
 	>
-		<Icon style="outline:none; width: 20px; height: 20px" tag="svg" viewBox="0 0 24 24">
+		<Icon class="h-5 w-5" tag="svg" viewBox="0 0 24 24">
 			<path class="fill-primary" d={editId === element.id ? mdiCheckBold : mdiPencilOutline} />
 		</Icon>
 	</button>
@@ -59,7 +59,7 @@
 		class="absolute -left-3 top-1 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 		on:click={() => swapElementPositions(element.id, element.position - 1)}
 	>
-		<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+		<Icon class="h-6 w-6" tag="svg" viewBox="0 0 24 24">
 			<path class="fill-primary" d={mdiChevronUp} />
 		</Icon>
 	</button>
@@ -67,7 +67,7 @@
 		class="absolute -left-3 top-8 mr-2 hidden rounded-md bg-primary-light hover:bg-primary-mid group-hover/edit:flex"
 		on:click={() => swapElementPositions(element.id, element.position + 1)}
 	>
-		<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+		<Icon class="h-6 w-6" tag="svg" viewBox="0 0 24 24">
 			<path class="fill-primary" d={mdiChevronDown} />
 		</Icon>
 	</button>

@@ -6,7 +6,7 @@
 	export let sortModel: string;
 </script>
 
-<div style="display: flex; align-items:center;">
+<div class="flex items-center">
 	<div>
 		<div>{header ? header : 'difference'}</div>
 		<div class="font-normal text-grey-dark">{$comparisonColumn?.name}</div>

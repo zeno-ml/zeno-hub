@@ -240,9 +240,7 @@
 					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
 				</Button>
 			{/if}
-			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
-				cancel
-			</Button>
+			<Button class="mr-4" variant="outlined" on:click={() => dispatch('close')}>cancel</Button>
 			{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
 				<p style:margin-right="10px" style:color="red">slice already exists</p>
 			{/if}
