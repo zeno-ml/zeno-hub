@@ -15,7 +15,7 @@
 
 <Row style="overflow: visible">
 	<!-- y cell -->
-	<Cell>
+	<Cell class="font-bold text-grey-dark">
 		{#if parameters.yChannel === SlicesOrModels.SLICES}
 			{#if row === -1}
 				<p>All instances</p>

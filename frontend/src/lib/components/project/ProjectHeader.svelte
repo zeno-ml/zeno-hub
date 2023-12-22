@@ -25,7 +25,7 @@
 	<ProjectPopup config={project} on:close={() => (projectEdit = false)} {user} />
 {/if}
 <div
-	class="flex w-full min-w-0 items-center justify-between overflow-hidden border-b border-b-grey-lighter bg-yellowish-light px-3 py-1"
+	class="flex w-full min-w-0 shrink-0 items-center justify-between overflow-hidden border-b border-b-grey-lighter bg-yellowish-light px-3 py-1"
 >
 	<div class="flex items-center">
 		{#if project.description}
