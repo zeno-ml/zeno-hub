@@ -18,8 +18,8 @@
 	let mounted = false;
 	let isChartEdit: boolean | undefined;
 	let chart = data.chart;
-	let chartData = chart.data ? JSON.parse(chart.data) : undefined;
 	let updatingData = false;
+	let chartDataRequest = zenoClient.getChartData(chart.projectUuid, chart.id);
 
 	$: updateEditUrl(isChartEdit);
 	$: updateChart(chart);
@@ -39,8 +39,8 @@
 	function updateChart(chart: Chart) {
 		updatingData = true;
 		if (mounted && $project && $project.editor && browser) {
-			zenoClient.updateChart($project.uuid, chart).then((d) => {
-				chartData = JSON.parse(d);
+			zenoClient.updateChart($project.uuid, chart).then(() => {
+				chartDataRequest = zenoClient.getChartData(chart.projectUuid, chart.id);
 				updatingData = false;
 			});
 		} else {
@@ -66,17 +66,21 @@
 	{:else}
 		<ViewHeader bind:isChartEdit bind:chartConfig={data.chartConfig} {chart} />
 	{/if}
-	{#if chartData}
+	{#await chartDataRequest then chartData}
 		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>
 			<ChartContainer chartName={chart.name} loading={updatingData}>
 				<svelte:component
 					this={chartMap[chart.type]}
 					{chart}
-					data={chartData}
+					data={JSON.parse(chartData)}
 					width={900}
 					chartConfig={data.chartConfig}
 				/>
 			</ChartContainer>
 		</div>
-	{/if}
+	{:catch error}
+		<p class="ml-4 mt-4 font-semibold text-error">
+			Chart data could not be loaded: {error.message}
+		</p>
+	{/await}
 </div>

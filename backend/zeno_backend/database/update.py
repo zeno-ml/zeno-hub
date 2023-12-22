@@ -18,7 +18,6 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
-from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def folder(folder: Folder, project: str):
@@ -65,25 +64,20 @@ async def chart(chart: Chart, project: str):
         chart (Chart): the chart data to use for the update.
         project (str): the project the user is currently working with.
     """
-    chart_data = await calculate_chart_data(chart, project)
-
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "UPDATE charts SET project_uuid = %s, name = %s, type = %s, "
-                "parameters = %s, data = %s, updated_at = CURRENT_TIMESTAMP "
+                "parameters = %s, data = NULL, updated_at = CURRENT_TIMESTAMP "
                 "WHERE id = %s;",
                 [
                     project,
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_data,
                     chart.id,
                 ],
             )
-
-    return chart_data
 
 
 async def chart_data(chart_id: int, data: str):

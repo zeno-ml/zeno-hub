@@ -181,7 +181,6 @@ class Chart(CamelModel):
         type (ChartType): the type of the chart.
         parameters (XCParameters | TableParameters | BeeswarmParameters |
             RadarParameters | HeatmapParameters): the parameters of the chart.
-        data (str): the JSON string data of the chart.
     """
 
     id: int
@@ -195,7 +194,6 @@ class Chart(CamelModel):
         | RadarParameters
         | HeatmapParameters
     )
-    data: str | None = None
 
 
 class ParametersEncoder(json.JSONEncoder):
