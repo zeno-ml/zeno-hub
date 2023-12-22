@@ -57,8 +57,8 @@ class ProjectHomeElement(CamelModel):
         id (int): ID of the project home element.
         type (ReportElementType): what type of element this represents.
         data (str | None): any data that the element holds.
-        x_pos (int): x-position of the element.
-        y_pos (int): y-position of the element.
+        x (int): x position of the element.
+        y (int): y position of the element.
         width (int): width of the element.
         height (int): height of the element.
     """
@@ -66,8 +66,8 @@ class ProjectHomeElement(CamelModel):
     id: int | None = None
     type: ProjectHomeElementType
     data: str | None = None
-    x_pos: int
-    y_pos: int
+    x: int
+    y: int
     width: int
     height: int
 
