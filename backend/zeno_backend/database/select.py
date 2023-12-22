@@ -1904,8 +1904,13 @@ async def table_data_paginated(
                 sql.Identifier(req.diff_column_1.id),
                 sql.Identifier(req.diff_column_2.id),
             )
+        elif req.diff_column_1.data_type == MetadataType.BOOLEAN:
+            diff_sql = sql.SQL(", {}::int - {}::int AS diff").format(
+                sql.Identifier(req.diff_column_1.id),
+                sql.Identifier(req.diff_column_2.id),
+            )
         else:
-            diff_sql = sql.SQL(", {} = {} AS diff").format(
+            diff_sql = sql.SQL(", {} != {} AS diff").format(
                 sql.Identifier(req.diff_column_1.id),
                 sql.Identifier(req.diff_column_2.id),
             )
