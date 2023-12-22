@@ -28,7 +28,6 @@
 		zenoClient.deleteChartConfig(config.projectUuid, chartId).then(() => {
 			zenoClient.getChartConfig(config.projectUuid, chartId).then((fetchedConfig) => {
 				config = fetchedConfig;
-				dispatch('close');
 			});
 		});
 	}
@@ -42,22 +41,17 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content
-		style="display: flex; flex-direction: column; width: 400px; max-height: 80vh; overflow-y: scroll"
-	>
+	<Content class="flex max-h-[80vh] w-[600px] flex-col overflow-y-auto">
 		<h2 class="mb-4 text-xl">Chart Configuration</h2>
 		<div>
 			<Textfield bind:value={config.fontSize} label="Font Size" class="mb-4 w-full" type="number" />
 		</div>
-		<div class="flex items-center self-end">
-			<Button style="margin-left: 10px;" variant="outlined" on:click={undoChartConfig}
-				>Cancel</Button
+		<div class="flex items-center">
+			<Button on:click={resetChartConfig}
+				>Reset to {chartId === null ? 'Default' : 'Project Settings'}</Button
 			>
-			<Button style="margin-left: 5px;" variant="outlined" on:click={resetChartConfig}>Reset</Button
-			>
-			<Button style="margin-left: 5px;" variant="outlined" on:click={updateChartConfig}
-				>Update</Button
-			>
+			<Button class="ml-auto" variant="outlined" on:click={undoChartConfig}>Cancel</Button>
+			<Button class="ml-2" variant="outlined" on:click={updateChartConfig}>Update</Button>
 		</div>
 	</Content>
 </Popup>

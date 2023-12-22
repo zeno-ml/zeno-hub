@@ -47,7 +47,7 @@
 			<Button
 				class="ml-auto mt-2 shrink-0 sm:mt-0"
 				variant="outlined"
-				on:click={() => (chartConfigEdit = true)}>Settings</Button
+				on:click={() => (chartConfigEdit = true)}>Chart Configuration</Button
 			>
 		{/if}
 	</div>
