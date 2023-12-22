@@ -10,7 +10,12 @@ from pyarrow import RecordBatch, Schema
 
 import zeno_backend.database.delete as delete
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart, ParametersEncoder
+from zeno_backend.classes.chart import (
+    Chart,
+    ChartConfig,
+    ConfigEncoder,
+    ParametersEncoder,
+)
 from zeno_backend.classes.filter import (
     FilterPredicate,
     FilterPredicateGroup,
@@ -856,4 +861,20 @@ async def report_org(report_id: int, organization: Organization):
                 "INSERT INTO organization_report (organization_id, report_id, editor) "
                 "VALUES (%s,%s,%s)",
                 [organization.id, report_id, organization.admin],
+            )
+
+
+async def chart_config(config: ChartConfig, chart_id: int | None = None):
+    """Add a chart config for a project or chart.
+
+    Args:
+        config (ChartConfig): the config to be added to the database.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "INSERT INTO chart_config (project_uuid, config, chart_id) "
+                "VALUES (%s,%s,%s);",
+                [config.project_uuid, json.dumps(config, cls=ConfigEncoder), chart_id],
             )

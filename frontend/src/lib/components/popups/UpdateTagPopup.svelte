@@ -47,17 +47,15 @@
 <svelte:window on:keydown={submit} />
 
 <Popup on:close>
-	<Content style="display: flex; align-items: center;">
+	<Content class="flex items-center">
 		<Select
 			bind:value={selectedTag}
 			options={$tags.map((tag) => {
 				return { value: tag, label: tag.tagName };
 			})}
 		/>
-		<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
-			>Cancel</Button
-		>
-		<Button style="margin-left: 5px;" variant="outlined" on:click={() => addToTag()}>Add</Button>
+		<Button class="ml-4" variant="outlined" on:click={() => dispatch('close')}>Cancel</Button>
+		<Button class="ml-2" variant="outlined" on:click={() => addToTag()}>Add</Button>
 	</Content>
 	{#if $selectionIds !== undefined && $selectionIds.length > 0}
 		<p style:margin-right="10px">

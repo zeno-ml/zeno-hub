@@ -59,17 +59,25 @@
 		<div
 			class="h-full w-[380px] shrink-0 overflow-y-auto border-r border-r-grey-lighter bg-yellowish-light px-5 pb-20"
 		>
-			<EditHeader bind:isChartEdit bind:chart />
+			<EditHeader bind:isChartEdit bind:chart bind:chartConfig={data.chartConfig} />
 			<ViewSelection bind:chart />
 			<Encoding bind:chart />
 		</div>
 	{:else}
-		<ViewHeader bind:isChartEdit />
+		<ViewHeader bind:isChartEdit bind:chartConfig={data.chartConfig} {chart} />
 	{/if}
-	{#await chartDataRequest then data}
-		<ChartContainer chartName={chart.name} loading={updatingData}>
-			<svelte:component this={chartMap[chart.type]} {chart} data={JSON.parse(data)} width={900} />
-		</ChartContainer>
+	{#await chartDataRequest then chartData}
+		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>
+			<ChartContainer chartName={chart.name} loading={updatingData}>
+				<svelte:component
+					this={chartMap[chart.type]}
+					{chart}
+					data={JSON.parse(chartData)}
+					width={900}
+					chartConfig={data.chartConfig}
+				/>
+			</ChartContainer>
+		</div>
 	{:catch error}
 		<p class="ml-4 mt-4 font-semibold text-error">
 			Chart data could not be loaded: {error.message}

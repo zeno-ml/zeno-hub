@@ -43,7 +43,7 @@
 			/>
 		{/if}
 		{#if index > -1}
-			<IconButton on:click={deletePredicate} style="min-width: 60px; color: var(--G2)">
+			<IconButton on:click={deletePredicate} class="min-w-[60px] text-grey-dark">
 				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="currentColor" d={mdiTrashCanOutline} />
 				</Icon>

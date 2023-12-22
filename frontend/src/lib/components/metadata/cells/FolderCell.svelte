@@ -166,7 +166,6 @@
 					{#if hovering}
 						<IconButton
 							size="button"
-							style="padding: 0px"
 							on:click={(e) => {
 								e.stopPropagation();
 								showOptions = !showOptions;

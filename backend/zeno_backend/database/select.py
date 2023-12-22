@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartConfig
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.homepage import EntrySort, HomeRequest
@@ -2689,3 +2689,35 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
         return bool(exists[0][0])
     else:
         raise HTTPException(status_code=500, detail="Could not check if system exists")
+
+
+async def chart_config(
+    project_uuid: str, chart_id: int | None = None
+) -> ChartConfig | None:
+    """Get a project's chart configuration.
+
+    Args:
+        project_uuid (str): the project for which to fetch the config.
+        chart_id (int): the chart for which to fetch the config.
+
+    Returns:
+        ChartConfig | None: the config if there is one, otherwise None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if chart_id is None:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE project_uuid = %s "
+                    "AND chart_id IS NULL;",
+                    [project_uuid],
+                )
+            else:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE chart_id = %s;",
+                    [chart_id],
+                )
+            config = await cur.fetchall()
+
+    if len(config) == 0:
+        return None
+    return config[0][0]

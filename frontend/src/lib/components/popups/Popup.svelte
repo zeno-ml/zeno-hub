@@ -9,7 +9,7 @@
 </script>
 
 <button
-	class="absolute inset-0 z-20 flex items-baseline justify-center bg-grey bg-opacity-60 p-12 text-left"
+	class="absolute inset-0 z-[2000] flex items-baseline justify-center bg-grey bg-opacity-60 p-12 text-left"
 	transition:fade={{ duration: 200 }}
 	bind:clientHeight={paperHeight}
 	on:mousedown={() => dispatch('close')}

@@ -11,19 +11,22 @@
 
 <div class="w-full">
 	<h3 class="text-lg font-semibold">{chart.name}</h3>
-	{#await zenoClient.getChartData(chart.projectUuid, chart.id) then data}
-		<div class="text-center">
-			<svelte:component
-				this={chartMap[chart.type]}
-				{chart}
-				{width}
-				data={JSON.parse(data)}
-				height={chart.type == ChartType.RADAR ? 600 : 400}
-			/>
-		</div>
-	{:catch error}
-		<p class="ml-4 mt-4 font-semibold text-error">
-			Chart data could not be loaded: {error.message}
-		</p>
+	{#await zenoClient.getChartConfig(chart.projectUuid, chart.id) then chartConfig}
+		{#await zenoClient.getChartData(chart.projectUuid, chart.id) then data}
+			<div class="text-center">
+				<svelte:component
+					this={chartMap[chart.type]}
+					{chart}
+					{chartConfig}
+					{width}
+					data={JSON.parse(data)}
+					height={chart.type == ChartType.RADAR ? 600 : 400}
+				/>
+			</div>
+		{:catch error}
+			<p class="ml-4 mt-4 font-semibold text-error">
+				Chart data could not be loaded: {error.message}
+			</p>
+		{/await}
 	{/await}
 </div>

@@ -57,7 +57,7 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content style="display: flex; flex-direction: column; width: 800px;">
+	<Content class="flex w-[800px] flex-col">
 		<h2 class="mb-4 text-xl">Copy Project</h2>
 		<div class="mb-12 flex flex-col">
 			{#if step === 1}
@@ -92,11 +92,9 @@
 					</div>
 				{/if}
 				<div class="flex items-center self-end">
-					<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
-						>Cancel</Button
-					>
+					<Button class="ml-4" variant="outlined" on:click={() => dispatch('close')}>Cancel</Button>
 					<Button
-						style="margin-left: 5px;"
+						class="ml-2"
 						variant="outlined"
 						disabled={invalidName}
 						on:click={() => copyProject()}>{'Copy'}</Button
