@@ -127,4 +127,6 @@
 			</button>
 		</div>
 	</div>
+{:else}
+	<p class="ml-4 mt-4 font-semibold text-error">Tag does not exist anymore.</p>
 {/if}
