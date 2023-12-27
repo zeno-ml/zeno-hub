@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, Report, User, ZenoService } from '$lib/zenoapi';
@@ -20,6 +21,7 @@
 	export let editPopup = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
+	const exploreTab = $page.route.id === '/(app)/home';
 
 	let linkCopied = false;
 </script>
@@ -89,38 +91,48 @@
 				report={false}
 			/>
 		{/if}
-		<IconButton
-			class="ml-2"
-			on:click={(e) => {
-				e.stopPropagation();
-				linkCopied = true;
-				if (project) {
-					navigator.clipboard.writeText(window.location.href.split('/explore')[0]);
-				} else {
-					navigator.clipboard.writeText(window.location.href);
-				}
-				setTimeout(() => (linkCopied = false), 2000);
-			}}
-		>
-			<Icon tag="svg" viewBox="0 0 24 24">
-				<path fill="black" d={mdiLinkVariant} />
-			</Icon>
-		</IconButton>
+		{#if project || report}
+			<IconButton
+				class="ml-2"
+				on:click={(e) => {
+					e.stopPropagation();
+					linkCopied = true;
+					if (project) {
+						navigator.clipboard.writeText(window.location.href.split('/explore')[0]);
+					} else {
+						navigator.clipboard.writeText(window.location.href);
+					}
+					setTimeout(() => (linkCopied = false), 2000);
+				}}
+			>
+				<Icon tag="svg" viewBox="0 0 24 24">
+					<path fill="black" d={mdiLinkVariant} />
+				</Icon>
+			</IconButton>
+		{/if}
 		{#if linkCopied}
 			<p class="ml-2 text-grey-dark" transition:fade>Link copied to clipboard</p>
 		{/if}
 	</div>
 	<div class="hidden h-full shrink-0 items-center sm:flex">
-		<HelpButton />
 		{#if (report && report.editor) || (project && project.editor)}
 			<button
-				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-xl text-primary transition hover:bg-primary-mid"
+				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-lg leading-none text-primary transition hover:bg-primary-mid"
 				on:click={() => (editPopup = true)}
 				use:tooltip={{ text: 'Preferences' }}
 			>
 				⚙
 			</button>
 		{/if}
+		{#if $page.route.id?.startsWith('/(app)/home')}
+			<Button
+				class="mr-3"
+				variant="outlined"
+				on:click={() => (exploreTab ? goto('/') : goto('/home'))}
+				>{exploreTab ? 'My Hub' : 'Explore'}</Button
+			>
+		{/if}
+		<HelpButton />
 		<UserButton {user} />
 	</div>
 </div>
