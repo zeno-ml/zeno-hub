@@ -149,7 +149,7 @@
 		report={data.report}
 		numLikes={data.numLikes}
 		userLiked={data.userLiked}
-		bind:reportEdit
+		bind:editPopup={reportEdit}
 	/>
 	<div class="overflow-auto">
 		<div
