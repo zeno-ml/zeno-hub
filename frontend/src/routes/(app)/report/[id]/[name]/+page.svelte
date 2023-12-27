@@ -5,6 +5,7 @@
 	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
+	import { tooltip } from '$lib/util/tooltip';
 	import { svelecteRendererName } from '$lib/util/util.js';
 	import {
 		ReportElementType,
@@ -13,7 +14,7 @@
 		type Project,
 		type User
 	} from '$lib/zenoapi';
-	import { mdiAccountCircleOutline } from '@mdi/js';
+	import { mdiAccountCircleOutline, mdiAlertBox } from '@mdi/js';
 	import { Icon } from '@smui/button';
 	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
@@ -236,6 +237,24 @@
 						</button>
 					{/each}
 				{/if}
+			</div>
+			<div class="mt-2 flex">
+				{#each data.projects as project}
+					{#await zenoClient.checkProjectVisibility(project.uuid, data.report.public ?? false, data.report.id) then visible}
+						{#if !visible}
+							<div
+								class="h-6 w-6 fill-grey"
+								use:tooltip={{
+									text: `Project ${project.name} has more restricive sharing right than this report and will not be visible to all users.`
+								}}
+							>
+								<Icon tag="svg" viewBox="0 0 24 24">
+									<path class={'fill-error'} d={mdiAlertBox} />
+								</Icon>
+							</div>
+						{/if}
+					{/await}
+				{/each}
 			</div>
 			{#if data.report.editor}
 				<hr class="mb-4 mt-4 text-grey-light" />

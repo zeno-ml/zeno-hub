@@ -1066,6 +1066,45 @@ export class ZenoService {
 	}
 
 	/**
+	 * Check Project Visibility
+	 * Check if a project's visibility matches or exceeds that of a report.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to be checked.
+	 * report_public (bool): whether the report is public.
+	 * report_id (int): id of the report to be checked against.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * bool: whether the project's visibility matches or exceeds that of the report.
+	 * @param projectUuid
+	 * @param reportPublic
+	 * @param reportId
+	 * @returns boolean Successful Response
+	 * @throws ApiError
+	 */
+	public checkProjectVisibility(
+		projectUuid: string,
+		reportPublic: boolean,
+		reportId: number
+	): CancelablePromise<boolean> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/project-visibility/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				report_public: reportPublic,
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
 	 * Get Projects
 	 * Get all projects from a list of UUIDs.
 	 *
