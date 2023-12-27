@@ -73,6 +73,7 @@ async def project(project_config: Project, owner_id: int):
         Exception: something went wrong in the process of creating the new project in
             the database.
     """
+    default_project = Project(uuid="", name="", owner_name="", view="")
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
@@ -84,9 +85,15 @@ async def project(project_config: Project, owner_id: int):
                     project_config.name,
                     owner_id,
                     project_config.view,
-                    project_config.samples_per_page,
-                    project_config.public,
-                    project_config.description,
+                    default_project.samples_per_page
+                    if project_config.samples_per_page is None
+                    else project_config.samples_per_page,
+                    default_project.public
+                    if project_config.public is None
+                    else project_config.public,
+                    default_project.description
+                    if project_config.description is None
+                    else project_config.description,
                 ],
             )
             await cur.execute(
