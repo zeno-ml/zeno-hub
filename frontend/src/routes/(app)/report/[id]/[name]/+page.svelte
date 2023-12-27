@@ -1,21 +1,14 @@
 <script lang="ts">
-	import { goto, invalidate } from '$app/navigation';
 	import Header from '$lib/components/general/Header.svelte';
 	import Confirm from '$lib/components/popups/Confirm.svelte';
 	import ReportPopup from '$lib/components/popups/ReportPopup.svelte';
 	import AddElementButton from '$lib/components/report/AddElementButton.svelte';
+	import Banner from '$lib/components/report/Banner.svelte';
 	import ElementContainer from '$lib/components/report/ElementContainer.svelte';
-	import { svelecteRendererName } from '$lib/util/util.js';
-	import {
-		ReportElementType,
-		ZenoService,
-		type Author,
-		type Project,
-		type User
-	} from '$lib/zenoapi';
+	import LinkedProjects from '$lib/components/report/LinkedProjects.svelte';
+	import { ReportElementType, ZenoService, type Author, type User } from '$lib/zenoapi';
 	import { mdiAccountCircleOutline } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import Svelecte from 'svelecte';
 	import { getContext } from 'svelte';
 	import { MultiSelect } from 'svelte-multiselect';
 
@@ -24,7 +17,6 @@
 	let reportEdit = false;
 	let elements = data.reportElements.sort((a, b) => a.position - b.position);
 	let authors: Author[] = data.authors.sort((a: Author, b: Author) => a.position - b.position);
-	let selectedProjects = data.report.linkedProjects ?? [];
 	let editId = -1;
 	let showConfirmDelete = -1;
 	let authorOptions: { id: number; label: string }[] = [
@@ -67,12 +59,6 @@
 				elements = elements.sort((a, b) => a.position - b.position);
 				editId = res;
 			});
-	}
-
-	function updateReportProjects(e: CustomEvent) {
-		const projectUuids = e.detail.map((p: Project) => p.uuid);
-		zenoClient.updateReportProjects(data.report.id, projectUuids);
-		invalidate('app:report');
 	}
 
 	$: updateReportAuthors(authorsSelected);
@@ -210,33 +196,8 @@
 				{/if}
 			</div>
 
-			<div class="mt-2 flex w-full flex-wrap items-center gap-2">
-				<p class="mr-2 text-lg text-grey-dark">Linked Projects:</p>
-				{#if data.report.editor}
-					{#await zenoClient.getUserProjects() then projects}
-						<Svelecte
-							bind:value={selectedProjects}
-							on:change={updateReportProjects}
-							valueField="uuid"
-							labelField="name"
-							searchable={false}
-							multiple={true}
-							options={projects}
-							renderer={svelecteRendererName}
-						/>
-					{/await}
-				{:else}
-					{#each data.projects as project}
-						<button
-							class="flex w-fit items-center rounded bg-primary-light px-2 py-1 transition hover:bg-primary-mid"
-							on:click={() => goto(`/project/${project.uuid}/${encodeURIComponent(project.name)}`)}
-						>
-							<img src="/zeno-logo-small.svg" alt="Zeno logo" class="mr-1" />
-							<p class="mr-1">{project.name}</p>
-						</button>
-					{/each}
-				{/if}
-			</div>
+			<LinkedProjects linkedProjects={data.projects} report={data.report} />
+
 			{#if data.report.editor}
 				<hr class="mb-4 mt-4 text-grey-light" />
 				<AddElementButton
@@ -280,99 +241,9 @@
 						/>
 					{/if}
 				{/each}
+
 				{#if !data.report.editor}
-					<div class="relative mt-10 w-full rounded bg-primary p-5">
-						<h4 class="text-xl text-white">Enjoyed this report? You can make one too!</h4>
-						<p class="mt-2 text-white">
-							Error analysis, chart authoring, shareable reports, and more with <a
-								class="font-bold transition hover:text-primary-dark"
-								href="https://zenoml.com">Zeno</a
-							>.
-						</p>
-						<div class="mt-4">
-							<button
-								class="rounded border border-white px-4 py-2 font-bold text-white transition hover:bg-primary-dark"
-								on:click={() => (window.location.href = 'https://zenoml.com')}
-							>
-								Learn more
-							</button>
-							<button
-								class="ml-4 rounded border border-white px-4 py-2 font-bold text-white transition hover:bg-primary-dark"
-								on:click={() => (window.location.href = 'https://zenoml.com/docs/intro')}
-							>
-								Get started
-							</button>
-						</div>
-						<div class="absolute right-0 top-0 hidden sm:inline">
-							<svg
-								width="300"
-								height="150"
-								viewBox="0 0 862 380"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M861.702 424.838L436.864 424.838L436.864 0.000147393L650.895 214.031L861.702 424.838Z"
-									fill="#9F55CD"
-								>
-									<animate
-										attributeName="opacity"
-										values=".6;1;.6"
-										dur="5s"
-										repeatCount="indefinite"
-									/>
-								</path>
-								<path
-									d="M417.842 426.106L205.423 213.687L417.842 1.26808L417.842 426.106Z"
-									fill="#9F55CD"
-									fill-opacity="0.8"
-								>
-									<animate
-										attributeName="opacity"
-										values=".8;.5;.8"
-										dur="5s"
-										repeatCount="indefinite"
-									/>
-								</path>
-								<path
-									d="M392.478 426.106L193.375 426.106L193.375 227.003L392.478 426.106Z"
-									fill="#9F55CD"
-									fill-opacity="0.6"
-								>
-									<animate
-										attributeName="opacity"
-										values=".4;.8;.4"
-										dur="5s"
-										repeatCount="indefinite"
-									/>
-								</path>
-								<path
-									d="M175.776 425.95L85.1012 335.276L176.255 244.122L175.776 425.95Z"
-									fill="#9F55CD"
-									fill-opacity="0.5"
-								>
-									<animate
-										attributeName="opacity"
-										values=".6;.2;.6"
-										dur="5s"
-										repeatCount="indefinite"
-									/>
-								</path>
-								<path
-									d="M8.92166e-05 417.575L68.7054 348.87L143.13 423.294L8.92166e-05 417.575Z"
-									fill="#9F55CD"
-									fill-opacity="0.5"
-								>
-									<animate
-										attributeName="opacity"
-										values=".2;.4;.2"
-										dur="5s"
-										repeatCount="indefinite"
-									/>
-								</path>
-							</svg>
-						</div>
-					</div>
+					<Banner />
 				{/if}
 			</div>
 		</div>
