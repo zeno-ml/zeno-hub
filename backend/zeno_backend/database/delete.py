@@ -41,12 +41,6 @@ async def project(project: str):
                     project,
                 ],
             )
-            # Delete the chart config.
-            await cur.execute(
-                "DELETE FROM chart_config WHERE project_uuid = %s;",
-                [project],
-            )
-
             await conn.commit()
 
 
@@ -60,9 +54,7 @@ async def report(report_id: int):
         async with conn.cursor() as cur:
             await cur.execute(
                 "DELETE FROM reports WHERE id = %s;",
-                [
-                    report_id,
-                ],
+                [report_id],
             )
             await conn.commit()
 
