@@ -3,7 +3,13 @@
 	import { page } from '$app/stores';
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, Report, User, ZenoService } from '$lib/zenoapi';
-	import { mdiFileChartOutline, mdiLinkVariant, mdiPlus, mdiViewGridOutline } from '@mdi/js';
+	import {
+		mdiCog,
+		mdiFileChartOutline,
+		mdiLinkVariant,
+		mdiPlus,
+		mdiViewGridOutline
+	} from '@mdi/js';
 	import Button, { Icon } from '@smui/button';
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
@@ -115,16 +121,19 @@
 		{/if}
 	</div>
 	<div class="hidden h-full shrink-0 items-center sm:flex">
+		<HelpButton />
 		{#if (report && report.editor) || (project && project.editor)}
 			<button
-				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-lg leading-none text-primary transition hover:bg-primary-mid"
+				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-primary transition hover:bg-primary-mid"
 				on:click={() => (editPopup = true)}
 				use:tooltip={{ text: 'Preferences' }}
 			>
-				⚙
+				<Icon tag="svg" viewBox="0 0 24 24" class="w-5 fill-primary">
+					<path d={mdiCog} />
+				</Icon>
 			</button>
 		{/if}
-		{#if $page.route.id?.startsWith('/(app)/home')}
+		{#if user && $page.route.id?.startsWith('/(app)/home')}
 			<Button
 				class="mr-3"
 				variant="outlined"
@@ -132,7 +141,6 @@
 				>{exploreTab ? 'My Hub' : 'Explore'}</Button
 			>
 		{/if}
-		<HelpButton />
 		<UserButton {user} />
 	</div>
 </div>
