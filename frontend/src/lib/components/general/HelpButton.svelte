@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { clickOutside } from '$lib/util/clickOutside';
 	import { tooltip } from '$lib/util/tooltip';
+	import { mdiHelp } from '@mdi/js';
 	import { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { fade } from 'svelte/transition';
@@ -13,11 +14,13 @@
 
 <div class="relative mr-2">
 	<button
-		class="h-8 w-8 rounded-full border border-grey-light text-xl capitalize text-primary transition hover:bg-primary-dark"
+		class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-primary transition hover:bg-primary-mid"
 		use:tooltip={{ text: 'Help' }}
 		on:click={() => (showOptions = !showOptions)}
 	>
-		?
+		<Icon tag="svg" viewBox="0 0 24 24" class="w-5 fill-primary">
+			<path d={mdiHelp} />
+		</Icon>
 	</button>
 
 	{#if showOptions}
