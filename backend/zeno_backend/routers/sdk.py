@@ -1,5 +1,6 @@
 """FastAPI server endpoints for the Zeno SDK."""
 import uuid
+from urllib import parse
 
 import pyarrow as pa
 from amplitude import BaseEvent
@@ -20,6 +21,7 @@ from zeno_backend.classes.amplitude import AmplitudeHandler
 from zeno_backend.classes.project import Project
 from zeno_backend.database import delete, insert, select, update
 from zeno_backend.database.util import match_instance_view
+from zeno_backend.util import user_project_editor
 
 # Bump only for breaking changes
 MIN_CLIENT_VERSION = "0.1.9"
@@ -86,6 +88,34 @@ class APIKeyBearer(HTTPBearer):
 router = APIRouter(tags=["zeno"], dependencies=[Depends(APIKeyBearer())])
 
 
+@router.get("/project-by-name/{owner_name}/{project_name}")
+async def get_project_by_name(
+    owner_name: str, project_name: str, api_key=Depends(APIKeyBearer())
+):
+    """Get a project by it's name and owner name.
+
+    Args:
+        owner_name (str): name of the project's owner.
+        project_name (str): name of the project.
+        api_key (_type_, optional): API key of the user making the request.
+            Defaults to Depends(APIKeyBearer()).
+
+    Returns:
+        str: uuid of the requested project.
+    """
+    uuid = await select.project_uuid(owner_name, parse.unquote(project_name))
+    if uuid is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "ERROR: Project " + owner_name + "/" + project_name + " does not exist."
+            ),
+        )
+    user = await select.user_by_api_key(api_key)
+    await user_project_editor(uuid, user)
+    return uuid
+
+
 @router.post("/project", status_code=200, response_model=Project)
 async def create_project(
     project: Project, response: Response, api_key=Depends(APIKeyBearer())
@@ -142,6 +172,7 @@ async def upload_dataset_schema(
         api_key (str, optional): API key.
     """
     user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -188,6 +219,7 @@ async def upload_dataset(
         api_key (str, optional): API key.
     """
     user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -237,6 +269,7 @@ async def upload_system_schema(
         api_key (str, optional): API key.
     """
     user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -285,6 +318,7 @@ async def upload_system(
         api_key (str, optional): API key.
     """
     user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -315,23 +349,31 @@ async def upload_system(
 
 
 @router.delete("/system/{project_uuid}/{system_name}")
-async def delete_system(project_uuid: str, system_name: str):
+async def delete_system(
+    project_uuid: str, system_name: str, api_key=Depends(APIKeyBearer())
+):
     """Delete a system from a Zeno project.
 
     Args:
         project_uuid (str): the UUID of the project to delete the system from.
         system_name (str): the name of the system.
+        api_key (str, optional): API key.
     """
+    user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     await delete.system(project_uuid, system_name)
 
 
 @router.delete("/systems/{project_uuid}")
-async def delete_all_systems(project_uuid: str):
+async def delete_all_systems(project_uuid: str, api_key=Depends(APIKeyBearer())):
     """Delete all systems from a Zeno project.
 
     Args:
         project_uuid (str): the UUID of the project to delete systems from.
+        api_key (str, optional): API key.
     """
+    user = await select.user_by_api_key(api_key)
+    await user_project_editor(project_uuid, user)
     await delete.systems(project_uuid)
 
 
