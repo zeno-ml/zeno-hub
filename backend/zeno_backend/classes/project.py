@@ -27,13 +27,13 @@ class Project(CamelModel):
 
     uuid: str
     name: str
-    description: str = ""
+    description: str | None = ""
     metrics: list[Metric] = []
     owner_name: str
     view: str
-    editor: bool
-    samples_per_page: int = 30
-    public: bool = False
+    editor: bool = False
+    samples_per_page: int | None = 30
+    public: bool | None = False
     created_at: str = ""
     updated_at: str = ""
 

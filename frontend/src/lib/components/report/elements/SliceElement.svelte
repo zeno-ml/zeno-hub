@@ -139,4 +139,6 @@
 			</button>
 		</div>
 	</div>
+{:else}
+	<p class="ml-4 mt-4 font-semibold text-error">Slice does not exist anymore.</p>
 {/if}

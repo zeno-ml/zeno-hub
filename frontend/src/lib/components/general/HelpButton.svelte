@@ -11,9 +11,9 @@
 	let docsLink = 'https://zenoml.com/docs/intro';
 </script>
 
-<div class="relative">
+<div class="relative mr-2">
 	<button
-		class="mr-3 h-8 w-8 rounded-full border border-grey-light text-xl capitalize text-primary transition hover:bg-primary-dark"
+		class="h-8 w-8 rounded-full border border-grey-light text-xl capitalize text-primary transition hover:bg-primary-dark"
 		use:tooltip={{ text: 'Help' }}
 		on:click={() => (showOptions = !showOptions)}
 	>
