@@ -124,8 +124,13 @@ async def histogram_metric_and_count(
     else:
         calculate_histograms = False
 
+    # if end = start, can't show a bar, remove bucket (only happens if signular value)
+    if col.data_type == MetadataType.CONTINUOUS:
+        buckets = list(filter(lambda x: x.bucket != x.bucket_end, buckets))
+
     if buckets is None or len(buckets) == 0:
         return []
+
     async with db_pool.connection() as conn:
         async with conn.cursor() as db:
             await db.execute(
