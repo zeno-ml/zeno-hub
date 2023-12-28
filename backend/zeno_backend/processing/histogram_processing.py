@@ -151,10 +151,9 @@ async def histogram_metric_and_count(
                     [request.metric.columns[0], request.model],
                 )
                 metric_col_id = await db.fetchone()
-                if metric_col_id is None:
-                    return []
-                metric_col_type = metric_col_id[1]
-                metric_col_id = metric_col_id[0]
+                if metric_col_id is not None:
+                    metric_col_type = metric_col_id[1]
+                    metric_col_id = metric_col_id[0]
 
             if col.data_type == MetadataType.NOMINAL:
                 if calculate_histograms and metric_col_id is not None:
@@ -182,7 +181,7 @@ async def histogram_metric_and_count(
 
                 await db.execute(statement)
                 db_res = await db.fetchall()
-                if calculate_histograms:
+                if calculate_histograms and metric_col_id is not None:
                     results_map = {r[0]: (r[1], r[2]) for r in db_res}
                     return [
                         HistogramBucket(
@@ -255,7 +254,7 @@ async def histogram_metric_and_count(
                 await db.execute(statement)
                 db_res = await db.fetchall()
 
-                if calculate_histograms:
+                if calculate_histograms and metric_col_id is not None:
                     results_map = {
                         int(r[0]): (r[1], r[2]) for r in db_res if r[0] is not None
                     }
@@ -313,7 +312,7 @@ async def histogram_metric_and_count(
 
                 true_res = [r for r in res if r[0] == 0]
                 false_res = [r for r in res if r[0] == 1]
-                if calculate_histograms:
+                if calculate_histograms and metric_col_id is not None:
                     return [
                         HistogramBucket(
                             bucket=True,
