@@ -255,19 +255,26 @@ async def project(project_config: Project):
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
-            await cur.execute(
-                "UPDATE projects SET name = %s, "
-                "view = %s, samples_per_page = %s, public = %s, "
-                "description = %s, updated_at = CURRENT_TIMESTAMP WHERE uuid = %s;",
-                [
-                    project_config.name,
-                    project_config.view,
-                    project_config.samples_per_page,
-                    project_config.public,
-                    project_config.description,
-                    project_config.uuid,
-                ],
+            query = sql.SQL(
+                "UPDATE projects SET name = %s, view = %s, "
+                "updated_at = CURRENT_TIMESTAMP",
             )
+            params: list[str | bool | int] = [
+                project_config.name,
+                project_config.view,
+            ]
+            if project_config.public is not None:
+                query += sql.SQL(", public = %s")
+                params.append(project_config.public)
+            if project_config.description is not None:
+                query += sql.SQL(", description = %s")
+                params.append(project_config.description)
+            if project_config.samples_per_page is not None:
+                query += sql.SQL(", samples_per_page = %s")
+                params.append(project_config.samples_per_page)
+            query += sql.SQL(" WHERE uuid = %s;")
+            params.append(project_config.uuid)
+            await cur.execute(query, params)
             await conn.commit()
 
 
