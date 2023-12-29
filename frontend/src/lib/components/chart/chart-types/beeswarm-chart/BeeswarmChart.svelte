@@ -122,7 +122,7 @@
 					: undefined
 			)}
 			options={{
-				actions: false,
+				actions: { source: false, editor: false, compiled: false },
 				width: width - 200,
 				height: 80,
 				scaleFactor: {
