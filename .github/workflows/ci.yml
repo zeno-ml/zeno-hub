@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install modules
         run: cd frontend && npm i
+      - name: version
+        run: cd frontend && npx prettier --version
       - name: linting
         run: cd frontend && npm run lint
 
