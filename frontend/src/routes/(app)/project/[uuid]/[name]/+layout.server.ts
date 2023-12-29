@@ -21,9 +21,9 @@ export async function load({ cookies, params, url }) {
 		const err = e as ApiError;
 		if (err.status === 401) {
 			if (cognitoUser !== null) {
-				throw redirect(303, `/auth`);
+				redirect(303, `/auth`);
 			} else {
-				throw redirect(303, `/login?redirectTo=${url.pathname}`);
+				redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
 		} else if (err.status === 404) {
 			// try to route using owner/project_name for legacy projects.
@@ -32,19 +32,19 @@ export async function load({ cookies, params, url }) {
 				encodeURIComponent(params.name)
 			);
 			project_result = await zenoClient.getProjectState(project_uuid);
-			throw redirect(
-				303,
-				`/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`
-			);
+			redirect(
+            				303,
+            				`/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`
+            			);
 		}
-		throw error(err.status, err.body.detail);
+		error(err.status, err.body.detail);
 	}
 
 	if (project_result.project.name !== decodeURI(params.name)) {
-		throw redirect(
-			301,
-			`/project/${params.uuid}/${encodeURIComponent(project_result.project.name)}`
-		);
+		redirect(
+        			301,
+        			`/project/${params.uuid}/${encodeURIComponent(project_result.project.name)}`
+        		);
 	}
 
 	// Get state from URL parameters.

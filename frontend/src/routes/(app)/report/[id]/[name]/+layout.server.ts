@@ -13,9 +13,9 @@ export async function load({ cookies, params, url, depends }) {
 	} catch (e: unknown) {
 		if ((e as ApiError).status === 401) {
 			if (cognitoUser !== null) {
-				throw redirect(303, `/auth`);
+				redirect(303, `/auth`);
 			} else {
-				throw redirect(303, `/login?redirectTo=${url.pathname}`);
+				redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
 		} else {
 			// try to route using owner/report_name for legacy reports.
@@ -26,12 +26,12 @@ export async function load({ cookies, params, url, depends }) {
 				);
 			} catch (e: unknown) {
 				const err = e as ApiError;
-				throw error(err.status, err.body.detail);
+				error(err.status, err.body.detail);
 			}
-			throw redirect(
-				301,
-				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
-			);
+			redirect(
+            				301,
+            				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
+            			);
 		}
 	}
 	const [projects, charts, slices, tags, authors, users, owner] = await Promise.all([
@@ -45,10 +45,10 @@ export async function load({ cookies, params, url, depends }) {
 	]);
 
 	if (reportResponse.report.name !== decodeURI(params.name)) {
-		throw redirect(
-			301,
-			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
-		);
+		redirect(
+        			301,
+        			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
+        		);
 	}
 
 	return {

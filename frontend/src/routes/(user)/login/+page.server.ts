@@ -51,11 +51,11 @@ export const actions: Actions = {
 				showReset: err.name === 'NotAuthorizedException'
 			});
 		}
-		throw redirect(
-			303,
-			data.has('redirect') && data.get('redirect') !== ''
-				? (data.get('redirect') as string)
-				: `/home/${username}`
-		);
+		redirect(
+        			303,
+        			data.has('redirect') && data.get('redirect') !== ''
+        				? (data.get('redirect') as string)
+        				: `/home/${username}`
+        		);
 	}
 };

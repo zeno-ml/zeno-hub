@@ -14,7 +14,7 @@ export async function load({ params, depends, cookies, url }) {
 		chartConfig = await zenoClient.getChartConfig(params.uuid);
 	} catch (e) {
 		const err = e as ApiError;
-		throw error(err.status, err.body.detail);
+		error(err.status, err.body.detail);
 	}
 
 	return {
