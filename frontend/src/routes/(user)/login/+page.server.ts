@@ -52,10 +52,10 @@ export const actions: Actions = {
 			});
 		}
 		redirect(
-        			303,
-        			data.has('redirect') && data.get('redirect') !== ''
-        				? (data.get('redirect') as string)
-        				: `/home/${username}`
-        		);
+			303,
+			data.has('redirect') && data.get('redirect') !== ''
+				? (data.get('redirect') as string)
+				: `/home/${username}`
+		);
 	}
 };
