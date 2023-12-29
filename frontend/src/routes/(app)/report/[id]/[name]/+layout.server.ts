@@ -1,6 +1,6 @@
 import { getClientAndUser } from '$lib/api/client';
 import type { ApiError, ReportResponse } from '$lib/zenoapi';
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, type NumericRange } from '@sveltejs/kit';
 
 export async function load({ cookies, params, url, depends }) {
 	depends('app:report');
@@ -26,12 +26,12 @@ export async function load({ cookies, params, url, depends }) {
 				);
 			} catch (e: unknown) {
 				const err = e as ApiError;
-				error(err.status, err.body.detail);
+				error(err.status as NumericRange<400, 599>, err.body.detail);
 			}
 			redirect(
-            				301,
-            				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
-            			);
+				301,
+				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
+			);
 		}
 	}
 	const [projects, charts, slices, tags, authors, users, owner] = await Promise.all([
@@ -46,9 +46,9 @@ export async function load({ cookies, params, url, depends }) {
 
 	if (reportResponse.report.name !== decodeURI(params.name)) {
 		redirect(
-        			301,
-        			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
-        		);
+			301,
+			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
+		);
 	}
 
 	return {

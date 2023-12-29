@@ -1,6 +1,6 @@
 import { getClient } from '$lib/api/client';
 import type { ApiError, Chart, ChartConfig } from '$lib/zenoapi';
-import { error } from '@sveltejs/kit';
+import { error, type NumericRange } from '@sveltejs/kit';
 
 export async function load({ params, cookies, url }) {
 	const zenoClient = await getClient(cookies, url);
@@ -12,7 +12,7 @@ export async function load({ params, cookies, url }) {
 		chartConfig = await zenoClient.getChartConfig(params.uuid, chart.id);
 	} catch (e) {
 		const err = e as ApiError;
-		error(err.status, err.body.detail);
+		error(err.status as NumericRange<400, 599>, err.body.detail);
 	}
 
 	return {

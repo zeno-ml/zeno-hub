@@ -7,7 +7,7 @@ import type {
 	ProjectState,
 	ZenoColumn
 } from '$lib/zenoapi/index.js';
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, type NumericRange } from '@sveltejs/kit';
 
 export const ssr = false;
 
@@ -32,19 +32,13 @@ export async function load({ cookies, params, url }) {
 				encodeURIComponent(params.name)
 			);
 			project_result = await zenoClient.getProjectState(project_uuid);
-			redirect(
-            				303,
-            				`/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`
-            			);
+			redirect(303, `/project/${project_uuid}/${encodeURIComponent(project_result.project.name)}`);
 		}
-		error(err.status, err.body.detail);
+		error(err.status as NumericRange<400, 599>, err.body.detail);
 	}
 
 	if (project_result.project.name !== decodeURI(params.name)) {
-		redirect(
-        			301,
-        			`/project/${params.uuid}/${encodeURIComponent(project_result.project.name)}`
-        		);
+		redirect(301, `/project/${params.uuid}/${encodeURIComponent(project_result.project.name)}`);
 	}
 
 	// Get state from URL parameters.
