@@ -64,7 +64,7 @@
 			<Encoding bind:chart />
 		</div>
 	{:else}
-		<ViewHeader bind:isChartEdit bind:chartConfig={data.chartConfig} {chart} />
+		<ViewHeader bind:isChartEdit />
 	{/if}
 	{#await chartDataRequest then chartData}
 		<div class={`flex h-full w-full flex-col overflow-auto pl-2`}>

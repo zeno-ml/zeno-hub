@@ -1,8 +1,9 @@
 <script lang="ts">
+	import CircleIconButton from '$lib/components/general/CircleIconButton.svelte';
 	import ChartConfigPopup from '$lib/components/popups/ChartConfigPopup.svelte';
 	import { project } from '$lib/stores';
 	import type { Chart, ChartConfig } from '$lib/zenoapi';
-	import Button from '@smui/button';
+	import { mdiCog } from '@mdi/js';
 
 	export let chart: Chart;
 	export let chartConfig: ChartConfig;
@@ -17,8 +18,5 @@
 		on:close={() => (chartConfigEdit = false)}
 	/>
 {/if}
-<Button
-	class="ml-auto mr-8 mt-2 shrink-0 sm:mt-0"
-	variant="outlined"
-	on:click={() => (chartConfigEdit = true)}>Chart Configuration</Button
->
+
+<CircleIconButton icon={mdiCog} on:click={() => (chartConfigEdit = true)} positioning="ml-auto" />

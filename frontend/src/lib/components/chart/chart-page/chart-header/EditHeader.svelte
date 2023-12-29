@@ -36,7 +36,5 @@
 		</Button>
 		<SettingsButton bind:chartConfig {chart}></SettingsButton>
 	</div>
-	<div>
-		<Textfield variant="outlined" label="Chart Name" bind:value={title} />
-	</div>
+	<Textfield variant="outlined" label="Chart Name" bind:value={title} />
 </div>

@@ -14,6 +14,7 @@
 	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import CircleIconButton from './CircleIconButton.svelte';
 	import HelpButton from './HelpButton.svelte';
 	import LikeButton from './LikeButton.svelte';
 	import UserButton from './UserButton.svelte';
@@ -123,15 +124,7 @@
 	<div class="hidden h-full shrink-0 items-center sm:flex">
 		<HelpButton />
 		{#if (report && report.editor) || (project && project.editor)}
-			<button
-				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-primary transition hover:bg-primary-mid"
-				on:click={() => (editPopup = true)}
-				use:tooltip={{ text: 'Preferences' }}
-			>
-				<Icon tag="svg" viewBox="0 0 24 24" class="w-5 fill-primary">
-					<path d={mdiCog} />
-				</Icon>
-			</button>
+			<CircleIconButton icon={mdiCog} on:click={() => (editPopup = true)} positioning="mr-2" />
 		{/if}
 		{#if user && $page.route.id?.startsWith('/(app)/home')}
 			<Button
