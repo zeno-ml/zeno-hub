@@ -4,7 +4,7 @@
 
 	export let data: string;
 
-	const renderedText = purify.sanitize(parse(data));
+	const renderedText = purify.sanitize(parse(data) as string);
 </script>
 
 <article class="[&_a]:break-word prose max-w-none [&_p]:whitespace-pre-wrap">
