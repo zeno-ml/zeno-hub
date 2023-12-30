@@ -5,7 +5,9 @@
 	import type { Project, Report, User, ZenoService } from '$lib/zenoapi';
 	import {
 		mdiCog,
+		mdiCompassOutline,
 		mdiFileChartOutline,
+		mdiHome,
 		mdiLinkVariant,
 		mdiPlus,
 		mdiViewGridOutline
@@ -127,12 +129,15 @@
 			<CircleIconButton icon={mdiCog} on:click={() => (editPopup = true)} positioning="mr-2" />
 		{/if}
 		{#if user && $page.route.id?.startsWith('/(app)/home')}
-			<Button
-				class="mr-3"
-				variant="outlined"
+			<button
+				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-primary transition hover:bg-primary-mid"
 				on:click={() => (exploreTab ? goto('/') : goto('/home'))}
-				>{exploreTab ? 'My Hub' : 'Explore'}</Button
+				use:tooltip={{ text: exploreTab ? 'Home' : 'Explore' }}
 			>
+				<Icon tag="svg" viewBox="0 0 24 24" class="w-5 fill-primary">
+					<path d={exploreTab ? mdiHome : mdiCompassOutline} />
+				</Icon>
+			</button>
 		{/if}
 		<UserButton {user} />
 	</div>
