@@ -124,7 +124,7 @@ async def histogram_metric_and_count(
     else:
         calculate_histograms = False
 
-    # if end = start, can't show a bar, remove bucket (only happens if signular value)
+    # if end == start, can't show a bar, remove bucket (only happens if singular value)
     if col.data_type == MetadataType.CONTINUOUS:
         buckets = list(filter(lambda x: x.bucket != x.bucket_end, buckets))
 
