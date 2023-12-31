@@ -17,20 +17,11 @@
 			defaultTracking: true
 		});
 
-	onNavigate((navigation) => {
+	onNavigate(() => {
 		tooltipState.set({
 			hover: false,
 			mousePos: { x: 0, y: 0 },
 			text: undefined
-		});
-
-		if (!document.startViewTransition) return;
-
-		return new Promise((resolve) => {
-			document.startViewTransition(async () => {
-				resolve();
-				await navigation.complete;
-			});
 		});
 	});
 </script>
