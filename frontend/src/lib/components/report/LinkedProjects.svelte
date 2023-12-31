@@ -46,22 +46,22 @@
 			</button>
 		{/each}
 	{/if}
-</div>
-<div class="mt-2 flex">
-	{#each linkedProjects as project}
-		{#await zenoClient.checkProjectVisibility(project.uuid, report.public ?? false, report.id) then visible}
-			{#if !visible}
-				<div
-					class="h-6 w-6 fill-grey"
-					use:tooltip={{
-						text: `Project ${project.name} has more restricive sharing rights than this report. Its content will not be visible to all users.`
-					}}
-				>
-					<Icon tag="svg" viewBox="0 0 24 24">
-						<path class={'fill-error'} d={mdiAlertBox} />
-					</Icon>
-				</div>
-			{/if}
-		{/await}
-	{/each}
+	<div class="flex">
+		{#each linkedProjects as project}
+			{#await zenoClient.checkProjectVisibility(project.uuid, report.public ?? false, report.id) then visible}
+				{#if !visible}
+					<div
+						class="h-6 w-6 fill-grey"
+						use:tooltip={{
+							text: `Project ${project.name} has more restricive sharing rights than this report. Its content will not be visible to all users.`
+						}}
+					>
+						<Icon tag="svg" viewBox="0 0 24 24">
+							<path class={'fill-error'} d={mdiAlertBox} />
+						</Icon>
+					</div>
+				{/if}
+			{/await}
+		{/each}
+	</div>
 </div>
