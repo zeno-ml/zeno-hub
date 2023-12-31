@@ -62,6 +62,6 @@ export const actions: Actions = {
 				error: (error as Error).message
 			});
 		}
-		throw redirect(303, `/verify/${username}`);
+		redirect(303, `/verify/${username}`);
 	}
 };

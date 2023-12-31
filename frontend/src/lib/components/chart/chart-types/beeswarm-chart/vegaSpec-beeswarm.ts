@@ -79,7 +79,7 @@ export default function generateSpec(
 						fill: 'color',
 						offset: 50
 					}
-			  ]
+				]
 			: [],
 		marks: [
 			{
