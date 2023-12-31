@@ -103,12 +103,18 @@ async def get_project_by_name(
     Returns:
         str: uuid of the requested project.
     """
-    uuid = await select.project_uuid(owner_name, parse.unquote(project_name))
+    uuid = await select.project_uuid(
+        parse.unquote(owner_name), parse.unquote(project_name)
+    )
     if uuid is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=(
-                "ERROR: Project " + owner_name + "/" + project_name + " does not exist."
+                "ERROR: Project "
+                + project_name
+                + " for user "
+                + owner_name
+                + " does not exist."
             ),
         )
     user = await select.user_by_api_key(api_key)
