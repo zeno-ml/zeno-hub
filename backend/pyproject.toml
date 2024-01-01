@@ -10,7 +10,7 @@ homepage = "https://zenoml.com"
 [tool.poetry.dependencies]
 amplitude-analytics = "^1.1.4"
 cognitojwt = "^1.4.1"
-fastapi = "^0.105.0"
+fastapi = "^0.108.0"
 fastapi-cloudauth = "^0.4.3"
 pandas = "^2.1.4"
 pgpq = "^0.9.0"
