@@ -27,7 +27,7 @@ zeno-sliceline = "^0.0.1"
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.6.0"
 pyright = "^1.1.344"
-pytest = "^7.4.1"
+pytest = "^7.4.4"
 ruff = "^0.1.9"
 
 [build-system]
