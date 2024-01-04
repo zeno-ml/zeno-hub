@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	import { navigating, page } from '$app/stores';
 	import { tooltip } from '$lib/util/tooltip';
 	import type { Project, Report, User, ZenoService } from '$lib/zenoapi';
 	import {
@@ -19,6 +19,7 @@
 	import CircleIconButton from './CircleIconButton.svelte';
 	import HelpButton from './HelpButton.svelte';
 	import LikeButton from './LikeButton.svelte';
+	import Spinner from './Spinner.svelte';
 	import UserButton from './UserButton.svelte';
 
 	export let user: User | null = null;
@@ -30,9 +31,10 @@
 	export let editPopup = false;
 
 	const zenoClient = getContext('zenoClient') as ZenoService;
-	const exploreTab = $page.route.id === '/(app)/home';
 
 	let linkCopied = false;
+
+	$: exploreTab = $page.route.id === '/(app)/home';
 </script>
 
 <div
@@ -124,6 +126,11 @@
 		{/if}
 	</div>
 	<div class="hidden h-full shrink-0 items-center sm:flex">
+		{#if $navigating}
+			<div class="mr-2">
+				<Spinner width={26} height={26} />
+			</div>
+		{/if}
 		<HelpButton />
 		{#if (report && report.editor) || (project && project.editor)}
 			<CircleIconButton icon={mdiCog} on:click={() => (editPopup = true)} positioning="mr-2" />
@@ -131,7 +138,7 @@
 		{#if user && $page.route.id?.startsWith('/(app)/home')}
 			<button
 				class="mr-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-grey-light text-primary transition hover:bg-primary-mid"
-				on:click={() => (exploreTab ? goto('/') : goto('/home'))}
+				on:click={() => (exploreTab ? goto('/home/' + user?.name) : goto('/home'))}
 				use:tooltip={{ text: exploreTab ? 'Home' : 'Explore' }}
 			>
 				<Icon tag="svg" viewBox="0 0 24 24" class="w-5 fill-primary">
