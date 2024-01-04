@@ -1,31 +1,43 @@
 import { tooltipState } from '$lib/stores';
 
 export function tooltip(node: HTMLElement, params: { text: string }) {
-	function handleFocus(e: MouseEvent) {
-		tooltipState.set({ hover: true, mousePos: { x: e.clientX, y: e.clientY }, text: params.text });
+	let isHovering = false;
 
-		node.addEventListener('mouseleave', handleBlur);
-		node.addEventListener('mousemove', handleMove);
-		node.removeEventListener('mouseenter', handleFocus);
-	}
+	const handleFocus = function (e: MouseEvent) {
+		isHovering = true;
+		tooltipState.set({
+			hover: true,
+			mousePos: { x: e.clientX, y: e.clientY },
+			text: params.text
+		});
+	};
 
-	function handleMove(e: MouseEvent) {
-		tooltipState.set({ hover: true, mousePos: { x: e.clientX, y: e.clientY }, text: params.text });
-	}
+	const handleMove = function (e: MouseEvent) {
+		if (!isHovering) return;
+		tooltipState.set({
+			hover: true,
+			mousePos: { x: e.clientX, y: e.clientY },
+			text: params.text
+		});
+	};
 
-	function handleBlur() {
+	const handleBlur = function () {
+		isHovering = false;
 		tooltipState.set({ hover: false, mousePos: { x: 0, y: 0 }, text: undefined });
-
-		node.removeEventListener('mouseleave', handleBlur);
-		node.removeEventListener('mousemove', handleMove);
-		node.addEventListener('mouseenter', handleFocus);
-	}
+	};
 
 	node.addEventListener('mouseenter', handleFocus);
+	node.addEventListener('mouseleave', handleBlur);
+	node.addEventListener('mousemove', handleMove);
 
 	return {
+		update(newParams: { text: string }) {
+			params = newParams;
+		},
 		destroy() {
 			node.removeEventListener('mouseenter', handleFocus);
+			node.removeEventListener('mouseleave', handleBlur);
+			node.removeEventListener('mousemove', handleMove);
 		}
 	};
 }
