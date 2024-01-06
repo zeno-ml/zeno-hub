@@ -21,15 +21,13 @@
 
 	$: {
 		data;
+		width;
+		height;
 		updateSpec();
 	}
 
 	function updateSpec() {
-		spec = generateSpec(
-			chart.parameters as RadarParameters,
-			Math.min(height, width),
-			Math.min(height, width)
-		) as VegaSpec;
+		spec = generateSpec(chart.parameters as RadarParameters, Math.min(width, height)) as VegaSpec;
 	}
 </script>
 
@@ -38,8 +36,8 @@
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: Math.min(height, width),
-		height: Math.min(height, width),
+		width: Math.min(width, height),
+		height: Math.min(width, height),
 		scaleFactor: {
 			png: 3
 		},
