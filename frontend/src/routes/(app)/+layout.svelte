@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { navigating } from '$app/stores';
 	import { getEndpoint } from '$lib/api/util.js';
-	import Spinner from '$lib/components/general/Spinner.svelte';
 	import { ZenoClient } from '$lib/zenoapi';
 	import * as amplitude from '@amplitude/analytics-browser';
 	import { setContext } from 'svelte';
@@ -28,11 +26,5 @@
 </script>
 
 <main class="h-full w-full text-left md:flex">
-	{#if Boolean($navigating)}
-		<div class="flex h-full w-full items-center justify-center">
-			<Spinner />
-		</div>
-	{:else}
-		<slot />
-	{/if}
+	<slot />
 </main>

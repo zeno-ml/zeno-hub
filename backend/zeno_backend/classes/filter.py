@@ -21,6 +21,7 @@ class Operation(str, Enum):
         LIKE: like.
         ILIKE: ilike.
         REGEX: regex.
+        NOT_REGEX: not matching regex.
     """
 
     EQUAL = "EQUAL"
@@ -32,6 +33,7 @@ class Operation(str, Enum):
     LIKE = "LIKE"
     ILIKE = "ILIKE"
     REGEX = "REGEX"
+    NOT_REGEX = "NOT_REGEX"
 
     def literal(self) -> LiteralString:
         """Obtain a string representation to be used in a SQL filter.
@@ -55,6 +57,8 @@ class Operation(str, Enum):
             return "ILIKE"
         if self == Operation.REGEX:
             return "~"
+        if self == Operation.NOT_REGEX:
+            return "!~"
         return "LIKE"
 
 

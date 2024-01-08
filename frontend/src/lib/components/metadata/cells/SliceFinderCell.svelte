@@ -60,10 +60,10 @@
 <svelte:window on:keydown={submit} />
 
 <div class="mb-2.5 ml-5 mt-2.5 flex items-center justify-between">
-	<span style="display: inline-block;">
+	<span class="inline-block">
 		<SliceDetails predicateGroup={slice.filterPredicates} />
 	</span>
-	<div style="display: flex; align-items: center;">
+	<div class="flex items-center">
 		<span style="margin-right: 10px; margin-left: 10px">
 			{metric}
 		</span>
@@ -95,7 +95,7 @@
 			on:keydown={submit}
 		>
 			<Paper elevation={7}>
-				<Content style="display:flex; flex-direction:column">
+				<Content class="flex flex-col">
 					<Textfield bind:value={newSliceName} label="Slice Name" bind:this={input} />
 					<div class="mt-2.5">
 						<Button

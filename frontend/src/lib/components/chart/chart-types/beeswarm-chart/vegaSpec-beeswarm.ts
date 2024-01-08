@@ -65,7 +65,6 @@ export default function generateSpec(
 		axes: [
 			{
 				title: xLabel,
-				titleFontSize: 13,
 				titlePadding: 10,
 				orient: 'bottom',
 				scale: 'xscale'
@@ -77,9 +76,10 @@ export default function generateSpec(
 					{
 						type: 'symbol',
 						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-						fill: 'color'
+						fill: 'color',
+						offset: 50
 					}
-			  ]
+				]
 			: [],
 		marks: [
 			{

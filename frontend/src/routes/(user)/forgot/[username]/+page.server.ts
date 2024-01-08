@@ -40,6 +40,6 @@ export const actions: Actions = {
 				error: (error as Error).message
 			});
 		}
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 };

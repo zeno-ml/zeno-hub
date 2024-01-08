@@ -52,11 +52,11 @@
 			tableRecord[cell.x_value] === undefined
 				? (tableRecord[cell.x_value] = {
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-				  })
+					})
 				: (tableRecord[cell.x_value] = {
 						...tableRecord[cell.x_value],
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-				  });
+					});
 		});
 	}
 	$: {
@@ -75,6 +75,48 @@
 				);
 			}
 		}
+	}
+
+	function saveCSV() {
+		let csvContent = 'data:text/csv;charset=utf-8,';
+		const cols = columns.map((column) => {
+			if (parameters.xChannel === SlicesMetricsOrModels.SLICES) {
+				if (column == -1) {
+					return 'all instances';
+				}
+				return slices.find((sli) => sli.id === column)?.sliceName ?? '';
+			} else if (parameters.xChannel === SlicesMetricsOrModels.METRICS) {
+				return column == -1 ? 'count' : metrics.find((met) => met.id === column)?.name ?? '';
+			} else {
+				return column;
+			}
+		});
+		csvContent += parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
+		csvContent += ',';
+		csvContent += cols.join(',') + '\n';
+		rows.forEach((row) => {
+			if (parameters.yChannel === SlicesOrModels.SLICES) {
+				if (row == -1) {
+					csvContent += 'all instances';
+				} else {
+					csvContent += slices.find((sli) => sli.id === row)?.sliceName ?? '';
+				}
+			} else {
+				csvContent += row;
+			}
+			csvContent += ',';
+			columns.forEach((column) => {
+				csvContent += tableRecord[column][row].fixedValue + ',';
+			});
+			csvContent = csvContent.slice(0, -1);
+			csvContent += '\n';
+		});
+		const encodedUri = encodeURI(csvContent);
+		const link = document.createElement('a');
+		link.setAttribute('href', encodedUri);
+		link.setAttribute('download', chart.name + '.csv');
+		document.body.appendChild(link);
+		link.click();
 	}
 </script>
 
@@ -97,7 +139,7 @@
 							}
 						}}
 					>
-						<div class="flex">
+						<div class="flex cursor-pointer transition hover:text-primary-dark">
 							<div class="min-h-[24px] overflow-hidden">
 								{#if parameters.xChannel === SlicesMetricsOrModels.SLICES}
 									<SliceDetailsContainer sli={slices.find((sli) => sli.id === column)} />
@@ -126,3 +168,9 @@
 		</Body>
 	</DataTable>
 </div>
+<button
+	on:click={saveCSV}
+	class="ml-auto rounded border border-primary-dark px-2 py-0.5 text-primary transition hover:bg-primary-mid"
+>
+	Download CSV
+</button>

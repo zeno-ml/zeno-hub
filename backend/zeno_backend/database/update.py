@@ -3,7 +3,12 @@ import json
 
 from psycopg import sql
 
-from zeno_backend.classes.chart import Chart, ParametersEncoder
+from zeno_backend.classes.chart import (
+    Chart,
+    ChartConfig,
+    ConfigEncoder,
+    ParametersEncoder,
+)
 from zeno_backend.classes.filter import PredicatesEncoder
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.metric import Metric
@@ -13,8 +18,6 @@ from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
-from zeno_backend.database.select import user as get_user
-from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def folder(folder: Folder, project: str):
@@ -61,25 +64,20 @@ async def chart(chart: Chart, project: str):
         chart (Chart): the chart data to use for the update.
         project (str): the project the user is currently working with.
     """
-    chart_data = await calculate_chart_data(chart, project)
-
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
                 "UPDATE charts SET project_uuid = %s, name = %s, type = %s, "
-                "parameters = %s, data = %s, updated_at = CURRENT_TIMESTAMP "
+                "parameters = %s, data = NULL, updated_at = CURRENT_TIMESTAMP "
                 "WHERE id = %s;",
                 [
                     project,
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_data,
                     chart.id,
                 ],
             )
-
-    return chart_data
 
 
 async def chart_data(chart_id: int, data: str):
@@ -257,19 +255,26 @@ async def project(project_config: Project):
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
-            await cur.execute(
-                "UPDATE projects SET name = %s, "
-                "view = %s, samples_per_page = %s, public = %s, "
-                "description = %s, updated_at = CURRENT_TIMESTAMP WHERE uuid = %s;",
-                [
-                    project_config.name,
-                    project_config.view,
-                    project_config.samples_per_page,
-                    project_config.public,
-                    project_config.description,
-                    project_config.uuid,
-                ],
+            query = sql.SQL(
+                "UPDATE projects SET name = %s, view = %s, "
+                "updated_at = CURRENT_TIMESTAMP",
             )
+            params: list[str | bool | int] = [
+                project_config.name,
+                project_config.view,
+            ]
+            if project_config.public is not None:
+                query += sql.SQL(", public = %s")
+                params.append(project_config.public)
+            if project_config.description is not None:
+                query += sql.SQL(", description = %s")
+                params.append(project_config.description)
+            if project_config.samples_per_page is not None:
+                query += sql.SQL(", samples_per_page = %s")
+                params.append(project_config.samples_per_page)
+            query += sql.SQL(" WHERE uuid = %s;")
+            params.append(project_config.uuid)
+            await cur.execute(query, params)
             await conn.commit()
 
 
@@ -345,17 +350,13 @@ async def report(report: Report):
     Args:
         report (Report): the configuration of the report.
     """
-    owner_id = await get_user(report.owner_name)
-    if owner_id is None:
-        return
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "UPDATE reports SET name = %s, owner_id = %s, public = %s, "
-                "description = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
+                "UPDATE reports SET name = %s, public = %s, description = %s, "
+                "updated_at = CURRENT_TIMESTAMP WHERE id = %s;",
                 [
                     report.name,
-                    owner_id.id,
                     report.public,
                     report.description,
                     report.id,
@@ -490,3 +491,25 @@ async def report_org(report_id: int, organization: Organization):
                 "AND organization_id = %s;",
                 [organization.admin, report_id, organization.id],
             )
+
+
+async def chart_config(config: ChartConfig, chart_id: int | None = None):
+    """Update a project's chart config.
+
+    Args:
+        config (ChartConfig): updated chart config for the project.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if chart_id is None:
+                await cur.execute(
+                    "UPDATE chart_config SET config = %s WHERE project_uuid = %s "
+                    "AND chart_id IS NULL;",
+                    [json.dumps(config, cls=ConfigEncoder), config.project_uuid],
+                )
+            else:
+                await cur.execute(
+                    "UPDATE chart_config SET config = %s WHERE chart_id = %s;",
+                    [json.dumps(config, cls=ConfigEncoder), chart_id],
+                )

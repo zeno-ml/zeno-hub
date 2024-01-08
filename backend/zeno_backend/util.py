@@ -87,6 +87,19 @@ async def project_editor(project_uuid: str, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Unauthorized",
         )
+    await user_project_editor(project_uuid, user)
+
+
+async def user_project_editor(project_uuid: str, user: User):
+    """Check if a user is a project's editor.
+
+    Args:
+        project_uuid (str): the project to check.
+        user (User): the user to check for.
+
+    Raises:
+        HTTPException: if the user is not an editor.
+    """
     available_project_ids = [
         project.uuid for project in await select.projects(user) if project.editor
     ]

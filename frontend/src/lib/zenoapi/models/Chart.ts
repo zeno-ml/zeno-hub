@@ -20,7 +20,6 @@ import type { XCParameters } from './XCParameters';
  * type (ChartType): the type of the chart.
  * parameters (XCParameters | TableParameters | BeeswarmParameters |
  * RadarParameters | HeatmapParameters): the parameters of the chart.
- * data (str): the JSON string data of the chart.
  */
 export type Chart = {
 	id: number;
@@ -33,5 +32,4 @@ export type Chart = {
 		| BeeswarmParameters
 		| RadarParameters
 		| HeatmapParameters;
-	data?: string | null;
 };

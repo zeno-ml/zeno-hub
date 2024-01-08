@@ -81,9 +81,7 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content
-		style="display: flex; flex-direction: column; width: 800px; max-height: 80vh; overflow-y: scroll"
-	>
+	<Content class="flex max-h-[80vh] w-[800px] flex-col overflow-y-auto">
 		<h2 class="mb-4 text-xl">Report Settings</h2>
 		<h3 class="text-lg">Settings</h3>
 		<div class="mb-12 flex flex-col">
@@ -102,7 +100,7 @@
 					<span>Updated: {new Date(report.updatedAt ?? '').toLocaleString()}</span>
 				</div>
 			</div>
-			<Textfield textarea bind:value={report.description} label="Description" style="width: 100%" />
+			<Textfield textarea bind:value={report.description} label="Description" class="w-full" />
 		</div>
 		<div class="mb-5 flex flex-col" transition:fade>
 			<h3 class="mb-2 text-lg">Collaborators</h3>
@@ -142,7 +140,7 @@
 										disabled={member.id === user.id}
 									/>
 								</td>
-								<td style="text-align: end;">
+								<td class="text-end">
 									{#if member.id !== user.id}
 										<IconButton
 											on:click={() =>
@@ -209,7 +207,7 @@
 												)}
 									/>
 								</td>
-								<td style="text-align: end;">
+								<td class="text-end">
 									<IconButton
 										on:click={() =>
 											zenoClient
@@ -240,14 +238,9 @@
 			{/if}
 		</div>
 		<div class="flex items-center self-end">
-			<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
-				>Cancel</Button
-			>
-			<Button
-				style="margin-left: 5px;"
-				variant="outlined"
-				disabled={invalidName}
-				on:click={() => updateReport()}>{'Update'}</Button
+			<Button class="ml-4" variant="outlined" on:click={() => dispatch('close')}>Cancel</Button>
+			<Button class="ml-2" variant="outlined" disabled={invalidName} on:click={() => updateReport()}
+				>{'Update'}</Button
 			>
 		</div>
 	</Content>

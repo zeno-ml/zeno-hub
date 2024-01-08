@@ -10,7 +10,12 @@ from pyarrow import RecordBatch, Schema
 
 import zeno_backend.database.delete as delete
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart, ParametersEncoder
+from zeno_backend.classes.chart import (
+    Chart,
+    ChartConfig,
+    ConfigEncoder,
+    ParametersEncoder,
+)
 from zeno_backend.classes.filter import (
     FilterPredicate,
     FilterPredicateGroup,
@@ -25,7 +30,6 @@ from zeno_backend.classes.tag import Tag
 from zeno_backend.classes.user import Author, Organization, User
 from zeno_backend.database.database import db_pool
 from zeno_backend.database.util import hash_api_key, resolve_metadata_type
-from zeno_backend.processing.chart import calculate_chart_data
 
 
 async def api_key(user: User) -> str | None:
@@ -69,6 +73,7 @@ async def project(project_config: Project, owner_id: int):
         Exception: something went wrong in the process of creating the new project in
             the database.
     """
+    default_project = Project(uuid="", name="", owner_name="", view="")
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
@@ -80,9 +85,15 @@ async def project(project_config: Project, owner_id: int):
                     project_config.name,
                     owner_id,
                     project_config.view,
-                    project_config.samples_per_page,
-                    project_config.public,
-                    project_config.description,
+                    default_project.samples_per_page
+                    if project_config.samples_per_page is None
+                    else project_config.samples_per_page,
+                    default_project.public
+                    if project_config.public is None
+                    else project_config.public,
+                    default_project.description
+                    if project_config.description is None
+                    else project_config.description,
                 ],
             )
             await cur.execute(
@@ -444,7 +455,7 @@ async def report(name: str, user: User) -> int:
             await cur.execute(
                 "INSERT INTO report_author (user_id, report_id, position) "
                 "VALUES (%s,%s,%s);",
-                [user.id, id, 0],
+                [user.id, id[0][0], 0],
             )
 
             await conn.commit()
@@ -704,18 +715,15 @@ async def chart(project: str, chart: Chart) -> int | None:
     Returns:
         int | None: the id of the newly created chart.
     """
-    chart_data = await calculate_chart_data(chart, project)
-
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO charts (name, type, parameters, data, project_uuid) "
-                "VALUES (%s,%s,%s,%s,%s) RETURNING id;",
+                "INSERT INTO charts (name, type, parameters, project_uuid) "
+                "VALUES (%s,%s,%s,%s) RETURNING id;",
                 [
                     chart.name,
                     chart.type,
                     json.dumps(chart.parameters, cls=ParametersEncoder),
-                    chart_data,
                     project,
                 ],
             )
@@ -860,4 +868,20 @@ async def report_org(report_id: int, organization: Organization):
                 "INSERT INTO organization_report (organization_id, report_id, editor) "
                 "VALUES (%s,%s,%s)",
                 [organization.id, report_id, organization.admin],
+            )
+
+
+async def chart_config(config: ChartConfig, chart_id: int | None = None):
+    """Add a chart config for a project or chart.
+
+    Args:
+        config (ChartConfig): the config to be added to the database.
+        chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "INSERT INTO chart_config (project_uuid, config, chart_id) "
+                "VALUES (%s,%s,%s);",
+                [config.project_uuid, json.dumps(config, cls=ConfigEncoder), chart_id],
             )

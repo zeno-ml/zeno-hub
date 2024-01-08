@@ -150,7 +150,7 @@
 						: 'Run the SliceLine algorithm to find slices of data with high or low metrics'
 				}}
 			>
-				<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+				<Icon tag="svg" viewBox="-6 -6 36 36">
 					<path d={mdiInformationOutline} />
 				</Icon>
 			</div>
@@ -163,20 +163,19 @@
 	</div>
 	<div class="flex items-center">
 		<div style:margin-left={'20px'}>
-			<div style="display:flex">
+			<div class="flex">
 				<div class="mb-2 mt-2">
 					{$page.url.href.includes('compare') ? 'Difference Column' : 'Metric Column'}
 				</div>
 				<div
-					class="h-6 w-6 cursor-help fill-grey-dark"
-					style="margin-top: 3px;"
+					class="mt-1 h-6 w-6 cursor-help fill-grey-dark"
 					use:tooltip={{
 						text: $page.url.href.includes('compare')
 							? 'The column on which to measure system disagreement'
 							: 'The continuous column to compare slices across'
 					}}
 				>
-					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+					<Icon tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -192,16 +191,15 @@
 			/>
 		</div>
 		<div style:width="100%">
-			<div style="display:flex">
+			<div class="flex">
 				<div class="mb-2 mt-2">Search Columns</div>
 				<div
-					class="h-6 w-6 cursor-help fill-grey-dark"
-					style="margin-top: 3px;"
+					class="mt-1 h-6 w-6 cursor-help fill-grey-dark"
 					use:tooltip={{
 						text: 'Metadata columns used to create slices'
 					}}
 				>
-					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+					<Icon tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -218,16 +216,15 @@
 			/>
 		</div>
 		<div>
-			<div style="display:flex">
+			<div class="flex">
 				<div class="mb-2 mt-2">Alpha</div>
 				<div
-					class="h-6 w-6 cursor-help fill-grey-dark"
-					style="margin-top: 3px;"
+					class="mt-1 h-6 w-6 cursor-help fill-grey-dark"
 					use:tooltip={{
 						text: 'Weight parameter for the average slice metric. Increase it to find more slices'
 					}}
 				>
-					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+					<Icon tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -241,16 +238,15 @@
 			/>
 		</div>
 		<div>
-			<div style="display:flex">
+			<div class="flex">
 				<div class="mb-2 mt-2">Max. Lattice</div>
 				<div
-					class="h-6 w-6 cursor-help fill-grey-dark"
-					style="margin-top: 3px;"
+					class="mt-1 h-6 w-6 cursor-help fill-grey-dark"
 					use:tooltip={{
 						text: 'Maximum number of predicates'
 					}}
 				>
-					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+					<Icon tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -263,18 +259,17 @@
 			/>
 		</div>
 		<div>
-			<div style="display:flex">
+			<div class="flex">
 				<div class="mb-2 mt-2">Order By</div>
 				<div
-					class="h-6 w-6 cursor-help fill-grey-dark"
-					style="margin-top: 3px;"
+					class="mt-1 h-6 w-6 cursor-help fill-grey-dark"
 					use:tooltip={{
 						text: $page.url.href.includes('compare')
 							? 'Order by slice score, a combination of system difference and size'
 							: 'Order by slice score, a combination of size and metric'
 					}}
 				>
-					<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+					<Icon tag="svg" viewBox="-6 -6 36 36">
 						<path d={mdiInformationOutline} />
 					</Icon>
 				</div>
@@ -289,7 +284,7 @@
 		</div>
 	</div>
 	{#if $selectionPredicates !== undefined || $selections.tags.length > 0}
-		<div style="margin-left: 20px;margin-right: 20px">
+		<div class="mx-5">
 			<div class="mb-2 mt-2">Search for slices in:</div>
 			<div class="flex rounded border border-grey-lighter">
 				<ChipsWrapper />
@@ -299,8 +294,7 @@
 	{#if sliceFinderReturn.slices.length > 0}
 		<div class="m-5 flex items-center justify-between">
 			<Button
-				variant="outlined"
-				style="color:white; background-color: var(--logo);"
+				variant="raised"
 				on:click={() => generateSlices()}
 				on:mouseleave={blur}
 				on:focusout={blur}
@@ -310,22 +304,21 @@
 			<span class="m-2.5">{sliceFinderMessage}</span>
 			<div>
 				<span class="mr-3"> Overall Average: </span>
-				<span class="average-value" style="color: var(--logo);">
+				<span class="average-value text-primary">
 					{sliceFinderReturn.overallMetric ? sliceFinderReturn.overallMetric.toFixed(2) : ''}
 				</span>
 			</div>
 		</div>
-		<div class="m-5 flex items-center justify-between" style="margin-bottom:0px;">
-			<h4 style="margin-bottom:0px;">Filter Predicates</h4>
-			<h4 style="margin-bottom:0px;">
+		<div class="m-5 flex items-center justify-between">
+			<h4>Filter Predicates</h4>
+			<h4>
 				Average Slice Metric {$page.url.href.includes('compare') ? 'difference' : ''}
 			</h4>
 		</div>
 	{:else}
 		<div class="m-5 flex flex-col items-center justify-center">
 			<Button
-				variant="outlined"
-				style="color:white; background-color: var(--logo);"
+				variant="raised"
 				on:click={() => generateSlices()}
 				on:mouseleave={blur}
 				on:focusout={blur}

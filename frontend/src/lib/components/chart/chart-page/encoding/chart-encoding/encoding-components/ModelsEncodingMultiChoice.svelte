@@ -22,7 +22,7 @@
 			outerDivClass="!w-full !border-grey-light !py-1 !bg-white"
 			liActiveOptionClass="!bg-primary-light"
 		>
-			<p style="text-wrap: pretty;" slot="selected" let:option>{option}</p>
+			<p class="text-pretty" slot="selected" let:option>{option}</p>
 		</MultiSelect>
 	{/if}
 	<div class="ml-auto flex items-center">

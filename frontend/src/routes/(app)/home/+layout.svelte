@@ -1,22 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import Header from '$lib/components/general/Header.svelte';
-	import Help from '$lib/components/general/Help.svelte';
 	import NewReportPopup from '$lib/components/popups/NewReportPopup.svelte';
 
 	export let data;
 	export let showNewReport = false;
 
-	let isExplore = $page.route.id === '/(app)/home';
+	$: isExplore = $page.route.id === '/(app)/home';
 </script>
 
 {#if showNewReport && data.user !== null}
 	<NewReportPopup on:close={() => (showNewReport = false)} bind:showNewReport />
 {/if}
-
-<div class="absolute bottom-6 right-6">
-	<Help />
-</div>
 
 <div class="flex h-full flex-grow flex-col">
 	<Header user={data.user} bind:showNewReport />

@@ -102,7 +102,7 @@
 				on:click={() => page--}
 			>
 				<div class="h-6 w-6 align-middle">
-					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill={page === 0 ? 'grey' : 'black'} d={mdiChevronLeft} />
 					</Icon>
 				</div>
@@ -132,11 +132,13 @@
 				on:click={() => page++}
 			>
 				<div class="h-6 w-6">
-					<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+					<Icon tag="svg" viewBox="0 0 24 24">
 						<path fill="black" d={mdiChevronRight} />
 					</Icon>
 				</div>
 			</button>
 		</div>
 	</div>
+{:else}
+	<p class="ml-4 mt-4 font-semibold text-error">Slice does not exist anymore.</p>
 {/if}

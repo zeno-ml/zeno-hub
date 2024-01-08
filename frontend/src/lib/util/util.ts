@@ -126,6 +126,8 @@ export function getOperation(representation: string) {
 			return Operation.ILIKE;
 		case 'REGEX':
 			return Operation.REGEX;
+		case 'NOT_REGEX':
+			return Operation.NOT_REGEX;
 		default:
 			return Operation.EQUAL;
 	}
@@ -140,7 +142,8 @@ export const inverseOperationMap = {
 	[Operation.LTE]: '<=',
 	[Operation.LIKE]: 'LIKE',
 	[Operation.ILIKE]: 'ILIKE',
-	[Operation.REGEX]: 'REGEX'
+	[Operation.REGEX]: 'REGEX',
+	[Operation.NOT_REGEX]: 'NOT_REGEX'
 };
 
 export function shortenNumber(num: number, digits: number) {

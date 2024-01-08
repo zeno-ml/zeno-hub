@@ -4,15 +4,18 @@
 		ZenoService,
 		type BeeswarmParameters,
 		type Chart,
+		type ChartConfig,
 		type Metric,
 		type Slice
 	} from '$lib/zenoapi';
 	import { extent } from 'd3-array';
 	import { getContext } from 'svelte';
 	import { Vega } from 'svelte-vega';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-beeswarm';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -48,8 +51,8 @@
 		parameters.fixedDimension === 'y'
 			? parameters.metrics.map((id) => metrics.find((metric) => metric.id === id)?.name ?? 'count')
 			: parameters.yChannel === SlicesOrModels.MODELS
-			  ? parameters.models
-			  : parameters.slices.map((id) => slices.find((sli) => sli.id === id)?.sliceName ?? '');
+				? parameters.models
+				: parameters.slices.map((id) => slices.find((sli) => sli.id === id)?.sliceName ?? '');
 
 	function dataFilter(
 		data: {
@@ -85,7 +88,7 @@
 
 {#each rows as row, i}
 	<div class="h-40 text-left">
-		<h4 class="relative mb-2.5">
+		<h4 class="relative mb-2.5 text-lg">
 			{parameters.fixedDimension === 'y'
 				? parameters.yChannel === SlicesOrModels.MODELS
 					? parameters.models[0]
@@ -127,7 +130,8 @@
 				},
 				renderer: 'svg',
 				theme: 'vox',
-				downloadFileName: chart.name
+				downloadFileName: chart.name,
+				config: getConfig(chartConfig)
 			}}
 		/>
 	</div>

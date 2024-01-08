@@ -9,6 +9,7 @@ import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_s
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Body_upload_system_schema } from '../models/Body_upload_system_schema';
 import type { Chart } from '../models/Chart';
+import type { ChartConfig } from '../models/ChartConfig';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -281,7 +282,7 @@ export class ZenoService {
 	 * HTTPException: error if the chart could not be fetched.
 	 *
 	 * Returns:
-	 * ChartResponse: chart spec and data.
+	 * ChartResponse: chart spec.
 	 * @param chartId
 	 * @param projectUuid
 	 * @returns Chart Successful Response
@@ -296,6 +297,136 @@ export class ZenoService {
 			},
 			query: {
 				project_uuid: projectUuid
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData1(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Get Chart Config
+	 * Get a project's chart configuration.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project for which to get the configuration.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * ChartConfig: the configuration of all charts in the project.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns ChartConfig Successful Response
+	 * @throws ApiError
+	 */
+	public getChartConfig(
+		projectUuid: string,
+		chartId?: number | null
+	): CancelablePromise<ChartConfig> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Delete Chart Config
+	 * Delete the chart config for a project.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to delete the chart config for.
+	 * request (Request): http request to get the user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteChartConfig(projectUuid: string, chartId?: number | null): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
 			},
 			errors: {
 				422: `Validation Error`
@@ -375,15 +506,46 @@ export class ZenoService {
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
-	 * @returns string Successful Response
+	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<string> {
+	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/chart/{project_uuid}',
 			path: {
 				project_uuid: projectUuid
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+
+	/**
+	 * Update Chart Config
+	 * Update or add a chart configuration for a project.
+	 *
+	 * Args:
+	 * chart_config (ChartConfig): chart configuration to be written.
+	 * request (Request): http request to get user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * @param requestBody
+	 * @param chartId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public updateChartConfig(
+		requestBody: ChartConfig,
+		chartId?: number | null
+	): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'PATCH',
+			url: '/chart-config',
+			query: {
+				chart_id: chartId
 			},
 			body: requestBody,
 			mediaType: 'application/json',
@@ -900,6 +1062,45 @@ export class ZenoService {
 		return this.httpRequest.request({
 			method: 'GET',
 			url: '/user-projects'
+		});
+	}
+
+	/**
+	 * Check Project Visibility
+	 * Check if a project's visibility matches or exceeds that of a report.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to be checked.
+	 * report_public (bool): whether the report is public.
+	 * report_id (int): id of the report to be checked against.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * bool: whether the project's visibility matches or exceeds that of the report.
+	 * @param projectUuid
+	 * @param reportPublic
+	 * @param reportId
+	 * @returns boolean Successful Response
+	 * @throws ApiError
+	 */
+	public checkProjectVisibility(
+		projectUuid: string,
+		reportPublic: boolean,
+		reportId: number
+	): CancelablePromise<boolean> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/project-visibility/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				report_public: reportPublic,
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
 		});
 	}
 

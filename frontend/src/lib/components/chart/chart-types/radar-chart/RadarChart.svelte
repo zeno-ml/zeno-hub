@@ -1,9 +1,11 @@
 <script lang="ts">
-	import type { Chart, RadarParameters } from '$lib/zenoapi';
+	import type { Chart, ChartConfig, RadarParameters } from '$lib/zenoapi';
 	import { Vega, type VegaSpec } from 'svelte-vega';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-radar';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: {
 		table: Array<{
 			axis_value: string | number;
@@ -19,15 +21,13 @@
 
 	$: {
 		data;
+		width;
+		height;
 		updateSpec();
 	}
 
 	function updateSpec() {
-		spec = generateSpec(
-			chart.parameters as RadarParameters,
-			Math.min(height, width),
-			Math.min(height, width)
-		) as VegaSpec;
+		spec = generateSpec(chart.parameters as RadarParameters, Math.min(width, height)) as VegaSpec;
 	}
 </script>
 
@@ -36,13 +36,14 @@
 	{data}
 	options={{
 		actions: { source: false, editor: false, compiled: false },
-		width: Math.min(height, width),
-		height: Math.min(height, width),
+		width: Math.min(width, height),
+		height: Math.min(width, height),
 		scaleFactor: {
 			png: 3
 		},
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: getConfig(chartConfig)
 	}}
 />

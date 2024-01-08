@@ -69,12 +69,32 @@
 			...($filterSelection ? $selectionIds : [])
 		];
 		const dataIds = [...new Set(secureIds)];
-		zenoClient
+		if (metadataHistograms.size === 0) {
+			// If histograms have not been loaded fully, load them, then load them filtered.
+			requestHistograms(requestColumns, s.model, s.metric, undefined, []).then(() => {
+				if (s.selectionPredicates || dataIds) {
+					requestHistograms(requestColumns, s.model, s.metric, s.selectionPredicates, dataIds);
+				}
+			});
+		} else {
+			// Update filtered size if histograms have been loaded already
+			requestHistograms(requestColumns, s.model, s.metric, s.selectionPredicates, dataIds);
+		}
+	});
+
+	async function requestHistograms(
+		requestColumns: ZenoColumn[],
+		model?: string,
+		metric?: Metric,
+		selectionPredicates?: FilterPredicateGroup,
+		dataIds?: string[]
+	) {
+		await zenoClient
 			.calculateHistograms($project.uuid, {
 				columns: requestColumns,
-				filterPredicates: s.selectionPredicates,
-				model: s.model,
-				metric: s.metric,
+				filterPredicates: selectionPredicates,
+				model: model,
+				metric: metric,
 				dataIds
 			})
 			.then((out) => {
@@ -83,7 +103,7 @@
 				if ($metricRange[0] === Infinity) {
 					metricRange.set(getMetricRange(out));
 				}
-				if (metadataHistograms.size == 0) {
+				if (metadataHistograms.size === 0) {
 					requestColumns.forEach((c, i) => {
 						metadataHistograms.set(
 							c.id,
@@ -108,10 +128,9 @@
 						}
 					});
 				}
-
 				metadataHistograms = new Map(metadataHistograms);
 			});
-	});
+	}
 </script>
 
 {#if !$page.url.href.includes('compare')}
@@ -119,7 +138,7 @@
 		.filter((c) => (c.model === undefined || c.model === null || c.model === $model) && histogramColumnsBaseFilter(c))
 		.sort(reverseColumnSort) as col (col.id)}
 		{@const hist = metadataHistograms.get(col.id)}
-		{#if hist}
+		{#if hist && hist.length > 0}
 			<MetadataCell {col} histogram={hist} />
 		{/if}
 	{/each}

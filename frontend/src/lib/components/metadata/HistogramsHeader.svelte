@@ -16,7 +16,7 @@
 				text: 'Interactive distributions for metadata columns. Click or drag on the histograms to filter the data'
 			}}
 		>
-			<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+			<Icon tag="svg" viewBox="-6 -6 36 36">
 				<path d={mdiInformationOutline} />
 			</Icon>
 		</div>

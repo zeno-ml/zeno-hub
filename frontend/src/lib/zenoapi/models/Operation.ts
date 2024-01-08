@@ -16,6 +16,7 @@
  * LIKE: like.
  * ILIKE: ilike.
  * REGEX: regex.
+ * NOT_REGEX: not matching regex.
  */
 export enum Operation {
 	EQUAL = 'EQUAL',
@@ -26,5 +27,6 @@ export enum Operation {
 	GTE = 'GTE',
 	LIKE = 'LIKE',
 	ILIKE = 'ILIKE',
-	REGEX = 'REGEX'
+	REGEX = 'REGEX',
+	NOT_REGEX = 'NOT_REGEX'
 }

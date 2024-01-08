@@ -61,7 +61,10 @@
 					) {
 						return false;
 					}
-					if (predicate.operation === Operation.REGEX) {
+					if (
+						predicate.operation === Operation.REGEX ||
+						predicate.operation === Operation.NOT_REGEX
+					) {
 						try {
 							new RegExp(String(predicate.value));
 						} catch (e) {
@@ -237,9 +240,7 @@
 					{sliceToEdit ? 'Update Slice' : 'Create Slice'}
 				</Button>
 			{/if}
-			<Button style="margin-right: 10px" variant="outlined" on:click={() => dispatch('close')}>
-				cancel
-			</Button>
+			<Button class="mr-4" variant="outlined" on:click={() => dispatch('close')}>cancel</Button>
 			{#if (!sliceToEdit && $slices.some((slice) => slice.sliceName === sliceName)) || (sliceToEdit && originalName !== sliceName && $slices.some((slice) => slice.sliceName === sliceName))}
 				<p style:margin-right="10px" style:color="red">slice already exists</p>
 			{/if}

@@ -28,13 +28,11 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content style="display: flex; align-items: center;">
+	<Content class="flex items-center">
 		<Textfield bind:value={organizationName} label="Organization Name" bind:this={input} />
-		<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}>
-			Cancel
-		</Button>
+		<Button class="ml-4" variant="outlined" on:click={() => dispatch('close')}>Cancel</Button>
 		<Button
-			style="margin-left: 5px;"
+			class="ml-2"
 			variant="outlined"
 			on:click={() =>
 				zenoClient

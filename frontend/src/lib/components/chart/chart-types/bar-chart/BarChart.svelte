@@ -1,10 +1,12 @@
 <script lang="ts">
-	import type { Chart, Metric, XCParameters, ZenoService } from '$lib/zenoapi';
+	import type { Chart, ChartConfig, Metric, XCParameters, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-bar';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: { table: Record<string, unknown> };
 	export let height = 400;
 	export let width: number;
@@ -43,6 +45,7 @@
 		},
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: getConfig(chartConfig)
 	}}
 />

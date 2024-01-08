@@ -1,10 +1,12 @@
 <script lang="ts">
-	import type { Chart, HeatmapParameters, Metric, ZenoService } from '$lib/zenoapi';
+	import type { Chart, ChartConfig, HeatmapParameters, Metric, ZenoService } from '$lib/zenoapi';
 	import { getContext } from 'svelte';
 	import { VegaLite, type VegaLiteSpec } from 'svelte-vega';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-heatmap';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: {
 		table: Array<{
 			x_value: string | number;
@@ -52,6 +54,7 @@
 		height: 700,
 		renderer: 'svg',
 		theme: 'vox',
-		downloadFileName: chart.name
+		downloadFileName: chart.name,
+		config: getConfig(chartConfig)
 	}}
 />

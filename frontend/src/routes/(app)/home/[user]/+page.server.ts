@@ -8,7 +8,7 @@ export async function load({ cookies, url, depends, parent }) {
 
 	const { cognitoUser } = await parent();
 	if (!cognitoUser) {
-		throw redirect(303, `/login?redirectto=${url.pathname}`);
+		redirect(303, `/login?redirectto=${url.pathname}`);
 	}
 
 	const zenoClient = await getClient(cookies, url);
@@ -21,7 +21,7 @@ export async function load({ cookies, url, depends, parent }) {
 			limit: 20
 		});
 	} catch (e) {
-		throw redirect(303, `/login?redirectto=${url.pathname}`);
+		redirect(303, `/login?redirectto=${url.pathname}`);
 	}
 
 	return {

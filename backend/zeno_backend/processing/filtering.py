@@ -87,7 +87,7 @@ async def filter_to_sql(
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail=f"Could not find column: {f.column.name} "
-                    "for model {f.column.model}.",
+                    f"for model {f.column.model}.",
                 )
             filt = (
                 filt
