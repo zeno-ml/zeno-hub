@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import ChartHomeBlock from '$lib/components/chart/ChartHomeBlock.svelte';
+	import ChartCard from '$lib/components/chart/ChartCard.svelte';
 	import ChartConfigPopup from '$lib/components/popups/ChartConfigPopup.svelte';
 	import { charts, project } from '$lib/stores';
 	import { chartDefaults } from '$lib/util/charts';
@@ -52,9 +52,9 @@
 		{/if}
 	</div>
 	<div class="mb-6 h-0.5 w-full rounded-full bg-grey-light" />
-	<div class="flex flex-wrap overflow-y-auto">
+	<div class="mb-4 grid h-full grid-cols-home content-start gap-5 overflow-y-auto">
 		{#each $charts.sort((a, b) => a.id - b.id) as chart}
-			<ChartHomeBlock {chart} />
+			<ChartCard {chart} />
 		{/each}
 	</div>
 </div>
