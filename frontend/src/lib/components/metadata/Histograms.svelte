@@ -137,9 +137,6 @@
 	{#each $columns
 		.filter((c) => (c.model === undefined || c.model === null || c.model === $model) && histogramColumnsBaseFilter(c))
 		.sort(reverseColumnSort) as col (col.id)}
-		{@const hist = metadataHistograms.get(col.id)}
-		{#if hist}
-			<MetadataCell {col} histogram={hist} />
-		{/if}
+		<MetadataCell {col} histogram={metadataHistograms.get(col.id)} />
 	{/each}
 {/if}

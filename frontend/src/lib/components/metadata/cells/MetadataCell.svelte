@@ -14,7 +14,7 @@
 	import TextMetadataCell from './metadata-cells/TextMetadataCell.svelte';
 
 	export let col: ZenoColumn;
-	export let histogram: HistogramBucket[];
+	export let histogram: HistogramBucket[] | undefined;
 
 	const columnMap = {
 		[MetadataType.NOMINAL]: NominalMetadataCell,
@@ -55,15 +55,13 @@
 	}
 </script>
 
-{#if histogram}
-	<div class="flex flex-col border-b border-grey-lighter pb-2 pt-2">
-		<div class="mb-2.5 ml-1 flex items-center justify-between text-grey-darker">
-			<div class="label top-text">
-				<span>
-					{col.name}
-				</span>
-			</div>
+<div class="flex flex-col border-b border-grey-lighter pb-2 pt-2">
+	<div class="mb-2.5 ml-1 flex items-center justify-between text-grey-darker">
+		<div class="label top-text">
+			{col.name}
 		</div>
+	</div>
+	{#if histogram}
 		<svelte:component
 			this={getChartType(col.dataType, histogram)}
 			filterPredicates={predicates}
@@ -71,5 +69,5 @@
 			{col}
 			{histogram}
 		/>
-	</div>
-{/if}
+	{/if}
+</div>
