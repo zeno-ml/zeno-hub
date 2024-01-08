@@ -7,6 +7,7 @@
 
 	export let chart: Chart;
 	export let chartConfig: ChartConfig;
+	export let preview: boolean;
 	export let data: { table: Record<string, unknown> };
 	export let width = 1000;
 	export let height = 400;
@@ -26,9 +27,9 @@
 		const params = chart.parameters as XCParameters;
 		const metric = mets.find((m) => m.id === params.metric);
 		if (metric) {
-			spec = generateSpec(params, metric.name, height, width);
+			spec = generateSpec(params, metric.name, height, width, preview);
 		} else {
-			spec = generateSpec(params, 'slice size', height, width);
+			spec = generateSpec(params, 'slice size', height, width, preview);
 		}
 	}
 </script>
@@ -37,7 +38,7 @@
 	{spec}
 	{data}
 	options={{
-		actions: { source: false, editor: false, compiled: false },
+		actions: preview ? false : { source: false, editor: false, compiled: false },
 		width: width,
 		height: height,
 		scaleFactor: {

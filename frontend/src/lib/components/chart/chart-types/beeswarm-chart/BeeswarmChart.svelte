@@ -16,6 +16,7 @@
 
 	export let chart: Chart;
 	export let chartConfig: ChartConfig;
+	export let preview: boolean;
 	export let data: {
 		table: Array<{
 			color_value: string | number;
@@ -86,53 +87,58 @@
 	}
 </script>
 
-{#each rows as row, i}
-	<div class="h-40 text-left">
-		<h4 class="relative mb-2.5 text-lg">
-			{parameters.fixedDimension === 'y'
-				? parameters.yChannel === SlicesOrModels.MODELS
-					? parameters.models[0]
-					: slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
-				: row}
-		</h4>
-		<Vega
-			spec={generateSpec(
-				parameters,
-				parameters.fixedDimension === 'y'
-					? row
-					: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
-				range,
-				i === 0,
-				width
-			)}
-			data={dataFilter(
-				data,
-				parameters.fixedDimension === 'y'
-					? row
-					: metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
-				parameters.colorChannel === SlicesOrModels.MODELS
-					? parameters.fixedDimension === 'y'
-						? slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
-						: row
-					: undefined,
-				parameters.colorChannel === SlicesOrModels.SLICES
-					? parameters.fixedDimension === 'y'
-						? parameters.models[0]
-						: row
-					: undefined
-			)}
-			options={{
-				actions: false,
-				width: width - 200,
-				height: 80,
-				scaleFactor: {
-					png: 3
-				},
-				renderer: 'svg',
-				theme: 'vox',
-				downloadFileName: chart.name,
-				config: getConfig(chartConfig)
-			}}
-		/>
-	</div>
-{/each}
+<div class="flex flex-col">
+	{#each rows as row, i}
+		<div class="flex {preview ? '' : 'h-40'} flex-col text-left">
+			{#if !preview}
+				<h4 class="relative mb-2.5 text-lg">
+					{parameters.fixedDimension === 'y'
+						? parameters.yChannel === SlicesOrModels.MODELS
+							? parameters.models[0]
+							: slices.find((sli) => sli.id === parameters.slices[0])?.sliceName
+						: row}
+				</h4>
+			{/if}
+			<Vega
+				spec={generateSpec(
+					parameters,
+					parameters.fixedDimension === 'y'
+						? row
+						: metrics.find((met) => met.id === parameters.metrics[0])?.name ?? '',
+					range,
+					i === 0,
+					width,
+					preview
+				)}
+				data={dataFilter(
+					data,
+					parameters.fixedDimension === 'y'
+						? row
+						: metrics.find((metric) => metric.id === parameters.metrics[0])?.name,
+					parameters.colorChannel === SlicesOrModels.MODELS
+						? parameters.fixedDimension === 'y'
+							? slices.find((slice) => slice.id === parameters.slices[0])?.sliceName ?? ''
+							: row
+						: undefined,
+					parameters.colorChannel === SlicesOrModels.SLICES
+						? parameters.fixedDimension === 'y'
+							? parameters.models[0]
+							: row
+						: undefined
+				)}
+				options={{
+					actions: false,
+					width: preview ? width : width - 200,
+					height: 80,
+					scaleFactor: {
+						png: 3
+					},
+					renderer: 'svg',
+					theme: 'vox',
+					downloadFileName: chart.name,
+					config: getConfig(chartConfig)
+				}}
+			/>
+		</div>
+	{/each}
+</div>

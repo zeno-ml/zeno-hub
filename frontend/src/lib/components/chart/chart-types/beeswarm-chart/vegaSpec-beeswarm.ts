@@ -6,7 +6,8 @@ export default function generateSpec(
 	xLabel: string,
 	domain: [number, number],
 	showLegend: boolean,
-	width: number
+	width: number,
+	preview: boolean
 ): VisualizationSpec {
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
@@ -62,25 +63,35 @@ export default function generateSpec(
 			}
 		],
 
-		axes: [
-			{
-				title: xLabel,
-				titlePadding: 10,
-				orient: 'bottom',
-				scale: 'xscale'
-			}
-		],
-
-		legends: showLegend
+		axes: preview
 			? [
 					{
-						type: 'symbol',
-						title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-						fill: 'color',
-						offset: 50
+						title: undefined,
+						orient: 'bottom',
+						scale: 'xscale',
+						labels: false
 					}
-				]
-			: [],
+			  ]
+			: [
+					{
+						title: xLabel,
+						titlePadding: 10,
+						orient: 'bottom',
+						scale: 'xscale'
+					}
+			  ],
+
+		legends:
+			showLegend && !preview
+				? [
+						{
+							type: 'symbol',
+							title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
+							fill: 'color',
+							offset: 50
+						}
+				  ]
+				: [],
 		marks: [
 			{
 				name: 'nodes',

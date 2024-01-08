@@ -14,6 +14,7 @@
 		mdiTable,
 		mdiViewGrid
 	} from '@mdi/js';
+	import { Icon } from '@smui/button';
 	import { getContext } from 'svelte';
 	import Spinner from '../general/Spinner.svelte';
 	import Confirm from '../popups/Confirm.svelte';
@@ -62,9 +63,9 @@
 	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
 	<div class="mt-2 flex h-9 w-full items-center px-3">
-		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 shrink-0 fill-black">
+		<Icon tag="svg" viewBox="0 0 24 24">
 			<path fill="black" d={iconMap[chart.type]} />
-		</svg>
+		</Icon>
 		<div class="flex pl-2" use:tooltip={{ text: chart.name }}>
 			<p class="line-clamp-1 text-xl text-black">
 				{chart.name}
@@ -85,34 +86,42 @@
 					showOptions = !showOptions;
 				}}
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6">
+				<Icon tag="svg" viewBox="0 0 24 24">
 					<path fill="black" d={mdiDotsHorizontal} />
-				</svg>
+				</Icon>
 			</button>
 			{#if showOptions}
 				<ChartOptions bind:showOptions bind:showDelete {chart} />
 			{/if}
 		</div>
 	</div>
-	{#await zenoClient.getChart(chart.id, $project.uuid)}
-		<Spinner width={24} height={24} />
-	{:then chart}
-		{#if chart.data}
-			<div
-				class="flex aspect-square w-full justify-center overflow-hidden text-center {chart.type !==
-				ChartType.TABLE
-					? 'items-center'
-					: ''}"
-				bind:clientWidth={width}
-			>
-				<svelte:component
-					this={chartMap[chart.type]}
-					{chart}
-					data={JSON.parse(chart.data)}
-					width={width - 70}
-					height={width - 70}
-				/>
-			</div>
-		{/if}
+	{#await zenoClient.getChartConfig(chart.projectUuid, chart.id) then chartConfig}
+		{#await zenoClient.getChartData($project.uuid, chart.id)}
+			<Spinner width={24} height={24} />
+		{:then chartData}
+			{#if chartData}
+				<div
+					class="flex aspect-square w-full justify-center overflow-hidden text-center {chart.type !==
+					ChartType.TABLE
+						? 'items-center'
+						: ''}"
+					bind:clientWidth={width}
+				>
+					<svelte:component
+						this={chartMap[chart.type]}
+						{chart}
+						{chartConfig}
+						preview={true}
+						data={JSON.parse(chartData)}
+						width={width - 70}
+						height={width - 70}
+					/>
+				</div>
+			{/if}
+		{/await}
+	{:catch error}
+		<p class="ml-4 mt-4 font-semibold text-error">
+			Chart config could not be loaded: {error.message}
+		</p>
 	{/await}
 </button>

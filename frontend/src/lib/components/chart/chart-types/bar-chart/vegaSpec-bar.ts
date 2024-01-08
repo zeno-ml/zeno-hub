@@ -5,7 +5,8 @@ export default function generateSpec(
 	parameters: XCParameters,
 	metricName: string,
 	height: number,
-	width: number
+	width: number,
+	preview: boolean
 ): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'system' : 'slice';
 	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
@@ -25,11 +26,13 @@ export default function generateSpec(
 				title: x_name,
 				field: 'x_value',
 				type: 'nominal',
-				axis: {
-					labelAngle: 45,
-					titlePadding: 10,
-					labelExpr: 'datum.label'
-				},
+				axis: preview
+					? false
+					: {
+							labelAngle: 45,
+							titlePadding: 10,
+							labelExpr: 'datum.label'
+					  },
 				sort: null
 			},
 			y: {
@@ -82,7 +85,8 @@ export default function generateSpec(
 			}
 		],
 		config: {
-			style: { label: { align: 'center', dy: -5 } }
+			style: { label: { align: 'center', dy: -5 } },
+			legend: preview ? { disable: true } : {}
 		}
 	};
 
