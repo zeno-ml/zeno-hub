@@ -47,7 +47,7 @@
 			</Fab>
 		{/if}
 	</div>
-	<div class="mt-4 flex h-full items-center md:ml-4 md:mt-0">
+	<div class="mt-4 hidden h-full items-center sm:flex md:ml-4 md:mt-0">
 		{#if loading}
 			<Spinner width={24} height={24} />
 		{/if}

@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import HomeCard from '$lib/components/home/HomeCard.svelte';
 	import HomeSearchBar from '$lib/components/home/HomeSearchBar.svelte';
 	import { inViewport } from '$lib/util/viewport';
-
 	import {
 		EntrySort,
 		EntryTypeFilter,
@@ -10,6 +10,7 @@
 		type ZenoService
 	} from '$lib/zenoapi/index.js';
 	import { getContext } from 'svelte';
+	import Device from 'svelte-device-info';
 
 	export let data;
 
@@ -20,6 +21,13 @@
 	let sort: EntrySort = EntrySort.POPULAR;
 	let entries: HomeEntry[] = data.entries;
 	let loading = false;
+
+	if (browser) {
+		if (Device.isMobile) {
+			typeFilter = EntryTypeFilter.REPORT;
+			updateEntries(searchText, typeFilter, sort);
+		}
+	}
 
 	function updateEntries(searchString: string, typeFilter: EntryTypeFilter, sort: EntrySort) {
 		loading = true;
