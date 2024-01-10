@@ -8,6 +8,8 @@ export default function generateSpec(
 ): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'system' : 'slice';
 	const y_name = parameters.yChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
+	const xAxis = preview ? false : { labelAngle: -20, orient: 'top', titlePadding: 10 };
+	const legend = preview ? { disable: true } : {};
 
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -32,13 +34,7 @@ export default function generateSpec(
 				title: x_name,
 				field: 'x_value',
 				type: 'ordinal',
-				axis: preview
-					? false
-					: {
-							labelAngle: -20,
-							orient: 'top',
-							titlePadding: 10
-					  },
+				axis: xAxis,
 				sort: null
 			},
 			y: {
@@ -116,7 +112,7 @@ export default function generateSpec(
 				strokeWidth: 0,
 				step: 70
 			},
-			legend: preview ? { disable: true } : {}
+			legend: legend
 		}
 	} as VegaLiteSpec;
 }

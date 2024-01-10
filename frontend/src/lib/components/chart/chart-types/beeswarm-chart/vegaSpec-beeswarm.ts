@@ -1,4 +1,5 @@
 import { SlicesOrModels, type BeeswarmParameters } from '$lib/zenoapi';
+import type { Legend } from 'vega';
 import type { VisualizationSpec } from 'vega-embed';
 
 export default function generateSpec(
@@ -9,6 +10,21 @@ export default function generateSpec(
 	width: number,
 	preview: boolean
 ): VisualizationSpec {
+	const axes = preview
+		? [{ title: undefined, orient: 'bottom', scale: 'xscale', labels: false }]
+		: [{ title: xLabel, titlePadding: 10, orient: 'bottom', scale: 'xscale' }];
+	let legends: Legend[] = [];
+	if (showLegend && preview) {
+		legends = [
+			{
+				type: 'symbol',
+				title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
+				fill: 'color',
+				offset: 50
+			}
+		];
+	}
+
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description:
@@ -62,36 +78,8 @@ export default function generateSpec(
 				range: { scheme: 'category20' }
 			}
 		],
-
-		axes: preview
-			? [
-					{
-						title: undefined,
-						orient: 'bottom',
-						scale: 'xscale',
-						labels: false
-					}
-			  ]
-			: [
-					{
-						title: xLabel,
-						titlePadding: 10,
-						orient: 'bottom',
-						scale: 'xscale'
-					}
-			  ],
-
-		legends:
-			showLegend && !preview
-				? [
-						{
-							type: 'symbol',
-							title: parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-							fill: 'color',
-							offset: 50
-						}
-				  ]
-				: [],
+		axes: axes,
+		legends: legends,
 		marks: [
 			{
 				name: 'nodes',

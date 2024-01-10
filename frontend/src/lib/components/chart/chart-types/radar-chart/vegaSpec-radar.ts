@@ -1,4 +1,5 @@
 import { SlicesOrModels, type RadarParameters } from '$lib/zenoapi';
+import type { Legend } from 'vega';
 import type { VisualizationSpec } from 'vega-embed';
 
 export default function generateSpec(
@@ -6,7 +7,16 @@ export default function generateSpec(
 	size: number,
 	preview: boolean
 ): VisualizationSpec {
-	const spec = {
+	let legend: Legend = {};
+	if (preview) {
+		legend = {
+			fill: 'color',
+			orient: 'none',
+			title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
+			encode: { legend: { update: { x: { value: -size / 2 }, y: { value: -size / 2 } } } }
+		};
+	}
+	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
 		description: 'A radar chart example, showing multiple dimensions in a radial layout.',
 		random_id: Date.now(), // used to force re-rendering of the chart
@@ -93,18 +103,7 @@ export default function generateSpec(
 				range: { scheme: 'category20' }
 			}
 		],
-		legends: preview
-			? []
-			: [
-					{
-						fill: 'color',
-						orient: 'none',
-						title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-						encode: {
-							legend: { update: { x: { value: -size / 2 }, y: { value: -size / 2 } } }
-						}
-					}
-			  ],
+		legends: [legend],
 		encode: {
 			enter: {
 				x: { signal: 'radius' },
@@ -223,7 +222,5 @@ export default function generateSpec(
 				}
 			}
 		]
-	};
-
-	return spec as VisualizationSpec;
+	} as VisualizationSpec;
 }
