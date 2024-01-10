@@ -105,7 +105,7 @@
 </script>
 
 <SelectionBar {currentResult} bind:selected />
-{#if compare && $metric && $model}
+{#if compare && $model}
 	{#if $comparisonModel !== undefined}
 		<ComparisonView {modelAResult} {modelBResult} />
 	{/if}
