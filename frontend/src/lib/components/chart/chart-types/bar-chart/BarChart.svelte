@@ -17,6 +17,8 @@
 	let metrics: Metric[] = [];
 	zenoClient.getMetrics(chart.projectUuid).then((m) => (metrics = m));
 
+	console.log(data);
+
 	$: {
 		data;
 		updateChart(metrics);
