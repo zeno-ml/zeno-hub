@@ -5,10 +5,13 @@ export default function generateSpec(
 	parameters: XCParameters,
 	metricName: string,
 	width: number,
-	height: number
+	height: number,
+	preview: boolean
 ): VegaLiteSpec {
 	const x_name = parameters.xChannel === SlicesOrModels.MODELS ? 'system' : 'slice';
 	const color_name = parameters.colorChannel === SlicesOrModels.SLICES ? 'slice' : 'system';
+	const legend = preview ? { disable: true } : {};
+	const xAxis = preview ? false : { labelAngle: 45, titlePadding: 10 };
 
 	return {
 		$schema: 'https://vega.github.io/schema/vega-lite/v5.json',
@@ -17,7 +20,7 @@ export default function generateSpec(
 		width: width,
 		height: height,
 		autosize: 'fit',
-		padding: { top: 20 },
+		padding: { top: 20, right: 10 },
 		data: {
 			name: 'table'
 		},
@@ -26,10 +29,7 @@ export default function generateSpec(
 				title: x_name,
 				field: 'x_value',
 				type: 'nominal',
-				axis: {
-					labelAngle: 45,
-					titlePadding: 10
-				},
+				axis: xAxis,
 				sort: null
 			},
 			y: {
@@ -110,7 +110,8 @@ export default function generateSpec(
 			}
 		],
 		config: {
-			style: { label: { dy: -13, dx: -2 } }
+			style: { label: { dy: -13, dx: -2 } },
+			legend: legend
 		}
 	} as VegaLiteSpec;
 }

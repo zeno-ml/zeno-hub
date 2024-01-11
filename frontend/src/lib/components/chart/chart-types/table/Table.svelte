@@ -15,6 +15,7 @@
 	import TableRow from './TableRow.svelte';
 
 	export let chart: Chart;
+	export let preview: boolean;
 	export let data: {
 		table: Array<{
 			x_value: string | number;
@@ -168,9 +169,11 @@
 		</Body>
 	</DataTable>
 </div>
-<button
-	on:click={saveCSV}
-	class="ml-auto rounded border border-primary-dark px-2 py-0.5 text-primary transition hover:bg-primary-mid"
->
-	Download CSV
-</button>
+{#if !preview}
+	<button
+		on:click={saveCSV}
+		class="ml-auto rounded border border-primary-dark px-2 py-0.5 text-primary transition hover:bg-primary-mid"
+	>
+		Download CSV
+	</button>
+{/if}

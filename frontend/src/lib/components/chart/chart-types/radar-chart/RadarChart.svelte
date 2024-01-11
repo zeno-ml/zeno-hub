@@ -6,6 +6,7 @@
 
 	export let chart: Chart;
 	export let chartConfig: ChartConfig;
+	export let preview: boolean;
 	export let data: {
 		table: Array<{
 			axis_value: string | number;
@@ -27,7 +28,11 @@
 	}
 
 	function updateSpec() {
-		spec = generateSpec(chart.parameters as RadarParameters, Math.min(width, height)) as VegaSpec;
+		spec = generateSpec(
+			chart.parameters as RadarParameters,
+			Math.min(width, height),
+			preview
+		) as VegaSpec;
 	}
 </script>
 
@@ -35,7 +40,7 @@
 	{spec}
 	{data}
 	options={{
-		actions: { source: false, editor: false, compiled: false },
+		actions: preview ? false : { source: false, editor: false, compiled: false },
 		width: Math.min(width, height),
 		height: Math.min(width, height),
 		scaleFactor: {

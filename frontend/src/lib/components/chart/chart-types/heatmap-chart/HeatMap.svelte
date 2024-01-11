@@ -7,6 +7,7 @@
 
 	export let chart: Chart;
 	export let chartConfig: ChartConfig;
+	export let preview: boolean;
 	export let data: {
 		table: Array<{
 			x_value: string | number;
@@ -32,9 +33,9 @@
 	function updateSpec() {
 		const metric = metrics.find((m) => m.id === parameters.metric);
 		if (metric) {
-			spec = generateSpec(parameters, metric.name);
+			spec = generateSpec(parameters, metric.name, preview);
 		} else {
-			spec = generateSpec(parameters, 'slice size');
+			spec = generateSpec(parameters, 'slice size', preview);
 		}
 	}
 </script>
@@ -46,7 +47,7 @@
 	{spec}
 	{data}
 	options={{
-		actions: { source: false, editor: false, compiled: false },
+		actions: preview ? false : { source: false, editor: false, compiled: false },
 		scaleFactor: {
 			png: 3
 		},

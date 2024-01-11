@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install modules
-        run: cd frontend && npm i
+        run: cd frontend && npm ci
       - name: version
         run: cd frontend && npx prettier --version
       - name: linting
@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install modules
-        run: cd frontend && npm i
+        run: cd frontend && npm ci
       - name: Svelte check
         run: cd frontend && npm run check
 
