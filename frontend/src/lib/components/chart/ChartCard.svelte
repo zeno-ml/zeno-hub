@@ -63,14 +63,14 @@
 	class="flex h-full w-full flex-col rounded-md border border-solid border-grey-light bg-white hover:shadow-sm"
 >
 	<div class="mt-2 flex h-9 w-full items-center px-3">
-		<Icon tag="svg" viewBox="0 0 24 24">
-			<path fill="black" d={iconMap[chart.type]} />
-		</Icon>
-		<div class="flex pl-2" use:tooltip={{ text: chart.name }}>
-			<p class="line-clamp-1 text-xl text-black">
-				{chart.name}
-			</p>
+		<div class="mr-3 w-[24px] flex-shrink-0">
+			<Icon tag="svg" viewBox="0 0 24 24">
+				<path fill="black" d={iconMap[chart.type]} />
+			</Icon>
 		</div>
+		<p class="w-full truncate text-left text-xl text-black" use:tooltip={{ text: chart.name }}>
+			{chart.name}
+		</p>
 		<div
 			class="relative ml-auto mt-1"
 			use:clickOutside={() => {
@@ -101,7 +101,7 @@
 		{:then chartData}
 			{#if chartData}
 				<div
-					class="flex aspect-square w-full justify-center overflow-hidden text-center {chart.type !==
+					class="pointer-events-none flex aspect-square w-full justify-center overflow-hidden text-center {chart.type !==
 					ChartType.TABLE
 						? 'items-center'
 						: ''}"

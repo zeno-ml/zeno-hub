@@ -7,14 +7,16 @@ export default function generateSpec(
 	size: number,
 	preview: boolean
 ): VisualizationSpec {
-	let legend: Legend = {};
-	if (preview) {
-		legend = {
-			fill: 'color',
-			orient: 'none',
-			title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
-			encode: { legend: { update: { x: { value: -size / 2 }, y: { value: -size / 2 } } } }
-		};
+	let legends: Legend[] = [];
+	if (!preview) {
+		legends = [
+			{
+				fill: 'color',
+				orient: 'none',
+				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
+				encode: { legend: { update: { x: { value: -size / 2 }, y: { value: -size / 2 } } } }
+			}
+		];
 	}
 	return {
 		$schema: 'https://vega.github.io/schema/vega/v5.json',
@@ -103,7 +105,7 @@ export default function generateSpec(
 				range: { scheme: 'category20' }
 			}
 		],
-		legends: [legend],
+		legends: legends,
 		encode: {
 			enter: {
 				x: { signal: 'radius' },

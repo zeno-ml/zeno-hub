@@ -14,7 +14,7 @@ export default function generateSpec(
 		? [{ title: undefined, orient: 'bottom', scale: 'xscale', labels: false }]
 		: [{ title: xLabel, titlePadding: 10, orient: 'bottom', scale: 'xscale' }];
 	let legends: Legend[] = [];
-	if (showLegend && preview) {
+	if (showLegend && !preview) {
 		legends = [
 			{
 				type: 'symbol',
