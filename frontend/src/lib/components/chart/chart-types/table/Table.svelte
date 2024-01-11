@@ -170,7 +170,7 @@
 </div>
 <button
 	on:click={saveCSV}
-	class="ml-auto rounded border border-primary-dark px-2 py-0.5 text-primary transition hover:bg-primary-mid"
+	class="mr-auto rounded border border-primary-dark px-2 py-0.5 text-primary opacity-40 transition-all hover:opacity-100"
 >
 	Download CSV
 </button>

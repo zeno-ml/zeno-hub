@@ -14,6 +14,8 @@ from zeno_backend.classes.metadata import HistogramBucket, StringFilterRequest
 from zeno_backend.classes.metric import Metric
 from zeno_backend.classes.project import (
     Project,
+    ProjectHomeElement,
+    ProjectHomeElementType,
     ProjectState,
     ProjectStats,
 )
@@ -859,6 +861,29 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
     )
 
 
+async def project_home_chart_ids(project_uuid: str) -> list[int]:
+    """Get all chart IDs for a project's home view.
+
+    Args:
+        project_uuid (str): the UUID of the project.
+
+    Returns:
+        list[int]: the list of chart IDs.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT data FROM project_home_elements WHERE project_uuid = %s "
+                "AND type = %s;",
+                [project_uuid, ProjectHomeElementType.CHART],
+            )
+            chart_results = await cur.fetchall()
+    if len(chart_results) == 0:
+        return []
+
+    return [r[0] for r in chart_results]
+
+
 async def tags_for_projects(project_uuids: list[str]) -> list[Tag]:
     """Get all tags for a list of projects.
 
@@ -984,6 +1009,38 @@ async def project_from_uuid(project_uuid: str) -> Project:
                     status.HTTP_500_INTERNAL_SERVER_ERROR,
                     "ERROR: Could not load project owner.",
                 )
+
+
+async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement]:
+    """Get the project data given a UUID.
+
+    Args:
+        project_uuid (str): the uuid of the project for which to fetch home elements.
+
+    Returns:
+        list[ProjectHomeElement]: Elements of the project's home view.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT id, type, data, x, y, width, height "
+                "FROM project_home_elements WHERE project_uuid = %s;",
+                [project_uuid],
+            )
+            project_home_elements_result = await cur.fetchall()
+
+    return [
+        ProjectHomeElement(
+            id=element[0],
+            type=element[1],
+            data=element[2],
+            x=element[3],
+            y=element[4],
+            width=element[5],
+            height=element[6],
+        )
+        for element in project_home_elements_result
+    ]
 
 
 async def report_from_id(report_id: int) -> Report:
@@ -1894,10 +1951,17 @@ async def table_data_paginated(
                 if sort == "":
                     sort = "diff"
 
-                order_sql = sql.SQL("ORDER BY {} {}").format(
-                    sql.Identifier(sort),
-                    sql.SQL("DESC" if req.sort[1] else "ASC"),
-                )
+                if req.sort[0].data_type == MetadataType.NOMINAL:
+                    order_sql = sql.SQL("ORDER BY {} COLLATE numeric {}").format(
+                        sql.Identifier(sort),
+                        sql.SQL("ASC" if req.sort[1] else "DESC"),
+                    )
+                else:
+                    order_sql = sql.SQL("ORDER BY {} {}").format(
+                        sql.Identifier(sort),
+                        sql.SQL("ASC" if req.sort[1] else "DESC"),
+                    )
+
             else:
                 await cur.execute(
                     sql.SQL("SELECT column_id FROM {} WHERE type = 'ID';").format(

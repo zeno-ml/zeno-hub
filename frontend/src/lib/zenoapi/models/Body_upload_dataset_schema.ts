@@ -2,7 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 export type Body_upload_dataset_schema = {
 	project_uuid: any;
 	id_column: any;

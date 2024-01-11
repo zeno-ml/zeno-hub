@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MetadataType } from './MetadataType';
 import type { ZenoColumnType } from './ZenoColumnType';
-
 /**
  * Representation of a column in a Zeno project.
  *

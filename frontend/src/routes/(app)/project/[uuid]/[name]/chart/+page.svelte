@@ -54,7 +54,7 @@
 	<div class="mb-6 h-0.5 w-full rounded-full bg-grey-light" />
 	<div class="flex flex-wrap overflow-y-auto">
 		{#each $charts.sort((a, b) => a.id - b.id) as chart}
-			<ChartHomeBlock {chart} />
+			<ChartHomeBlock {chart} deletable={!data.homeChartIds.includes(chart.id)} />
 		{/each}
 	</div>
 </div>

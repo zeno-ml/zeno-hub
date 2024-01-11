@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { SlicesOrModels } from './SlicesOrModels';
-
 /**
  * Parameter specification for the x and color channels of a chart.
  *

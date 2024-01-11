@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { SlicesMetricsOrModels } from './SlicesMetricsOrModels';
 import type { SlicesOrModels } from './SlicesOrModels';
-
 /**
  * Parameter specification for a radar chart.
  *

@@ -17,8 +17,11 @@ export async function load({ params, depends, cookies, url }) {
 		error(err.status as NumericRange<400, 599>, err.body.detail);
 	}
 
+	const homeChartIds = await zenoClient.projectHomeChartIds(params.uuid);
+
 	return {
 		charts: charts,
+		homeChartIds: homeChartIds,
 		chartConfig
 	};
 }

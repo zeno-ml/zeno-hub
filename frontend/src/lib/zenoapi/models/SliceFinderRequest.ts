@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FilterPredicateGroup } from './FilterPredicateGroup';
 import type { ZenoColumn } from './ZenoColumn';
-
 /**
  * Specification of a request to the slice finder functionality.
  *

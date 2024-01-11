@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Slice } from './Slice';
-
 /**
  * Specification of metric keys in zeno.
  *

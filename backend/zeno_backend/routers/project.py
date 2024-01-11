@@ -10,10 +10,12 @@ import zeno_backend.database.delete as delete
 import zeno_backend.database.insert as insert
 import zeno_backend.database.select as select
 import zeno_backend.database.update as update
+import zeno_backend.processing.project_home as project_home
 import zeno_backend.util as util
 from zeno_backend.classes.project import (
     Project,
     ProjectCopy,
+    ProjectHomeElement,
     ProjectState,
 )
 from zeno_backend.classes.user import Organization, User
@@ -57,6 +59,28 @@ async def get_project_state(
     project = await select.project_from_uuid(project_uuid)
     user = await util.get_user_from_token(request)
     return await select.project_state(project_uuid, user, project)
+
+
+@router.get(
+    "/project-home-elements/{project_uuid}",
+    response_model=list[ProjectHomeElement],
+    tags=["zeno"],
+)
+async def get_project_home_elements(project_uuid: str, request: Request):
+    """Get all elements on a project's home page.
+
+    Args:
+        project_uuid (str): id of the project for which to fetch elements.
+        request (Request): http request to get user information from.
+
+    Returns:
+        list[ProjectHomeElement]: all elements on the project's home page.
+    """
+    await util.project_access_valid(project_uuid, request)
+    elements = await select.project_home_elements(project_uuid)
+    if len(elements) == 0:
+        elements = await project_home.create_project_home(project_uuid)
+    return elements
 
 
 @router.get(

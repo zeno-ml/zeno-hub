@@ -23,7 +23,7 @@ from zeno_backend.classes.filter import (
     Operation,
     PredicatesEncoder,
 )
-from zeno_backend.classes.project import Project
+from zeno_backend.classes.project import Project, ProjectHomeElement
 from zeno_backend.classes.report import ReportElement
 from zeno_backend.classes.slice import Slice
 from zeno_backend.classes.tag import Tag
@@ -119,6 +119,37 @@ async def project(project_config: Project, owner_id: int):
                 )
 
             await conn.commit()
+
+
+async def project_home_element(project_uuid: str, element: ProjectHomeElement):
+    """Add a project home element to the database.
+
+    Args:
+        project_uuid (str): the uuid of the project to add the element to.
+        element (ProjectHomeElement): the element to add to the project.
+
+    Returns:
+        int | None: the id of the newly created report element.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "INSERT INTO project_home_elements (project_uuid, type, data, x, "
+                "y, width, height)"
+                " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id;",
+                [
+                    project_uuid,
+                    element.type,
+                    element.data,
+                    element.x,
+                    element.y,
+                    element.width,
+                    element.height,
+                ],
+            )
+            id = await cur.fetchall()
+            if len(id) > 0:
+                return id[0][0]
 
 
 async def dataset_schema(

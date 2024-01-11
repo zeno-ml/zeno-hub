@@ -1,4 +1,5 @@
 """Types for Zeno projects."""
+from enum import Enum
 
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 from zeno_backend.classes.folder import Folder
@@ -36,6 +37,39 @@ class Project(CamelModel):
     public: bool | None = False
     created_at: str = ""
     updated_at: str = ""
+
+
+class ProjectHomeElementType(Enum):
+    """Enumeration of possible elements on a project's home in Zeno.
+
+    Attributes:
+        CHART: chart element for a report.
+    """
+
+    CHART = "CHART"
+    LIST = "LIST"
+
+
+class ProjectHomeElement(CamelModel):
+    """Representation of an element on a project's home in Zeno.
+
+    Attributes:
+        id (int): ID of the project home element.
+        type (ReportElementType): what type of element this represents.
+        data (str | None): any data that the element holds.
+        x (int): x position of the element.
+        y (int): y position of the element.
+        width (int): width of the element.
+        height (int): height of the element.
+    """
+
+    id: int | None = None
+    type: ProjectHomeElementType
+    data: str | None = None
+    x: int
+    y: int
+    width: int
+    height: int
 
 
 class ProjectStats(CamelModel):

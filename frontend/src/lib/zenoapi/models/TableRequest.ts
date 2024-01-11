@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FilterPredicateGroup } from './FilterPredicateGroup';
 import type { ZenoColumn } from './ZenoColumn';
-
 /**
  * A request specification for table data.
  *

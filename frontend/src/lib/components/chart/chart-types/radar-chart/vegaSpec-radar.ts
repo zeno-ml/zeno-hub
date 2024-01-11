@@ -94,6 +94,7 @@ export default function generateSpec(parameters: RadarParameters, size: number):
 				fill: 'color',
 				orient: 'none',
 				title: parameters.layerChannel === SlicesOrModels.SLICES ? 'slice' : 'system',
+				direction: 'horizontal',
 				encode: {
 					legend: { update: { x: { value: -size / 2 }, y: { value: -size / 2 } } }
 				}

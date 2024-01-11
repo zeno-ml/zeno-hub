@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { collapseHeader, models, project } from '$lib/stores';
+	import { collapseHeader, metrics, models, project } from '$lib/stores';
 	import { getProjectRouteFromURL } from '$lib/util/util';
 	import {
 		mdiArrowCollapseLeft,
 		mdiArrowCollapseRight,
 		mdiChartBoxOutline,
 		mdiCompare,
-		mdiCompassOutline
+		mdiCompassOutline,
+		mdiHomeOutline
 	} from '@mdi/js';
 	import HeaderIcon from '../general/HeaderIcon.svelte';
 
@@ -20,30 +21,36 @@
 		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish-light text-grey"
 	>
 		<div class="flex flex-col items-center justify-center">
-			{#if $page.url.href.includes('project/')}
-				<div class="flex flex-col">
+			<div class="mt-3 flex flex-col">
+				{#if $models.length > 0 && $metrics.length > 0}
 					<HeaderIcon
-						pageName={'explore'}
-						tooltipContent={'Explore your data and system outputs'}
-						icon={mdiCompassOutline}
+						pageName={'home'}
+						tooltipContent={'Summary landing page'}
+						icon={mdiHomeOutline}
 						on:click={() => goto(getProjectRouteFromURL($page.url))}
 					/>
-					{#if $models.length > 1 && $project.view !== ''}
-						<HeaderIcon
-							pageName={'compare'}
-							tooltipContent={'Qualitatively compare system outputs'}
-							icon={mdiCompare}
-							on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
-						/>
-					{/if}
+				{/if}
+				<HeaderIcon
+					pageName={'explore'}
+					tooltipContent={'Explore your data and system outputs'}
+					icon={mdiCompassOutline}
+					on:click={() => goto(`${getProjectRouteFromURL($page.url)}/explore`)}
+				/>
+				{#if $models.length > 1 && $project.view !== ''}
 					<HeaderIcon
-						pageName={'chart'}
-						tooltipContent={'Create charts from your slices and metrics'}
-						icon={mdiChartBoxOutline}
-						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
+						pageName={'compare'}
+						tooltipContent={'Qualitatively compare system outputs'}
+						icon={mdiCompare}
+						on:click={() => goto(`${getProjectRouteFromURL($page.url)}/compare`)}
 					/>
-				</div>
-			{/if}
+				{/if}
+				<HeaderIcon
+					pageName={'chart'}
+					tooltipContent={'Create charts from your slices and metrics'}
+					icon={mdiChartBoxOutline}
+					on:click={() => goto(`${getProjectRouteFromURL($page.url)}/chart`)}
+				/>
+			</div>
 		</div>
 		<div class="flex h-full items-center">
 			{#if currentTab?.includes('explore') || currentTab?.includes('compare')}

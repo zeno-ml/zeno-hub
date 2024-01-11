@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Tag } from './Tag';
-
 /**
  * Specification of TagMetricKeys in Zeno.
  *
