@@ -36,7 +36,7 @@
 				{/if}
 			</div>
 
-			<div class="ml-auto mr-10">
+			<div class="ml-auto mr-10 hidden sm:block">
 				<svg
 					width="300"
 					height="150"

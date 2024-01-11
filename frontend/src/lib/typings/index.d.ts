@@ -2,3 +2,4 @@
 declare module '@svelte-plugins/tooltips';
 declare module 'svelecte';
 declare module 'simple-svelte-autocomplete';
+declare module 'svelte-device-info';
