@@ -54,7 +54,7 @@
 >
 	<div class="flex w-full items-center justify-between">
 		<div class="mr-3 min-w-[24px]">
-			<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+			<Icon tag="svg" viewBox="0 0 24 24">
 				<path fill="black" d={iconMap[chart.type]} />
 			</Icon>
 		</div>

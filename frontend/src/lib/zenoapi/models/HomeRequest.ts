@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { EntrySort } from './EntrySort';
 import type { EntryTypeFilter } from './EntryTypeFilter';
-
 /**
  * Request for homepage entries.
  *

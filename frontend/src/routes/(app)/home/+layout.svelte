@@ -6,7 +6,7 @@
 	export let data;
 	export let showNewReport = false;
 
-	let isExplore = $page.route.id === '/(app)/home';
+	$: isExplore = $page.route.id === '/(app)/home';
 </script>
 
 {#if showNewReport && data.user !== null}

@@ -6,6 +6,6 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const username = data.get('username') as string;
 		sendPasswordResetCode(username);
-		throw redirect(303, `/forgot/${username}`);
+		redirect(303, `/forgot/${username}`);
 	}
 };

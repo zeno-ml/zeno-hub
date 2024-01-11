@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { SlicesOrModels } from './SlicesOrModels';
-
 /**
  * Parameter specirication for a heatmap chart.
  *

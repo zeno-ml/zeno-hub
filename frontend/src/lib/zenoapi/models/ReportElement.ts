@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { ReportElementType } from './ReportElementType';
-
 /**
  * Representation of an element of a Zeno report.
  *

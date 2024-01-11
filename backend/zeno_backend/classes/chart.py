@@ -25,6 +25,28 @@ class ChartType(str, Enum):
     HEATMAP = "HEATMAP"
 
 
+class ChartConfig(CamelModel):
+    """Configuration for a project's charts."""
+
+    project_uuid: str
+    font_size: int = 16
+
+
+class ConfigEncoder(json.JSONEncoder):
+    """JSON encoder for chart configurations."""
+
+    def default(self, o: ChartConfig):
+        """Convert chart a config into JSON to be saved in the database.
+
+        Args:
+            o (ChartConfig): chart config to be converted.
+
+        Returns:
+            object: a dict to be encoded by a JSON encoder and saved into the database.
+        """
+        return o.__dict__
+
+
 class SlicesOrModels(str, Enum):
     """Choice of chart encoding types between slices and models.
 
@@ -159,7 +181,6 @@ class Chart(CamelModel):
         type (ChartType): the type of the chart.
         parameters (XCParameters | TableParameters | BeeswarmParameters |
             RadarParameters | HeatmapParameters): the parameters of the chart.
-        data (str): the JSON string data of the chart.
     """
 
     id: int
@@ -173,7 +194,6 @@ class Chart(CamelModel):
         | RadarParameters
         | HeatmapParameters
     )
-    data: str | None = None
 
 
 class ParametersEncoder(json.JSONEncoder):

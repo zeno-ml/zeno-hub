@@ -52,11 +52,11 @@
 			tableRecord[cell.x_value] === undefined
 				? (tableRecord[cell.x_value] = {
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-				  })
+					})
 				: (tableRecord[cell.x_value] = {
 						...tableRecord[cell.x_value],
 						[cell.y_value]: { fixedValue: cell.fixed_value, size: cell.size }
-				  });
+					});
 		});
 	}
 	$: {
@@ -170,7 +170,7 @@
 </div>
 <button
 	on:click={saveCSV}
-	class="mr-auto rounded border border-primary-dark px-2 py-0.5 text-primary opacity-40 transition transition-all hover:opacity-100"
+	class="mr-auto rounded border border-primary-dark px-2 py-0.5 text-primary opacity-40 transition-all hover:opacity-100"
 >
 	Download CSV
 </button>

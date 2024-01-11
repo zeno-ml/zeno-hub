@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { ProjectHomeElementType } from './ProjectHomeElementType';
-
 /**
  * Representation of an element on a project's home in Zeno.
  *

@@ -2,14 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Folder } from './Folder';
 import type { Metric } from './Metric';
 import type { Project } from './Project';
 import type { Slice } from './Slice';
 import type { Tag } from './Tag';
 import type { ZenoColumn } from './ZenoColumn';
-
 /**
  * State variables for a Zeno project.
  *

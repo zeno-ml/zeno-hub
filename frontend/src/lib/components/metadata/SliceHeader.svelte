@@ -42,7 +42,7 @@
 				text: 'Slices are named combinations of filters'
 			}}
 		>
-			<Icon style="outline:none" tag="svg" viewBox="-6 -6 36 36">
+			<Icon tag="svg" viewBox="-6 -6 36 36">
 				<path d={mdiInformationOutline} />
 			</Icon>
 		</div>

@@ -15,7 +15,7 @@
 	aria-label={pageName}
 >
 	<div class="h-6 w-6 fill-grey">
-		<Icon style="outline:none" tag="svg" viewBox="0 0 24 24">
+		<Icon tag="svg" viewBox="0 0 24 24">
 			<path
 				class={`${
 					$page.url.href.includes(pageName) ||

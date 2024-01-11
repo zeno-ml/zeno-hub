@@ -1,10 +1,11 @@
 <script lang="ts">
-	import type { Chart, RadarParameters } from '$lib/zenoapi';
+	import type { Chart, ChartConfig, RadarParameters } from '$lib/zenoapi';
 	import { Vega, type VegaSpec } from 'svelte-vega';
-	import { config } from '../../config';
+	import { getConfig } from '../../config';
 	import generateSpec from './vegaSpec-radar';
 
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 	export let data: {
 		table: Array<{
 			axis_value: string | number;
@@ -43,6 +44,6 @@
 		renderer: 'svg',
 		theme: 'vox',
 		downloadFileName: chart.name,
-		config: config
+		config: getConfig(chartConfig)
 	}}
 />

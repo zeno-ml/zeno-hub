@@ -1,6 +1,6 @@
 import { getClientAndUser } from '$lib/api/client';
 import type { ApiError, ReportResponse } from '$lib/zenoapi';
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, type NumericRange } from '@sveltejs/kit';
 
 export async function load({ cookies, params, url, depends }) {
 	depends('app:report');
@@ -13,9 +13,9 @@ export async function load({ cookies, params, url, depends }) {
 	} catch (e: unknown) {
 		if ((e as ApiError).status === 401) {
 			if (cognitoUser !== null) {
-				throw redirect(303, `/auth`);
+				redirect(303, `/auth`);
 			} else {
-				throw redirect(303, `/login?redirectTo=${url.pathname}`);
+				redirect(303, `/login?redirectTo=${url.pathname}`);
 			}
 		} else {
 			// try to route using owner/report_name for legacy reports.
@@ -26,9 +26,9 @@ export async function load({ cookies, params, url, depends }) {
 				);
 			} catch (e: unknown) {
 				const err = e as ApiError;
-				throw error(err.status, err.body.detail);
+				error(err.status as NumericRange<400, 599>, err.body.detail);
 			}
-			throw redirect(
+			redirect(
 				301,
 				`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
 			);
@@ -45,7 +45,7 @@ export async function load({ cookies, params, url, depends }) {
 	]);
 
 	if (reportResponse.report.name !== decodeURI(params.name)) {
-		throw redirect(
+		redirect(
 			301,
 			`/report/${reportResponse.report.id}/${encodeURIComponent(reportResponse.report.name)}`
 		);

@@ -2,11 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { FilterPredicateGroup } from './FilterPredicateGroup';
 import type { Metric } from './Metric';
 import type { ZenoColumn } from './ZenoColumn';
-
 /**
  * Specification of a histogram request in Zeno.
  *

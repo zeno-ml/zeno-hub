@@ -2,10 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Operation } from './Operation';
 import type { ZenoColumn } from './ZenoColumn';
-
 /**
  * Specification of a string filter request in Zeno.
  *

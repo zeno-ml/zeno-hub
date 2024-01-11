@@ -1,11 +1,13 @@
 <script lang="ts">
-	import type { Chart } from '$lib/zenoapi';
+	import type { Chart, ChartConfig } from '$lib/zenoapi';
 	import Button, { Label } from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import HomeButton from './HomeButton.svelte';
+	import SettingsButton from './SettingsButton.svelte';
 
 	export let isChartEdit: boolean;
 	export let chart: Chart;
+	export let chartConfig: ChartConfig;
 
 	let title = chart.name;
 
@@ -32,8 +34,7 @@
 		>
 			<Label>{isChartEdit ? 'View' : 'Edit'}</Label>
 		</Button>
+		<SettingsButton bind:chartConfig {chart}></SettingsButton>
 	</div>
-	<div>
-		<Textfield variant="outlined" label="Chart Name" bind:value={title} />
-	</div>
+	<Textfield variant="outlined" label="Chart Name" bind:value={title} />
 </div>

@@ -2,14 +2,12 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { BeeswarmParameters } from './BeeswarmParameters';
 import type { ChartType } from './ChartType';
 import type { HeatmapParameters } from './HeatmapParameters';
 import type { RadarParameters } from './RadarParameters';
 import type { TableParameters } from './TableParameters';
 import type { XCParameters } from './XCParameters';
-
 /**
  * Generic chart specification with parameters for specific chart types.
  *
@@ -20,7 +18,6 @@ import type { XCParameters } from './XCParameters';
  * type (ChartType): the type of the chart.
  * parameters (XCParameters | TableParameters | BeeswarmParameters |
  * RadarParameters | HeatmapParameters): the parameters of the chart.
- * data (str): the JSON string data of the chart.
  */
 export type Chart = {
 	id: number;
@@ -33,5 +30,4 @@ export type Chart = {
 		| BeeswarmParameters
 		| RadarParameters
 		| HeatmapParameters;
-	data?: string | null;
 };

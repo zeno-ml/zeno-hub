@@ -12,7 +12,7 @@ export async function load({ cookies, url, depends }) {
 	try {
 		homeResponse = await zenoClient.getHomeDetails({ limit: 20 });
 	} catch (e) {
-		throw redirect(303, `/login?redirectto=${url.pathname}`);
+		redirect(303, `/login?redirectto=${url.pathname}`);
 	}
 
 	return {

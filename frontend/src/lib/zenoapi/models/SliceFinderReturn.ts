@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Slice } from './Slice';
-
 /**
  * Specification of the return type of a slice finder request.
  *

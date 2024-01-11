@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { MetricKey } from './MetricKey';
-
 /**
  * Specification of a metric request in Zeno.
  *

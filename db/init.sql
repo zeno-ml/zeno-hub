@@ -155,3 +155,10 @@ CREATE TABLE project_like (
     project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE chart_config (
+    id integer GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    project_uuid text NOT NULL REFERENCES projects(uuid) ON DELETE CASCADE ON UPDATE CASCADE,
+    chart_id integer REFERENCES charts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    config jsonb NOT NULL
+)

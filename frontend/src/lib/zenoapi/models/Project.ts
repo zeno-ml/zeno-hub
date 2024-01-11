@@ -2,9 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { Metric } from './Metric';
-
 /**
  * Projects with datasets & models.
  *
@@ -25,13 +23,13 @@ import type { Metric } from './Metric';
 export type Project = {
 	uuid: string;
 	name: string;
-	description?: string;
+	description?: string | null;
 	metrics?: Array<Metric>;
 	ownerName: string;
 	view: string;
-	editor: boolean;
-	samplesPerPage?: number;
-	public?: boolean;
+	editor?: boolean;
+	samplesPerPage?: number | null;
+	public?: boolean | null;
 	createdAt?: string;
 	updatedAt?: string;
 };

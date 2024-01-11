@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from psycopg import sql
 
 from zeno_backend.classes.base import MetadataType, ZenoColumn, ZenoColumnType
-from zeno_backend.classes.chart import Chart
+from zeno_backend.classes.chart import Chart, ChartConfig
 from zeno_backend.classes.filter import FilterPredicateGroup, Join, Operation
 from zeno_backend.classes.folder import Folder
 from zeno_backend.classes.homepage import EntrySort, HomeRequest
@@ -854,7 +854,6 @@ async def charts_for_projects(project_uuids: list[str]) -> list[Chart]:
                 name=r[1],
                 type=r[2],
                 parameters=json.loads(r[3]),
-                data=json.dumps(r[4]) if r[4] is not None else None,
                 project_uuid=r[5],
             ),
             chart_results,
@@ -1733,7 +1732,7 @@ async def chart(chart_id: int) -> Chart:
         chart_id (int): the ID of the chart to be fetched.
 
     Returns:
-        Chart | None: the requested chart.
+        Chart: the requested chart.
     """
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
@@ -1755,9 +1754,34 @@ async def chart(chart_id: int) -> Chart:
         name=chart_result[0][1],
         type=chart_result[0][2],
         parameters=json.loads(chart_result[0][3]),
-        data=json.dumps(chart_result[0][4]) if chart_result[0][4] is not None else None,
         project_uuid=chart_result[0][5],
     )
+
+
+async def chart_data(chart_id: int) -> str | None:
+    """Get a chart's data.
+
+    Args:
+        chart_id (int): ID of the chart to get data for.
+
+    Returns:
+        str | None: chart data.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            await cur.execute(
+                "SELECT data FROM charts WHERE id = %s",
+                [chart_id],
+            )
+            chart_result = await cur.fetchall()
+
+    if len(chart_result) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Chart could not be found.",
+        )
+
+    return json.dumps(chart_result[0][0]) if chart_result[0][0] is not None else None
 
 
 async def charts(project_uuid: str) -> list[Chart]:
@@ -2729,3 +2753,35 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
         return bool(exists[0][0])
     else:
         raise HTTPException(status_code=500, detail="Could not check if system exists")
+
+
+async def chart_config(
+    project_uuid: str, chart_id: int | None = None
+) -> ChartConfig | None:
+    """Get a project's chart configuration.
+
+    Args:
+        project_uuid (str): the project for which to fetch the config.
+        chart_id (int): the chart for which to fetch the config.
+
+    Returns:
+        ChartConfig | None: the config if there is one, otherwise None.
+    """
+    async with db_pool.connection() as conn:
+        async with conn.cursor() as cur:
+            if chart_id is None:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE project_uuid = %s "
+                    "AND chart_id IS NULL;",
+                    [project_uuid],
+                )
+            else:
+                await cur.execute(
+                    "SELECT config from chart_config WHERE chart_id = %s;",
+                    [chart_id],
+                )
+            config = await cur.fetchall()
+
+    if len(config) == 0:
+        return None
+    return config[0][0]

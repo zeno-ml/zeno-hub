@@ -27,7 +27,7 @@
 		bind:offsetWidth={tooltipWidth}
 		bind:offsetHeight={tooltipHeight}
 	>
-		<div class="flex flex-col break-all p-2">
+		<div class="break-word flex flex-col p-2">
 			{$tooltipState.text}
 		</div>
 	</div>

@@ -9,6 +9,7 @@ import type { Body_upload_dataset_schema } from '../models/Body_upload_dataset_s
 import type { Body_upload_system } from '../models/Body_upload_system';
 import type { Body_upload_system_schema } from '../models/Body_upload_system_schema';
 import type { Chart } from '../models/Chart';
+import type { ChartConfig } from '../models/ChartConfig';
 import type { Folder } from '../models/Folder';
 import type { GroupMetric } from '../models/GroupMetric';
 import type { HistogramBucket } from '../models/HistogramBucket';
@@ -40,13 +41,10 @@ import type { TagMetricKey } from '../models/TagMetricKey';
 import type { TagTableRequest } from '../models/TagTableRequest';
 import type { User } from '../models/User';
 import type { ZenoColumn } from '../models/ZenoColumn';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-
 export class ZenoService {
 	constructor(public readonly httpRequest: BaseHttpRequest) {}
-
 	/**
 	 * Login
 	 * Log a user in to Zeno.
@@ -77,7 +75,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Users
 	 * Get all users in the database.
@@ -93,7 +90,6 @@ export class ZenoService {
 			url: '/users'
 		});
 	}
-
 	/**
 	 * Get Organizations
 	 * Get all organizations in the database.
@@ -109,7 +105,6 @@ export class ZenoService {
 			url: '/organizations'
 		});
 	}
-
 	/**
 	 * Get User Organizations
 	 * Get all organizations a specified user is a member of.
@@ -132,7 +127,6 @@ export class ZenoService {
 			url: '/user_organizations'
 		});
 	}
-
 	/**
 	 * Create Api Key
 	 * Create a new API key for a specific user.
@@ -152,7 +146,6 @@ export class ZenoService {
 			url: '/api-key/'
 		});
 	}
-
 	/**
 	 * Add Organization
 	 * Add an organization to the database.
@@ -175,7 +168,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Organization
 	 * Delete an organization from the database.
@@ -197,7 +189,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update User
 	 * Update a user's profile.
@@ -219,7 +210,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Organization
 	 * Update an organization in the database.
@@ -241,7 +231,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Charts
 	 * Get all charts of a project.
@@ -268,7 +257,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Chart
 	 * Get a chart by its id.
@@ -282,7 +270,7 @@ export class ZenoService {
 	 * HTTPException: error if the chart could not be fetched.
 	 *
 	 * Returns:
-	 * ChartResponse: chart spec and data.
+	 * ChartResponse: chart spec.
 	 * @param chartId
 	 * @param projectUuid
 	 * @returns Chart Successful Response
@@ -303,7 +291,132 @@ export class ZenoService {
 			}
 		});
 	}
-
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+	/**
+	 * Get Chart Data
+	 * Get a chart's data.
+	 *
+	 * Args:
+	 * project_uuid (str): UUID of the project to get a chart from.
+	 * chart_id (int): id of the chart to be fetched.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Raises:
+	 * HTTPException: error if the chart could not be fetched.
+	 *
+	 * Returns:
+	 * str: chart data.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns string Successful Response
+	 * @throws ApiError
+	 */
+	public getChartData1(projectUuid: any, chartId: number): CancelablePromise<string> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/chart-data/{project_uuid}/{chart_id}',
+			path: {
+				project_uuid: projectUuid,
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+	/**
+	 * Get Chart Config
+	 * Get a project's chart configuration.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project for which to get the configuration.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * ChartConfig: the configuration of all charts in the project.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns ChartConfig Successful Response
+	 * @throws ApiError
+	 */
+	public getChartConfig(
+		projectUuid: string,
+		chartId?: number | null
+	): CancelablePromise<ChartConfig> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
+	/**
+	 * Delete Chart Config
+	 * Delete the chart config for a project.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to delete the chart config for.
+	 * request (Request): http request to get the user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * @param projectUuid
+	 * @param chartId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public deleteChartConfig(projectUuid: string, chartId?: number | null): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'DELETE',
+			url: '/chart-config/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				chart_id: chartId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
 	/**
 	 * Project Home Chart Ids
 	 * Get the ids of all charts in a project's home page.
@@ -330,7 +443,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Charts For Projects
 	 * Get all charts for a list of projects.
@@ -356,7 +468,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Chart
 	 * Add a new chart to a project.
@@ -392,7 +503,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Chart
 	 * Update a chart.
@@ -403,10 +513,10 @@ export class ZenoService {
 	 * request (Request): http request to get user information from.
 	 * @param projectUuid
 	 * @param requestBody
-	 * @returns string Successful Response
+	 * @returns any Successful Response
 	 * @throws ApiError
 	 */
-	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<string> {
+	public updateChart(projectUuid: string, requestBody: Chart): CancelablePromise<any> {
 		return this.httpRequest.request({
 			method: 'PATCH',
 			url: '/chart/{project_uuid}',
@@ -420,7 +530,36 @@ export class ZenoService {
 			}
 		});
 	}
-
+	/**
+	 * Update Chart Config
+	 * Update or add a chart configuration for a project.
+	 *
+	 * Args:
+	 * chart_config (ChartConfig): chart configuration to be written.
+	 * request (Request): http request to get user information from.
+	 * chart_id (int | None): the id of the chart this is linked to. Defaults to None.
+	 * @param requestBody
+	 * @param chartId
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public updateChartConfig(
+		requestBody: ChartConfig,
+		chartId?: number | null
+	): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'PATCH',
+			url: '/chart-config',
+			query: {
+				chart_id: chartId
+			},
+			body: requestBody,
+			mediaType: 'application/json',
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
 	/**
 	 * Delete Chart
 	 * Delete a chart from the database.
@@ -447,7 +586,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Folders
 	 * Get all folders for a specific project.
@@ -474,7 +612,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Folder
 	 * Add a folder to a project.
@@ -509,7 +646,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Folder
 	 * Update a folder in the database.
@@ -537,7 +673,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Folder
 	 * Delete an existing folder from the database.
@@ -577,7 +712,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Models
 	 * Get all models for a project.
@@ -604,7 +738,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Columns
 	 * Get all columns of a project.
@@ -631,7 +764,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Home Details
 	 * Get the details of the home view including projects, reports, and statistics.
@@ -657,7 +789,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Calculate Histograms
 	 * Calculate the histograms for a project.
@@ -691,7 +822,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Filter String Metadata
 	 * Select distinct string values of a column and return their short representation.
@@ -725,7 +855,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Metrics
 	 * Get all metrics for a specific project.
@@ -752,7 +881,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Metrics Filtered
 	 * Get all metrics that match a metrics query.
@@ -786,7 +914,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Metric For Tag
 	 * Get the metric for a specific tag.
@@ -820,7 +947,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Is Project Public
 	 * Check if a given project is public.
@@ -847,7 +973,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Project State
 	 * Get the current state of a project.
@@ -877,7 +1002,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Project Home Elements
 	 * Get all elements on a project's home page.
@@ -904,7 +1028,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Project Uuid
 	 * Get the UUID of a project by owner and project name.
@@ -937,7 +1060,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get User Projects
 	 * Get all projects for the current user.
@@ -957,7 +1079,44 @@ export class ZenoService {
 			url: '/user-projects'
 		});
 	}
-
+	/**
+	 * Check Project Visibility
+	 * Check if a project's visibility matches or exceeds that of a report.
+	 *
+	 * Args:
+	 * project_uuid (str): uuid of the project to be checked.
+	 * report_public (bool): whether the report is public.
+	 * report_id (int): id of the report to be checked against.
+	 * request (Request): http request to get user information from.
+	 *
+	 * Returns:
+	 * bool: whether the project's visibility matches or exceeds that of the report.
+	 * @param projectUuid
+	 * @param reportPublic
+	 * @param reportId
+	 * @returns boolean Successful Response
+	 * @throws ApiError
+	 */
+	public checkProjectVisibility(
+		projectUuid: string,
+		reportPublic: boolean,
+		reportId: number
+	): CancelablePromise<boolean> {
+		return this.httpRequest.request({
+			method: 'POST',
+			url: '/project-visibility/{project_uuid}',
+			path: {
+				project_uuid: projectUuid
+			},
+			query: {
+				report_public: reportPublic,
+				report_id: reportId
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
 	/**
 	 * Get Projects
 	 * Get all projects from a list of UUIDs.
@@ -983,7 +1142,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Like Project
 	 * Like a project.
@@ -1008,7 +1166,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Project Users
 	 * Get all users of a specific project.
@@ -1035,7 +1192,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Project Orgs
 	 * Get all organizations that have access to a project.
@@ -1062,7 +1218,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Project User
 	 * Add a user to a project.
@@ -1090,7 +1245,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Project User
 	 * Update the rights of a project user.
@@ -1118,7 +1272,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Project User
 	 * Remove a user from a project.
@@ -1146,7 +1299,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Project Org
 	 * Add an organization to a project.
@@ -1174,7 +1326,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Project Org
 	 * Update the rights of a project's organization.
@@ -1202,7 +1353,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Project Org
 	 * Remove an organization from a project.
@@ -1230,7 +1380,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Copy Project
 	 * Create a copy of an existing project.
@@ -1260,7 +1409,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Project
 	 * Update a project's specification.
@@ -1283,7 +1431,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Project
 	 * Delete a project from the database.
@@ -1308,7 +1455,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report By Name
 	 * Get a report by its name and owner name.
@@ -1341,7 +1487,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report
 	 * Get a report by its id.
@@ -1371,7 +1516,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report Elements
 	 * Get all elements that a report contains.
@@ -1398,7 +1542,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report Authors
 	 * Get all authors of a report.
@@ -1425,7 +1568,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Like Report
 	 * Like a report as a user.
@@ -1450,7 +1592,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report Users
 	 * Get all users  that have access to a report.
@@ -1477,7 +1618,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report Owner
 	 * Get the owner of a report.
@@ -1504,7 +1644,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Report Orgs
 	 * Get all the organizations that have access to a report.
@@ -1531,7 +1670,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Slice Element Options
 	 * Get the options of a report's slice element.
@@ -1562,7 +1700,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Tag Element Options
 	 * Get the options of a report's tag element.
@@ -1591,7 +1728,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Report
 	 * Add a new report to the Database.
@@ -1622,7 +1758,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Report Element
 	 * Add an element to an existing report.
@@ -1658,7 +1793,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Report Author
 	 * Add an author to a report.
@@ -1686,7 +1820,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report Author
 	 * Update the author of a report.
@@ -1714,7 +1847,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Report Author
 	 * Remove an author from a report.
@@ -1742,7 +1874,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Report User
 	 * Add a user to a report.
@@ -1770,7 +1901,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report User
 	 * Update a user's privileges for a report.
@@ -1798,7 +1928,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Report User
 	 * Remove a user from a report.
@@ -1826,7 +1955,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Report Org
 	 * Add an organization to a report.
@@ -1854,7 +1982,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report Org
 	 * Update a organization's privileges for a report.
@@ -1882,7 +2009,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Report Org
 	 * Remove an organizations from a report.
@@ -1910,7 +2036,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report Element
 	 * Update an element of a report.
@@ -1938,7 +2063,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report
 	 * Update a report's settings.
@@ -1961,7 +2085,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Report Projects
 	 * Update the projects associated with a report.
@@ -1992,7 +2115,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Report
 	 * Delete an existing report from the databse.
@@ -2020,7 +2142,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Report Element
 	 * Delete an element from a report.
@@ -2047,7 +2168,36 @@ export class ZenoService {
 			}
 		});
 	}
-
+	/**
+	 * Get Project By Name
+	 * Get a project by it's name and owner name.
+	 *
+	 * Args:
+	 * owner_name (str): name of the project's owner.
+	 * project_name (str): name of the project.
+	 * api_key (_type_, optional): API key of the user making the request.
+	 * Defaults to Depends(APIKeyBearer()).
+	 *
+	 * Returns:
+	 * str: uuid of the requested project.
+	 * @param ownerName
+	 * @param projectName
+	 * @returns any Successful Response
+	 * @throws ApiError
+	 */
+	public getProjectByName(ownerName: string, projectName: string): CancelablePromise<any> {
+		return this.httpRequest.request({
+			method: 'GET',
+			url: '/project-by-name/{owner_name}/{project_name}',
+			path: {
+				owner_name: ownerName,
+				project_name: projectName
+			},
+			errors: {
+				422: `Validation Error`
+			}
+		});
+	}
 	/**
 	 * Create Project
 	 * Create a new project.
@@ -2071,7 +2221,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Upload Dataset Schema
 	 * Upload a dataset schema to the database. Called before uploading data.
@@ -2098,7 +2247,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Upload Dataset
 	 * Upload a dataset to a Zeno project.
@@ -2126,7 +2274,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Upload System Schema
 	 * Upload a dataset schema to the database. Called before uploading system.
@@ -2153,7 +2300,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Upload System
 	 * Upload a system to a Zeno project.
@@ -2188,7 +2334,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete System
 	 * Delete a system from a Zeno project.
@@ -2196,6 +2341,7 @@ export class ZenoService {
 	 * Args:
 	 * project_uuid (str): the UUID of the project to delete the system from.
 	 * system_name (str): the name of the system.
+	 * api_key (str, optional): API key.
 	 * @param projectUuid
 	 * @param systemName
 	 * @returns any Successful Response
@@ -2214,13 +2360,13 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete All Systems
 	 * Delete all systems from a Zeno project.
 	 *
 	 * Args:
 	 * project_uuid (str): the UUID of the project to delete systems from.
+	 * api_key (str, optional): API key.
 	 * @param projectUuid
 	 * @returns any Successful Response
 	 * @throws ApiError
@@ -2237,7 +2383,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Min Client Version
 	 * Get the minimum client version required to use the server.
@@ -2250,7 +2395,6 @@ export class ZenoService {
 			url: '/min-client-version'
 		});
 	}
-
 	/**
 	 * Get Slices
 	 * Fetch all slices of a project.
@@ -2277,7 +2421,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Run Slice Finder
 	 * Run slice finder to recommend slices to the user.
@@ -2313,7 +2456,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Slices For Projects
 	 * Get all slices for a list of projects.
@@ -2339,7 +2481,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Slice
 	 * Add a slice to a project.
@@ -2375,7 +2516,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Slice
 	 * Update a slice in the database.
@@ -2403,7 +2543,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Slice Instance Ids
 	 * Get all instance ids of a slice.
@@ -2444,7 +2583,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add All Slices
 	 * Add all slices for a column's values.
@@ -2488,7 +2626,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Slice
 	 * Delete a slice from the database.
@@ -2515,7 +2652,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Filtered Table
 	 * Get the data in a project's table.
@@ -2549,7 +2685,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Slice Table
 	 * Get the data in a project's table for a specific slice.
@@ -2578,7 +2713,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Tag Table
 	 * Get the data in a project's table for a specific tag.
@@ -2607,7 +2741,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Tags
 	 * Get all tags for a project.
@@ -2634,7 +2767,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Get Tags For Projects
 	 * Get all tags for a list of projects.
@@ -2659,7 +2791,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Add Tag
 	 * Add a tag to a project.
@@ -2695,7 +2826,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Update Tag
 	 * Update a tag in the database.
@@ -2723,7 +2853,6 @@ export class ZenoService {
 			}
 		});
 	}
-
 	/**
 	 * Delete Tag
 	 * Delete a tag from the database.

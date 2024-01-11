@@ -32,9 +32,9 @@
 		</Banner>
 	</div>
 {:else}
-	<div class="flex h-full min-h-0 w-full min-w-0 flex-grow flex-row">
+	<div class="flex h-full min-h-0 w-full min-w-0">
 		<MetadataPanel compare={data.compare} />
-		<div class="flex min-h-0 w-full min-w-0 flex-col px-3">
+		<div class="flex w-full min-w-0 flex-col px-3">
 			<Instances compare={data.compare} />
 		</div>
 	</div>

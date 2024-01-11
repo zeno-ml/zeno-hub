@@ -6,7 +6,7 @@
 
 	export let element: ReportElement;
 
-	$: renderedInput = element.data ? purify.sanitize(parse(element.data)) : '';
+	$: renderedInput = element.data ? purify.sanitize(parse(element.data) as string) : '';
 </script>
 
 <article class="w-full overflow-hidden break-words">

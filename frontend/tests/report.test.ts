@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('can see report elements', async ({ page }) => {
-	await expect(page.getByRole('heading', { name: 'Translation Report' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Translation Report', level: 4 })).toBeVisible();
 	await expect(page.getByText('Here is my new report.')).toBeVisible();
 	await expect(page.getByText('Slice short latin model GPT4 five-shot')).toBeVisible();
 	await expect(

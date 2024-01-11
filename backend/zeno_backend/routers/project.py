@@ -138,6 +138,44 @@ async def get_user_projects(current_user=Depends(util.auth.claim())):
     return await select.projects(user)
 
 
+@router.post("/project-visibility/{project_uuid}", response_model=bool, tags=["zeno"])
+async def check_project_visibility(
+    project_uuid: str,
+    report_public: bool,
+    report_id: int,
+    request: Request,
+):
+    """Check if a project's visibility matches or exceeds that of a report.
+
+    Args:
+        project_uuid (str): uuid of the project to be checked.
+        report_public (bool): whether the report is public.
+        report_id (int): id of the report to be checked against.
+        request (Request): http request to get user information from.
+
+    Returns:
+        bool: whether the project's visibility matches or exceeds that of the report.
+    """
+    await util.report_access_valid(report_id, request)
+
+    if await select.project_public(project_uuid):
+        return True
+    elif report_public:
+        return False
+
+    project_orgs = await get_project_orgs(project_uuid, request)
+    for org in await select.report_orgs(report_id):
+        if org not in project_orgs:
+            return False
+
+    project_users = await get_project_users(project_uuid, request)
+    for user in await select.report_users(report_id):
+        if user not in project_users:
+            return False
+
+    return True
+
+
 @router.post("/projects", tags=["zeno"])
 async def get_projects(project_uuids: list[str], request: Request):
     """Get all projects from a list of UUIDs.

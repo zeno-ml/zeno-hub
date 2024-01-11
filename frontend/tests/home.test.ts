@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test('can go to report', async ({ page }) => {
 	await page.getByRole('button', { name: 'Translation Report' }).click();
-	await expect(page.getByRole('heading', { name: 'Translation Report' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Translation Report', level: 4 })).toBeVisible();
 });
 
 test('can go to project', async ({ page }) => {
@@ -19,5 +19,5 @@ test('can create report', async ({ page }) => {
 	await page.getByRole('button', { name: 'new report' }).click();
 	await page.getByRole('textbox', { name: 'report name' }).fill('test report');
 	await page.keyboard.down('Enter');
-	await expect(page.getByRole('heading', { name: 'test report' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'test report', level: 4 })).toBeVisible();
 });

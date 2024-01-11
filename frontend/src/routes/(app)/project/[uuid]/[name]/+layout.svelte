@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Header from '$lib/components/general/Header.svelte';
+	import ProjectPopup from '$lib/components/popups/ProjectPopup.svelte';
 	import ProjectSidebar from '$lib/components/project/ProjectSidebar.svelte';
 	import {
 		columns,
@@ -26,6 +28,8 @@
 	import { ZenoColumnType } from '$lib/zenoapi/index.js';
 
 	export let data;
+
+	let projectEdit = false;
 
 	// Only set stores and subscriptions if the project has changed.
 	if ($project === undefined || $project.uuid !== data.project.uuid) {
@@ -78,5 +82,20 @@
 	<meta name="description" content={data.project.description || 'Zeno Evaluation Project'} />
 </svelte:head>
 
-<ProjectSidebar />
-<slot />
+{#if projectEdit && data.user !== null}
+	<ProjectPopup config={data.project} on:close={() => (projectEdit = false)} user={data.user} />
+{/if}
+
+<div class="flex h-full min-h-0 w-full min-w-0 flex-col">
+	<Header
+		user={data.user}
+		project={data.project}
+		bind:editPopup={projectEdit}
+		userLiked={data.userLiked}
+		numLikes={data.numLikes}
+	/>
+	<div class="flex h-full min-h-0 w-full min-w-0 flex-col sm:flex-row">
+		<ProjectSidebar />
+		<slot />
+	</div>
+</div>

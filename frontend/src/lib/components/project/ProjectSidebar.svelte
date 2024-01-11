@@ -16,23 +16,11 @@
 	$: currentTab = $page.url.href.split('/').pop();
 </script>
 
-<nav class="z-20 flex md:hidden">
-	<header
-		class="flex w-full flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish text-grey"
-	>
-		<a href="/">
-			<img class="w-8 pb-2 pt-2" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
-		</a>
-	</header>
-</nav>
 <nav class="z-20 hidden md:flex">
 	<header
 		class="flex h-full w-12 flex-col items-center justify-between border-r border-x-grey-lighter bg-yellowish-light text-grey"
 	>
 		<div class="flex flex-col items-center justify-center">
-			<a href="/">
-				<img class="mt-3 w-8" src="/zeno.png" alt="Square spiral logo next to 'Zeno'" />
-			</a>
 			<div class="mt-3 flex flex-col">
 				{#if $models.length > 0 && $metrics.length > 0}
 					<HeaderIcon

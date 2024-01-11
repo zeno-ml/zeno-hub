@@ -17,7 +17,7 @@
     "
 	>
 		<div class="bg-white">
-			<Icon style="outline:none; width: 24px; height: 24px" tag="svg" viewBox="0 0 24 24">
+			<Icon class="h-6 w-6" tag="svg" viewBox="0 0 24 24">
 				<path class="fill-primary-dark" d={mdiPlusCircle} />
 			</Icon>
 		</div>

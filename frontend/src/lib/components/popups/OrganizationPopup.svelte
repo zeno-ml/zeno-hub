@@ -54,7 +54,7 @@
 
 <svelte:window on:keydown={submit} />
 <Popup on:close>
-	<Content style="display: flex; flex-direction: column;">
+	<Content class="flex flex-col">
 		<h2>Organization Settings</h2>
 		<div class="mb-5 flex flex-col">
 			<Textfield bind:value={organizationToEdit.name} label="Name" bind:this={input} />
@@ -66,9 +66,9 @@
 					<thead
 						class="sticky left-0 top-0 border-b border-grey-lighter bg-background pb-1 font-semibold"
 					>
-						<th style="width: 200px;">Email</th>
+						<th class="w-[200px]">Email</th>
 						<th>Admin</th>
-						<th style="width: auto;" />
+						<th class="w-auto" />
 					</thead>
 					<tbody>
 						{#each members as member}
@@ -128,11 +128,9 @@
 			{/await}
 		</div>
 		<div class="flex items-center self-end">
-			<Button style="margin-left: 10px;" variant="outlined" on:click={() => dispatch('close')}
-				>Cancel</Button
-			>
+			<Button class="ml-4" variant="outlined" on:click={() => dispatch('close')}>Cancel</Button>
 			<Button
-				style="margin-left: 5px;"
+				class="ml-2"
 				variant="outlined"
 				disabled={invalidName}
 				on:click={() => updateOrganization()}>{'Update'}</Button

@@ -34,6 +34,6 @@ export const actions: Actions = {
 				error: err.message
 			});
 		}
-		throw redirect(303, '/login');
+		redirect(303, '/login');
 	}
 };
