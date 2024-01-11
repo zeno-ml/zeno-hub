@@ -181,8 +181,8 @@
 					/>
 				{/if}
 			</div>
-			{#await zenoClient.getOrganizations() then oragnizationNames}
-				{@const availableOrgs = oragnizationNames.filter(
+			{#await zenoClient.getUserOrganizations() then organizationNames}
+				{@const availableOrgs = organizationNames.filter(
 					(currentOrg) => !projectOrganizations.some((org) => org.id === currentOrg.id)
 				)}
 				{#if availableOrgs.length > 0 || projectOrganizations.length > 0}
