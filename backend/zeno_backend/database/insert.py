@@ -123,15 +123,15 @@ async def project_home_element(project_uuid: str, element: ProjectHomeElement):
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO project_home_elements (project_uuid, type, data, x_pos, "
-                "y_pos, width, height)"
+                "INSERT INTO project_home_elements (project_uuid, type, data, x, "
+                "y, width, height)"
                 " VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id;",
                 [
                     project_uuid,
                     element.type,
                     element.data,
-                    element.x_pos,
-                    element.y_pos,
+                    element.x,
+                    element.y,
                     element.width,
                     element.height,
                 ],

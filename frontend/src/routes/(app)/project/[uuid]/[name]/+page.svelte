@@ -16,7 +16,7 @@
 		{#each data.elements as element}
 			<div
 				class="absolute overflow-auto p-2"
-				style="width: {element.width}%; height: {element.height}%; top: {element.yPos}%; left: {element.xPos}%;"
+				style="width: {element.width}%; height: {element.height}%; top: {element.y}%; left: {element.x}%;"
 			>
 				<div class="h-full w-full">
 					<Element {element} />

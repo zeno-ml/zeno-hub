@@ -1024,7 +1024,7 @@ async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement]:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "SELECT id, type, data, x_pos, y_pos, width, height "
+                "SELECT id, type, data, x, y, width, height "
                 "FROM project_home_elements WHERE project_uuid = %s;",
                 [project_uuid],
             )
@@ -1035,8 +1035,8 @@ async def project_home_elements(project_uuid: str) -> list[ProjectHomeElement]:
             id=element[0],
             type=element[1],
             data=element[2],
-            x_pos=element[3],
-            y_pos=element[4],
+            x=element[3],
+            y=element[4],
             width=element[5],
             height=element[6],
         )
@@ -1904,8 +1904,13 @@ async def table_data_paginated(
                 sql.Identifier(req.diff_column_1.id),
                 sql.Identifier(req.diff_column_2.id),
             )
+        elif req.diff_column_1.data_type == MetadataType.BOOLEAN:
+            diff_sql = sql.SQL(", {}::int - {}::int AS diff").format(
+                sql.Identifier(req.diff_column_1.id),
+                sql.Identifier(req.diff_column_2.id),
+            )
         else:
-            diff_sql = sql.SQL(", {} = {} AS diff").format(
+            diff_sql = sql.SQL(", {} != {} AS diff").format(
                 sql.Identifier(req.diff_column_1.id),
                 sql.Identifier(req.diff_column_2.id),
             )
