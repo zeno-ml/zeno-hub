@@ -33,7 +33,7 @@
 	let lastPage = 0;
 	let sampleOptions = [
 		...new Set(
-			$project.samplesPerPage !== undefined
+			$project.samplesPerPage !== undefined && $project.samplesPerPage !== null
 				? [5, 15, 30, 60, 100, $project.samplesPerPage]
 				: [5, 15, 30, 60, 100]
 		)

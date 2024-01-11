@@ -13,7 +13,6 @@
 	let width;
 	let height;
 
-	console.log(element);
 	let chartId = -1;
 	$: if (
 		element.type === ProjectHomeElementType.CHART &&
