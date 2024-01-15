@@ -71,9 +71,9 @@
 			chart = { ...chart, parameters: { ...parameters, metrics: [e.detail] } };
 		} else {
 			if (parameters.yChannel === SlicesOrModels.MODELS) {
-				chart = { ...chart, parameters: { ...parameters, models: [e.detail] } };
+				chart = { ...chart, parameters: { ...parameters, models: [e.detail.value] } };
 			} else {
-				chart = { ...chart, parameters: { ...parameters, slices: [e.detail] } };
+				chart = { ...chart, parameters: { ...parameters, slices: [e.detail.value] } };
 			}
 		}
 	}
