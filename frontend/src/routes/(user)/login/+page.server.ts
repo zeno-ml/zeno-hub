@@ -53,7 +53,7 @@ export const actions: Actions = {
 		}
 		redirect(
 			303,
-			data.has('redirect') && data.get('redirect') !== ''
+			data.has('redirect') && data.get('redirect') !== '' && data.get('redirect') !== '/login'
 				? (data.get('redirect') as string)
 				: `/home/${username}`
 		);
