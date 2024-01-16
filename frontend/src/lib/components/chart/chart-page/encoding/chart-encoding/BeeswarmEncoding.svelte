@@ -85,7 +85,13 @@
 		<Checkbox
 			checked={fixedDimension === 'metric'}
 			on:click={() =>
-				(chart = { ...chart, parameters: { ...parameters, fixedDimension: 'metric' } })}
+				(chart = {
+					...chart,
+					parameters: {
+						...parameters,
+						fixedDimension: fixedDimension === 'metric' ? 'y' : 'metric'
+					}
+				})}
 		/>
 	</div>
 	<svelte:fragment slot="component">
@@ -104,7 +110,11 @@
 		<span>fixed</span>
 		<Checkbox
 			checked={fixedDimension === 'y'}
-			on:click={() => (chart = { ...chart, parameters: { ...parameters, fixedDimension: 'y' } })}
+			on:click={() =>
+				(chart = {
+					...chart,
+					parameters: { ...parameters, fixedDimension: fixedDimension === 'y' ? 'metric' : 'y' }
+				})}
 		/>
 	</div>
 	<svelte:fragment slot="component">
