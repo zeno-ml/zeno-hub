@@ -60,7 +60,7 @@
 		"vitest": "^1.1.1"
 	},
 	"dependencies": {
-		"@amplitude/analytics-browser": "^2.3.5",
+		"@amplitude/analytics-browser": "^2.4.0",
 		"@auth/core": "^0.20.0",
 		"@auth/sveltekit": "^0.5.2",
 		"@codemirror/lang-json": "^6.0.1",
