@@ -42,7 +42,7 @@ jobs:
   typecheck-python:
     runs-on: ubuntu-latest
     steps:
-      - uses: jakebailey/pyright-action@v1
+      - uses: jakebailey/pyright-action@v2
 
   test-integration:
     runs-on: ubuntu-latest
