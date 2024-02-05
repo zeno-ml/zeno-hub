@@ -75,7 +75,7 @@
 		"marked": "^11.1.1",
 		"svelte-codemirror-editor": "^1.1.0",
 		"svelte-device-info": "^1.0.0",
-		"svelte-highlight": "^7.4.6",
+		"svelte-highlight": "^7.5.0",
 		"svelte-multiselect": "^10.2.0",
 		"svelte-vega": "^2.1.0",
 		"vega": "^5.26.1",
