@@ -25,7 +25,7 @@ uvicorn = "^0.27.1"
 zeno-sliceline = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^3.6.1"
+pre-commit = "^3.6.2"
 pyright = "^1.1.350"
 pytest = "^7.4.4"
 ruff = "^0.2.2"
