@@ -28,7 +28,7 @@ zeno-sliceline = "^0.0.1"
 pre-commit = "^3.6.1"
 pyright = "^1.1.350"
 pytest = "^7.4.4"
-ruff = "^0.2.0"
+ruff = "^0.2.2"
 
 [build-system]
 requires = ["poetry-core"]
