@@ -10,4 +10,4 @@
 	{@html github}
 </svelte:head>
 
-<HighlightAuto code={data} />
+<HighlightAuto code={`${data}`} />
