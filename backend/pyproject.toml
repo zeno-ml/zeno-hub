@@ -40,8 +40,8 @@ backend = "zeno_backend.server:serve"
 [tool.pyright]
 include = ["zeno_backend"]
 
-[tool.ruff]
+[tool.ruff.lint]
 select = ["E", "F", "I", "PD", "N", "D", "T20"]
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "google"

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import Paper, { Content } from '@smui/paper';
 	import { createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';

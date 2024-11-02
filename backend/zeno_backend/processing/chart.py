@@ -1,4 +1,5 @@
 """Functions for extracting chart data from SQL."""
+
 import json
 from typing import Any
 

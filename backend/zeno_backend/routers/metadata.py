@@ -1,4 +1,5 @@
 """FastAPI server endpoints for metadata-related queries."""
+
 import asyncio
 import datetime
 

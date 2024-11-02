@@ -1,4 +1,5 @@
 """Type representations for chart data."""
+
 import json
 from enum import Enum
 

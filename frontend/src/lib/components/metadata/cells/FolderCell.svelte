@@ -5,7 +5,7 @@
 	import { clickOutside } from '$lib/util/clickOutside';
 	import type { Folder, ZenoService } from '$lib/zenoapi';
 	import { mdiChevronDown, mdiChevronRight, mdiDotsHorizontal } from '@mdi/js';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Checkbox from '@smui/checkbox';
 	import IconButton, { Icon } from '@smui/icon-button';
 	import Paper, { Content } from '@smui/paper';
 	import { getContext } from 'svelte';

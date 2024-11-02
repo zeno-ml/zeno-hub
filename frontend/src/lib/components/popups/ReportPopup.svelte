@@ -3,10 +3,9 @@
 	import { page } from '$app/stores';
 	import type { Organization, Report, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose } from '@mdi/js';
-	import { Icon } from '@smui/button';
-	import Button from '@smui/button/src/Button.svelte';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
-	import IconButton from '@smui/icon-button/src/IconButton.svelte';
+	import Button, { Icon } from '@smui/button';
+	import Checkbox from '@smui/checkbox';
+	import IconButton from '@smui/icon-button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import Svelecte from 'svelecte';

@@ -1,4 +1,5 @@
 """FastAPI server endpoints for slice-related queries."""
+
 from amplitude import BaseEvent
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 

@@ -3,7 +3,7 @@
 	import { elementMap, isComplexElement } from '$lib/instance-views/resolve.js';
 	import type { ViewSchema } from '$lib/instance-views/schema';
 	import schema from '$lib/instance-views/schema.json';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Checkbox from '@smui/checkbox';
 	import Ajv from 'ajv';
 	import { createEventDispatcher } from 'svelte';
 

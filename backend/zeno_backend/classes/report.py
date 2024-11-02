@@ -1,4 +1,5 @@
 """Types for Zeno reports."""
+
 from enum import Enum
 
 from zeno_backend.classes.base import CamelModel

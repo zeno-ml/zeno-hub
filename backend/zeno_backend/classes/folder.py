@@ -1,4 +1,5 @@
 """Type representation for folder data."""
+
 from zeno_backend.classes.base import CamelModel
 
 

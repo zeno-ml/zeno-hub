@@ -1,4 +1,5 @@
 """Utility functions for Zeno's backend."""
+
 import os
 
 import cognitojwt

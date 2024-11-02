@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { featureFlags } from '$lib/stores';
 	import { zenoFeatureFlags } from '$lib/util/features';
-	import Button from '@smui/button/src/Button.svelte';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Button from '@smui/button';
+	import Checkbox from '@smui/checkbox';
 	import { Content } from '@smui/paper';
 	import { createEventDispatcher } from 'svelte';
 	import Popup from './Popup.svelte';

@@ -1,4 +1,5 @@
 """FastAPI server endpoints for data-table-related queries."""
+
 from amplitude import BaseEvent
 from fastapi import (
     APIRouter,

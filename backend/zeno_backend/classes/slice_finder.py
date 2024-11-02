@@ -1,4 +1,5 @@
 """Type representations for slice finder data."""
+
 from typing import Any
 
 from zeno_backend.classes.base import CamelModel, ZenoColumn

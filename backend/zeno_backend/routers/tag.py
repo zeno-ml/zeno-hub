@@ -1,4 +1,5 @@
 """FastAPI server endpoints for tag-related queries."""
+
 from amplitude import BaseEvent
 from fastapi import (
     APIRouter,

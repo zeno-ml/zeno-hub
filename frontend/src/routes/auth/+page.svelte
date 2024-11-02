@@ -1,6 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 </script>
 
 <div class="m-auto h-full bg-primary pt-20 text-center">

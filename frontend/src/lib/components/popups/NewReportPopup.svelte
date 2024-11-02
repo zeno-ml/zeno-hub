@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { ApiError, ZenoService } from '$lib/zenoapi';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher, getContext } from 'svelte';

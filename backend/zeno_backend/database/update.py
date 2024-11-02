@@ -1,4 +1,5 @@
 """Functions to update data in the database."""
+
 import json
 
 from psycopg import sql

@@ -1,4 +1,5 @@
 """Functions to select data from the database."""
+
 import asyncio
 import json
 

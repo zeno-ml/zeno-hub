@@ -1,4 +1,5 @@
 """Amplitude handler for tracking after env has been set up with a singleton object."""
+
 import os
 
 from amplitude import Amplitude, BaseEvent

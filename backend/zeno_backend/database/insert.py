@@ -1,4 +1,5 @@
 """Functions to insert new data into Zeno's database."""
+
 import json
 import secrets
 import uuid

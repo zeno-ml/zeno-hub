@@ -1,4 +1,5 @@
 """FastAPI server endpoints for data-table-related queries."""
+
 import shutil
 from pathlib import Path
 from urllib import parse

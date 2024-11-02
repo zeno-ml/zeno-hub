@@ -1,4 +1,5 @@
 """FastAPI server endpoints for report-related queries."""
+
 from urllib import parse
 
 from amplitude import BaseEvent

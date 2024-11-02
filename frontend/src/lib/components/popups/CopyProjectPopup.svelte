@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { invalidate } from '$app/navigation';
 	import type { Project, User, ZenoService } from '$lib/zenoapi';
-	import Button from '@smui/button/src/Button.svelte';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Button from '@smui/button';
+	import Checkbox from '@smui/checkbox';
 	import { Content } from '@smui/paper';
 	import Textfield from '@smui/textfield';
 	import { createEventDispatcher, getContext } from 'svelte';

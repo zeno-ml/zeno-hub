@@ -1,4 +1,5 @@
 """FastAPI server endpoints for data-table-related queries."""
+
 import pandas as pd
 from fastapi import APIRouter, HTTPException, Request, status
 

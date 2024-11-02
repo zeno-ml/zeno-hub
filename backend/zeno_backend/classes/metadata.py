@@ -1,4 +1,5 @@
 """Type representations for metric data."""
+
 from zeno_backend.classes.base import CamelModel, ZenoColumn
 from zeno_backend.classes.filter import Operation
 from zeno_backend.classes.metric import Metric
