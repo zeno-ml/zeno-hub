@@ -1,4 +1,5 @@
 """Functions to delete data from the database."""
+
 from psycopg import sql
 
 from zeno_backend.classes.user import Author, Organization, User

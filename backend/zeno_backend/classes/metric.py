@@ -1,4 +1,5 @@
 """Type representations for metric data."""
+
 from zeno_backend.classes.base import CamelModel
 from zeno_backend.classes.slice import Slice
 

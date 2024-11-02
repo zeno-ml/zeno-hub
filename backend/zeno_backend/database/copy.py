@@ -1,4 +1,5 @@
 """Functionality for copying instances in the database."""
+
 import json
 import uuid
 

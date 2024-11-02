@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import type { User, ZenoService } from '$lib/zenoapi';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 	import { getContext } from 'svelte';
 	import { fade } from 'svelte/transition';

@@ -1,4 +1,5 @@
 """Classes required for specifying data filters."""
+
 import json
 from enum import Enum
 from typing import LiteralString

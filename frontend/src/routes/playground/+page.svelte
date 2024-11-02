@@ -5,7 +5,7 @@
 	import Error from '$lib/instance-views/Error.svelte';
 	import InstanceView from '$lib/instance-views/InstanceView.svelte';
 	import { json } from '@codemirror/lang-json';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import CodeMirror from 'svelte-codemirror-editor';
 	import { samples } from './samples.js';
 	import { setURLParameters, type URLParams } from './util.js';

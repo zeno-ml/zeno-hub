@@ -1,4 +1,5 @@
 """Mean metric calculation."""
+
 from psycopg import sql
 
 from zeno_backend.classes.base import GroupMetric, MetadataType

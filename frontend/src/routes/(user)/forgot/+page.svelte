@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 
 	let username = '';

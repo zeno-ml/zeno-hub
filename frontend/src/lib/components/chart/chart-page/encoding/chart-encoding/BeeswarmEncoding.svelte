@@ -5,7 +5,7 @@
 		type BeeswarmParameters,
 		type Chart
 	} from '$lib/zenoapi';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Checkbox from '@smui/checkbox';
 	import Svelecte from 'svelecte';
 	import { EncodingMap } from '../encodingUtil';
 	import EncodingSection from './EncodingSection.svelte';

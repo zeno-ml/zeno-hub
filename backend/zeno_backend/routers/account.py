@@ -1,4 +1,5 @@
 """FastAPI server endpoints for user and organization related queries."""
+
 from amplitude import BaseEvent
 from fastapi import (
     APIRouter,

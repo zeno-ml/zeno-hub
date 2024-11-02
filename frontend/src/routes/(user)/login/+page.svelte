@@ -2,7 +2,7 @@
 	import { browser } from '$app/environment';
 	import { enhance } from '$app/forms';
 	import Spinner from '$lib/components/general/Spinner.svelte';
-	import Button from '@smui/button/src/Button.svelte';
+	import Button from '@smui/button';
 	import Textfield from '@smui/textfield';
 
 	export let form;

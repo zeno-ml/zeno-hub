@@ -1,4 +1,5 @@
 """Functionality to interact with the database."""
+
 import asyncio
 import os
 from configparser import ConfigParser

@@ -1,4 +1,5 @@
 """Base types used in Zeno's backend."""
+
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict

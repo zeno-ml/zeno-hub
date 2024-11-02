@@ -4,7 +4,7 @@
 	import type { Organization, User, ZenoService } from '$lib/zenoapi';
 	import { mdiClose, mdiCog, mdiLogout, mdiPlus } from '@mdi/js';
 	import { Icon } from '@smui/button';
-	import IconButton from '@smui/icon-button/src/IconButton.svelte';
+	import IconButton from '@smui/icon-button';
 	import { getContext } from 'svelte';
 	import Confirm from '../popups/Confirm.svelte';
 	import NewOrganizationPopup from '../popups/NewOrganizationPopup.svelte';

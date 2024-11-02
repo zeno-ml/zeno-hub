@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import Button from '@smui/button/src/Button.svelte';
-	import Checkbox from '@smui/checkbox/src/Checkbox.svelte';
+	import Button from '@smui/button';
+	import Checkbox from '@smui/checkbox';
 	import Textfield from '@smui/textfield';
 
 	export let form;
