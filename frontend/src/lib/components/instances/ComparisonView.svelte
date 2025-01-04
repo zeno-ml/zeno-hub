@@ -271,10 +271,12 @@
 			{#each table as tableContent (`${tableContent[idColumn]}_${modelAColumn}_${modelBColumn}`)}
 				<tr>
 					<td class="p-3 align-baseline">
-						<p class="mb-2">
-							<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
-							{modelValueAndDiff($model, tableContent)}
-						</p>
+						{#if $comparisonColumn?.name !== 'output'}
+							<p class="mb-2">
+								<span class="text-grey-dark">{$comparisonColumn?.name}:</span>
+								{modelValueAndDiff($model, tableContent)}
+							</p>
+						{/if}
 						<InstanceView
 							view={$project.view}
 							{idColumn}
