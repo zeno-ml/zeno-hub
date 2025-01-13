@@ -20,7 +20,7 @@ pyarrow = "^14.0.2"
 python = "^3.11"
 python-dotenv = "^1.0.1"
 python-multipart = "^0.0.20"
-requests = "^2.28.1"
+requests = "^2.32.3"
 uvicorn = "^0.34.0"
 zeno-sliceline = "^0.0.1"
 
