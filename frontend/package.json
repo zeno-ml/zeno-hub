@@ -67,7 +67,7 @@
 		"@mdi/js": "^7.3.67",
 		"@smui/fab": "^7.0.0-beta.15",
 		"ajv": "^8.12.0",
-		"amazon-cognito-identity-js": "^6.3.7",
+		"amazon-cognito-identity-js": "^6.3.12",
 		"d3-array": "^3.2.4",
 		"d3-interpolate": "^3.0.1",
 		"d3-scale": "^4.0.2",
