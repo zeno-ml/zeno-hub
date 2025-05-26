@@ -13,8 +13,14 @@ With Zeno, you can go from exploring your data and model outputs to creating ric
 
 We recommend you use the [hosted version of Zeno](https://hub.zenoml.com), but you can run Zeno locally with `docker-compose`:
 
-1. [Send us an email](hello@zenoml.com) to get the environment variables to put in `/frontend/.env`
-2. Run `docker-compose up -d`
+1. Ues these environment variables to put in `/frontend/.env`:
+   ```
+   ZENO_USER_POOL_AUTH_REGION = "us-west-1"
+   ZENO_USER_POOL_CLIENT_ID = "7qmm6lkspl49ddc42ughpeuja3"
+   ZENO_USER_POOL_ID = "us-west-1_hCnmZ0NGk"
+   PUBLIC_BACKEND_ENDPOINT = "http://zeno-backend:8000”
+   ```
+3. Run `docker-compose up -d`
 
 ## Development
 
