@@ -220,8 +220,7 @@ async def public_projects(home_request: HomeRequest) -> list[Project]:
     )
     if home_request.search_string:
         projects_query += sql.SQL(
-            "AND (LOWER(p.name) LIKE LOWER(%s) OR "
-            "LOWER(p.description) LIKE LOWER(%s)) "
+            "AND (LOWER(p.name) LIKE LOWER(%s) OR LOWER(p.description) LIKE LOWER(%s)) "
         )
         params += [
             "%" + home_request.search_string + "%",
@@ -283,8 +282,7 @@ async def reports(
     """
     params = [user.id, user.id, user.id, user.id, user.id]
     likes_query = sql.SQL(
-        "SELECT report_id, COUNT(*) as total_likes"
-        " FROM report_like GROUP BY report_id "
+        "SELECT report_id, COUNT(*) as total_likes FROM report_like GROUP BY report_id "
     )
     reports_query = (
         sql.SQL("WITH LikesSummary AS (")
@@ -372,8 +370,7 @@ async def public_reports(home_request: HomeRequest) -> list[Report]:
     )
     if home_request.search_string:
         reports_query += sql.SQL(
-            "AND (LOWER(r.name) LIKE LOWER(%s) OR "
-            "LOWER(r.description) LIKE LOWER(%s)) "
+            "AND (LOWER(r.name) LIKE LOWER(%s) OR LOWER(r.description) LIKE LOWER(%s)) "
         )
         params += [
             "%" + home_request.search_string + "%",
@@ -1379,7 +1376,7 @@ async def report_stats(report_id: int, user_id: int | None = None) -> ReportStat
             )
             num_projects = await cur.fetchall()
             await cur.execute(
-                "SELECT COUNT(*) FROM report_elements " "WHERE report_id = %s;",
+                "SELECT COUNT(*) FROM report_elements WHERE report_id = %s;",
                 [report_id],
             )
             num_elements = await cur.fetchall()
@@ -2680,7 +2677,7 @@ async def system_exists(project_uuid: str, system_name: str) -> bool:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                sql.SQL("SELECT EXISTS(SELECT 1 FROM {} " "WHERE model = %s);").format(
+                sql.SQL("SELECT EXISTS(SELECT 1 FROM {} WHERE model = %s);").format(
                     sql.Identifier(f"{project_uuid}_column_map")
                 ),
                 [system_name],

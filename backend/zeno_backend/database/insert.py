@@ -586,8 +586,7 @@ async def folder(project: str, name: str) -> int | None:
     async with db_pool.connection() as conn:
         async with conn.cursor() as cur:
             await cur.execute(
-                "INSERT INTO folders (name, project_uuid) VALUES (%s,%s) "
-                "RETURNING id;",
+                "INSERT INTO folders (name, project_uuid) VALUES (%s,%s) RETURNING id;",
                 [name, project],
             )
             id = await cur.fetchall()
