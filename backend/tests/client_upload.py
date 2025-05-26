@@ -1,4 +1,5 @@
 """Test the client upload functionality."""
+
 import os
 
 import pandas as pd
